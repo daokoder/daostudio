@@ -1,0 +1,114 @@
+
+<title>Some tips of using Dao Studio</title>
+
+<===>Vertical arranging of the code editor, script console and data browser</===>
+
+The code editor, script console and data browser are splitted
+vertically in the same window. Mouse click on any of them will
+maximize the clicked widget and minimize the others.
+If the user wants to disable this feature,
+the manual splitting button (with up and down arrows near to a hand) 
+in the tool bar must be pressed down.
+
+<===>Automatic word completion in code editor or console:</===>
+
+Inside the code editor or console, whenever the user types
+an identifier, the software will propose upto 3 words that
+matching the typed letters. Then the user can type
+CTRL + J, K, L, to complete the unfinished identifier with the first,
+second and third proposed word respectively.
+Typing the tabular key will complete with the first propsed word.
+
+
+Currently words corresponding to names of classes, functions, 
+global constants and variables can be completed in this way.
+
+
+<===>Browsing command history in console</===>
+
+The previously input scripts in the console can be browsed and retrived
+by using up and down keys.
+
+<===>Multiple line commands in console</===>
+
+In the console, when the return key is pressed, normally, 
+the scripts in the command line will be sent to the console to execute.
+However, if there is an unclosed (not paired) left braces, 
+brackets or squared brackets, the input will be expanded to an extra line
+to allow typing unfinished scripts.
+
+
+So the simplest way to type multiple lines of scripts in the console is to
+type a left brace first, and type a block of scripts, 
+then type a right brace before entring the scripts.
+
+<===>Other usage of the console</===>
+
+<list>
+--Print the value of an expression: <it>(dao) = expression</it>
+--Execute a Dao script: <it>(dao) \\script_file_name.dao </it>
+--Execute a shell command: <it>(dao) \\command </it>
+</list>
+
+<===>Set and unset break points for debugging</===>
+
+Right click on a line number will popup a menu to set or unset a break point.
+Break points set on lines without codes will be ignored.
+The program will enter debugging mode after execution the line with break point.
+Resuming of the program will start with the next line.
+
+<===>Reset execution point during debugging</===>
+
+During debugging, right click on a line number inside the 
+current function being executed will popup a menu with extra option
+to set the execution point at the current line.
+When the execution of the program is resumed, the execution will start
+from the new execution point.
+
+<===>Edit and continue during debugging</===>
+
+Edit&Continue is an advanced feature of Dao Studio,
+which allows the user to modify the sources and then execute it
+without restart the program from the beginning.
+
+
+When a program is run inside Dao Studio in debugging mode,
+the source codes can be modified during the pause by a break point.
+Such modification is limited inside the current function
+where the program is paused.
+
+
+After modification, if the execution point is after the modification positions,
+the execution point will be automatically set to the first modified line.
+The execution point can also be set manually by right click the mouse on
+a line number.
+
+
+When the user click the debugging button to resume the program,
+the modified function will be re-compiled, and the execution
+will be started from the new execution point.
+Some of the values of local variables will be reused whenever possible.
+
+
+<===>Data browsing and modification</===>
+
+The main entry to data browsing is listed as "Data List"
+inside the left panel. Normally only the namespace of the script console
+is listed there, but during program debugging, the executing virtual
+process will also be listed there.
+
+
+If the user clicks on the namespace or process entry, 
+the data object of the clicked entity will be displayed in the data browser,
+the basic information and value of the data object is display in the left side.
+If the data object is of a basic data type, its value can be modified there.
+And if it is an aggregated type such as list, map, function or class instance etc.,
+its components will be displayed as tables in the right side.
+
+
+Then the user can click on one of the data components,
+the clicked one will be added onto the "Data List" in the left panel.
+The "Data List" is actually organized as a stack:
+click on a data component from the data browser will push the data component
+onto the stack;
+and click on one item inside the stack will erase all the items above it.

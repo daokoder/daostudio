@@ -1,0 +1,1085 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+
+<h2>Quick Guide to Dao</h2>
+<div align=center><p><b>Limin Fu (phoolimin<img src="/images/at.png"/>gmail<img src="/images/dot.png"/>com)</b></p></div>
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#1">Basics</a></li>
+<li style="margin-top: 5px"><a href="#2">Logic&nbsp;and&nbsp;Loop&nbsp;Controls</a></li>
+<li style="margin-top: 5px"><a href="#3">Input&nbsp;&&nbsp;Output</a></li>
+<li style="margin-top: 5px"><a href="#4">Routine&nbsp;or&nbsp;Function</a></li>
+<li style="margin-top: 5px"><a href="#5">Class&nbsp;and&nbsp;Object-Oriented&nbsp;Programming</a></li>
+<li style="margin-top: 5px"><a href="#6">Module&nbsp;Loading</a></li>
+<li style="margin-top: 5px"><a href="#7">Programming&nbsp;Tips</a></li>
+</ol></td></tr></table> <br/><br/>
+(For version 1.1)<br/><br/>
+This document is licensed under
+<a href="http://www.gnu.org/copyleft/fdl.html">GNU Free Documentation License</a> .<br/><br/>
+<span class=text_bold> Dao</span>  is a simple yet powerful object-oriented programming language featured by, 
+optional typing, BNF-like macro system, regular expression, 
+multidimensional numeric array, asynchronous function call for concurrent programming etc.
+Supporting for multi-threaded programming is also implemented as an integrate part of Dao.
+Dao also provides some built-in methods for functional style programming.
+Network programming and concurrent programming by message passing interface
+are supported as standard library of Dao.
+Moreover, Dao can be easily extended with C/C++, through a simple and transparent interface;
+and easily embedded into other C/C++ programs as well.<br/>
+<table class="topsection"><tr><td><a name="1"><H3>1  Basics</H3>
+</td><td align="right"><a href="&section=1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#1.1">How&nbsp;to&nbsp;run</a></li>
+<li style="margin-top: 5px"><a href="#1.2">Hello&nbsp;World</a></li>
+<li style="margin-top: 5px"><a href="#1.3">Basic&nbsp;Data&nbsp;Types</a></li>
+<li style="margin-top: 5px"><a href="#1.4">Data&nbsp;Storage&nbsp;Types</a></li>
+<li style="margin-top: 5px"><a href="#1.5">Data&nbsp;Declaration</a></li>
+<li style="margin-top: 5px"><a href="#1.6">Subindexing</a></li>
+<li style="margin-top: 5px"><a href="#1.7">Operators</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="1.1"><H4>1.1  How to run</H4>
+</td><td align="right"><a href="&section=1.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+From command line, type the name of the executable of Dao interpreter followed by
+a Dao script file:<br/><br/>
+<span class=text_bold> dao [options] script_source.dao</span> <br/><br/>
+Use <span class=text_italic> dao -h</span>  to list the available options.<br/><br/>
+<table><tr><td><a name="1.2"><H4>1.2  Hello World</H4>
+</td><td align="right"><a href="&section=1.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Since <span class=text_italic> helloworld</span>  example is the first example one would see 
+in almost all tutorials for programming languages, here is the Dao version, 
+just to introduce a few basic staffs in Dao.
+<div class="hlcode">
+<span class=Comment># This is a simple demo:
+<br /></span>io.write<span class=SpecSymbol>(</span>&thinsp; <span class=String>"Hello World!"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Comment>#{
+<br />Here are multi-lines comments.
+<br />Here are multi-lines comments.
+<br />#}</span></div>
+ 
+As commented in the example, <span class=text_bold> #</span>  and <span class=text_bold> #{  #}</span>  can be used to comment single line
+or multiple lines respectively. In many cases, semicolon can be omitted in the end of a statement,
+as long as there is no ambiguity; two exceptions for this are the <span class=text_bold> load,return</span>  statements.
+
+<table class="sdmltable">
+<tr class=docTableRow><td class=docTableCell><span class=text_bold> #</span></td><td class=docTableCell> single line comments</td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_bold> #{  #}</span></td><td class=docTableCell> multiple line comments</td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_bold> ;</span></td><td class=docTableCell> statement ending</td></tr>
+</table>
+ <br/><br/>
+In the above example, <span class=text_bold> io</span>  (with alias <span class=text_bold> stdio</span> ) is the basic IO library in Dao, 
+<span class=text_bold> io.write()</span>  writes to the standard output device (normally the computer screen)
+the resulting values of the expressions in the parameter list.
+Since Dao 1.1, some basic math functions and functional methods have been added 
+as built-in functions. All other standard functions or methods are available as part of
+certain built-in library or as methods of certain type. <br/><br/>
+The available built-in libraries in Dao include:
+<span class=text_bold> io</span> , <span class=text_bold> std</span>  (with alias <span class=text_bold> stdlib</span> ), <span class=text_bold> math</span> , <span class=text_bold> reflect</span> , <span class=text_bold> coroutine</span> , 
+<span class=text_bold> network</span> , <span class=text_bold> mpi</span>  (message passing interface) 
+and <span class=text_bold> mtlib</span> (multi-threading library) etc.
+The available methods for each data type and library 
+can be listed by <span class=text_bold> stdlib.listmeth( obj )</span> .
+See also <span class=text_italic> Dao Library Reference</span> .<br/>
+<table><tr><td><a name="1.3"><H4>1.3  Basic Data Types</H4>
+</td><td align="right"><a href="&section=1.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Dao language supports the following data type: integer, float, double, 
+string, list, associative array (map, or dictionary), class object, complex number
+and numeric array etc. They can be created by assignment, enumeration
+or function calls. <br/>
+
+<table class="sdmltable">
+<tr class=docTableRow><td class=docTableCell><span class=text_bold> int</span></td><td class=docTableCell> integer</td><td class=docTableCell> 1234</td></tr>
+<tr><td class=docTableCell></td><td class=docTableCell></td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell></td><td class=docTableCell> hex</td><td class=docTableCell> 0xff88</td></tr>
+<tr><td class=docTableCell></td><td class=docTableCell></td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_bold> float</span></td><td class=docTableCell> decimal</td><td class=docTableCell> 12.34</td></tr>
+<tr class=docTableRow><td class=docTableCell></td><td class=docTableCell> scientific</td><td class=docTableCell> 1e-10 (lower case e)</td></tr>
+<tr><td class=docTableCell></td><td class=docTableCell></td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_bold> double</span></td><td class=docTableCell> decimal</td><td class=docTableCell> 12.34D</td></tr>
+<tr class=docTableRow><td class=docTableCell></td><td class=docTableCell> scientific</td><td class=docTableCell> 1E-10 (upper case e)</td></tr>
+<tr><td class=docTableCell></td><td class=docTableCell></td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_bold> complex</span></td><td class=docTableCell> $ as imaginary part</td><td class=docTableCell> 1+3$</td></tr>
+<tr><td class=docTableCell></td><td class=docTableCell></td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_bold> long</span></td><td class=docTableCell> big integer</td><td class=docTableCell> 1234L</td></tr>
+<tr><td class=docTableCell></td><td class=docTableCell></td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_bold> string</span></td><td class=docTableCell> multi-bytes string (MBS)</td><td class=docTableCell> 'mbs'</td></tr>
+<tr class=docTableRow><td class=docTableCell></td><td class=docTableCell> wide character string (WCS)</td><td class=docTableCell> "wcs"</td></tr>
+<tr><td class=docTableCell></td><td class=docTableCell></td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_bold> list</span></td><td class=docTableCell> enumeration</td><td class=docTableCell> { 1, 2, 3 }</td></tr>
+<tr class=docTableRow><td class=docTableCell></td><td class=docTableCell> range</td><td class=docTableCell> { init : step : size }</td></tr>
+<tr><td class=docTableCell></td><td class=docTableCell></td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_bold> map</span></td><td class=docTableCell> enumeration</td><td class=docTableCell> { "A"=&gt;1, "B"=&gt;2, "C"=&gt;3 }</td></tr>
+<tr><td class=docTableCell></td><td class=docTableCell></td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_bold> array (numeric array)</span></td><td class=docTableCell> vector enumeration</td><td class=docTableCell> [ 1, 2, 3 ]</td></tr>
+<tr class=docTableRow><td class=docTableCell></td><td class=docTableCell> range</td><td class=docTableCell> [ init : step : size ]</td></tr>
+<tr class=docTableRow><td class=docTableCell></td><td class=docTableCell> matrix enumeration</td><td class=docTableCell> [ 1, 2, 3; 4, 5, 6 ]</td></tr>
+<tr class=docTableRow><td class=docTableCell></td><td class=docTableCell> with complex elements</td><td class=docTableCell> [ 1, 2$, 3 ]</td></tr>
+<tr><td class=docTableCell></td><td class=docTableCell></td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_bold> tuple</span></td><td class=docTableCell> tuple enumeration</td><td class=docTableCell> ( 1, 2, "abc" )</td></tr>
+<tr class=docTableRow><td class=docTableCell></td><td class=docTableCell> enumeration with field name</td><td class=docTableCell> ( x =&gt; 1.5, y =&gt; 2.0 )</td></tr>
+</table>
+ <br/>
+Note 1: in numeric array creation by range,
+the <span class=text_italic> init</span>  value can be a numeric array, in this case,
+a multi-dimensional numeric array will be created such that,
+the first "row" is a slice that equals to <span class=text_italic> init</span> ,
+and the second "row" is equal to <span class=text_italic> init + step</span> , and so on,
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>0</span>&thinsp; :&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>]</span>&thinsp; :&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>]</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>;<br/><br/>a&thinsp; =&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>0</span>&thinsp; :&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>]</span>&thinsp; :&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>1</span>&thinsp; :&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>]</span>&thinsp; :&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>]</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+Note 2: tuple enumeration has to contain at least two items when enumerating 
+without field names, since enumeration of
+zero or one item will be confused with the usual grouping of arithmetic expressions.
+However, they can be created by casting from lists and associative arrays:
+<div class="hlcode">
+ls&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=String>"abc"</span>&thinsp; <span class=SpecSymbol>}</span>;<br/>tp&thinsp; =&thinsp; <span class=SpecSymbol>(</span><span class=DataType>tuple</span>&lt;<span class=DataType>string</span>&gt;<span class=SpecSymbol>)</span>&thinsp; ls;</div>
+ <br/>
+For convenience, it is possible to use keyword <span class=text_bold> typedef</span>  to define
+an alias for a type:
+<div class="hlcode">
+<span class=CodeStruct>typedef</span>&thinsp; <span class=DataType>tuple</span>&lt;x:<span class=DataType>float</span>,y:<span class=DataType>float</span>,z:<span class=DataType>float</span>&gt;&thinsp; Point3D;<br/>pt&thinsp; :&thinsp; Point3D&thinsp; =&thinsp; <span class=SpecSymbol>(</span>&thinsp; <span class=Number>1.0</span>,&thinsp; <span class=Number>2.0</span>,&thinsp; <span class=Number>3.0</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; pt.x&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table><tr><td><a name="1.3.1"><H6>1.3.1  MBS vs WCS</H6>
+</td><td align="right"><a href="&section=1.3.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+String quoted with single quotation symbol is stored as
+Multi-Bytes String (MBS) in UTF-8, which is more efficient to represent
+ASCII and latin letters; while string quoted with
+double quotation symbol is stored as Wide Character String (WCS) in Unicode,
+which is more efficient to represent other types of symbols,
+such as CJK (Chinese, Japanese and Korean) symbols.
+These two types of strings can be mixed together, one can be converted to
+the other automatically when necessary. But it's better to use one
+of them consistently.<br/>
+<table><tr><td><a name="1.4"><H4>1.4  Data Storage Types</H4>
+</td><td align="right"><a href="&section=1.4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+Dao data with different scopes are stored differently, there are
+local/global/class constants and variables, and class instance variables
+which are specified by the following keywords.
+<ol>
+<li><span class=text_bold> const</span> : used to declare constant data, which could be local,
+or global in a namespace or class, depending on the context it is used.
+If it is used in a class body, the declared data will be a constant member of the class.
+Otherwise, if it is used outside a function/routine, and is not nested inside
+any lexical scope, the data will be a global constant.
+In other cases, it will declare a local constatn;</li>
+
+<li><span class=text_bold> global</span> : used to declare global variable;</li>
+
+<li><span class=text_bold> var</span> : used to declare local variable,
+or instance variable if used inside class body;</li>
+
+<li><span class=text_bold> static</span> : used to declare static variable, similar to that of C++.</li>
+
+</ol>
+ <br/>
+<table><tr><td><a name="1.5"><H4>1.5  Data Declaration</H4>
+</td><td align="right"><a href="&section=1.5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class="sdmltable">
+<tr><th> Example</th><th> Meaning</th></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_italic> variable = expression</span></td><td class=docTableCell> declaration by assignment; type can be fixed if it is inferable.</td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_italic> variable : type</span></td><td class=docTableCell> variable with fixed type.</td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_italic> variable : type = expression</span></td><td class=docTableCell> declaration by assignment with fixed type.</td></tr>
+</table>
+ 
+For <span class=text_bold> =</span> , if it is used to declare a constant, the expression in the right side
+of the assignment must be evaluable at compiling time. If <span class=text_bold> =</span>  is used in class constructor
+with prefix <span class=text_bold> var</span>  and its right side is constant, it will declare the class instance variable
+with a fixed type and default value.<br/>
+<span class=text_bold> type</span>  can be one of the type names in the previous table, it can also be
+a class name or C data type name. For <span class=text_italic> list,map,array</span> , the type can also be composite,
+e.g., <span class=text_italic> list&lt;int&gt;, map&lt;string,list&lt;float&gt; &gt;, array&lt;double&gt;</span>  etc.<br/>
+<table><tr><td><a name="1.6"><H4>1.6  Subindexing</H4>
+</td><td align="right"><a href="&section=1.6"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+Some data types such as string and array support accessing their elements by sub-indexing.
+
+<table class="sdmltable">
+<tr><th> Form</th><th> Meaning</th><th> Supported Types</th><th> Notes</th></tr>
+<tr class=docTableRow><td class=docTableCell> data[i]</td><td class=docTableCell> single element</td><td class=docTableCell> string, list, hash, numeric array</td><td class=docTableCell> multidimensional numeric array is treated as a vector!</td></tr>
+<tr class=docTableRow><td class=docTableCell> data[from:to]</td><td class=docTableCell> elements within index/key range</td><td class=docTableCell> string, list, hash, numeric array</td><td class=docTableCell><span class=text_italic> from</span>  and/or <span class=text_italic> to</span>  can be omitted; by default <span class=text_italic> from</span>  is the first index/key, <span class=text_italic> to</span>  is the last</td></tr>
+<tr class=docTableRow><td class=docTableCell> data[list]</td><td class=docTableCell> elements specified by indices</td><td class=docTableCell> string, list, numeric array</td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell> data[numarray]</td><td class=docTableCell> elements specified by indices</td><td class=docTableCell> numeric array</td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell> data[ d1, d2, ...]</td><td class=docTableCell> multiple dimensional index</td><td class=docTableCell> numeric array</td><td class=docTableCell> index for each dimension can be one of the first three forms</td></tr>
+</table>
+ <br/>
+<table><tr><td><a name="1.7"><H4>1.7  Operators</H4>
+</td><td align="right"><a href="&section=1.7"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Dao Language supports a set of abundant operators to facilitate
+the writing of more expressive scripts. Many of these operators
+can be used for different data types.<br/>
+<table><tr><td><a name="1.7.1"><H6>1.7.1  Arithmetic:</H6>
+</td><td align="right"><a href="&section=1.7.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+
+<table class="sdmltable">
+<tr><th> Operator</th><th> Name</th><th> Supported Types</th></tr>
+<tr class=docTableRow><td class=docTableCell> +</td><td class=docTableCell> addition</td><td class=docTableCell> number, string, complex, numeric array</td></tr>
+<tr class=docTableRow><td class=docTableCell> -</td><td class=docTableCell> subtraction</td><td class=docTableCell> number, complex, numeric array</td></tr>
+<tr class=docTableRow><td class=docTableCell> *</td><td class=docTableCell> multiplication</td><td class=docTableCell> number, complex, numeric array</td></tr>
+<tr class=docTableRow><td class=docTableCell> /</td><td class=docTableCell> division</td><td class=docTableCell> number, complex, numeric array</td></tr>
+<tr class=docTableRow><td class=docTableCell> %</td><td class=docTableCell> mod</td><td class=docTableCell> number, numeric array</td></tr>
+<tr class=docTableRow><td class=docTableCell> **</td><td class=docTableCell> pow</td><td class=docTableCell> number, complex</td></tr>
+<tr class=docTableRow><td class=docTableCell> ++</td><td class=docTableCell> self increment</td><td class=docTableCell> number, complex, numeric array</td></tr>
+<tr class=docTableRow><td class=docTableCell> - -</td><td class=docTableCell> self decrement</td><td class=docTableCell> number, complex, numeric array</td></tr>
+<tr class=docTableRow><td class=docTableCell> -</td><td class=docTableCell> unary minus</td><td class=docTableCell> number, complex, numeric array</td></tr>
+<tr class=docTableRow><td class=docTableCell> +=</td><td class=docTableCell> addition assignment</td><td class=docTableCell> number, string, complex, numeric array</td></tr>
+<tr class=docTableRow><td class=docTableCell> -=</td><td class=docTableCell> subtracting assignment</td><td class=docTableCell> number, complex, numeric array</td></tr>
+<tr class=docTableRow><td class=docTableCell> *=</td><td class=docTableCell> multiplication assignment</td><td class=docTableCell> number, complex, numeric array</td></tr>
+<tr class=docTableRow><td class=docTableCell> /=</td><td class=docTableCell> divide assignment (XXX, name)</td><td class=docTableCell> number, numeric array</td></tr>
+<tr class=docTableRow><td class=docTableCell> %=</td><td class=docTableCell> mod assignment (XXX, name)</td><td class=docTableCell> number, numeric array</td></tr>
+</table>
+ 
+<span class=text_underline> Note1: for numeric array, the binary operators in the table perform pairwise element operation;
+unary operators perform on each element.</span> <br/><br/>
+<span class=text_underline> Note2: for self in/decrement operators, there is no difference between prefix and postfix.
+They yield the value after the increment or decrement.</span> <br/><br/>
+<table><tr><td><a name="1.7.2"><H6>1.7.2  Numeric and String Comparison:</H6>
+</td><td align="right"><a href="&section=1.7.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class="sdmltable">
+<tr><th> Operator</th><th> Name</th><th> Supported Types</th></tr>
+<tr class=docTableRow><td class=docTableCell> ==</td><td class=docTableCell> equal</td><td class=docTableCell> number, string, complex</td></tr>
+<tr class=docTableRow><td class=docTableCell> !=</td><td class=docTableCell> not equal</td><td class=docTableCell> number, string, complex</td></tr>
+<tr class=docTableRow><td class=docTableCell> &lt;</td><td class=docTableCell> less than</td><td class=docTableCell> number, string</td></tr>
+<tr class=docTableRow><td class=docTableCell> &gt;</td><td class=docTableCell> greater than</td><td class=docTableCell> number, string</td></tr>
+<tr class=docTableRow><td class=docTableCell> &lt;=</td><td class=docTableCell> less than or equal</td><td class=docTableCell> number, string</td></tr>
+<tr class=docTableRow><td class=docTableCell> &gt;=</td><td class=docTableCell> greater than or equal</td><td class=docTableCell> number, string</td></tr>
+</table>
+ <br/>
+<table><tr><td><a name="1.7.3"><H6>1.7.3  Boolean Logic:</H6>
+</td><td align="right"><a href="&section=1.7.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class="sdmltable">
+<tr><th> Operator</th><th> Name</th><th> Supported Types</th></tr>
+<tr class=docTableRow><td class=docTableCell> &&</td><td class=docTableCell> and</td><td class=docTableCell> number</td></tr>
+<tr class=docTableRow><td class=docTableCell> ||</td><td class=docTableCell> or</td><td class=docTableCell> number</td></tr>
+<tr class=docTableRow><td class=docTableCell> !</td><td class=docTableCell> not</td><td class=docTableCell> number</td></tr>
+</table>
+ 
+Note, to make code more readable, <span class=text_italic> and</span> , <span class=text_italic> or</span>  and <span class=text_italic> not</span> 
+are also supported as equivalent operators.
+And the <span class=text_italic> and</span>  and <span class=text_italic> or</span>  operator behave in the same way as the Lua
+<span class=text_italic> and</span>  <span class=text_italic> or</span>  operators,
+namely, the last evaluated operand is returned as the result.
+This means, when the first operand can determine the result,
+return the first operand, otherwise return the second.
+When the operands have values of 0 or 1, this behaviour is exactly
+the same as normal boolean logic. The following lists some examples
+for other cases,
+<div class="hlcode">
+<span class=Number>10</span>&thinsp; &&&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>0</span><br/><span class=Number>0</span>&thinsp; &&&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>0</span><br/><span class=Number>10</span>&thinsp; &&&thinsp; <span class=Number>20</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>20</span><br/><span class=Number>20</span>&thinsp; &&&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>10</span><br/><br/><span class=Number>10</span>&thinsp; ||&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>10</span><br/>&thinsp; <span class=Number>0</span>&thinsp; ||&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>10</span><br/><span class=Number>10</span>&thinsp; ||&thinsp; <span class=Number>20</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>10</span><br/><span class=Number>20</span>&thinsp; ||&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>20</span></div>
+ 
+Properly exploiting the behaviour of the <span class=text_italic> and</span>  <span class=text_italic> or</span>  operators 
+can simplify coding for some cases.<br/>
+<table><tr><td><a name="1.7.4"><H6>1.7.4  Type Operator</H6>
+</td><td align="right"><a href="&section=1.7.4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+
+<table class="sdmltable">
+<tr><th> Operator</th><th> Name</th><th> Usage</th></tr>
+<tr class=docTableRow><td class=docTableCell> ?=</td><td class=docTableCell> type equal</td><td class=docTableCell> value1 ?= value2</td></tr>
+<tr class=docTableRow><td class=docTableCell> ?&lt;</td><td class=docTableCell> is type of</td><td class=docTableCell> value ?&lt; type</td></tr>
+</table>
+ <br/>
+<table><tr><td><a name="1.7.5"><H6>1.7.5  Assertion Operator</H6>
+</td><td align="right"><a href="&section=1.7.5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Operator <span class=text_bold> ??</span>  can be used to assert if the last
+operation is executed successfully,
+and return 1 on success, and 0 otherwise.
+In the case that the last operation can produce a value,
+this operator can also be used to specify an alternative 
+value if that operation failed.<br/>
+<div class="hlcode">
+a&thinsp; =&thinsp; alist<span class=SpecSymbol>[</span>i<span class=SpecSymbol>]</span>&thinsp; ??&thinsp; &thinsp; &thinsp; <span class=Comment># check if item accessing by index is successful;
+<br /></span>b&thinsp; =&thinsp; amap<span class=SpecSymbol>[</span><span class=Method>key</span><span class=SpecSymbol>]</span>&thinsp; ??&thinsp; &thinsp; <span class=Comment># check if a map has a particular key;
+<br /></span>val&thinsp; =&thinsp; amap<span class=SpecSymbol>[</span><span class=Method>key</span><span class=SpecSymbol>]</span>&thinsp; ??&thinsp; another&thinsp; &thinsp; <span class=Comment># if amap has the key, assign its value, otherwise assign another;</span></div>
+ <br/>
+<table><tr><td><a name="1.7.6"><H6>1.7.6  Multiple Assignment:</H6>
+</td><td align="right"><a href="&section=1.7.6"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+<span class=SpecSymbol>(</span>&thinsp; <span class=Number>C</span>,&thinsp; <span class=Number>A</span>,&thinsp; <span class=Number>B</span>,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; =&thinsp; <span class=SpecSymbol>(</span>&thinsp; <span class=Number>A</span>,&thinsp; <span class=Number>B</span>,&thinsp; <span class=Number>C</span>,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>(</span>&thinsp; <span class=Number>A</span>,&thinsp; <span class=Number>B</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; =&thinsp; func<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;</div>
+ 
+the expression in the right side should yield a list or tuple,
+and each of the elements in the tuple/list is assigned accordingly to
+each of the variables in the left side.
+Extra elements are ignored.<br/>
+<table><tr><td><a name="1.7.7"><H6>1.7.7  Other Operators</H6>
+</td><td align="right"><a href="&section=1.7.7"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class="sdmltable">
+<tr class=docTableRow><td class=docTableCell> |</td><td class=docTableCell> bits or</td></tr>
+<tr class=docTableRow><td class=docTableCell> &</td><td class=docTableCell> bits and</td></tr>
+<tr class=docTableRow><td class=docTableCell> ^</td><td class=docTableCell> bits xor</td></tr>
+<tr class=docTableRow><td class=docTableCell> ~</td><td class=docTableCell> flip bits, unary</td></tr>
+<tr class=docTableRow><td class=docTableCell> &=</td><td class=docTableCell> bit and assignment</td></tr>
+<tr class=docTableRow><td class=docTableCell> |=</td><td class=docTableCell> bit or assignment</td></tr>
+</table>
+ <br/>
+<table class="topsection"><tr><td><a name="2"><H3>2  Logic and Loop Controls</H3>
+</td><td align="right"><a href="&section=2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#2.1">If&nbsp;Else</a></li>
+<li style="margin-top: 5px"><a href="#2.2">While</a></li>
+<li style="margin-top: 5px"><a href="#2.3">For</a></li>
+<li style="margin-top: 5px"><a href="#2.4">Do-Until</a></li>
+<li style="margin-top: 5px"><a href="#2.5">Do-While</a></li>
+<li style="margin-top: 5px"><a href="#2.6">Switch-Case</a></li>
+<li style="margin-top: 5px"><a href="#2.7">Other&nbsp;Controls</a></li>
+</ol></td></tr></table> <br/>
+To accomplish a task, a program often need to conditionally and/or repeatedly 
+execute a block of codes according to whether a condition is fullfilled or not. 
+This can be achieved by using logic and loop control statements.
+Currently <span class=text_italic> if-else</span> , <span class=text_italic> while</span> , <span class=text_italic> for</span> , <span class=text_italic> do-until</span> ,
+<span class=text_italic> switch-case</span> , <span class=text_italic> break</span>  and <span class=text_italic> skip</span>  etc. are supported.<br/>
+<table><tr><td><a name="2.1"><H4>2.1  If Else</H4>
+</td><td align="right"><a href="&section=2.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+If a condition is true, execute a block of codes:
+<div class="hlcode">
+<span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; expr1&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; block1;<br/><span class=SpecSymbol>}</span><span class=StmtKey>elif</span><span class=SpecSymbol>(</span>&thinsp; expr2&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; block2;<br/><span class=SpecSymbol>}</span><span class=StmtKey>else</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; block3;<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+If <span class=text_italic> expr1</span>  is true, <span class=text_italic> block1</span>  is executed;
+otherwise, if <span class=text_italic> expr2</span>  is true, <span class=text_italic> block2</span>  is executed;
+otherwise, <span class=text_italic> block3</span>  is executed; zero or more <span class=text_bold> elseif</span> 
+and zero or one <span class=text_bold> else</span>  statement can be used.<br/>
+<div class="hlcode">
+<span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>2</span>&thinsp; &gt;&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; io.writeln<span class=SpecSymbol>(</span><span class=String>"2 is larger than 1."</span><span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table><tr><td><a name="2.2"><H4>2.2  While</H4>
+</td><td align="right"><a href="&section=2.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+When a condition is true, <span class=text_bold> repeatedly</span>  execute a block of codes:
+<div class="hlcode">
+<span class=StmtKey>while</span><span class=SpecSymbol>(</span>&thinsp; expr&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; block;<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+If <span class=text_italic> expr</span>  is true, <span class=text_italic> block</span>  is executed and repeated until <span class=text_italic> expr</span>  becomes false,
+namely, while <span class=text_italic> expr</span>  is true, execute <span class=text_italic> block</span> .<br/>
+<div class="hlcode">
+i&thinsp; =&thinsp; <span class=Number>0</span>;<br/><span class=StmtKey>while</span><span class=SpecSymbol>(</span>&thinsp; i&thinsp; &lt;&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; i&thinsp; <span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; &thinsp; i&thinsp; ++;<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+<table><tr><td><a name="2.3"><H4>2.3  For</H4>
+</td><td align="right"><a href="&section=2.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Dao supports different styles of for-looping, the most useful one is probably the following,
+<div class="hlcode">
+<span class=StmtKey>for</span><span class=SpecSymbol>(</span>&thinsp; var&thinsp; =&thinsp; init_value&thinsp; :&thinsp; step_value&thinsp; :&thinsp; max_value&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; block;<br/><span class=SpecSymbol>}</span></div>
+ 
+The looping will be started with <span class=text_italic> var = init_value</span> ,
+then after each cycle, <span class=text_italic> var</span>  is increased by <span class=text_italic> step_value</span> ,
+the looping will stop when the value of <span class=text_italic> var</span>  exceed the <span class=text_italic> max_value</span> .
+The <span class=text_italic> step_value</span>  can be omit, in this case, value 1 is taken as the step.
+Please note, the initial, step and maximum values are always evaluated before the
+looping.<br/><br/>
+C/C++ style <span class=text_bold> for</span>  looping is supported by Dao:
+<div class="hlcode">
+<span class=StmtKey>for</span><span class=SpecSymbol>(</span>&thinsp; init;&thinsp; condition;&thinsp; step&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; block;<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+The execution sequence of <span class=text_bold> for</span>  statement is the following:<br/>
+<ol>
+<li> execute initial expression <span class=text_italic> init</span> , and goto 3;</li>
+
+<li> execute <span class=text_italic> step</span> ;</li>
+
+<li> evaluate the condition expression <span class=text_italic> condition</span> ;</li>
+
+<li> check the value of <span class=text_italic> condition</span> : if true, goto 5; otherwise, goto 6;</li>
+
+<li> execute <span class=text_italic> block</span> , and goto 2;</li>
+
+<li> stop looping; and start to execute the statements after the loop body.</li>
+
+</ol>
+ <br/>
+Usually, the C/C++ style <span class=text_bold> for</span>  loop is equivalent to,
+<div class="hlcode">
+init;<br/><span class=StmtKey>while</span><span class=SpecSymbol>(</span>&thinsp; condition&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; block;<br/>&thinsp; &thinsp; &thinsp; step;<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+Dao also supports Python style <span class=text_italic> for-in-do</span>  loop,
+<div class="hlcode">
+<span class=StmtKey>for</span><span class=SpecSymbol>(</span>&thinsp; item&thinsp; <span class=StmtKey>in</span>&thinsp; <span class=DataType>list</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; block;<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+Multiple <span class=text_italic> in</span>  can appear in one loop, and the items of the same
+indices from multiple lists are taken in each cycle. These lists should
+contain the same number of items, otherwise an exception will be arose,
+as shown in the following example.
+<div class="hlcode">
+<span class=StmtKey>for</span><span class=SpecSymbol>(</span>&thinsp; item1&thinsp; <span class=StmtKey>in</span>&thinsp; list1;&thinsp; item2&thinsp; <span class=StmtKey>in</span>&thinsp; list2;&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; block;<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+<span class=text_italic> for-in</span>  can also be used for maps,
+<div class="hlcode">
+<span class=StmtKey>for</span><span class=SpecSymbol>(</span>&thinsp; item&thinsp; <span class=StmtKey>in</span>&thinsp; a_map&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; block;<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+Examples,
+<div class="hlcode">
+<span class=StmtKey>for</span><span class=SpecSymbol>(</span>&thinsp; i<span class=SpecSymbol>:=</span><span class=Number>0</span>;&thinsp; i&lt;<span class=Number>3</span>;&thinsp; i++&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; i&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span><br/><br/>hash&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=String>"b"</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>11</span>,&thinsp; <span class=String>"a"</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>22</span>,&thinsp; <span class=String>"e"</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>33</span>,&thinsp; <span class=String>"c"</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>44</span>&thinsp; <span class=SpecSymbol>}</span>;<br/><span class=StmtKey>for</span><span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=StmtKey>in</span>&thinsp; hash.<span class=Method>key</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;&thinsp; b&thinsp; <span class=StmtKey>in</span>&thinsp; hash.<span class=Method>value</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;&thinsp; c&thinsp; <span class=StmtKey>in</span>&thinsp; <span class=SpecSymbol>{</span><span class=Number>1</span>&thinsp; :&thinsp; <span class=Number>1</span>&thinsp; :&thinsp; hash.<span class=Method>size</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>-<span class=Number>1</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; <span class=Comment>#if a == "a" break
+<br /></span>&thinsp; &thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b,&thinsp; c&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span></div>
+ 
+This example raises an exception, because the last list <span class=text_italic> c</span>  contains
+one less element.<br/><br/>
+Note: if a single string is used in the condition expression in <span class=text_bold> if,while,for</span>  statements,
+it returns true, if the string has length larger than zero, otherwise, returns false.<br/>
+<table><tr><td><a name="2.4"><H4>2.4  Do-Until</H4>
+</td><td align="right"><a href="&section=2.4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<span class=text_italic> do-until</span>  can be used to execute a code <span class=text_italic> block</span>  until
+a <span class=text_italic> condition</span>  is fullfilled,
+<div class="hlcode">
+<span class=StmtKey>do</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; block;<br/><span class=SpecSymbol>}</span>&thinsp; until&thinsp; <span class=SpecSymbol>(</span>&thinsp; condition&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=Number>10</span>;<br/><span class=StmtKey>do</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; c&thinsp; =&thinsp; <span class=Number>1</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"here"</span>,&thinsp; a&thinsp; --&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span>until<span class=SpecSymbol>(</span>&thinsp; a&thinsp; ==&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+<table><tr><td><a name="2.5"><H4>2.5  Do-While</H4>
+</td><td align="right"><a href="&section=2.5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+<span class=StmtKey>do</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; block;<br/><span class=SpecSymbol>}</span>&thinsp; <span class=StmtKey>while</span>&thinsp; <span class=SpecSymbol>(</span>&thinsp; condition&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Execute <span class=text_italic> block</span> , and then repeat executing it when the <span class=text_italic> condition</span>  is true.<br/>
+<table><tr><td><a name="2.6"><H4>2.6  Switch-Case</H4>
+</td><td align="right"><a href="&section=2.6"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+Switch-case control provides a convenient way to branch the code and choose a block of code to
+execute based on the value of a object.
+<div class="hlcode">
+<span class=StmtKey>switch</span><span class=SpecSymbol>(</span>&thinsp; <span class=Method>value</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; <span class=StmtKey>case</span>&thinsp; <span class=Number>C_1</span>&thinsp; :&thinsp; block_1<br/>&thinsp; &thinsp; &thinsp; <span class=StmtKey>case</span>&thinsp; <span class=Number>C_2</span>&thinsp; :&thinsp; block_2<br/>&thinsp; &thinsp; &thinsp; <span class=StmtKey>case</span>&thinsp; <span class=Number>C_3</span>&thinsp; :&thinsp; block_3<br/>&thinsp; &thinsp; &thinsp; <span class=SpecSymbol>...</span><br/>&thinsp; &thinsp; &thinsp; <span class=StmtKey>default</span>:&thinsp; block0<br/><span class=SpecSymbol>}</span></div>
+ 
+If the <span class=text_italic> value</span>  equals to <span class=text_italic> C_i</span> , <span class=text_italic> block_i</span>  will be executed. Here <span class=text_italic> C_i</span>  must be a constant,
+but they can be of different types, that means, you can mix numbers and strings as case values.
+Unlike in C/C++, no <span class=text_bold> break</span>  statement is required to get out of the <span class=text_bold> switch</span> .<br/><br/>
+If you want to execute the same block of codes for different case values, you just need to
+organize them together in the following way:
+<div class="hlcode">
+<span class=StmtKey>switch</span><span class=SpecSymbol>(</span>&thinsp; <span class=Method>value</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; <span class=StmtKey>case</span>&thinsp; <span class=Number>C1</span>,&thinsp; <span class=Number>C2</span>,&thinsp; <span class=Number>C3</span>&thinsp; :<br/>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; block3<br/>&thinsp; &thinsp; &thinsp; <span class=SpecSymbol>...</span><br/>&thinsp; &thinsp; &thinsp; <span class=StmtKey>default</span>:&thinsp; block0<br/><span class=SpecSymbol>}</span></div>
+ 
+Namely, Dao allows one case entry to have multiple values.
+In this way, <span class=text_italic> block3</span>  will be executed for case values <span class=text_italic> C1,C2</span>  and <span class=text_italic> C3</span> .
+As a simple example,
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=String>"a"</span>;<br/><span class=StmtKey>switch</span><span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; <span class=StmtKey>case</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=String>"a"</span>&thinsp; :&thinsp; io.write<span class=SpecSymbol>(</span><span class=String>"case 1 or a"</span><span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; <span class=StmtKey>default</span>&thinsp; :&thinsp; &thinsp; io.write<span class=SpecSymbol>(</span><span class=String>"case default"</span><span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span></div>
+ <br/><br/>
+Dao also allows the use of a value range represented as <span class=text_italic> start ... end</span>  as case entry,
+so that the corresponding code block is executed if the value in switch
+falls inside the range. Please note that, the range includes the boundary values,
+and if the ranges of different case entries overlaps, the entry with the lowest <span class=text_italic> start</span> 
+value is used when the switch value belongs to mulitple overlapping ranges.
+<div class="hlcode">
+<span class=StmtKey>switch</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/><span class=StmtKey>case</span>&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=Number>5</span>&thinsp; :&thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'case 1-5'</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=StmtKey>case</span>&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=Number>10</span>&thinsp; :&thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'case 5-10'</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=StmtKey>case</span>&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=Number>11</span>&thinsp; :&thinsp; a&thinsp; =&thinsp; <span class=Number>1</span>;<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+<table><tr><td><a name="2.7"><H4>2.7  Other Controls</H4>
+</td><td align="right"><a href="&section=2.7"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<span class=text_bold> break</span>  can be used to exit a loop, and <span class=text_bold> skip</span>  can be used
+to skip the rest part of script and start the next cycle of a loop.
+<span class=text_bold> skip</span>  is equivalent to <span class=text_bold> continue</span>  in C/C++.<br/>
+<div class="hlcode">
+<span class=StmtKey>for</span><span class=SpecSymbol>(</span>&thinsp; i=<span class=Number>0</span>;&thinsp; i&lt;<span class=Number>5</span>;&thinsp; i++&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; i&thinsp; <span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; &thinsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; i&thinsp; ==&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=StmtKey>break</span>;<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+<table class="topsection"><tr><td><a name="3"><H3>3  Input & Output</H3>
+</td><td align="right"><a href="&section=3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Few programs don't need to deal with files or some kind of
+Input/Output. Dao language supports the basic operations for IO.
+IO functionalities are accessible through <span class=text_bold> io</span>  library.
+<span class=text_bold> io.read()</span> , <span class=text_bold> io.write()</span> , <span class=text_bold> io.writeln</span> 
+and <span class=text_bold> io.writef()</span>  can be used to read from and write to
+the standard IO device. To read and write a file, <span class=text_bold> io.open()</span> 
+can be used to open a file and create a file stream object,
+which can use the common methods such as <span class=text_bold> read()</span> , <span class=text_bold> print()</span> ,
+<span class=text_bold> println()</span>  and <span class=text_bold> printf()</span>  to perform reading and writing.
+There are also other methods such as <span class=text_bold> eof()</span> , <span class=text_bold> tell()</span>  and
+<span class=text_bold> seek()</span>  to check or set stream position.
+<span class=text_bold> sstream()</span>  can be used to created a string stream.<br/><br/>
+For more informations about this library, please see
+<a href="libref#STREAM">The Dao Library Reference|daoweb.dao?page</a> .<br/><br/>
+Example,
+<div class="hlcode">
+<span class=Comment># Open a file for writing:
+<br /></span>fout&thinsp; =&thinsp; io.open<span class=SpecSymbol>(</span>&thinsp; <span class=String>"test1.txt"</span>,&thinsp; <span class=String>"w"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><br/><span class=Comment># Write to the file:
+<br /></span>fout.write<span class=SpecSymbol>(</span>&thinsp; <span class=String>"log(10)="</span>,&thinsp; <span class=Method>math.log</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><br/><span class=Comment># Open a file for reading:
+<br /></span>fin&thinsp; =&thinsp; io.open<span class=SpecSymbol>(</span>&thinsp; <span class=String>"test2.txt"</span>,&thinsp; <span class=String>"r"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><br/><span class=Comment># while there is something to read:
+<br /></span><span class=StmtKey>while</span><span class=SpecSymbol>(</span>&thinsp; !&thinsp; fin.eof<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=Comment># Read from the file:
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; line&thinsp; =&thinsp; fin.<span class=Method>read</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=Comment># Write to std out:
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; io.write<span class=SpecSymbol>(</span>&thinsp; line&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span><br/><br/><span class=Comment># Read from std in:
+<br /></span>d&thinsp; =&thinsp; io.<span class=Method>read</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; d&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table class="topsection"><tr><td><a name="4"><H3>4  Routine or Function</H3>
+</td><td align="right"><a href="&section=4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#4.1">Definition</a></li>
+<li style="margin-top: 5px"><a href="#4.2">Named&nbsp;Parameter</a></li>
+<li style="margin-top: 5px"><a href="#4.3">Parameter&nbsp;Type&nbsp;and&nbsp;Default&nbsp;Value</a></li>
+<li style="margin-top: 5px"><a href="#4.4">Constant&nbsp;Parameter</a></li>
+<li style="margin-top: 5px"><a href="#4.5">Parameter&nbsp;Passing&nbsp;by&nbsp;Reference</a></li>
+<li style="margin-top: 5px"><a href="#4.6">Parameter&nbsp;Grouping</a></li>
+<li style="margin-top: 5px"><a href="#4.7">Routine&nbsp;Overloading</a></li>
+<li style="margin-top: 5px"><a href="#4.8">Routine&nbsp;As&nbsp;First&nbsp;Class&nbsp;Object</a></li>
+<li style="margin-top: 5px"><a href="#4.9">Generator&nbsp;and&nbsp;Coroutine</a></li>
+</ol></td></tr></table> <br/>
+Routine is a block of codes, once defined, can be used in different places
+at different time repeatedly. It can accept parameters to changes its
+behaviour. It may also return results to its callee.<br/>
+<table><tr><td><a name="4.1"><H4>4.1  Definition</H4>
+</td><td align="right"><a href="&section=4.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Dao routines are declared with keyword <span class=text_bold> routine</span> 
+or <span class=text_bold> function</span>  or <span class=text_bold> sub</span>  (which is exactly equivalent to <span class=text_bold> routine</span> ),<br/>
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; func<span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; &thinsp; a&thinsp; =&thinsp; <span class=Number>10</span>;<br/>&thinsp; &thinsp; &thinsp; b&thinsp; =&thinsp; <span class=String>"test"</span>;<br/>&thinsp; &thinsp; &thinsp; <span class=StmtKey>return</span>&thinsp; a,&thinsp; b;&thinsp; <span class=Comment># return more than one results.
+<br /></span><span class=SpecSymbol>}</span><br/><br/>r1,&thinsp; r2;<br/><span class=SpecSymbol>(</span>&thinsp; r1,&thinsp; r2&thinsp; <span class=SpecSymbol>)</span>&thinsp; =&thinsp; func<span class=SpecSymbol>(</span>&thinsp; <span class=Number>111</span>,&thinsp; <span class=String>"AAA"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>r3&thinsp; =&thinsp; func<span class=SpecSymbol>(</span>&thinsp; r1,&thinsp; r2&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"r1 = "</span>,&thinsp; r1&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"r2 = "</span>,&thinsp; r2&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"r3 = "</span>,&thinsp; r3&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table><tr><td><a name="4.2"><H4>4.2  Named Parameter</H4>
+</td><td align="right"><a href="&section=4.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+In Dao the function parameters are named, and parameter values can be passed in by name:
+<div class="hlcode">
+func<span class=SpecSymbol>(</span>&thinsp; b&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>123</span>,&thinsp; a&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=String>"ABC"</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table><tr><td><a name="4.3"><H4>4.3  Parameter Type and Default Value</H4>
+</td><td align="right"><a href="&section=4.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+It is also possible to specify the type or the default value of a parameter.
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; MyRout<span class=SpecSymbol>(</span>&thinsp; name&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; index&thinsp; =&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"NAME  = "</span>,&thinsp; name&thinsp; <span class=SpecSymbol>)</span><br/>&thinsp; &thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"INDEX = "</span>,&thinsp; index&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>}</span></div>
+ 
+Here <span class=text_italic> name</span>  is specified as string, and <span class=text_italic> index</span>  is specified as number with default value 0.
+If a routine is called with wrong type of parameters, or no value is passed to a parameter without a
+default value, an exception will be issued and the execution will abort.<br/><br/>
+Default value can be defined for a parameter before another parameter which does not have default
+value. In this case, if you want to use the default value for that parameter with default value,
+you need to pass value by name to the parameter without default value:
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; MyRout2<span class=SpecSymbol>(</span>&thinsp; i=<span class=Number>0</span>,&thinsp; j&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; i,&thinsp; <span class=String>" "</span>,&thinsp; j&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>}</span><br/>MyRout2<span class=SpecSymbol>(</span>&thinsp; j&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+<table><tr><td><a name="4.4"><H4>4.4  Constant Parameter</H4>
+</td><td align="right"><a href="&section=4.4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Constant parameter can be specified by adding "const" in front
+of the parameter type:
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; Test<span class=SpecSymbol>(</span>&thinsp; a&thinsp; :&thinsp; <span class=DataPrefix>const</span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; a<span class=SpecSymbol>[</span><span class=Number>1</span><span class=SpecSymbol>]</span>&thinsp; =&thinsp; <span class=Number>100</span>;&thinsp; <span class=Comment># error !!!
+<br /></span>&thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span><br/>a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>}</span><br/>Test<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table><tr><td><a name="4.5"><H4>4.5  Parameter Passing by Reference</H4>
+</td><td align="right"><a href="&section=4.5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Parameter passing by reference can be done by adding <span class=text_bold> &</span> 
+in front of a parameter. Only local variables of primitive types 
+can be passed as references, and references can be only created in parameter list.
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; Test<span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; p&thinsp; +=&thinsp; p;<br/><span class=SpecSymbol>}</span><br/>i&thinsp; =&thinsp; <span class=Number>10</span>;<br/>Test<span class=SpecSymbol>(</span>&thinsp; &&thinsp; i&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; i&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table><tr><td><a name="4.6"><H4>4.6  Parameter Grouping</H4>
+</td><td align="right"><a href="&section=4.6"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Dao also supports parameter grouping as in Python.
+Parameter grouping is defined by putting a pair of parenthesis
+around one or more parameters in a function prototype.
+When a tuple is passed as parameter to a function with parameter grouping
+in the corresponding position, and if the items of the tuple have types 
+compatible to those parameters in the grouping, the tuple will be expanded
+with items passed as corresponding parameters.<br/>
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; Test<span class=SpecSymbol>(</span>&thinsp; a&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=SpecSymbol>(</span>&thinsp; b&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; c&thinsp; =&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b,&thinsp; c&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span><br/>t&thinsp; =&thinsp; <span class=SpecSymbol>(</span>&thinsp; <span class=String>'abc'</span>,&thinsp; <span class=Number>123</span>&thinsp; <span class=SpecSymbol>)</span><br/>Test<span class=SpecSymbol>(</span>&thinsp; <span class=Number>0</span>,&thinsp; t&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/><br/>
+<table><tr><td><a name="4.7"><H4>4.7  Routine Overloading</H4>
+</td><td align="right"><a href="&section=4.7"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Routine overloading by parameter types is also supported in Dao,
+which means that multiple routines can be defined with the same name,
+but different parameters.
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; MyRout<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; name&thinsp; =&thinsp; <span class=String>"ABC"</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"INDEX = "</span>,&thinsp; index&thinsp; <span class=SpecSymbol>)</span><br/>&thinsp; &thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"NAME  = "</span>,&thinsp; name&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>}</span><br/><br/>MyRout<span class=SpecSymbol>(</span>&thinsp; <span class=String>"DAO"</span>,&thinsp; <span class=Number>123</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=Comment># invoke the first MyRout()
+<br /></span>MyRout<span class=SpecSymbol>(</span>&thinsp; <span class=Number>456</span>,&thinsp; <span class=String>"script"</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=Comment># invoke the second MyRout()</span></div>
+ <br/>
+<table><tr><td><a name="4.8"><H4>4.8  Routine As First Class Object</H4>
+</td><td align="right"><a href="&section=4.8"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Dao also support first class functions / routines. They can be created in the following way:
+<div class="hlcode">
+foo&thinsp; =&thinsp; <span class=CodeStruct>routine</span><span class=SpecSymbol>(</span>&thinsp; x,&thinsp; y&thinsp; :&thinsp; <span class=Number>TYPE</span>,&thinsp; z&thinsp; =&thinsp; <span class=Number>DEFAULT</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; codes;<br/><span class=SpecSymbol>}</span></div>
+ 
+The definition of such functions is identical to the normal function definition, except
+the following differences:
+<ol>
+<li> there is no need for a function name, but the created function must be assigned to a variable;</li>
+
+<li> the default value expressions for parameters do not necessary to be constant expressions,
+they are evaluated at running time when the function is created;</li>
+
+<li> the function body may contain variables defined in the "upper" function that creates it;
+depending on the type of the "upper" variable, its copy (for simple types) 
+or reference will be used by the created function.</li>
+
+</ol>
+ <br/><br/>
+Here is an example,
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=String>"ABC"</span>;<br/><br/>rout&thinsp; =&thinsp; <span class=CodeStruct>routine</span><span class=SpecSymbol>(</span>&thinsp; x,&thinsp; y&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; z&thinsp; =&thinsp; a+a&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; &thinsp; a&thinsp; +=&thinsp; <span class=String>"_abc"</span>;<br/>&thinsp; &thinsp; &thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"lambda "</span>,&thinsp; a&thinsp; <span class=SpecSymbol>)</span><br/>&thinsp; &thinsp; &thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"lambda "</span>,&thinsp; y&thinsp; <span class=SpecSymbol>)</span><br/>&thinsp; &thinsp; &thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"lambda "</span>,&thinsp; z&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>}</span><br/><br/>rout<span class=SpecSymbol>(</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=String>"XXX"</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table><tr><td><a name="4.9"><H4>4.9  Generator and Coroutine</H4>
+</td><td align="right"><a href="&section=4.9"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+If the function name is prefixed with <span class=text_bold> @</span>  when it is called,
+this call will return a generator or coroutine body,
+so that it will yield a value or a tuple each time 
+the generator or coroutine is called.
+Inside the generator and coroutine, value(s) emitted by the
+<span class=text_bold> yield</span>  statment.
+Their execution will be suspended after they <span class=text_bold> yield</span> ,
+and when they are reseumed, they will start to execute from where
+they are suspended.
+The data returned by the <span class=text_bold> yield</span>  statment is the parameters
+passed to them when they are resumed.
+When a <span class=text_bold> return</span>  statment is executed or the end of the function is reached, 
+the generator or coroutine will exit and become not resumable anymore.<br/>
+<div class="hlcode">
+<span class=Comment># int =&gt; tuple&lt;int,int&gt;
+<br /></span><span class=CodeStruct>routine</span>&thinsp; gen1<span class=SpecSymbol>(</span>&thinsp; a&thinsp; =&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; k&thinsp; =&thinsp; <span class=Number>0</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>while</span><span class=SpecSymbol>(</span>&thinsp; k&thinsp; ++&thinsp; &lt;&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; a&thinsp; =&thinsp; yield<span class=SpecSymbol>(</span>&thinsp; k,&thinsp; a&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; <span class=Number>0</span>,<span class=Number>0</span>;<br/><span class=SpecSymbol>}</span><br/><span class=CodeStruct>routine</span>&thinsp; gen2<span class=SpecSymbol>(</span>&thinsp; a&thinsp; =&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; gen1<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span><br/>g&thinsp; =&thinsp; @gen2<span class=SpecSymbol>(</span>&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Comment># parameters can be omitted the first time it's called;
+<br /></span><span class=Comment># the first call may use the parameters 
+<br /></span><span class=Comment># that are used for creating the generator:
+<br /></span>io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'main1: '</span>,&thinsp; g<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'main2: '</span>,&thinsp; g<span class=SpecSymbol>(</span>&thinsp; <span class=Number>100</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'main3: '</span>,&thinsp; g<span class=SpecSymbol>(</span>&thinsp; <span class=Number>200</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ 
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; foo<span class=SpecSymbol>(</span>&thinsp; a&thinsp; =&thinsp; <span class=Number>0</span>,&thinsp; b&thinsp; =&thinsp; <span class=String>''</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'foo:'</span>,&thinsp; a&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; yield<span class=SpecSymbol>(</span>&thinsp; <span class=Number>2</span>&thinsp; *&thinsp; a,&thinsp; <span class=String>'by foo()'</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>routine</span>&thinsp; bar<span class=SpecSymbol>(</span>&thinsp; a&thinsp; =&thinsp; <span class=Number>0</span>,&thinsp; b&thinsp; =&thinsp; <span class=String>''</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'bar:'</span>,&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>(</span>&thinsp; r,&thinsp; s&thinsp; <span class=SpecSymbol>)</span>&thinsp; =&thinsp; foo<span class=SpecSymbol>(</span>&thinsp; a&thinsp; +&thinsp; <span class=Number>1</span>,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'bar:'</span>,&thinsp; r,&thinsp; s&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>(</span>&thinsp; r,&thinsp; s&thinsp; <span class=SpecSymbol>)</span>&thinsp; =&thinsp; yield<span class=SpecSymbol>(</span>&thinsp; a&thinsp; +&thinsp; <span class=Number>100</span>,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'bar:'</span>,&thinsp; r,&thinsp; s&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; a,&thinsp; <span class=String>'ended'</span>;<br/><span class=SpecSymbol>}</span><br/><br/>co&thinsp; =&thinsp; @bar<span class=SpecSymbol>(</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=String>"a"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; &thinsp; <br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'main: '</span>,&thinsp; co<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'main: '</span>,&thinsp; co<span class=SpecSymbol>(</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=String>'x'</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'main: '</span>,&thinsp; co<span class=SpecSymbol>(</span>&thinsp; <span class=Number>2</span>,&thinsp; <span class=String>'y'</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Comment># coroutine has been finished, the following will rise an exception.
+<br /></span>io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'main: '</span>,&thinsp; co<span class=SpecSymbol>(</span>&thinsp; <span class=Number>3</span>,&thinsp; <span class=String>'z'</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+Generators and coroutines can also be created by the standard
+method <span class=text_bold> stdlib.coroutine()</span> , but then the values
+must be yielded by the method <span class=text_bold> stdlib.yield()</span> .
+Besides this, there is another important difference between these 
+two ways of using generators and coroutines regarding Dao typing system.<br/><br/>
+The variables passed around by generators or coroutines created 
+by prefixing the function with <span class=text_bold> @</span> 
+are <span class=text_bold> type-checked</span>  by the typing system,
+while generators and coroutines created by the <span class=text_bold> stdlib.coroutine()</span> 
+	method will not be type-checked.<br/>
+<table class="topsection"><tr><td><a name="5"><H3>5  Class and Object-Oriented Programming</H3>
+</td><td align="right"><a href="&section=5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#5.1">Class&nbsp;Definition</a></li>
+<li style="margin-top: 5px"><a href="#5.2">Class&nbsp;Instance</a></li>
+<li style="margin-top: 5px"><a href="#5.3">Member&nbsp;Variable</a></li>
+<li style="margin-top: 5px"><a href="#5.4">Setters,&nbsp;Getters&nbsp;and&nbsp;Overloadable&nbsp;Operators</a></li>
+<li style="margin-top: 5px"><a href="#5.5">Method&nbsp;Overloading</a></li>
+<li style="margin-top: 5px"><a href="#5.6">Inheritance</a></li>
+</ol></td></tr></table> <br/>
+Dao supports object-oriented programming (OOP) by allowing user to define
+classes using keyword <span class=text_bold> class</span>  and create instances of them by calling them
+in the same way as calling routines. A class is simply a set
+of member variables and functions,
+which define the properties and possible behaviours of the class.
+An instance (which is often called object) is the realization of a class
+with some properties being initialized to certain values. The functions
+of a class are usually used to operate on the class or its instance.
+Permission modifiers <span class=text_bold> private</span> , <span class=text_bold> protected</span>  and <span class=text_bold> public</span>  can be used to set permissions
+on the variables and functions. Optionally, permission modifiers can be followed by a colon.
+Class members are public by default.<br/>
+<table><tr><td><a name="5.1"><H4>5.1  Class Definition</H4>
+</td><td align="right"><a href="&section=5.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<span class=text_underline> 
+Starting from Dao v1.1, the syntax for class definition has been changed slightly.
+Now parameters and codes are not allowed in class body.
+</span> <br/>
+<div class="hlcode">
+<span class=CodeStruct>class</span>&thinsp; MyNumber<br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=PermiPrefix>private</span><br/><br/>&thinsp; &thinsp; &thinsp; var&thinsp; <span class=Method>value</span>&thinsp; =&thinsp; <span class=Number>0</span>;<br/>&thinsp; &thinsp; &thinsp; var&thinsp; name&thinsp; :&thinsp; <span class=DataType>string</span>;<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=PermiPrefix>public</span><br/><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; MyNumber<span class=SpecSymbol>(</span>&thinsp; <span class=Method>value</span>&thinsp; =&thinsp; <span class=Number>0</span>,&thinsp; s&thinsp; =&thinsp; <span class=String>"NoName"</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Method>value</span>&thinsp; =&thinsp; <span class=Method>value</span>;<br/>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; name&thinsp; =&thinsp; s;<br/>&thinsp; &thinsp; &thinsp; <span class=SpecSymbol>}</span><br/><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; setValue<span class=SpecSymbol>(</span>&thinsp; v&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=Method>value</span>&thinsp; =&thinsp; v&thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; getValue<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>return</span>&thinsp; <span class=Method>value</span>&thinsp; <span class=SpecSymbol>}</span><br/><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; setValue<span class=SpecSymbol>(</span>&thinsp; v&thinsp; :&thinsp; <span class=DataType>float</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>routine</span>&thinsp; MyNumber<span class=SpecSymbol>::</span>setValue<span class=SpecSymbol>(</span>&thinsp; v&thinsp; :&thinsp; <span class=DataType>float</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; <span class=Method>value</span>&thinsp; =&thinsp; v;<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+Whenever an instance/object of a class is created, a specific routine
+is invoked to initialize the object.
+This kind of routine is called constructor for the class.
+Unlike other languages where a constructor should be explicitly defined
+as a member function of a class, the class body is the constructor
+for Dao class.
+Like in Python, the constructors are not used to create class instances,
+instead, an instance is created before, and then the constructor is called
+after to initialize the instance.<br/><br/>
+In the class body, whenever a variable is specified
+with keyword <span class=text_bold> var</span> , it is regarded as an instance variable.
+The data type of instance variable can be set by in the following way,
+<div class="hlcode">
+var&thinsp; variable&thinsp; :&thinsp; type;</div>
+ 
+Where <span class=text_italic> type</span>  must be a valid type name.
+And <span class=text_italic> variable</span>  will have to have the same type as <span class=text_italic> type</span> ,
+or have to be an instance of <span class=text_italic> type</span>  if it is a class.<br/>
+The default value of instance variable can also be specified,
+<div class="hlcode">
+var&thinsp; variable&thinsp; =&thinsp; init_value;</div>
+ 
+Where <span class=text_italic> init_value</span>  must also be a constant.<br/><br/>
+Within class methods, the special variable <span class=text_bold> self</span>  represents the current class
+instance. Class methods may be declared inside class body and defined outside
+in the same way as in C++, but in Dao, one should make sure that, the parameter list
+must be exactly the same in the places for declaration and definition.
+If no instance variable is used in a method, this method can be invoked with class
+by <span class=text_italic> class.method(...)</span> .<br/><br/>
+Like in C++, virtual method can be declared by adding keyword <span class=text_bold> virtual</span> 
+before the <span class=text_bold> routine</span>  or <span class=text_bold> function</span>  keyword.<br/>
+<table><tr><td><a name="5.2"><H4>5.2  Class Instance</H4>
+</td><td align="right"><a href="&section=5.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Class instance can be created by invoking the constructor of the class in the same way as
+a function call,
+<div class="hlcode">
+obj1&thinsp; =&thinsp; MyNumber<span class=SpecSymbol>(</span><span class=Number>1</span><span class=SpecSymbol>)</span>;</div>
+ 
+Class instance may also be created by enumerating the members of a class,
+<div class="hlcode">
+obj2&thinsp; =&thinsp; MyNumber<span class=SpecSymbol>{</span>&thinsp; <span class=Number>2</span>,&thinsp; <span class=String>"enumerated"</span>&thinsp; <span class=SpecSymbol>}</span>;</div>
+ 
+The names of instance variables may also be specified in enumeration,
+<div class="hlcode">
+obj3&thinsp; =&thinsp; MyNumber<span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; name&thinsp; &thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=String>"enumerated"</span>;<br/>&thinsp; &thinsp; &thinsp; <span class=Method>value</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>3</span>;<br/><span class=SpecSymbol>}</span>;</div>
+ <br/>
+When you create a class instance using enumeration, the instance is created,
+and filled with the values in the enumeration.
+Instance creation by enumeration is much faster than creation by invoking class constructor,
+since no class constructor is called and there is no overhead associated with function call
+(parameter passing, running time context preparation for the call etc.).
+So such instance creation is very desirable for creating many instances for simple classes,
+in which there are no complicated initialization operations.<br/><br/>
+<table><tr><td><a name="5.3"><H4>5.3  Member Variable</H4>
+</td><td align="right"><a href="&section=5.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+As mentioned above, instance variables are declared in class constructor
+using <span class=text_bold> var</span>  keyword. 
+Class constant can be declared using <span class=text_bold> const</span>  keyword,
+and static member can be declared using <span class=text_bold> static</span>  keyword as in C++:
+<div class="hlcode">
+<span class=CodeStruct>class</span>&thinsp; Klass<br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; <span class=DataPrefix>const</span>&thinsp; aClassConst&thinsp; =&thinsp; <span class=String>"KlassConst"</span>;<br/>&thinsp; &thinsp; &thinsp; static&thinsp; aClassStatic;<br/><span class=SpecSymbol>}</span></div>
+ 
+Here <span class=text_italic> aClassConst</span>  will be constant belonging to a <span class=text_italic> Klass</span> .
+While <span class=text_italic> aClassStatic</span>  will be a static variable in the class scope.<br/>
+<table><tr><td><a name="5.4"><H4>5.4  Setters, Getters and Overloadable Operators</H4>
+</td><td align="right"><a href="&section=5.4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Instead of defining <span class=text_italic> setXyz()</span>  methods, one can define <span class=text_italic> .Xyz=()</span>  method
+as setter operator,
+so that modifying class member <span class=text_italic> Xyz</span>  by <span class=text_italic> obj.Xyz=abc</span>  will be allowed;
+similarly, if <span class=text_italic> .Xyz()</span>  is defined, get the value by <span class=text_italic> obj.Xyz</span>  will also
+be allowed:
+<div class="hlcode">
+<span class=CodeStruct>class</span>&thinsp; MyNumber0<br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=PermiPrefix>private</span><br/>&thinsp; &thinsp; &thinsp; <br/>&nbsp;&nbsp;&nbsp;&nbsp; var&thinsp; <span class=Method>value</span>&thinsp; =&thinsp; <span class=Number>0</span>;<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=PermiPrefix>public</span><br/><br/>&thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; MyNumber0<span class=SpecSymbol>(</span>&thinsp; v&thinsp; =&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; &thinsp; <span class=Method>value</span>&thinsp; =&thinsp; v;<br/>&thinsp; &thinsp; <span class=SpecSymbol>}</span><br/><br/>&thinsp; &thinsp; operator&thinsp; .<span class=Method>value</span>=<span class=SpecSymbol>(</span>&thinsp; v&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=Method>value</span>&thinsp; =&thinsp; v;&thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"value is set"</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; operator&thinsp; .<span class=Method>value</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>return</span>&thinsp; <span class=Method>value</span>&thinsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/>num&thinsp; =&thinsp; MyNumber0<span class=SpecSymbol>(</span>&thinsp; <span class=Number>123</span>&thinsp; <span class=SpecSymbol>)</span><br/>num.<span class=Method>value</span>&thinsp; =&thinsp; <span class=Number>456</span><br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; num.<span class=Method>value</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+<span class=text_italic> As you may guess, accessing instance variable through getters and setters are much more expensive
+than using them as public variables!
+They should be used only when they make things more convenient
+(for example, when you want them to do extra work when a variable is accessed).
+</span> <br/>
+Other supported operators for overloaing include:
+<ol>
+<li> operator =(...)  for assignment;</li>
+
+<li> operator ()(...)  for function call;</li>
+
+<li> operator [](...)  for getting item(s);</li>
+
+<li> operator []=(...)  for setting item(s);</li>
+
+</ol>
+ 
+Other operators will be supported in the future versions.<br/>
+<table><tr><td><a name="5.5"><H4>5.5  Method Overloading</H4>
+</td><td align="right"><a href="&section=5.5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Class methods can be overloaded in the same way as normal functions.
+Class constructor may also be overloaded by simply adding a method with the same name
+as the class. 
+For example, class <span class=text_italic> MyNumber</span>  can be modified to hold numeric value only:
+<div class="hlcode">
+<span class=CodeStruct>class</span>&thinsp; MyNumber<br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=PermiPrefix>private</span><br/><br/>&thinsp; &thinsp; &thinsp; var&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; =&thinsp; <span class=Number>0</span>;<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=PermiPrefix>public</span><br/><br/>&thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; MyNumber<span class=SpecSymbol>(</span>&thinsp; <span class=Method>value</span>&thinsp; =&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># accept integer as parameter
+<br /></span>&thinsp; &thinsp; &thinsp; &thinsp; self.<span class=Method>value</span>&thinsp; =&thinsp; <span class=Method>value</span>;<br/>&thinsp; &thinsp; <span class=SpecSymbol>}</span><br/><br/>&thinsp; &thinsp; &thinsp; <span class=Comment># overloaded constructor to accept MyNumber as parameter:
+<br /></span>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; MyNumber<span class=SpecSymbol>(</span>&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; MyNumber&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; self.<span class=Method>value</span>&thinsp; =&thinsp; <span class=Method>value</span>.<span class=Method>value</span>&thinsp; <span class=SpecSymbol>}</span><br/><br/>&thinsp; &thinsp; &thinsp; operator&thinsp; .<span class=Method>value</span>=<span class=SpecSymbol>(</span>&thinsp; v&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=Method>value</span>&thinsp; =&thinsp; v&thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; &thinsp; operator&thinsp; .<span class=Method>value</span>=<span class=SpecSymbol>(</span>&thinsp; v&thinsp; :&thinsp; MyNumber&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=Method>value</span>&thinsp; =&thinsp; v.<span class=Method>value</span>&thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; &thinsp; operator&thinsp; .<span class=Method>value</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>return</span>&thinsp; <span class=Method>value</span>&thinsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/>num1&thinsp; =&thinsp; MyNumber<span class=SpecSymbol>(</span>&thinsp; <span class=Number>123</span>&thinsp; <span class=SpecSymbol>)</span><br/>num1.<span class=Method>value</span>&thinsp; =&thinsp; <span class=Number>456</span><br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; num1.<span class=Method>value</span>&thinsp; <span class=SpecSymbol>)</span><br/><br/>num2&thinsp; =&thinsp; MyNumber<span class=SpecSymbol>(</span>&thinsp; num1&thinsp; <span class=SpecSymbol>)</span><br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; num2.<span class=Method>value</span>&thinsp; <span class=SpecSymbol>)</span><br/><br/>num2.<span class=Method>value</span>&thinsp; =&thinsp; <span class=Number>789</span><br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; num2.<span class=Method>value</span>&thinsp; <span class=SpecSymbol>)</span><br/><br/>num2.<span class=Method>value</span>&thinsp; =&thinsp; num1<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; num2.<span class=Method>value</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+<table><tr><td><a name="5.6"><H4>5.6  Inheritance</H4>
+</td><td align="right"><a href="&section=5.6"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+<span class=CodeStruct>class</span>&thinsp; ColorRBG<br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; var&thinsp; Red&thinsp; =&thinsp; <span class=Number>0</span>;<br/>&thinsp; &thinsp; &thinsp; var&thinsp; Green&thinsp; =&thinsp; <span class=Number>0</span>;<br/>&thinsp; &thinsp; &thinsp; var&thinsp; Blue&thinsp; =&thinsp; <span class=Number>0</span>;<br/><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; ColorRBG<span class=SpecSymbol>(</span>&thinsp; r,&thinsp; g,&thinsp; b&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; Red&thinsp; =&thinsp; r;<br/>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; Green&thinsp; =&thinsp; g;<br/>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; Blue&thinsp; =&thinsp; b;<br/>&thinsp; &thinsp; &thinsp; <span class=SpecSymbol>}</span><br/><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; setRed<span class=SpecSymbol>(</span>&thinsp; r&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; Red&thinsp; =&thinsp; r;&thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; setGreen<span class=SpecSymbol>(</span>&thinsp; g&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; Green&thinsp; =&thinsp; g;&thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; setBlue<span class=SpecSymbol>(</span>&thinsp; b&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; Blue&thinsp; =&thinsp; b;&thinsp; <span class=SpecSymbol>}</span><br/><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; getRed<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>return</span>&thinsp; Red;&thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; getGreen<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>return</span>&thinsp; Green;&thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; getBlue<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>return</span>&thinsp; Blue;&thinsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/>yellow&thinsp; =&thinsp; ColorRBG<span class=SpecSymbol>(</span>&thinsp; <span class=Number>255</span>,&thinsp; <span class=Number>255</span>,&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>;&thinsp; <span class=Comment># create an instance.</span></div>
+ 
+The following will define a derived class of <span class=text_italic> ColorRBG</span> ,
+<div class="hlcode">
+<span class=CodeStruct>class</span>&thinsp; ColorQuad&thinsp; :&thinsp; ColorRBG<br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; var&thinsp; alpha&thinsp; =&thinsp; <span class=Number>0</span>;&thinsp; <span class=Comment># alpha component for tranparency.
+<br /></span><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; ColorQuad<span class=SpecSymbol>(</span>&thinsp; r,&thinsp; g,&thinsp; b,&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; :&thinsp; ColorRBG<span class=SpecSymbol>(</span>&thinsp; r,&thinsp; g,&thinsp; b&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; alpha&thinsp; =&thinsp; a;<br/>&thinsp; &thinsp; &thinsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/>yellow2&thinsp; =&thinsp; ColorQuad<span class=SpecSymbol>(</span>&thinsp; <span class=Number>255</span>,&thinsp; <span class=Number>255</span>,&thinsp; <span class=Number>0</span>,&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>;&thinsp; <span class=Comment># not tranparent.
+<br /></span>yellow2.alpha&thinsp; =&thinsp; <span class=Number>127</span>;&thinsp; <span class=Comment># change to half tranparency.</span></div>
+ <br/>
+In the definition of derived class,
+the parent class <span class=text_italic> ColorRBG</span>  should be put after the derived class 
+and be separated with <span class=text_bold> :</span> . If there are more than
+one parent classes, separate them with <span class=text_bold> ,</span> . The parameters for derived class
+can be passed to parent classes in the way as shown in the example.<br/><br/>
+Derived class will automatically inherit constructors from its parent class,
+if it has only one parent class, and there is no redefined constructors with
+signatures the same as those to be inherited.<br/>
+<table class="topsection"><tr><td><a name="6"><H3>6  Module Loading</H3>
+</td><td align="right"><a href="&section=6"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#6.1">Compiling&nbsp;Time&nbsp;Loading</a></li>
+<li style="margin-top: 5px"><a href="#6.2">Running&nbsp;Time&nbsp;Loading</a></li>
+<li style="margin-top: 5px"><a href="#6.3">Path&nbsp;Management</a></li>
+</ol></td></tr></table> <br/>
+Sometimes, it is important to modulize an application for easier maintenance. Dao
+provides several mechanism to load modules from files. Such modules can be written in
+Dao language, or in C/C++ language using C interfaces provided by Dao.
+Modules can be loaded at compiling time (static loading) or at running time (dynamic loading).<br/><br/>
+If the module is written in Dao, its scripts will be executed immediately after loading.
+When the module is loaded for the second time, the content of the script file will be examined
+to see if it is changed. If not, the previous loaded representation of the module will be use,
+and the compiled scripts in the module will be executed again. If yes, the module will be
+re-compiled.<br/>
+<table><tr><td><a name="6.1"><H4>6.1  Compiling Time Loading</H4>
+</td><td align="right"><a href="&section=6.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+The simplest example to load a module is:
+<div class="hlcode">
+<span class=StmtKey>load</span>&thinsp; MyModule;&thinsp; <span class=Comment># the same as: load "MyModule";</span></div>
+ 
+In this case, <span class=text_italic> MyModule.dao</span>  will be searched in the current path and the library paths,
+if not found, <span class=text_italic> MyModule.so</span>  or <span class=text_italic> MyModule.dll</span>  will be searched.<br/><br/>
+Additional relative path can also be specified in the <span class=text_italic> load</span>  statement:
+<div class="hlcode">
+<span class=StmtKey>load</span>&thinsp; MyPath.MyModule;&thinsp; <span class=Comment># the same as: load "MyPath/MyModule";</span></div>
+ 
+And in this case, the current path and the library paths will be searched for sub-directory
+<span class=text_italic> MyPatch</span>  and a file named <span class=text_italic> MyModule.dao</span> , or <span class=text_italic> MyModule.so</span> ,
+or <span class=text_italic> MyModule.dll</span>  in such sub-directory.<br/><br/>
+In both cases, all the global variables, functions, classes and registered C++ types are loaded
+into the current name space. To restrict which objects should be loaded, 
+one can use <span class=text_italic> import</span> :
+<div class="hlcode">
+<span class=StmtKey>load</span>&thinsp; MyModule&thinsp; import&thinsp; name1,&thinsp; name2;</div>
+ 
+If you do not want them to be imported into the current namespace, do
+<div class="hlcode">
+<span class=StmtKey>load</span>&thinsp; MyModule&thinsp; <span class=CodeStruct>as</span>&thinsp; MyNS1;<br/><span class=StmtKey>load</span>&thinsp; MyModule&thinsp; import&thinsp; name1,&thinsp; name2,&thinsp; name3&thinsp; <span class=CodeStruct>as</span>&thinsp; MyNS2;</div>
+ 
+then new namespace <span class=text_italic> MyNS1</span>  and <span class=text_italic> MyNS2</span>  will be created, and can be used as <span class=text_italic> MyNS1.xyz</span> 
+or <span class=text_italic> MyNS1.xyz(...)</span> .<br/><br/>
+In some cases, a C/C++ module may depend on other C/C++ modules,
+which can be specified with <span class=text_italic> require</span> ,
+<div class="hlcode">
+<span class=StmtKey>load</span>&thinsp; MyModule&thinsp; <span class=StmtKey>require</span>&thinsp; AnotherMod1,&thinsp; AnotherMod2;</div>
+ 
+Here the module names after <span class=text_italic> require</span>  must be the file names
+(excluding path and suffix) of the required modules.
+If there are multiple modules with the same name loaded from different paths,
+only the last loaded one will be considered.<br/>
+<table><tr><td><a name="6.2"><H4>6.2  Running Time Loading</H4>
+</td><td align="right"><a href="&section=6.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+To load modules dynamically, use function <span class=text_italic> stdlib.load( mod )</span> ,
+where <span class=text_italic> mod</span>  must be the path and file name to a module.
+The global variables, routines and classes defined in that module 
+will be loaded in to the current name space.<br/>
+<table><tr><td><a name="6.3"><H4>6.3  Path Management</H4>
+</td><td align="right"><a href="&section=6.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+If a relative path is given for a module, the current directory where the interpreter is invoked
+will be searched first, then the library paths are searched until the module is found.
+For the library paths, the last path added into library paths is search first.
+The current path and library paths can be changed by <span class=text_italic> @@PATH(+-path)</span>  at compiling time:<br/>
+  * Set current path,
+<div class="hlcode">
+@@<span class=Number>PATH</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>"/home/guest"</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+  * Add path (in front),
+<div class="hlcode">
+@@<span class=Number>PATH</span><span class=SpecSymbol>(</span>&thinsp; +&thinsp; <span class=String>"./mypath/"</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+If a relative path is provided, then it is supposed to be relative to the current path or one of the
+library paths. If there is a file named <span class=text_italic> addpath.dao</span>  under <span class=text_italic> ./mypath</span> ,
+this file will be loaded and interpreted.
+So one can put the paths for the sub-directories of <span class=text_italic> ./mypath</span>  in <span class=text_italic> addpath.dao</span> ,
+so that they can also be added by <span class=text_italic> @@PATH()</span> , an example of such file:
+<div class="hlcode">
+<span class=Comment># Sample addpath.dao file:
+<br /></span>@@<span class=Number>PATH</span><span class=SpecSymbol>(</span>&thinsp; +&thinsp; <span class=String>"subdir1"</span>&thinsp; <span class=SpecSymbol>)</span><br/>@@<span class=Number>PATH</span><span class=SpecSymbol>(</span>&thinsp; +&thinsp; <span class=String>"subdir2"</span>&thinsp; <span class=SpecSymbol>)</span><br/>@@<span class=Number>PATH</span><span class=SpecSymbol>(</span>&thinsp; +&thinsp; <span class=String>"subdir1/subsub"</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>...</span></div>
+ <br/>
+  * Remove path,
+<div class="hlcode">
+@@<span class=Number>PATH</span><span class=SpecSymbol>(</span>&thinsp; -&thinsp; <span class=String>"./mypath/"</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Similarly, If there is a file named <span class=text_italic> delpath.dao</span>  under <span class=text_italic> ./mypath</span> ,
+this file will be loaded and interpreted.<br/><br/>
+The following paths are added into the library paths by default:
+(1) a system wide path: <span class=text_italic> /usr/lib/dao</span>  (or: <span class=text_italic> C:dao</span>  for Windows);
+(2) a user specific path under the user's home directory: <span class=text_italic> ~/dao</span> ;
+(3) a path defined in the environment variable <span class=text_italic> DAO_DIR</span> , if it exists.
+As mentioned before, the paths are searched in the reverse order they are
+added.<br/>
+<table class="topsection"><tr><td><a name="7"><H3>7  Programming Tips</H3>
+</td><td align="right"><a href="&section=7"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#7.1">Handling&nbsp;Command&nbsp;Line&nbsp;Arguments</a></li>
+<li style="margin-top: 5px"><a href="#7.2">Convenient&nbsp;Type&nbsp;Casting</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="7.1"><H4>7.1  Handling Command Line Arguments</H4>
+</td><td align="right"><a href="&section=7.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+In Dao, the command line arguments are stored in two global variables:
+<span class=text_italic> CMDARG</span>  and <span class=text_italic> ARGV</span> .
+<span class=text_italic> CMDARG</span>  is a map that maps the argument names and positions to argument values;
+and <span class=text_italic> ARGV</span>  is a list containing the argument values.
+For example, if <span class=text_italic> dao cmdarg.dao -arg1 -arg2 abc -arg3=def arg4=10</span> 
+is executed from a shell, <span class=text_italic> CMDARG</span>  and <span class=text_italic> ARGV</span>  will contain the following
+elements,
+<div class="hlcode">
+<span class=Number>CMDARG</span>&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; arg1&thinsp; <span class=SpecSymbol>=></span>&thinsp; arg1,&thinsp; arg2&thinsp; <span class=SpecSymbol>=></span>&thinsp; abc,&thinsp; arg3&thinsp; <span class=SpecSymbol>=></span>&thinsp; def,&thinsp; arg4&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>10</span>,&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; cmdarg.dao,&thinsp; <span class=Number>2</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; arg1,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; abc,&thinsp; <span class=Number>4</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; def,&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>}</span><br/><span class=Number>ARGV</span>&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; cmdarg.dao,&thinsp; arg1,&thinsp; abc,&thinsp; def,&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>}</span></div>
+ 
+The rules of parsing command line arguments are the following,
+
+<table class="sdmltable">
+<tr><th> Form</th><th> Argument Name</th><th> Argument Value</th></tr>
+<tr class=docTableRow><td class=docTableCell> -arg</td><td class=docTableCell> arg</td><td class=docTableCell> arg</td></tr>
+<tr class=docTableRow><td class=docTableCell> -arg value</td><td class=docTableCell> arg</td><td class=docTableCell> value</td></tr>
+<tr class=docTableRow><td class=docTableCell> -arg=value</td><td class=docTableCell> arg</td><td class=docTableCell> value</td></tr>
+<tr class=docTableRow><td class=docTableCell> arg=value</td><td class=docTableCell> arg</td><td class=docTableCell> value</td></tr>
+<tr class=docTableRow><td class=docTableCell> - -arg</td><td class=docTableCell> arg</td><td class=docTableCell> arg</td></tr>
+<tr class=docTableRow><td class=docTableCell> - -arg value</td><td class=docTableCell> arg</td><td class=docTableCell> value</td></tr>
+<tr class=docTableRow><td class=docTableCell> - -arg=value</td><td class=docTableCell> arg</td><td class=docTableCell> value</td></tr>
+</table>
+ 
+Though the user can interperate the meaning of the arguments using <span class=text_italic> CMDARG</span>  and
+<span class=text_italic> ARGV</span> , there is a much simpler automatic way to interperate the arguments.
+In fact, one can define a <span class=text_italic> main()</span>  function with the argument names as parameter
+names, then when the script is executed, the <span class=text_italic> main()</span>  function is invoked with
+the argument values as parameters. 
+If the arguments do not match to the parameter requirements of the <span class=text_italic> main()</span>  function,
+the execution will be aborted, and the documentation of <span class=text_italic> main()</span>  will be printed.
+A default value can be set as the default parameter for optional arguments.
+<div class="hlcode">
+<span class=Comment># the main function for script.dao:
+<br /></span><span class=CodeStruct>routine</span>&thinsp; main<span class=SpecSymbol>(</span>&thinsp; name&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; index=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Comment>#{
+<br />&nbsp;&nbsp;&nbsp;&nbsp;Documentation of this function, it may contain something like:
+<br />&nbsp;&nbsp;&nbsp;&nbsp;Usage: dao script.dao name=abc [index=0]
+<br />#}</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>...</span><br/><span class=SpecSymbol>}</span></div>
+ 
+For this exampe, the script must be invoked with a string as the first argument,
+and an optional number as the second. So it must be invoked as the following,
+<div class="hlcode">
+dao&thinsp; script.dao&thinsp; xyz<br/>dao&thinsp; script.dao&thinsp; xyz&thinsp; <span class=Number>10</span><br/>dao&thinsp; script.dao&thinsp; name=xyz&thinsp; index=<span class=Number>10</span><br/>dao&thinsp; script.dao&thinsp; index=<span class=Number>10</span>&thinsp; name=xyz<br/><span class=SpecSymbol>...</span></div>
+ <br/>
+<table><tr><td><a name="7.2"><H4>7.2  Convenient Type Casting</H4>
+</td><td align="right"><a href="&section=7.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Most of the Dao data types can be converted into another type by simple
+type casting, just as an example,
+<div class="hlcode">
+num&thinsp; =&thinsp; <span class=Number>123456789</span>;<br/>str&thinsp; =&thinsp; <span class=SpecSymbol>(</span><span class=DataType>string</span><span class=SpecSymbol>)</span>&thinsp; num;<br/>ls&thinsp; =&thinsp; <span class=SpecSymbol>(</span><span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;<span class=SpecSymbol>)</span>&thinsp; str;<br/>ar&thinsp; =&thinsp; <span class=SpecSymbol>(</span><span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;<span class=SpecSymbol>)</span>&thinsp; ls;<br/>tup&thinsp; =&thinsp; <span class=SpecSymbol>(</span><span class=DataType>tuple</span>&lt;<span class=DataType>float</span>,<span class=DataType>float</span>&gt;<span class=SpecSymbol>)</span>&thinsp; ls<span class=SpecSymbol>[</span><span class=Number>0</span>:<span class=Number>1</span><span class=SpecSymbol>]</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; num&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; str&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; ls&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; ar&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; tup&thinsp; <span class=SpecSymbol>)</span>;<br/><br/>ar&thinsp; +=&thinsp; <span class=String>'a'</span><span class=SpecSymbol>[</span><span class=Number>0</span><span class=SpecSymbol>]</span>&thinsp; -&thinsp; <span class=String>'1'</span><span class=SpecSymbol>[</span><span class=Number>0</span><span class=SpecSymbol>]</span>;<br/>ls&thinsp; =&thinsp; <span class=SpecSymbol>(</span><span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;<span class=SpecSymbol>)</span>&thinsp; ar;<br/>str&thinsp; =&thinsp; <span class=SpecSymbol>(</span><span class=DataType>string</span><span class=SpecSymbol>)</span>&thinsp; ls;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; ar&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; ls&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; str&thinsp; <span class=SpecSymbol>)</span>;<br/><br/>ar2&thinsp; =&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>65</span>&thinsp; :&thinsp; <span class=Number>3</span><span class=SpecSymbol>]</span>&thinsp; :&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>]</span>;<br/>ls2&thinsp; =&thinsp; <span class=SpecSymbol>(</span><span class=DataType>list</span>&lt;<span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;&thinsp; &gt;<span class=SpecSymbol>)</span>&thinsp; ar2;<br/>ls3&thinsp; =&thinsp; <span class=SpecSymbol>(</span><span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;<span class=SpecSymbol>)</span>&thinsp; ar2;<br/>ls4&thinsp; =&thinsp; <span class=SpecSymbol>(</span><span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;<span class=SpecSymbol>)</span>&thinsp; ls2;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; ar2&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; ls2&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; ls3&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; ls4&thinsp; <span class=SpecSymbol>)</span>;</div>
+<br clear=all />
+</div></body></html>

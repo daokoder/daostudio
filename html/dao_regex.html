@@ -1,0 +1,348 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+
+<h2>Dao Regex Tutorial</h2>
+<div align=center><p><b>Fu Limin (phoolimin<img src="/images/at.png"/>gmail<img src="/images/dot.png"/>com)</b></p></div>
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#1">Introduction</a></li>
+<li style="margin-top: 5px"><a href="#2">Character&nbsp;Class</a></li>
+<li style="margin-top: 5px"><a href="#3">Pattern&nbsp;Item</a></li>
+<li style="margin-top: 5px"><a href="#4">Grouping&nbsp;and&nbsp;Captures</a></li>
+<li style="margin-top: 5px"><a href="#5">String&nbsp;Methods&nbsp;for&nbsp;Regex</a></li>
+<li style="margin-top: 5px"><a href="#6">Examples</a></li>
+</ol></td></tr></table> <br/>
+<table class="topsection"><tr><td><a name="1"><H3>1  Introduction</H3>
+</td><td align="right"><a href="&section=1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+A regular expression (<span class=text_italic> regex</span> <br/>
+Starting from the latest release, the functionalities of regex
+can be accessed by string methods.
+The previous perl-style regex has been removed 
+(as a way to simplify the language and implementation).
+The syntax of the new regex is similar to that of Lua,
+but most of the character class names are different.<br/>
+<table class="topsection"><tr><td><a name="2"><H3>2  Character Class</H3>
+</td><td align="right"><a href="&section=2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+A character class is used to identify a set of characters.
+<ul>
+<li> x  : ordinary characters represent themselves, excluding magic characters  &lt;hlbf&gt; ^$()%.[]*+-?{}&lt;&gt; &lt;/hlbf&gt; ;</li>
+
+<li> .  : a dot represents any characters;</li>
+
+<li> %a  : all alphabetic characters;</li>
+
+<li> %s  : all white space characters;</li>
+
+<li> %k  : all control characters;</li>
+
+<li> %p  : all punctuation characters;</li>
+
+<li> %d  : all digits;</li>
+
+<li> %x  : all hexadecimal digits;</li>
+
+<li> %c  : all lower case characters;</li>
+
+<li> %w  : all alphabetic characters, digists and character '_';</li>
+
+<li> %A  : non alphabetic characters, complement of  &lt;hlbf&gt; %a &lt;/hlbf&gt; ;</li>
+
+<li> %S  : non white space characters, complement of  &lt;hlbf&gt; %s &lt;/hlbf&gt; ;</li>
+
+<li> %K  : non control characters, complement of  &lt;hlbf&gt; %k &lt;/hlbf&gt; ;</li>
+
+<li> %P  : non punctuation characters, complement of  &lt;hlbf&gt; %p &lt;/hlbf&gt; ;</li>
+
+<li> %D  : non digits, complement of  &lt;hlbf&gt; %d &lt;/hlbf&gt; ;</li>
+
+<li> %X  : non hexadecimal digits, complement of  &lt;hlbf&gt; %x &lt;/hlbf&gt; ;</li>
+
+<li> %C  : upper case characters;</li>
+
+<li> %W  : complement of  &lt;hlbf&gt; %w &lt;/hlbf&gt; ;</li>
+
+<li> %<span class=text_bold> x</span>  : represents character <span class=text_bold> x</span> , where <span class=text_bold> x</span>  is
+any non-alphanumeric character; <span class=text_bold> x</span>  may also be an alphabetic 
+character if it is not one of the character class symbols or <span class=text_bold> b</span> 
+or <span class=text_bold> B</span> .</li>
+
+<li> [set]  : represents the union of all characters in  &lt;hlbf&gt; set &lt;/hlbf&gt; ;
+a range of characters starting from a character <span class=text_bold> x</span>  
+up to another character <span class=text_bold> y</span>  can be included in  &lt;hlbf&gt; set &lt;/hlbf&gt;  
+as <span class=text_bold> x-y</span> ; the above character classes can also be included in  &lt;hlbf&gt; set &lt;/hlbf&gt; ;</li>
+
+<li> [^set]  : complement of  &lt;hlbf&gt; [set] &lt;/hlbf&gt; ;</li>
+
+</ul>
+ <br/>
+<table class="topsection"><tr><td><a name="3"><H3>3  Pattern Item</H3>
+</td><td align="right"><a href="&section=3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+A pattern item can be
+<ul>
+<li>  a single character class;</li>
+
+<li> ^  : match at the begin of a string;</li>
+
+<li> $  : match at the end of a string;</li>
+
+<li> %n  : match <span class=text_bold> n</span> -th captured sub string; <span class=text_bold> n</span>  can be one or more digits;</li>
+
+<li> %bxy  : match a balanced pair of characters <span class=text_bold> x</span>  and <span class=text_bold> y</span> ;
+here balance means, starting from the same matched position, 
+the mached sub string should contain 
+the same number and minimum number of <span class=text_bold> x</span>  and <span class=text_bold> y</span> ;
+the same as that in Lua;</li>
+
+<li> %B{pattern1}{pattern2}  : match a balanced pair of patterns
+<span class=text_bold> pattern1</span>  and <span class=text_bold> pattern2</span> ; here balance has the same meaning as in
+ &lt;hlbf&gt; %bxy &lt;/hlbf&gt; ;</li>
+
+</ul>
+ <br/>
+A pattern item  &lt;hlbf&gt; e &lt;/hlbf&gt;  can be optional skiped or matched repeatedly as indicated by:
+<ul>
+<li> e?  : match zero time or once;</li>
+
+<li> e*  : match zero time or any number of times;</li>
+
+<li> e+  : match once or more;</li>
+
+<li> e{n}  : match exactly <span class=text_bold> n</span>  times;</li>
+
+<li> e{n,}  : match at least <span class=text_bold> n</span>  times;</li>
+
+<li> e{,n}  : match at most <span class=text_bold> n</span>  times;</li>
+
+<li> e{n,m}  : match at least <span class=text_bold> n</span>  times and at most <span class=text_bold> m</span>  times;</li>
+
+</ul>
+ <br/>
+<table class="topsection"><tr><td><a name="4"><H3>4  Grouping and Captures</H3>
+</td><td align="right"><a href="&section=4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+In a pattern, one or more pattern items can be grouped together 
+by parenthesis to form sub patterns (group). 
+Alternative patterns in a group can be separated by <span class=text_bold> |</span> ,
+and the group could be optionally skipped if an empty alternative pattern is
+specified as <span class=text_italic> (|pattern)</span>  or <span class=text_italic> (pattern|)</span> .
+When a string is matched to
+a pattern, the sub strings that match the groups of sub patterns
+can be captured for other use. Captures are numbered according to their
+left parenthesis. For example, in pattern <span class=text_italic> (%a+)%s*(%d+(%a+))</span> ,
+the first <span class=text_italic> (%a+)</span>  will have group number 1, and <span class=text_italic> (%d+(%a+))</span> 
+will have group number 2, and the second <span class=text_italic> (%a+)</span>  will have group number 3.
+For convenience, the whole pattern has group number 0.<br/><br/>
+In case there are multiple possible ways of matching a substring starting
+from the same position, the matching length is calculated as the sum
+of the lengths of the sub-matches of all groups (including number 0 group) 
+in the pattern, and the matching giving maximum matching length is 
+returned as the result. In this way, one can put a deeper nesting of parenthesis
+around a group, if one want that group has high priority to be matched.
+For example, when <span class=text_italic> 1a2</span>  is matched to patterh <span class=text_italic> (%d%w*)(%w*%d)</span> ,
+there are two possible ways of macthing, namely, <span class=text_italic> 1a</span>  matching to <span class=text_italic> (%d%w*)</span> 
+and <span class=text_italic> 2</span>  matching to <span class=text_italic> (%w*%d)</span> , or <span class=text_italic> 1</span>  matching to <span class=text_italic> (%d%w*)</span> 
+and <span class=text_italic> a2</span>  matching to <span class=text_italic> (%w*%d)</span> ,
+but if an extra parenthesis is added to one of the group, for example, as
+<span class=text_italic> (%d%w*)((%w*%d))</span> , then the matching becomes unique, which is
+the second way of matching where letter <span class=text_italic> a</span>  is matched in the last group.<br/>
+<table class="topsection"><tr><td><a name="5"><H3>5  String Methods for Regex</H3>
+</td><td align="right"><a href="&section=5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#5.1">pfind():&nbsp;find&nbsp;regular&nbsp;expression&nbsp;pattern</a></li>
+<li style="margin-top: 5px"><a href="#5.2">match():&nbsp;match&nbsp;subtring</a></li>
+<li style="margin-top: 5px"><a href="#5.3">extract():&nbsp;extract&nbsp;substrings</a></li>
+<li style="margin-top: 5px"><a href="#5.4">capture():&nbsp;capture&nbsp;groups</a></li>
+<li style="margin-top: 5px"><a href="#5.5">change():&nbsp;change&nbsp;substrings</a></li>
+</ol></td></tr></table> <br/>
+Like in Lua, the regular expression matching functionalities are accessed
+through various string methods. The regular expression patterns are stored 
+in strings, and passed to these string methods. 
+Each pattern string corresponds to an internal representation of a regular expression,
+which are compiled from the pattern string at the first time it is used.
+Though the strings that represent the same pattern can be passed multiple times 
+to these methods, they are compiled once in one process (virtual machine process).
+So the overhead of compiling a regular expression can be normally ignored.<br/>
+<table><tr><td><a name="5.1"><H5>5.1  pfind(): find regular expression pattern</H5>
+</td><td align="right"><a href="&section=5.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+<span class=DataType>string</span>.pfind<span class=SpecSymbol>(</span>&thinsp; pt&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; index=<span class=Number>0</span>,&thinsp; start=<span class=Number>0</span>,&thinsp; <span class=CodeStruct>end</span>=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>list</span>&lt;<span class=DataType>tuple</span>&lt;<span class=DataType>int</span>,<span class=DataType>int</span>&gt;&thinsp; &gt;</div>
+ <br/>
+This method searches for the position(s) of substring(s) that match(es) to
+the pattern represented by <span class=text_italic> pt</span> . If <span class=text_italic> index</span>  is greater than zero,
+search for the <span class=text_italic> index</span> -th occurrence of the matched substring,
+otherwise, search for all. The searching starts from position <span class=text_italic> start</span> ,
+and ends at <span class=text_italic> end</span>  if it is greater than zero. Zero value for <span class=text_italic> end</span> 
+indicates searching until the end of the string.<br/>
+<table><tr><td><a name="5.2"><H5>5.2  match(): match subtring</H5>
+</td><td align="right"><a href="&section=5.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+<span class=DataType>string</span>.match<span class=SpecSymbol>(</span>&thinsp; pt&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; start=<span class=Number>0</span>,&thinsp; <span class=CodeStruct>end</span>=<span class=Number>0</span>,&thinsp; substring=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>=></span><span class=DataType>tuple</span>&lt;start:<span class=DataType>int</span>,<span class=CodeStruct>end</span>:<span class=DataType>int</span>,substring:<span class=DataType>string</span>&gt;</div>
+ <br/>
+Find a substring that matches to <span class=text_italic> pt</span> , starting from position <span class=text_italic> start</span>  
+until position <span class=text_italic> end</span> . Also extract the matched subtring if parmeter
+<span class=text_italic> substring</span>  is not zero;<br/>
+<table><tr><td><a name="5.3"><H5>5.3  extract(): extract substrings</H5>
+</td><td align="right"><a href="&section=5.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+<span class=DataType>string</span>.extract<span class=SpecSymbol>(</span>&thinsp; pt&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; matched=<span class=Number>1</span>,&thinsp; mask=<span class=String>''</span>,&thinsp; rev=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;</div>
+ <br/>
+If only paremeter <span class=text_italic> pt</span>  is presented, 
+this method will extract the substrings that match to the pattern
+represented by string <span class=text_italic> pt</span> .
+If <span class=text_italic> matched</span>  is positive, the matched substrings are returned;
+and if it is negative, the complement substrings of the matched regions 
+are returned; and when <span class=text_italic> matched=0</span> , both the matched substrings
+and the complement substrings are returned.<br/><br/>
+One can also set the <span class=text_italic> mask</span>  pattern, to restrict the seaching
+of <span class=text_italic> pt</span>  within the substrings that match to <span class=text_italic> mask</span> 
+if <span class=text_italic> rev</span>  is set to zero, otherwise, the searching will be restricted outside
+of <span class=text_italic> mask</span> -matched regions.<br/>
+<table><tr><td><a name="5.4"><H5>5.4  capture(): capture groups</H5>
+</td><td align="right"><a href="&section=5.4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+<span class=DataType>string</span>.capture<span class=SpecSymbol>(</span>&thinsp; pt&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; start=<span class=Number>0</span>,&thinsp; <span class=CodeStruct>end</span>=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;</div>
+ <br/>
+Search for a substring that matches to <span class=text_italic> pt</span> ,
+and capture the substrings that match to pattern groups.
+The captured substrings are returned as a list,
+where the i-th item is substring that matches to the i-th group.<br/>
+<table><tr><td><a name="5.5"><H5>5.5  change(): change substrings</H5>
+</td><td align="right"><a href="&section=5.5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+<span class=DataType>string</span>.change<span class=SpecSymbol>(</span>&thinsp; pt&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; s&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; index=<span class=Number>0</span>,&thinsp; start=<span class=Number>0</span>,&thinsp; <span class=CodeStruct>end</span>=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>int</span></div>
+ <br/>
+Replace the substrings that match to <span class=text_italic> pt</span>  with string <span class=text_italic> s</span> ,
+which may contain reference to captured subtrings for groups,
+for example, if <span class=text_italic> s = 'abc%1'</span> , it means replacing with a string
+	which is a concatenation of <span class=text_italic> abc</span>  and the substring
+	that match to the first group of <span class=text_italic> pt</span> .<br/><br/>
+If <span class=text_italic> index</span>  is positive, replace the <span class=text_italic> index</span> -th occurrence
+of the substring matching to <span class=text_italic> pt</span> . The substitution can also
+be restricted within a region starting from position <span class=text_italic> start</span> 
+until position <span class=text_italic> end</span> .<br/><br/>
+The number of occurrence of substitution is returned.<br/>
+<table class="topsection"><tr><td><a name="6"><H3>6  Examples</H3>
+</td><td align="right"><a href="&section=6"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+s&thinsp; =&thinsp; <span class=String>'abc123def456'</span>;<br/><br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; s.pfind<span class=SpecSymbol>(</span>&thinsp; <span class=String>'%d+'</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; s.match<span class=SpecSymbol>(</span>&thinsp; <span class=String>'%d+'</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; s.extract<span class=SpecSymbol>(</span>&thinsp; <span class=String>'%d+'</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; s.extract<span class=SpecSymbol>(</span>&thinsp; <span class=String>'%d+'</span>,&thinsp; -<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; s.extract<span class=SpecSymbol>(</span>&thinsp; <span class=String>'%d+'</span>,&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; s.capture<span class=SpecSymbol>(</span>&thinsp; <span class=String>'(%a+)(%d+)'</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><br/>s.change<span class=SpecSymbol>(</span>&thinsp; <span class=String>'(%a+)'</span>,&thinsp; <span class=String>'==%1=='</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; s&thinsp; <span class=SpecSymbol>)</span>;<br/><br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; s.extract<span class=SpecSymbol>(</span>&thinsp; <span class=String>'%d+'</span>,&thinsp; <span class=Number>1</span>,&thinsp; <span class=String>'==%d+=='</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+<br clear=all />
+</div></body></html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+<h2>道语言宏系统</h2>
+<div align=center><p><b>傅利民(phoolimin<img src="/images/at.png"/>gmail<img src="/images/dot.png"/>com)</b></p></div> <br/>
+道语言支持比较好的宏系统，它可以被用来定义新的语法。
+道语言的宏比较象BNF形式的语法表示。
+道宏里，由一组语法标记来定义需要应用宏的语法模式，
+并由另一组语法标记需要转换到的道语言基本语法模式。
+当道解释器编译道代码时，它将用宏的语法模式去匹配代码，
+并将匹配的代码转换成目标遵循道语言基本语法的代码。<br/>
+<div class="hlcode">
+<span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; 源语法模式<br/><span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; 目标语法模式<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+下面的控制符号可用来标记语法模式：
+
+<table class="sdmltable">
+<tr><th> 控制符号</th><th> 含义</th></tr>
+<tr class=docTableRow><td class=docTableCell> ( )</td><td class=docTableCell> 分组</td></tr>
+<tr class=docTableRow><td class=docTableCell> ?</td><td class=docTableCell> 可选(重复0或1次), 必须跟在( )后面</td></tr>
+<tr class=docTableRow><td class=docTableCell> *</td><td class=docTableCell> 重复0或任意多次, 必须跟在( )后面</td></tr>
+<tr class=docTableRow><td class=docTableCell> +</td><td class=docTableCell> 重复1或任意多次, 必须跟在( )后面</td></tr>
+<tr class=docTableRow><td class=docTableCell> !</td><td class=docTableCell> 重复0次, 即前面的分组必须不出现，必须跟在( )后面</td></tr>
+<tr class=docTableRow><td class=docTableCell> [ ]</td><td class=docTableCell> 可选，等价于( ) ?</td></tr>
+<tr class=docTableRow><td class=docTableCell> { }</td><td class=docTableCell> 重复0或任意多次，( ) *</td></tr>
+<tr class=docTableRow><td class=docTableCell> |</td><td class=docTableCell> 替代模式，必须出现在(), [],{}这样的一对控制符号之间</td></tr>
+</table>
+ 
+<span class=text_underline> 如果<span class=text_bold> ?,*,+,!</span> 出现在特殊分组<span class=text_bold> [ ]</span> 或<span class=text_bold> { }</span> 
+后面，这些特殊分组将被视为跟 <span class=text_bold> ( )</span> 等同。</span> <br/><br/>
+下面的特殊前缀可用来定义语法模式里的语法变量：
+
+<table class="sdmltable">
+<tr><th> 前缀</th><th> 含义</th></tr>
+<tr class=docTableRow><td class=docTableCell> $ID</td><td class=docTableCell> 有效的标志名</td></tr>
+<tr class=docTableRow><td class=docTableCell> $OP</td><td class=docTableCell> 有效的操作符</td></tr>
+<tr class=docTableRow><td class=docTableCell> $EXP</td><td class=docTableCell> 表达式或子表达式</td></tr>
+<tr class=docTableRow><td class=docTableCell> $BL</td><td class=docTableCell> 可包含任意语法结构的语句块</td></tr>
+<tr class=docTableRow><td class=docTableCell> $VAR</td><td class=docTableCell> 目标语法模式里使用的临时变量</td></tr>
+</table>
+ 
+在每次进行宏语法转换时，道解释器的语法解析器将为宏里的每个
+临时变量（带$VAR前缀）生成一个独一的变量名。
+一般情况下，带$EXP前缀的语法变量将匹配一个整的表达式，
+但如果该语法变量后面跟了一个普通的字符标志（非控制符，非语法变量），
+那么该语法变量将可以匹配一个子表达式。
+带$BL前缀的语法变量将匹配一个语句块，并尽量地延伸其匹配。
+类似的，如果该$BL前缀的语法变量后面跟了一个普通的字符标志，
+那么此标志将标记该语法变量匹配的语句块的边界。
+另外，如果带$EXP或$BL前缀的语法变量后面跟了一个模式分组，
+那么模式分组里的模式将被用来确定语法变量所要匹配的表达式或
+语句块的边界。<br/><br/>
+普通道语言运算符也可被用到语法模式里。
+当括号被用语法模式里时，它们应该被合理配对。
+要使用不配对的括号，把它们放到单引号里，如'(', '[', '{'等。<br/><br/>
+对于在源和目标语法模式里的同名语法变量，
+它们最好是出现在具有类似结构的分组和重复模式里。
+这样语法变换将有确定的行为。
+当源语法模式被匹配到某段代码时，相应于语法变量的代码将被提取出来，
+然后，目标语法模式被扫描，被提取出来的代码将在对应的语法变量处展开。
+展开的结果将被用来替换被源模式匹配的代码部分。<br/><br/>
+道语言的早期版本曾支持过do-end, else-end, routine-end和class-end等形式
+的语法结构。但从2007年的一次发布起不再对它们作核心支持，
+不过，还是可以使用下面的宏作支持：
+<div class="hlcode">
+<span class=Comment># Syntax transformation macros
+<br /></span><br/><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># if do elif else end
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>if</span>&thinsp; $EXP_1&thinsp; <span class=StmtKey>do</span>&thinsp; \[&thinsp; $BL_1&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; \{&thinsp; <span class=StmtKey>elif</span>&thinsp; $EXP_2&thinsp; <span class=StmtKey>do</span>&thinsp; \[&thinsp; $BL_2&thinsp; \]&thinsp; \}<br/>&nbsp;&nbsp;&nbsp;&nbsp; \[&thinsp; <span class=StmtKey>else</span>&thinsp; \[&thinsp; $BL_3&thinsp; \]&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=CodeStruct>end</span><br/><span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># if(){}elif(){}else{}
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; $EXP_1&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; \[&thinsp; $BL_1&thinsp; \]&thinsp; <span class=SpecSymbol>}</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \{&thinsp; <span class=StmtKey>elif</span><span class=SpecSymbol>(</span>&thinsp; $EXP_2&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; \[&thinsp; $BL_2&thinsp; \]&thinsp; <span class=SpecSymbol>}</span>&thinsp; \}<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \[&thinsp; <span class=StmtKey>else</span><span class=SpecSymbol>{</span>&thinsp; \[&thinsp; $BL_3&thinsp; \]&thinsp; <span class=SpecSymbol>}</span>&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>if</span>&thinsp; $EXP&thinsp; <span class=StmtKey>break</span>&thinsp; <span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; $EXP&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>break</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>}</span><br/><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>if</span>&thinsp; $EXP&thinsp; <span class=StmtKey>skip</span>&thinsp; <span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; $EXP&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>skip</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>if</span>&thinsp; $EXP_1&thinsp; $ID&thinsp; \{&thinsp; $EXP_2&thinsp; \}&thinsp; ;<br/><span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; $EXP_1&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; $ID&thinsp; \{&thinsp; $EXP_2&thinsp; \}&thinsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># while do end
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>while</span>&thinsp; $EXP&thinsp; <span class=StmtKey>do</span>&thinsp; \[&thinsp; $BL&thinsp; \]&thinsp; <span class=CodeStruct>end</span><br/><span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># while(){}
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>while</span><span class=SpecSymbol>(</span>&thinsp; $EXP&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; \[&thinsp; $BL&thinsp; \]&thinsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># for in do end
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>for</span>&thinsp; $EXP_1&thinsp; <span class=StmtKey>in</span>&thinsp; $EXP_2&thinsp; \{&thinsp; ;&thinsp; $EXP_3&thinsp; <span class=StmtKey>in</span>&thinsp; $EXP_4&thinsp; \}&thinsp; <span class=StmtKey>do</span>&thinsp; \[&thinsp; $BL_1&thinsp; \]&thinsp; <span class=CodeStruct>end</span><br/><span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># for( in ){}
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>for</span><span class=SpecSymbol>(</span>&thinsp; $EXP_1&thinsp; <span class=StmtKey>in</span>&thinsp; $EXP_2&thinsp; \{&thinsp; ;&thinsp; $EXP_3&thinsp; <span class=StmtKey>in</span>&thinsp; $EXP_4&thinsp; \}&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; \[&thinsp; $BL_1&thinsp; \]&thinsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># for ; ; do end
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>for</span>&thinsp; \[&thinsp; $EXP_1&thinsp; \];&thinsp; \[&thinsp; $EXP_2&thinsp; \];&thinsp; \[&thinsp; $EXP_3&thinsp; \]&thinsp; <span class=StmtKey>do</span>&thinsp; \[&thinsp; $BL_1&thinsp; \]&thinsp; <span class=CodeStruct>end</span><br/><span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># for( ; ; ){}
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>for</span><span class=SpecSymbol>(</span>&thinsp; \[&thinsp; $EXP_1&thinsp; \];&thinsp; \[&thinsp; $EXP_2&thinsp; \];&thinsp; \[&thinsp; $EXP_3&thinsp; \]&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; \[&thinsp; $BL_1&thinsp; \]&thinsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># switch do end
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>switch</span>&thinsp; $EXP&thinsp; <span class=StmtKey>do</span>&thinsp; \[&thinsp; $BL&thinsp; \]&thinsp; <span class=CodeStruct>end</span><br/><span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># switch(){}
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>switch</span><span class=SpecSymbol>(</span>&thinsp; $EXP&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; \[&thinsp; $BL&thinsp; \]&thinsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/><span class=Comment># routine definition
+<br /></span><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=CodeStruct>routine</span>&thinsp; $ID1&thinsp; \{&thinsp; <span class=SpecSymbol>::</span>&thinsp; $ID2&thinsp; \}&thinsp; <span class=SpecSymbol>(</span>&thinsp; \[&thinsp; $BL1&thinsp; \]&thinsp; <span class=SpecSymbol>)</span>&thinsp; \(&thinsp; ;&thinsp; \)&thinsp; \!<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \(&thinsp; <span class=SpecSymbol>{</span>&thinsp; $BL2&thinsp; <span class=SpecSymbol>}</span>&thinsp; \)&thinsp; \!<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \[&thinsp; $BL3&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=CodeStruct>end</span><br/><span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=CodeStruct>routine</span>&thinsp; $ID1&thinsp; \{&thinsp; <span class=SpecSymbol>::</span>&thinsp; $ID2&thinsp; \}&thinsp; <span class=SpecSymbol>(</span>&thinsp; \[&thinsp; $BL1&thinsp; \]&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \[&thinsp; $BL3&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/><span class=Comment># class definition
+<br /></span><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=CodeStruct>class</span>&thinsp; $ID1&thinsp; \{&thinsp; <span class=SpecSymbol>::</span>&thinsp; $ID2&thinsp; \}&thinsp; \[&thinsp; <span class=SpecSymbol>(</span>&thinsp; \[&thinsp; $BL1&thinsp; \]&thinsp; <span class=SpecSymbol>)</span>&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \[&thinsp; :&thinsp; $ID3&thinsp; \{&thinsp; <span class=SpecSymbol>::</span>&thinsp; $ID4&thinsp; \}&thinsp; \[&thinsp; <span class=SpecSymbol>(</span>&thinsp; \[&thinsp; $BL2&thinsp; \]&thinsp; <span class=SpecSymbol>)</span>&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \{&thinsp; ,&thinsp; $ID5&thinsp; \{&thinsp; <span class=SpecSymbol>::</span>&thinsp; $ID6&thinsp; \}&thinsp; \[&thinsp; <span class=SpecSymbol>(</span>&thinsp; \[&thinsp; $BL3&thinsp; \]&thinsp; <span class=SpecSymbol>)</span>&thinsp; \]&thinsp; \}&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \(&thinsp; <span class=SpecSymbol>{</span>&thinsp; $BL5&thinsp; <span class=SpecSymbol>}</span>&thinsp; \)&thinsp; \!<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \[&thinsp; $BL4&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=CodeStruct>end</span><br/><span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=CodeStruct>class</span>&thinsp; $ID1&thinsp; \{&thinsp; <span class=SpecSymbol>::</span>&thinsp; $ID2&thinsp; \}&thinsp; \[&thinsp; <span class=SpecSymbol>(</span>&thinsp; \[&thinsp; $BL1&thinsp; \]&thinsp; <span class=SpecSymbol>)</span>&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \[&thinsp; :&thinsp; $ID3&thinsp; \{&thinsp; <span class=SpecSymbol>::</span>&thinsp; $ID4&thinsp; \}&thinsp; \[&thinsp; <span class=SpecSymbol>(</span>&thinsp; \[&thinsp; $BL2&thinsp; \]&thinsp; <span class=SpecSymbol>)</span>&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \{&thinsp; ,&thinsp; $ID5&thinsp; \{&thinsp; <span class=SpecSymbol>::</span>&thinsp; $ID6&thinsp; \}&thinsp; \[&thinsp; <span class=SpecSymbol>(</span>&thinsp; \[&thinsp; $BL3&thinsp; \]&thinsp; <span class=SpecSymbol>)</span>&thinsp; \]&thinsp; \}&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \[&thinsp; $BL4&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># try rescue do rescue end
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; try&thinsp; \[&thinsp; $BL_1&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; \{&thinsp; rescue&thinsp; $BL_2&thinsp; <span class=StmtKey>do</span>&thinsp; \[&thinsp; $BL_3&thinsp; \]&thinsp; \}<br/>&nbsp;&nbsp;&nbsp;&nbsp; \[&thinsp; rescue&thinsp; \[&thinsp; $BL_4&thinsp; \]&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=CodeStruct>end</span><br/><span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># try{} rescue(){} rescue{}
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; try<span class=SpecSymbol>{</span>&thinsp; \[&thinsp; $BL_1&thinsp; \]&thinsp; <span class=SpecSymbol>}</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \{&thinsp; rescue<span class=SpecSymbol>(</span>&thinsp; $BL_2&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; \[&thinsp; $BL_3&thinsp; \]&thinsp; <span class=SpecSymbol>}</span>&thinsp; \}<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \[&thinsp; rescue<span class=SpecSymbol>{</span>&thinsp; \[&thinsp; $BL_4&thinsp; \]&thinsp; <span class=SpecSymbol>}</span>&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>if</span>&thinsp; $EXP&thinsp; retry&thinsp; <span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; $EXP&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; retry&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>}</span></div>
+<br clear=all />
+</div></body></html>

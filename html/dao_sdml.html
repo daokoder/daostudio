@@ -1,0 +1,253 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+
+<h2>Simple Document Marking Language</h2>
+ <br/>
+Simple Document Marking Language (SDML, a tentative name),
+is a simple marking up language developed for writing documentation for Dao.
+SDML uses simple syntax to specify the elements of a document,
+which can be then converted to a Latex document (then PDF) or
+a HTML document.
+SDML is also the basic format used to prepare the website content 
+of <a href="">daovm.net</a> .<br/><br/>
+Basic elements of SDML:
+<ul>
+<li> Document title: <span class=text_bold> &lt;title&gt; example &lt;/title&gt;</span> ;<br/>
+	One can optional use the followings, which have effects (currently)
+	only when the document is converted to Latex document, to set the type
+	of document.
+	<ol>
+<li><span class=text_bold> &lt;article&gt; example &lt;/article&gt;</span> ;</li>
+
+<li><span class=text_bold> &lt;report&gt; example &lt;/report&gt;</span> ;</li>
+
+<li><span class=text_bold> &lt;book&gt; example &lt;/book&gt;</span> ;</li>
+
+</ol>
+</li>
+
+<li> Author name: <span class=text_bold> &lt;author&gt; somebody &lt;/author&gt;</span> ;</li>
+
+<li> Chapter or section name: <span class=text_bold> &lt;===&gt;section&lt;/===&gt;</span> ;<br/>
+	There can be one or more <span class=text_bold> =</span>  marks in the tag.
+	The nesting level is corresponding to the length of the tag.</li>
+
+<li> Font: bold, <span class=text_bold> &lt;bf&gt;text&lt;/bf&gt;</span> ; italic, <span class=text_bold> &lt;it&gt;text&lt;/it&gt;</span> ;</li>
+
+<li> Link: <span class=text_bold> &lt;link&gt;text=url&lt;/link&gt;</span> ;<br/>
+	In the case that this format is used on the Dao website,
+	if <span class=text_bold> url</span>  contains only letters, digits and underscore mark,
+	<span class=text_bold> url</span>  is interpreted as a named web page,
+	otherwise it is interpreted as a HTTP URL.<br/>
+<div class="hlcode">
+<span class=DataType>&lt;link&gt;</span>Dao&thinsp; Documentations=document<span class=DataType>&lt;/link&gt;</span><br />
+<span class=DataType>&lt;link&gt;</span>daovm.net=http://www.daovm.net<span class=DataType>&lt;/link&gt;</span></div>
+ 
+<a href="/page/document">Dao Documentations</a> <br/>
+<a href="http://www.daovm.net">daovm.net</a></li>
+
+<li> Image: <span class=text_bold> &lt;image&gt;name&lt;/image&gt;</span> ;<br/>
+	In the case that this format is used on the Dao website,
+	if <span class=text_bold> url</span>  contains only letters, digits and underscore mark,
+	<span class=text_bold> url</span>  is interpreted as a named image (uploaded image),
+	otherwise it is interpreted as the HTTP URL of an image.<br/>
+<div class="hlcode">
+<span class=DataType>&lt;image&gt;</span>Test<span class=DataType>&lt;/image&gt;</span><br />
+<span class=DataType>&lt;image&gt;</span>images/calendar_cell.png<span class=DataType>&lt;/image&gt;</span><br />
+<span class=DataType>&lt;image&gt;</span>http://daovm.net/images/calendar_cell.png<span class=DataType>&lt;/image&gt;</span></div>
+</li>
+
+<li> List: <span class=text_bold> &lt;list&gt;items&lt;/list&gt;</span> ;<br/>
+	Use <span class=text_bold> ==</span>  (for ordered list) or <span class=text_bold> --</span>  (for un-ordered list)
+	to list the items.<br/>
+	Ordered list:
+<div class="hlcode">
+<span class=StmtKey>&lt;list&gt;</span><span class=codeback><br />
+==&thinsp; item1<br />
+==&thinsp; item2<br />
+</span><span class=StmtKey>&lt;/list&gt;</span></div>
+ 
+	This will give:
+	<ol>
+<li> item1</li>
+
+<li> item2</li>
+
+</ol>
+ <br/>
+	Un-ordered list:
+<div class="hlcode">
+<span class=StmtKey>&lt;list&gt;</span><span class=codeback><br />
+--&thinsp; item1<br />
+--&thinsp; item2<br />
+</span><span class=StmtKey>&lt;/list&gt;</span></div>
+ 
+	This will give:
+	<ul>
+<li> item1</li>
+
+<li> item2</li>
+
+</ul>
+</li>
+
+<li> Table: <span class=text_bold> &lt;table&gt;cells&lt;/table&gt;</span> ;<br/>
+	<span class=text_bold> ^</span>  can be to mark the headers of a table;
+	<span class=text_bold> |</span>  to define the cells of a table;
+	and <span class=text_bold> ===</span>  can be use to mark a row break.
+<div class="hlcode">
+<span class=StmtKey>&lt;table&gt;</span><span class=codeback><br />
+^&thinsp; Header1&thinsp; ^&thinsp; Header2&thinsp; ^<br />
+|&thinsp; Cell11&thinsp; &thinsp; |&thinsp; Cell12&thinsp; &thinsp; |<br />
+===<br />
+|&thinsp; Cell21&thinsp; &thinsp; |&thinsp; Cell22&thinsp; &thinsp; |<br />
+|&thinsp; Cell31&thinsp; &thinsp; |&thinsp; Cell32&thinsp; &thinsp; |<br />
+</span><span class=StmtKey>&lt;/table&gt;</span></div>
+ 
+	This will give:
+	
+<table class="sdmltable">
+<tr><th> Header1</th><th> Header2</th></tr>
+<tr class=docTableRow><td class=docTableCell> Cell11</td><td class=docTableCell> Cell12</td></tr>
+<tr><td class=docTableCell></td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell> Cell21</td><td class=docTableCell> Cell22</td></tr>
+<tr class=docTableRow><td class=docTableCell> Cell31</td><td class=docTableCell> Cell32</td></tr>
+</table>
+ 
+	The row of headers is optional.</li>
+
+<li> Text citing: <span class=text_bold> &lt;cite&gt;text&lt;/cite&gt;</span> ;
+<div class="hlcode text_italic"> 
+text
+</div></li>
+
+<li> Source code highlighting: <span class=text_bold> &lt;code lang&gt;source&lt;/code&gt;</span> ;<br/>
+	At this moment, <span class=text_bold> lang</span>  can be <span class=text_bold> dao</span> , <span class=text_bold> cpp</span> ,
+	<span class=text_bold> bnf</span>  or <span class=text_bold> sdml</span> , other languages will be supported
+	in the future.<br/>
+<div class="hlcode">
+<span class=StmtKey>&lt;code&thinsp; dao&gt;</span><span class=codeback><br />
+stdio.println(&thinsp; 'hello&thinsp; world!'&thinsp; );<br />
+</span><span class=StmtKey>&lt;/code&gt;</span></div>
+ 
+This will give:
+<div class="hlcode">
+<span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>'hello world!'</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+</li>
+
+</ul>
+<br clear=all />
+</div></body></html>

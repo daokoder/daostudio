@@ -1,0 +1,240 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+
+<h2>Web Programming Using Dao</h2>
+<div align=center><p><b>Limin Fu (phoolimin<img src="/images/at.png"/>gmail<img src="/images/dot.png"/>com)</b></p></div>
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#1">Using&nbsp;CGI&nbsp;Module</a></li>
+<li style="margin-top: 5px"><a href="#2">Database&nbsp;Handling</a></li>
+<li style="margin-top: 5px"><a href="#3">Simple&nbsp;Way&nbsp;to&nbsp;Separate&nbsp;Model&nbsp;and&nbsp;View</a></li>
+</ol></td></tr></table> <br/><br/>
+This document will not explain how to do web programming, instead, 
+it will just show how to use Dao as a server side scripting language.
+Server side web scripts usually interact with a web server (such as Apache)
+through the Common Gateway Interface (CGI) protocol.
+Web scripts can access the information of a HTTP request using CGI protocol,
+and decide how to respond to the request.
+Normally, web scripts also have to query a database,
+and present the results in a good way to the client browser.<br/>
+<table class="topsection"><tr><td><a name="1"><H3>1  Using CGI Module</H3>
+</td><td align="right"><a href="&section=1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+DaoCGI is a module to parse the information of a HTTP request,
+and presents the information in a structured way (as Dao variables)
+to Dao web scripts.<br/><br/>
+The CGI module can be loaded by
+<div class="hlcode">
+<span class=StmtKey>load</span>&thinsp; DaoCGI;</div>
+ 
+After loading, there will be several global variables imported into the
+current namespace:
+
+<table class="sdmltable">
+<tr><th> Name</th><th> Type</th><th> Use</th></tr>
+<tr class=docTableRow><td class=docTableCell> HTTP_ENV</td><td class=docTableCell> map&lt;string,string&gt;</td><td class=docTableCell> environment information about the HTTP request</td></tr>
+<tr class=docTableRow><td class=docTableCell> HTTP_GET</td><td class=docTableCell> map&lt;string,string&gt;</td><td class=docTableCell> variables for a GET request</td></tr>
+<tr class=docTableRow><td class=docTableCell> HTTP_POST</td><td class=docTableCell> map&lt;string,string&gt;</td><td class=docTableCell> variables for a POST request</td></tr>
+<tr class=docTableRow><td class=docTableCell> HTTP_GETS</td><td class=docTableCell> map&lt;string,list&lt;string&gt; &gt;</td><td class=docTableCell> variables for a GET request</td></tr>
+<tr class=docTableRow><td class=docTableCell> HTTP_POSTS</td><td class=docTableCell> map&lt;string,list&lt;string&gt; &gt;</td><td class=docTableCell> variables for a POST request</td></tr>
+<tr class=docTableRow><td class=docTableCell> HTTP_COOKIE</td><td class=docTableCell> map&lt;string,string&gt;</td><td class=docTableCell> cookies for the request</td></tr>
+<tr class=docTableRow><td class=docTableCell> HTTP_FILE</td><td class=docTableCell> map&lt;string,stream&gt;</td><td class=docTableCell> uploaded files for the request</td></tr>
+</table>
+ 
+For <span class=text_italic> HTTP_GETS, HTTP_POSTS</span> , there could be multiple values for the same key.
+For <span class=text_italic> HTTP_FILE</span> , the key is the upload name for the file:
+<div class="hlcode">
+&lt;input&thinsp; type=<span class=String>"file"</span>&thinsp; name=<span class=String>"upload_name"</span>&thinsp; id=<span class=String>"filename"</span>/&gt;</div>
+ 
+and the value is an IO stream containing the uploaded file.<br/><br/>
+A simple CGI program using Dao could be,
+<div class="hlcode">
+<span class=StmtKey>load</span>&thinsp; DaoCGI;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>'content-type: text/plain\n'</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>'You are from:'</span>,&thinsp; <span class=Number>HTTP_ENV</span><span class=SpecSymbol>[</span>&thinsp; <span class=String>'REMOTE_ADDR'</span>&thinsp; <span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>'Welcome to visit:'</span>,&thinsp; <span class=Number>HTTP_ENV</span><span class=SpecSymbol>[</span><span class=String>'REQUEST_URI'</span><span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table class="topsection"><tr><td><a name="2"><H3>2  Database Handling</H3>
+</td><td align="right"><a href="&section=2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Currently Dao only has a module to handle MYSQL	database.
+The way this module handles database is by mapping Dao classes
+to database tables (class members to table fields),
+and by using class instances to operate on database tables.
+For the details, please refer to the
+<a href="/page/dao_datamodel">Database Handling by DaoDataModel</a> .<br/>
+<table class="topsection"><tr><td><a name="3"><H3>3  Simple Way to Separate Model and View</H3>
+</td><td align="right"><a href="&section=3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+It is normally the responsibility of server side web scripts to generate
+HTML codes to present some information to a web browser.
+Such information or data are often stored in files or databases,
+and have to be processed in certain way (model).
+If the information is going to be presented to a web brower,
+it is preferrable to achieve certain visual appearance by generating
+appropriate HTML codes (view).<br/><br/>
+Obviously, it is better to separate model and view,
+so that it becomes much easier to modify one of them without affecting the other,
+resulting web applications that are easy to maintain or upgrade.
+The DaoDataModel suit well the model part of a web application.
+While for the view part, several string methods are available in Dao
+to make thing much easier. In the following, I will use an example
+to explain this.<br/><br/>
+Suppose there is a database table named <span class=text_italic> Friend</span>  
+for an address book with the following information:
+<div class="hlcode">
+id&thinsp; &thinsp; :&thinsp; <span class=Number>INTEGER</span>&thinsp; <span class=Number>PRIMARY</span>&thinsp; <span class=Number>KEY</span>&thinsp; <span class=Number>AUTOINCREMENT</span><br/>name&thinsp; &thinsp; :&thinsp; <span class=Number>CHAR</span><span class=SpecSymbol>(</span><span class=Number>50</span><span class=SpecSymbol>)</span><br/>phone&thinsp; :&thinsp; <span class=Number>CHAR</span><span class=SpecSymbol>(</span><span class=Number>20</span><span class=SpecSymbol>)</span><br/>city&thinsp; &thinsp; :&thinsp; <span class=Number>CHAR</span><span class=SpecSymbol>(</span><span class=Number>50</span><span class=SpecSymbol>)</span><br/>street&thinsp; :&thinsp; <span class=Number>VARCHAR</span><span class=SpecSymbol>(</span><span class=Number>100</span><span class=SpecSymbol>)</span></div>
+ <br/>
+and the corresponding Dao class would be:
+<div class="hlcode">
+<span class=CodeStruct>typedef</span>&thinsp; <span class=DataType>tuple</span>&lt;id:<span class=DataType>string</span>,name:<span class=DataType>string</span>,phone:<span class=DataType>string</span>,city:<span class=DataType>string</span>,street:<span class=DataType>string</span>&gt;&thinsp; friend_t;<br/><br/><span class=CodeStruct>class</span>&thinsp; Friend<br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=DataPrefix>my</span>&thinsp; id&thinsp; :&thinsp; <span class=Number>INT_PRIMARY_KEY_AUTOINCREMENT</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=DataPrefix>my</span>&thinsp; name&thinsp; &thinsp; :&thinsp; <span class=Number>CHAR50</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=DataPrefix>my</span>&thinsp; phone&thinsp; :&thinsp; <span class=Number>CHAR20</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=DataPrefix>my</span>&thinsp; city&thinsp; &thinsp; :&thinsp; <span class=Number>CHAR50</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=DataPrefix>my</span>&thinsp; street&thinsp; :&thinsp; <span class=Number>CHAR100</span>;<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=CodeStruct>routine</span>&thinsp; AsTuple<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; friend_t&thinsp; <span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; <span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>(</span><span class=DataType>string</span><span class=SpecSymbol>)</span>&thinsp; id,&thinsp; name,&thinsp; phone,&thinsp; city,&thinsp; street&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span></div>
+ 
+Here a tuple type (friend_t) with named items is also defined to be
+the basic data structure to interface between the model and view part 
+of the application.<br/><br/>
+Now suppose again, the database is open as,
+<div class="hlcode">
+<span class=DataPrefix>global</span>&thinsp; model&thinsp; =&thinsp; DataModel<span class=SpecSymbol>(</span>&thinsp; <span class=String>'dbname'</span>,&thinsp; <span class=String>'host'</span>,&thinsp; <span class=String>'user'</span>,&thinsp; <span class=String>'password'</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+Now in the model part, querying the database table is extremely simple.
+For example, one would like to find all friends in certain city,
+this can be done as,
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; FriendInCity<span class=SpecSymbol>(</span>&thinsp; city&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;friend_t&gt;<br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; friends&thinsp; =&thinsp; <span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; friend&thinsp; =&thinsp; Friend<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; hd&thinsp; =&thinsp; model.Select<span class=SpecSymbol>(</span>&thinsp; Friend&thinsp; <span class=SpecSymbol>)</span>.Where<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>.<span class=Number>EQ</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>'city'</span>,&thinsp; city&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>while</span><span class=SpecSymbol>(</span>&thinsp; hd.Query<span class=SpecSymbol>(</span>&thinsp; friend&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; friends.<span class=Method>append</span><span class=SpecSymbol>(</span>&thinsp; friend.AsTuple<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; hd.Done<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; friends;<br/><span class=SpecSymbol>}</span></div>
+ 
+Obviously this function can also be defined as 
+a member method of class <span class=text_bold> Friend</span> .<br/><br/>
+Creating view can also be done in a simple way by using template HTML codes.
+For example, if the queried friends need to be displayed in a table,
+one can define the following template,
+<div class="hlcode">
+&lt;tr&thinsp; <span class=CodeStruct>class</span>=<span class=String>"myrowstyle"</span>&gt;&lt;td&thinsp; <span class=CodeStruct>class</span>=<span class=String>"mycellstyle"</span>&gt;@<span class=SpecSymbol>(</span>id<span class=SpecSymbol>)</span>&lt;/td&gt;<br/>&lt;td&gt;@<span class=SpecSymbol>(</span>name<span class=SpecSymbol>)</span>&lt;/td&gt;&lt;td&gt;@<span class=SpecSymbol>(</span>phone<span class=SpecSymbol>)</span>&lt;/td&gt;<br/>&lt;td&gt;@<span class=SpecSymbol>(</span>city<span class=SpecSymbol>)</span>&lt;/td&gt;&lt;td&gt;@<span class=SpecSymbol>(</span>street<span class=SpecSymbol>)</span>&lt;/td&gt;&lt;/tr&gt;</div>
+ 
+The template will define which fields to be displayed, and how is the layout.
+The color and font information can also be included in the template,
+but it is easier to set them by using Cascade Style Sheet (CSS).<br/><br/>
+The generation of view would be,
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; ViewFriends<span class=SpecSymbol>(</span>&thinsp; friends&thinsp; :&thinsp; <span class=DataType>list</span>&lt;friend_t&gt;,&thinsp; rowtpl&thinsp; =&thinsp; <span class=String>''</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; html&thinsp; =&thinsp; <span class=String>'&lt;table class="mytablestyle"&gt;\n'</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>for</span><span class=SpecSymbol>(</span>&thinsp; friend&thinsp; <span class=StmtKey>in</span>&thinsp; friends&thinsp; <span class=SpecSymbol>)</span>&thinsp; html&thinsp; +=&thinsp; rowtpl.expand<span class=SpecSymbol>(</span>&thinsp; friend,&thinsp; <span class=String>'@'</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; html&thinsp; +=&thinsp; <span class=String>'&lt;/table&gt;'</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; html;<br/><span class=SpecSymbol>}</span></div>
+ 
+Here the method <span class=text_italic> rowtpl.expand()</span>  will expand the <span class=text_italic> rowtpl</span> 
+string and substitute the place-holders by the tuple items of <span class=text_italic> friend</span> 
+with corresponding item names. A map (associative array) could also be
+used in the place of the tuple parameter of <span class=text_bold> expand()</span> .<br/><br/>
+So to query the friends and view them, one could use,
+<div class="hlcode">
+row&thinsp; =&thinsp; <span class=String>'&lt;tr class="myrowstyle"&gt;&lt;td class="mycellstyle"&gt;@(id)&lt;/td&gt;
+<br />&lt;td&gt;@(name)&lt;/td&gt;&lt;td&gt;@(phone)&lt;/td&gt;
+<br />&lt;td&gt;@(city)&lt;/td&gt;&lt;td&gt;@(street)&lt;/td&gt;&lt;/tr&gt;'</span>;<br/><br/>friends&thinsp; =&thinsp; FriendInCity<span class=SpecSymbol>(</span>&thinsp; <span class=String>'Beijing'</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>view&thinsp; =&thinsp; ViewFriends<span class=SpecSymbol>(</span>&thinsp; friends,&thinsp; row&thinsp; <span class=SpecSymbol>)</span>;</div>
+ 
+By changing the template html codes (as well as CSS), 
+the appearance of the view can be easily changed.<br clear=all />
+</div></body></html>

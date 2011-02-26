@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+
+<h2>安装道语言虚拟机</h2>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#1">编译和安装</a></li>
+<li style="margin-top: 5px"><a href="#2">配置路径</a></li>
+<li style="margin-top: 5px"><a href="#3">Extra&nbsp;Configuration</a></li>
+</ol></td></tr></table><table class="topsection"><tr><td><a name="1"><H3>1  编译和安装</H3>
+</td><td align="right"><a href="&section=1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+在装有GCC的Linux下，执行：
+<div class="hlcode">
+shell:&thinsp; make<br/>shell:&thinsp; make&thinsp; install</div>
+ 
+这将启用DVM的大部分特性，编译并安装在<span class=text_bold> /usr/local/dao</span> 。
+如果你也可以通过修改Makefile来换其他编译器编译，或禁用道语言的某些特性，
+或更改安装目录。<br/><br/>
+在Windows下，DVM可使用MinGW Developer studio和Microsoft Visual Studio Express编译。
+你只需新建一项目，并将DVM的源代码文件(daoMaindl.h出外)添加到项目里，
+然后添加下列预编译定义：
+<div class="hlcode">
+-<span class=Number>DDAO_WITH_AFC</span>,<br/>-<span class=Number>DDAO_WITH_JIT</span>,<br/>-<span class=Number>DDAO_WITH_MPI</span>,<br/>-<span class=Number>DDAO_WITH_MACRO</span>,<br/>-<span class=Number>DDAO_WITH_THREAD</span>,<br/>-<span class=Number>DDAO_WITH_NETWORK</span>,<br/>-<span class=Number>DDAO_WITH_NUMARRAY</span>,</div>
+ 
+再添加一些链接库：MinGW下是<span class=text_italic> msvcp60</span> ；
+MS visual studio里是<span class=text_italic> ws2_32</span> , <span class=text_italic> winmm</span> , <span class=text_italic> msvcprt</span> 。
+这样DVM应该可以顺利的通过编译。<br/><br/>
+道语言的发布也附带了一个可以直接用MinGW在Windows下编译道的Makefile文件。<br/><br/>
+在苹果机也可以编译DVM。<br/>
+<table class="topsection"><tr><td><a name="2"><H3>2  配置路径</H3>
+</td><td align="right"><a href="&section=2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+配置路径主要是为了方便模块载入，可参看道语言简介里的模块目录管理小节。
+简单的讲，用户只需建立一个名为addpath.dao的文件，并在文件里加入如下行：
+<div class="hlcode">
+@@<span class=Number>PATH</span><span class=SpecSymbol>(</span>&thinsp; +&thinsp; <span class=String>"你的安装路径"</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+并把这个文件放到下面的三个位置之一：
+<ol>
+<li> Linux下的/usr/lib/dao for linux, 或Windows下的C:\dao;</li>
+
+<li> 你的用户目录/dao；</li>
+
+<li> 环境变量DAO_DIR所定义的目录。</li>
+
+</ol>
+ 
+如果你想直接使用道语言发布所附带的二进制文件，你只需将解压缩后的路径
+设置在addpath.dao文件里。<br/>
+<table class="topsection"><tr><td><a name="3"><H3>3  Extra Configuration</H3>
+</td><td align="right"><a href="&section=3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+额外的配置可以使用名为dao.conf的配置文件来设置。
+当道解释器启动时，它将首先在下列目录里查找名为dao.conf的文件，
+如果找到，它将读取此文件，并根据此文件更改道虚拟机的当前配置。
+<ol>
+<li> Linux下的/usr/local/dao (或Windows下的C:\dao)；</li>
+
+<li> 环境变量DAO_DIR所指的目录；</li>
+
+<li> 启动解释器的当前目录。</li>
+
+</ol>
+ 
+所有被找到的dao.conf文件都将被用来修改道虚拟机的配置设定，
+因此，第一个dao.conf文件里的设定将可以取代道虚拟机的内部缺省设定；
+而接下来的dao.conf文件则可以取代前面dao.conf文件的设定。<br/><br/>
+例子配置文件，
+<div class="hlcode">
+<span class=Comment># CPU数目
+<br /></span>cpu&thinsp; =&thinsp; <span class=Number>2</span><br/><br/><span class=Comment># 即时编译
+<br /></span>jit&thinsp; =&thinsp; yes<br/><br/><span class=Comment># 类型优化的虚拟机指令
+<br /></span>typedcode&thinsp; =&thinsp; yes<br/><br/><span class=Comment># 增量编译
+<br /></span>incompile&thinsp; =&thinsp; yes<br/><br/><span class=Comment># 安全运行模式
+<br /></span>safe&thinsp; =&thinsp; no</div>
+<br clear=all />
+</div></body></html>

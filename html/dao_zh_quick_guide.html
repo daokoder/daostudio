@@ -1,0 +1,1023 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+
+<h2>道语言简明教程</h2>
+<div align=center><p><b>傅利民(phoolimin<img src="/images/at.png"/>gmail<img src="/images/dot.png"/>com)</b></p></div>
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#1">基础</a></li>
+<li style="margin-top: 5px"><a href="#2">逻辑与循环控制</a></li>
+<li style="margin-top: 5px"><a href="#3">输入输出</a></li>
+<li style="margin-top: 5px"><a href="#4">函数</a></li>
+<li style="margin-top: 5px"><a href="#5">类和面向对象编程</a></li>
+<li style="margin-top: 5px"><a href="#6">模块载入</a></li>
+<li style="margin-top: 5px"><a href="#7">编程小提示</a></li>
+</ol></td></tr></table> <br/><br/>
+(适用于道语言1.1)<br/><br/>
+本文档基于<a href="http://www.gnu.org/copyleft/fdl.html">GNU Free Documentation License</a> 许可发布。<br/><br/>
+<span class=text_bold> 道(Dao)</span> 语言是一门面向对象的程序设计语言，它支持显式的变量类型申明，和隐式的类型推测，
+既可以作为强类型语言使用，也可作为弱类型语言使用。
+道支持多种复杂的数据类型。它拥有较强的文本处理能力，支持正则表达式。
+它还提供了内置的如复数和数值数组等数值类型，这些类型的操作在道里比较方便。
+道语言还对函数式编程有了较好的支持。
+多线程编程作为一个不可分割的部分集成到了道语言及其虚拟机里。
+道语言还实现了函数的异步调用，使得某些类型的并行编程变得很简单。
+网络编程和基于消息传递的分布式编程也作为标准库被支持。
+道还有比较好的宏机制，可以实现语法扩展。
+道语言可以由C/C++以方便透明的方式加以扩展，或者被嵌入到C/C++程序中。<br/>
+<table class="topsection"><tr><td><a name="1"><H3>1  基础</H3>
+</td><td align="right"><a href="&section=1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#1.1">如何运行</a></li>
+<li style="margin-top: 5px"><a href="#1.2">基本类型</a></li>
+<li style="margin-top: 5px"><a href="#1.3">数据储存方式</a></li>
+<li style="margin-top: 5px"><a href="#1.4">变量声明</a></li>
+<li style="margin-top: 5px"><a href="#1.5">下标运算</a></li>
+<li style="margin-top: 5px"><a href="#1.6">运算符</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="1.1"><H4>1.1  如何运行</H4>
+</td><td align="right"><a href="&section=1.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+从命令行，输入道解释器程序名称，后面跟上脚本文件名：<br/>
+<span class=text_bold> dao [选项] script_source.dao</span> <br/>
+可使用<span class=text_italic> dao -h</span> 查看可用选项。<br/><br/>
+既然helloworld是很多程序设计教程里的经典例子，这里也提供一个类似的例子来介绍一点道语言里最基本的要素。
+<div class="hlcode">
+<span class=Comment># Hello World例程:
+<br /></span>io.write<span class=SpecSymbol>(</span>&thinsp; <span class=String>"Hello World!"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Comment>#{
+<br />多行注释
+<br />多行注释
+<br />#}</span></div>
+ 
+已在例子里提到了，<span class=text_bold> #</span> 用于注释单行，其后的字符将被解释器忽略；一对<span class=text_bold> #{  #}</span> 用于注释多行。
+多数情况下，语句结束符<span class=text_bold> ;</span> 可省略，例外是<span class=text_bold> load,return</span> 语句，它们必须由<span class=text_bold> ;</span> 结束。
+
+<table class="sdmltable">
+<tr class=docTableRow><td class=docTableCell><span class=text_bold> #</span></td><td class=docTableCell> 注释单行</td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_bold> #{  #}</span></td><td class=docTableCell> 注释多行</td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_bold> ;</span></td><td class=docTableCell> 结束语句，可省略</td></tr>
+</table>
+ <br/>
+<span class=text_italic> io</span> 是道里面的基本IO库，<span class=text_italic> io.write()</span> 将其参数的结果打印到标准输出。
+从道语言1.1版开始，道语言以内置函数的方式支持了一些基本的数学函数和函数式方法。
+道语言里的其他标准函数和方法都成为了某个库或类型的成员方法，
+需要适用相应的库或类型访问。
+道里面可用的库包括：
+<span class=text_italic> io</span> (stdio作为io的别名被保留，以保持向后兼容)，<span class=text_italic> std</span> (stdlib同样被作为别名被保留)，
+<span class=text_italic> math</span> ，<span class=text_italic> reflect</span> ，<span class=text_italic> coroutine</span> ,
+<span class=text_italic> network</span> , <span class=text_italic> mpi</span> （message passing interface消息传递接口）
+和<span class=text_italic> mtlib</span> （multi-threading library多线程库）。
+另外，大部分道数据对象都有内置的成员方法。任何数据对象或库的成员方法均可由
+<span class=text_italic> stdlib.listmeth( obj )</span> 列出来。
+参考<a href="">道语言类型和库函数手册</a> 。<br/>
+<table><tr><td><a name="1.2"><H4>1.2  基本类型</H4>
+</td><td align="right"><a href="&section=1.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+道语言支持以下数据类型：数字，字符串，列表，关联表（字典），类对象
+复数和数值数组等。它们可由赋值，枚举或函数调用等方式创建。每个道变量可以有
+固定的类型。<br/>
+
+<table class="sdmltable">
+<tr class=docTableRow><td class=docTableCell><span class=text_italic> int</span> （整数）</td><td class=docTableCell> 十进制数</td><td class=docTableCell> 1234</td></tr>
+<tr class=docTableRow><td class=docTableCell></td><td class=docTableCell> 16进制数</td><td class=docTableCell> 0xff88</td></tr>
+<tr><td class=docTableCell></td><td class=docTableCell></td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_italic> float</span> （单精度浮点数）</td><td class=docTableCell> 十进制数</td><td class=docTableCell> 12.34</td></tr>
+<tr class=docTableRow><td class=docTableCell></td><td class=docTableCell> 科学记数</td><td class=docTableCell> 1e-10（小写e）</td></tr>
+<tr><td class=docTableCell></td><td class=docTableCell></td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_italic> double</span> （双精度浮点数）</td><td class=docTableCell> 十进制数</td><td class=docTableCell> 12.34D</td></tr>
+<tr class=docTableRow><td class=docTableCell></td><td class=docTableCell> 科学记数</td><td class=docTableCell> 1E-10（大写E）</td></tr>
+<tr><td class=docTableCell></td><td class=docTableCell></td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_italic> complex</span> （复数）</td><td class=docTableCell><span class=text_italic> $</span> 表征虚部</td><td class=docTableCell> 1+3$</td></tr>
+<tr><td class=docTableCell></td><td class=docTableCell></td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_italic> long</span></td><td class=docTableCell> 大整数</td><td class=docTableCell> 1234L</td></tr>
+<tr><td class=docTableCell></td><td class=docTableCell></td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_italic> string</span> （字符串）</td><td class=docTableCell> 多字节字符串(MBS)</td><td class=docTableCell> 'mbs'（单引号）</td></tr>
+<tr class=docTableRow><td class=docTableCell></td><td class=docTableCell> 宽字节字符串(WCS)</td><td class=docTableCell> "wcs"（双引号）</td></tr>
+<tr><td class=docTableCell></td><td class=docTableCell></td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_italic> list</span> （列表）</td><td class=docTableCell> 枚举</td><td class=docTableCell> { 1, 2, 3 }</td></tr>
+<tr class=docTableRow><td class=docTableCell></td><td class=docTableCell> 等差序列</td><td class=docTableCell> { init : step : size }</td></tr>
+<tr><td class=docTableCell></td><td class=docTableCell></td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_italic> map</span> （关联表，字典）</td><td class=docTableCell> 枚举</td><td class=docTableCell> { "A"=&gt;1, "B"=&gt;2, "C"=&gt;3 }</td></tr>
+<tr><td class=docTableCell></td><td class=docTableCell></td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_italic> array</span> （数值数组）</td><td class=docTableCell> 枚举向量</td><td class=docTableCell> [ 1, 2, 3 ]</td></tr>
+<tr class=docTableRow><td class=docTableCell></td><td class=docTableCell> 等差序列</td><td class=docTableCell> [ init : step : size ]</td></tr>
+<tr class=docTableRow><td class=docTableCell></td><td class=docTableCell> 枚举矩阵</td><td class=docTableCell> [ 1, 2, 3; 4, 5, 6 ]</td></tr>
+<tr class=docTableRow><td class=docTableCell></td><td class=docTableCell> 复数组</td><td class=docTableCell> [ 1, 2$, 3 ]</td></tr>
+<tr><td class=docTableCell></td><td class=docTableCell></td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_italic> tuple</span> （元组）</td><td class=docTableCell> 枚举</td><td class=docTableCell> ( 1, 2, "abc" )</td></tr>
+<tr class=docTableRow><td class=docTableCell></td><td class=docTableCell> 带元素域名的枚举</td><td class=docTableCell> ( x =&gt; 1.5, y =&gt; 2.0 )</td></tr>
+</table>
+ <br/>
+注1：在以等差序列创建数值数组时，<span class=text_italic> init</span> 值也可以是一个数值数组，
+这种情况下，被创建的多维数值数组中，“第一行”将等同于<span class=text_italic> init</span> ，
+“第二行”将等同于<span class=text_italic> init + step</span> ，如此等等：
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>0</span>&thinsp; :&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>]</span>&thinsp; :&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>]</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>;<br/><br/>a&thinsp; =&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>0</span>&thinsp; :&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>]</span>&thinsp; :&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>1</span>&thinsp; :&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>]</span>&thinsp; :&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>]</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+注2：当不带元素域名的枚举元组时，枚举的元素数目必须不少于二，
+因为当数目少于二时，这种枚举会和算术表达式使用括号分组相混淆。
+元素数目少于二的元组可从列表或关联表映射得到，
+<div class="hlcode">
+ls&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=String>"abc"</span>&thinsp; <span class=SpecSymbol>}</span>;<br/>tp&thinsp; =&thinsp; <span class=SpecSymbol>(</span><span class=DataType>tuple</span>&lt;<span class=DataType>string</span>&gt;<span class=SpecSymbol>)</span>&thinsp; ls;</div>
+ <br/>
+为了方便，道语言支持用<span class=text_bold> typedef</span> 来定义类型的别名，
+<div class="hlcode">
+<span class=CodeStruct>typedef</span>&thinsp; <span class=DataType>tuple</span>&lt;x:<span class=DataType>float</span>,y:<span class=DataType>float</span>,z:<span class=DataType>float</span>&gt;&thinsp; Point3D;<br/>pt&thinsp; :&thinsp; Point3D&thinsp; =&thinsp; <span class=SpecSymbol>(</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; pt.x&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table><tr><td><a name="1.2.1"><H6>1.2.1  MBS vs WCS</H6>
+</td><td align="right"><a href="&section=1.2.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+单引号字符串的内部表示为<span class=text_bold> 多</span> 字节字符串(UTF-8)；
+双引号字符串的内部表示为<span class=text_bold> 宽</span> 字节字符串(Unicode).
+单引号字符串用来表示西方语言字符更有效；
+而双引号字符串用来表示东方语言如CJK(Chinese, Japanese, and Korean)字符更有效。
+这两种字符串可以混合使用，如需要，它们间会作自动转换。
+但一般情况下最好一致的使用一种。<br/><br/>
+<table><tr><td><a name="1.3"><H4>1.3  数据储存方式</H4>
+</td><td align="right"><a href="&section=1.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+道语言有不同方式储存的数据，包括：局部、全局、类的常量和变量。
+它们可由下面的关键字或它们的组合来申明。
+<ol>
+<li><span class=text_bold> const</span> : 用于申明常量。取决于使用的地方，
+它可以是局部常量，也可以是命名空间或类的全局变量。
+如果被用在类定义体里，它将申明一个类常量成员。
+如果被用在函数外并没有被任何花括号所包围，
+那么它将申明一个全局常量，否则申明一个局部常量。</li>
+
+<li><span class=text_bold> global</span> : 用于申明全局变量;</li>
+
+<li><span class=text_bold> var</span> : 用于申明局部变量，或者在类定义体里申明类实例成员变量;</li>
+
+<li><span class=text_bold> static</span> : 用于申明静态变量，可用于函数里或类定义体里（和C++里的类似）。</li>
+
+</ol>
+ <br/>
+<table><tr><td><a name="1.4"><H4>1.4  变量声明</H4>
+</td><td align="right"><a href="&section=1.4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class="sdmltable">
+<tr><th> 例子</th><th> 含义</th></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_italic> 变量名 = 表达式</span></td><td class=docTableCell> 赋值申明变量; 如果“表达式”的值的类型可以推断出来，该变量的类型将被固定为此类型</td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_italic> 变量名 : 类型名</span></td><td class=docTableCell> 申明固定类型的变量</td></tr>
+<tr class=docTableRow><td class=docTableCell><span class=text_italic> 变量名 : 类型名 = 表达式</span></td><td class=docTableCell> 申明固定类型的变量并赋值</td></tr>
+</table>
+ 
+对于<span class=text_bold> =</span> ，如果它们被用来声明常量，运算符右侧的表达式必须是可在编译时求值
+的常量表达式。另外，如果<span class=text_bold> =</span> 
+被使用在类的定义体里声明一个成员变量，而且操作符右侧是常量表达式，那么此成员变量将被声明为
+拥有固定类型，并以该常量表达式的值作缺省值。<br/>
+<table><tr><td><a name="1.5"><H4>1.5  下标运算</H4>
+</td><td align="right"><a href="&section=1.5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class="sdmltable">
+<tr><th> 形式</th><th> 含义</th><th> 支持类型</th><th> 备注</th></tr>
+<tr class=docTableRow><td class=docTableCell> data[i]</td><td class=docTableCell> 单元素</td><td class=docTableCell> 字符串，列表，哈希表，数值数组</td><td class=docTableCell> 多维数值数组作一维向量处理！</td></tr>
+<tr class=docTableRow><td class=docTableCell> data[from:to]</td><td class=docTableCell> 下标或键区间内的元素</td><td class=docTableCell> 字符串，列表，哈希表，数值数组</td><td class=docTableCell><span class=text_italic> from</span> 或<span class=text_italic> to</span> 可省略；缺省情况下，<span class=text_italic> from</span> 是第一个下标或键, <span class=text_italic> to</span> 是最后一个</td></tr>
+<tr class=docTableRow><td class=docTableCell> data[list]</td><td class=docTableCell> 列表包含的下标所对应的元素</td><td class=docTableCell> 字符串，列表，数值数组</td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell> data[numarray]</td><td class=docTableCell> 数组包含的下标所对应的元素</td><td class=docTableCell> 数值数组</td><td class=docTableCell></td></tr>
+<tr class=docTableRow><td class=docTableCell> data[ d1, d2, ...]</td><td class=docTableCell> 多维下标</td><td class=docTableCell> 多维数组</td><td class=docTableCell> 每个维度上的下标可是上面任一种下标形式</td></tr>
+</table>
+ <br/>
+<table><tr><td><a name="1.6"><H4>1.6  运算符</H4>
+</td><td align="right"><a href="&section=1.6"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+道语言支持丰富的运算符来增强代码的表达能力。许多运算符可用于多种数据类型。<br/>
+<table><tr><td><a name="1.6.1"><H6>1.6.1  算术运算</H6>
+</td><td align="right"><a href="&section=1.6.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+
+<table class="sdmltable">
+<tr><th> 运算符</th><th> 名称</th><th> 支持类型</th></tr>
+<tr class=docTableRow><td class=docTableCell> +</td><td class=docTableCell> 加</td><td class=docTableCell> 数字，字符串，复数，数值数组</td></tr>
+<tr class=docTableRow><td class=docTableCell> -</td><td class=docTableCell> 减</td><td class=docTableCell> 数字，字符串，复数，数值数组</td></tr>
+<tr class=docTableRow><td class=docTableCell> *</td><td class=docTableCell> 乘</td><td class=docTableCell> 数字，复数，数值数组</td></tr>
+<tr class=docTableRow><td class=docTableCell> /</td><td class=docTableCell> 除</td><td class=docTableCell> 数字，复数，数值数组</td></tr>
+<tr class=docTableRow><td class=docTableCell> %</td><td class=docTableCell> 取余数</td><td class=docTableCell> 数字，数值数组</td></tr>
+<tr class=docTableRow><td class=docTableCell> **</td><td class=docTableCell> 取幂</td><td class=docTableCell> 数字，复数</td></tr>
+<tr class=docTableRow><td class=docTableCell> ++</td><td class=docTableCell> 自增</td><td class=docTableCell> 数字，复数，数值数组</td></tr>
+<tr class=docTableRow><td class=docTableCell> - -</td><td class=docTableCell> 自减</td><td class=docTableCell> 数字，复数，数值数组</td></tr>
+<tr class=docTableRow><td class=docTableCell> -</td><td class=docTableCell> 取负</td><td class=docTableCell> 数字，复数，数值数组</td></tr>
+<tr class=docTableRow><td class=docTableCell> +=</td><td class=docTableCell> 加赋值</td><td class=docTableCell> 数字，字符串，复数，数值数组</td></tr>
+<tr class=docTableRow><td class=docTableCell> -=</td><td class=docTableCell> 减赋值</td><td class=docTableCell> 数字，复数，数值数组</td></tr>
+<tr class=docTableRow><td class=docTableCell> *=</td><td class=docTableCell> 乘值乘</td><td class=docTableCell> 数字，复数，数值数组</td></tr>
+<tr class=docTableRow><td class=docTableCell> /=</td><td class=docTableCell> 除值除</td><td class=docTableCell> 数字，复数，数值数组</td></tr>
+<tr class=docTableRow><td class=docTableCell> %=</td><td class=docTableCell> 取余赋值</td><td class=docTableCell> 数字，数值数组</td></tr>
+</table>
+ 
+<span class=text_underline> 备注一：对于数值数组，上表中的二元运算符作对应元素之间的运算；
+一元运算符针对每个元素作运算</span> <br/>
+<span class=text_underline> 备注二：对于自增或自减运算符，前缀与后缀无区别，均产生运算后的值。</span> <br/><br/>
+<table><tr><td><a name="1.6.2"><H6>1.6.2  数字或字符串间的比较</H6>
+</td><td align="right"><a href="&section=1.6.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class="sdmltable">
+<tr><th> 运算符</th><th> 名称</th><th> 支持类型</th></tr>
+<tr class=docTableRow><td class=docTableCell> ==</td><td class=docTableCell> 相等</td><td class=docTableCell> 数字，字符串，复数</td></tr>
+<tr class=docTableRow><td class=docTableCell> !=</td><td class=docTableCell> 不等</td><td class=docTableCell> 数字，字符串，复数</td></tr>
+<tr class=docTableRow><td class=docTableCell> &lt;</td><td class=docTableCell> 小于</td><td class=docTableCell> 数字，字符串</td></tr>
+<tr class=docTableRow><td class=docTableCell> &gt;</td><td class=docTableCell> 大于</td><td class=docTableCell> 数字，字符串</td></tr>
+<tr class=docTableRow><td class=docTableCell> &lt;=</td><td class=docTableCell> 小于等于</td><td class=docTableCell> 数字，字符串</td></tr>
+<tr class=docTableRow><td class=docTableCell> &gt;=</td><td class=docTableCell> 大于等于</td><td class=docTableCell> 数字，字符串</td></tr>
+</table>
+ <br/>
+<table><tr><td><a name="1.6.3"><H6>1.6.3  布尔运算</H6>
+</td><td align="right"><a href="&section=1.6.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class="sdmltable">
+<tr><th> 运算符</th><th> 名称</th><th> 支持类型</th></tr>
+<tr class=docTableRow><td class=docTableCell> &&</td><td class=docTableCell> 与</td><td class=docTableCell> 数字</td></tr>
+<tr class=docTableRow><td class=docTableCell> ||</td><td class=docTableCell> 或</td><td class=docTableCell> 数字</td></tr>
+<tr class=docTableRow><td class=docTableCell> !</td><td class=docTableCell> 非</td><td class=docTableCell> 数字</td></tr>
+</table>
+ <br/>
+为了增加可读性，与或非运算符可用<span class=text_italic> and</span> , <span class=text_italic> or</span> 和<span class=text_italic> not</span> 代替。
+与或运算符运算方式跟Lua里的与或运算符运算方式一样，
+也就是，这些运算返回最后求值的运算子的值。
+这意味着，如果第一个运算子的值可以决定运算的结果，返回第一个运算子的值；
+否则，返回第二个运算子的值。
+当运算子的值均为0或1时，这种运算方式跟普通的布尔运算完全等价。
+下面的例子给出运算子是任意值的情况，
+<div class="hlcode">
+<span class=Number>10</span>&thinsp; &&&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>0</span><br/><span class=Number>0</span>&thinsp; &&&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>0</span><br/><span class=Number>10</span>&thinsp; &&&thinsp; <span class=Number>20</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>20</span><br/><span class=Number>20</span>&thinsp; &&&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>10</span><br/><br/><span class=Number>10</span>&thinsp; ||&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>10</span><br/><span class=Number>0</span>&thinsp; ||&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>10</span><br/><span class=Number>10</span>&thinsp; ||&thinsp; <span class=Number>20</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>10</span><br/><span class=Number>20</span>&thinsp; ||&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>20</span></div>
+ 
+在某些情况下适当使用与或运算符的运算方式可以简化代码。<br/>
+<table><tr><td><a name="1.6.4"><H6>1.6.4  类型操作符</H6>
+</td><td align="right"><a href="&section=1.6.4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+
+<table class="sdmltable">
+<tr><th> 操作符</th><th> 名称</th><th> 用法</th></tr>
+<tr class=docTableRow><td class=docTableCell> ?=</td><td class=docTableCell> 数据类型相等</td><td class=docTableCell> 值A ?= 值B</td></tr>
+<tr class=docTableRow><td class=docTableCell> ?&lt;</td><td class=docTableCell> 数据类型属于</td><td class=docTableCell> 值 ?&lt; 类型</td></tr>
+</table>
+ <br/>
+<table><tr><td><a name="1.6.5"><H6>1.6.5  断定检查操作(assertion)</H6>
+</td><td align="right"><a href="&section=1.6.5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Operator 
+操作符
+<span class=text_bold> ??</span> 
+可用来检查上一操作是否成功，如果成功返回1，否则0。
+如果上一操作能产生值，此操作符还可带第二个操作数，
+以指定上一操作失败时可使用的替代值。<br/>
+<div class="hlcode">
+a&thinsp; =&thinsp; alist<span class=SpecSymbol>[</span>i<span class=SpecSymbol>]</span>&thinsp; ??&thinsp; &thinsp; &thinsp; <span class=Comment># 检查下标运算是否成功;
+<br /></span>b&thinsp; =&thinsp; amap<span class=SpecSymbol>[</span><span class=Method>key</span><span class=SpecSymbol>]</span>&thinsp; ??&thinsp; &thinsp; <span class=Comment># 检查键值运算是否成功;
+<br /></span>val&thinsp; =&thinsp; amap<span class=SpecSymbol>[</span><span class=Method>key</span><span class=SpecSymbol>]</span>&thinsp; ??&thinsp; another&thinsp; &thinsp; <span class=Comment># 如果存在键,返回值,否则返回第二个操作数的值;</span></div>
+ <br/>
+<table><tr><td><a name="1.6.6"><H6>1.6.6  多元赋值</H6>
+</td><td align="right"><a href="&section=1.6.6"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+<span class=SpecSymbol>(</span>&thinsp; <span class=Number>C</span>,&thinsp; <span class=Number>A</span>,&thinsp; <span class=Number>B</span>,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; =&thinsp; <span class=SpecSymbol>(</span>&thinsp; <span class=Number>A</span>,&thinsp; <span class=Number>B</span>,&thinsp; <span class=Number>C</span>,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>(</span>&thinsp; <span class=Number>A</span>,&thinsp; <span class=Number>B</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; =&thinsp; func<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;</div>
+ 
+右边的表达式必须产生一个元组或列表，它们中的每个元素被赋给左边相应的变量。
+多余的列表元素或被赋值变量将被忽略。<br/>
+<table><tr><td><a name="1.6.7"><H6>1.6.7  其他运算符</H6>
+</td><td align="right"><a href="&section=1.6.7"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class="sdmltable">
+<tr class=docTableRow><td class=docTableCell> &</td><td class=docTableCell> 比特与</td></tr>
+<tr class=docTableRow><td class=docTableCell> |</td><td class=docTableCell> 比特或</td></tr>
+<tr class=docTableRow><td class=docTableCell> ^</td><td class=docTableCell> 比特与非</td></tr>
+<tr class=docTableRow><td class=docTableCell> ~</td><td class=docTableCell> 取互补比特XXX</td></tr>
+<tr class=docTableRow><td class=docTableCell> &=</td><td class=docTableCell> 比特与赋值</td></tr>
+<tr class=docTableRow><td class=docTableCell> |=</td><td class=docTableCell> 比特或赋值</td></tr>
+</table>
+ <br/>
+<table class="topsection"><tr><td><a name="2"><H3>2  逻辑与循环控制</H3>
+</td><td align="right"><a href="&section=2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#2.1">If&nbsp;Else</a></li>
+<li style="margin-top: 5px"><a href="#2.2">While</a></li>
+<li style="margin-top: 5px"><a href="#2.3">For</a></li>
+<li style="margin-top: 5px"><a href="#2.4">Do-Until</a></li>
+<li style="margin-top: 5px"><a href="#2.5">Do-While</a></li>
+<li style="margin-top: 5px"><a href="#2.6">Switch-Case</a></li>
+<li style="margin-top: 5px"><a href="#2.7">其他控制</a></li>
+</ol></td></tr></table> <br/>
+为了完成一项任务，程序经常需要根据某个条件有选择性地或反复地执行一段代码，
+这可以使用逻辑与循环控制语句来做到。
+道语言目前支持<span class=text_italic> if-else</span> , <span class=text_italic> while</span> , <span class=text_italic> for</span> , <span class=text_italic> do-until</span> ,
+<span class=text_italic> switch-case</span> , <span class=text_italic> break</span> 和<span class=text_italic> skip</span> 等控制。<br/>
+<table><tr><td><a name="2.1"><H4>2.1  If Else</H4>
+</td><td align="right"><a href="&section=2.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+当某条件表达式值为真时，执行一块代码：
+<div class="hlcode">
+<span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; expr1&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; block1;<br/><span class=SpecSymbol>}</span><span class=StmtKey>elif</span><span class=SpecSymbol>(</span>&thinsp; expr2&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; block2;<br/><span class=SpecSymbol>}</span><span class=StmtKey>else</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; block3;<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+如果条件表达式<span class=text_italic> expr1</span> 的值为真，<span class=text_italic> block1</span> 将被执行；
+否则如条件<span class=text_italic> expr2</span> 为真，<span class=text_italic> block2</span> 被执行；
+否则执行<span class=text_italic> block3</span> 。可使用零个或多个<span class=text_bold> elseif / elif</span> ,
+和零个或一个<span class=text_bold> else</span> 。<br/>
+<div class="hlcode">
+<span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>2</span>&thinsp; &gt;&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; io.writeln<span class=SpecSymbol>(</span><span class=String>"2 is larger than 1."</span><span class=SpecSymbol>)</span></div>
+ <br/>
+<table><tr><td><a name="2.2"><H4>2.2  While</H4>
+</td><td align="right"><a href="&section=2.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+当某条件表达式值为真时，<span class=text_bold> 反复</span> 执行一块代码：
+<div class="hlcode">
+<span class=StmtKey>while</span><span class=SpecSymbol>(</span>&thinsp; expr&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; block;<br/><span class=SpecSymbol>}</span></div>
+ 
+如果条件表达式<span class=text_italic> expr</span> 值为真，反复执行<span class=text_italic> block</span> 直到表达式<span class=text_italic> expr</span> 值为假。<br/>
+<div class="hlcode">
+i&thinsp; =&thinsp; <span class=Number>0</span>;<br/><span class=StmtKey>while</span><span class=SpecSymbol>(</span>&thinsp; i&thinsp; &lt;&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; i&thinsp; <span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; &thinsp; i&thinsp; ++;<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+<table><tr><td><a name="2.3"><H4>2.3  For</H4>
+</td><td align="right"><a href="&section=2.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+道语言支持多种形式的for循环，最方便使用的是下面这种，
+<div class="hlcode">
+<span class=StmtKey>for</span><span class=SpecSymbol>(</span>&thinsp; 变量&thinsp; =&thinsp; 初值&thinsp; :&thinsp; 步长&thinsp; :&thinsp; 终值&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; 代码;<br/><span class=SpecSymbol>}</span></div>
+ 
+循环将从<span class=text_italic> 变量=初值</span> 开始执行，然后每次循环后，<span class=text_italic> 变量</span> 的值按<span class=text_italic> 步长</span> 
+增加，直到<span class=text_italic> 变量</span> 的值变得大于<span class=text_italic> 终值</span> 时终止循环。
+这里<span class=text_italic> 步长</span> 可以省略，其缺省值是1。
+<span class=text_italic> 初值</span> ，<span class=text_italic> 步长</span> 和<span class=text_italic> 终值</span> 总是在循环开始前被计算。<br/><br/>
+C/C++类型<span class=text_bold> for</span> 循环：
+<div class="hlcode">
+<span class=StmtKey>for</span><span class=SpecSymbol>(</span>&thinsp; init;&thinsp; condition;&thinsp; step&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; block;<br/><span class=SpecSymbol>}</span></div>
+ 
+<span class=text_bold> for</span> 语句块的执行顺序是这样的：<br/>
+<ol>
+<li> 执行循环初始表达式<span class=text_italic> init</span> ；转到3；</li>
+
+<li> 执行<span class=text_italic> step</span> ；</li>
+
+<li> 执行条件表达式<span class=text_italic> condition</span> ；</li>
+
+<li> 检查<span class=text_italic> condition</span> 的值：如为真，转到5，否则转到6；</li>
+
+<li> 执行<span class=text_italic> block</span> ；转到2；</li>
+
+<li> 终止循环，开始执行循环体后面的语句。</li>
+
+</ol>
+ <br/>
+一般情况下，C/C++类型<span class=text_bold> for</span> 循环等价于下面的<span class=text_bold> while</span> 循环:
+<div class="hlcode">
+init;<br/><span class=StmtKey>while</span><span class=SpecSymbol>(</span>&thinsp; condition&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; block;<br/>&thinsp; &thinsp; &thinsp; step;<br/><span class=SpecSymbol>}</span></div>
+ 
+但如果<span class=text_italic> block</span> 包含一个不被其他循环语句包含的<span class=text_bold> skip</span> 语句，那么上面这个<span class=text_bold> while</span> 循环
+与C/C++类型<span class=text_bold> for</span> 循环并不完全等价。因在<span class=text_bold> for</span> 循环体中，<span class=text_bold> skip</span> 只跳过<span class=text_italic> block</span> 
+块余下的部分，而在上面的<span class=text_bold> while</span> 循环中，<span class=text_bold> skip</span> 将同时跳过<span class=text_italic> step</span> 语句。<br/><br/>
+道语言也支持Python风格的<span class=text_bold> for-in</span> 循环：
+<div class="hlcode">
+<span class=StmtKey>for</span><span class=SpecSymbol>(</span>&thinsp; item&thinsp; <span class=StmtKey>in</span>&thinsp; <span class=DataType>list</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; block;<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+关联表也可用在for-in循环中，这里<span class=text_italic> item</span> 将会是一对键与值，
+<div class="hlcode">
+<span class=StmtKey>for</span><span class=SpecSymbol>(</span>&thinsp; item&thinsp; <span class=StmtKey>in</span>&thinsp; a_map&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; block;<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+在一个for-in循环中可以使用多个in语句，但那些列表或关联表必须含有相同个数的元素，
+否则，程序将抛出例外，
+<div class="hlcode">
+<span class=StmtKey>for</span><span class=SpecSymbol>(</span>&thinsp; item1&thinsp; <span class=StmtKey>in</span>&thinsp; list1;&thinsp; item2&thinsp; <span class=StmtKey>in</span>&thinsp; list2;&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; block;<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+例子，
+<div class="hlcode">
+<span class=StmtKey>for</span><span class=SpecSymbol>(</span>&thinsp; i<span class=SpecSymbol>:=</span><span class=Number>0</span>;&thinsp; i&lt;<span class=Number>3</span>;&thinsp; i++&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; i&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span><br/><br/>hash&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=String>"b"</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>11</span>,&thinsp; <span class=String>"a"</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>22</span>,&thinsp; <span class=String>"e"</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>33</span>,&thinsp; <span class=String>"c"</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>44</span>&thinsp; <span class=SpecSymbol>}</span>;<br/><span class=StmtKey>for</span><span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=StmtKey>in</span>&thinsp; hash.<span class=Method>key</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;&thinsp; b&thinsp; <span class=StmtKey>in</span>&thinsp; hash.<span class=Method>value</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;&thinsp; c&thinsp; <span class=StmtKey>in</span>&thinsp; <span class=SpecSymbol>{</span><span class=Number>1</span>&thinsp; :&thinsp; <span class=Number>1</span>&thinsp; :&thinsp; hash.<span class=Method>size</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>-<span class=Number>1</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=Comment>#if a == "a" break
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; a,&thinsp; <span class=String>"\t"</span>,&thinsp; b,&thinsp; <span class=String>"\t"</span>,&thinsp; c&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span></div>
+ 
+这个例子抛出了一个例外，因为最后那个列表的元素数目比其他第一个列表少一。<br/>
+<table><tr><td><a name="2.4"><H4>2.4  Do-Until</H4>
+</td><td align="right"><a href="&section=2.4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<span class=text_italic> do-until</span> 可用于执行一段代码<span class=text_italic> block</span> 直到某个条件<span class=text_italic> condition</span> 满足，
+<div class="hlcode">
+<span class=StmtKey>do</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; block;<br/><span class=SpecSymbol>}</span>&thinsp; until&thinsp; <span class=SpecSymbol>(</span>&thinsp; condition&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=Number>10</span>;<br/><span class=StmtKey>do</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; c&thinsp; =&thinsp; <span class=Number>1</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"here"</span>,&thinsp; a&thinsp; --&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span>until<span class=SpecSymbol>(</span>&thinsp; a&thinsp; ==&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+注：当使用单个字符串作为<span class=text_bold> if,while,for,until</span> 中的条件表达式时，
+如果字符串长度大于零，返回真值；否则返回假值。<br/>
+<table><tr><td><a name="2.5"><H4>2.5  Do-While</H4>
+</td><td align="right"><a href="&section=2.5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+<span class=StmtKey>do</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; block;<br/><span class=SpecSymbol>}</span>&thinsp; <span class=StmtKey>while</span>&thinsp; <span class=SpecSymbol>(</span>&thinsp; condition&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+执行代码块<span class=text_italic> block</span> , 然后在条件表达式式<span class=text_italic> condition</span> 为真
+的情况下重复执行<span class=text_italic> block</span> 。<br/>
+<table><tr><td><a name="2.6"><H4>2.6  Switch-Case</H4>
+</td><td align="right"><a href="&section=2.6"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<span class=text_bold> Switch-case</span> 开关控制可基于一个表达式的值选择相应的代码块执行。它可以用来方便地实现的分支控制。
+<div class="hlcode">
+<span class=StmtKey>switch</span><span class=SpecSymbol>(</span>&thinsp; exprs&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; <span class=StmtKey>case</span>&thinsp; <span class=Number>C1</span>&thinsp; :&thinsp; block1<br/>&thinsp; &thinsp; &thinsp; <span class=StmtKey>case</span>&thinsp; <span class=Number>C2</span>&thinsp; :&thinsp; block2<br/>&thinsp; &thinsp; &thinsp; <span class=StmtKey>case</span>&thinsp; <span class=Number>C3</span>&thinsp; :&thinsp; block3<br/>&thinsp; &thinsp; &thinsp; <span class=SpecSymbol>...</span><br/>&thinsp; &thinsp; &thinsp; <span class=StmtKey>default</span>:&thinsp; block0<br/><span class=SpecSymbol>}</span></div>
+ 
+如果表达式<span class=text_italic> exprs</span> 的值等于某个<span class=text_bold> case</span> 语句的<span class=text_italic> Ci</span> ，代码块<span class=text_italic> blocki</span> 将被执行。
+这里<span class=text_italic> Ci</span> 必须是常量，可以是不同类型的值。与C/C++不同的是，代码块<span class=text_italic> blocki</span> 被执行后，
+程序执行将跳到<span class=text_bold> switch</span> 块外，因此这里不需要象C/C++里那样使用<span class=text_bold> break</span> 语句来显示跳出
+<span class=text_bold> switch</span> 块。<br/>
+如果你需要对不同的<span class=text_bold> case</span> 值都执行同一块代码，你仅需将那些<span class=text_bold> case</span> 值放在一起：
+<div class="hlcode">
+<span class=StmtKey>switch</span><span class=SpecSymbol>(</span>&thinsp; <span class=Method>value</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; <span class=StmtKey>case</span>&thinsp; <span class=Number>C1</span>,&thinsp; <span class=Number>C2</span>,&thinsp; <span class=Number>C3</span>&thinsp; :&thinsp; <br/>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; block3<br/>&thinsp; &thinsp; &thinsp; <span class=SpecSymbol>...</span><br/>&thinsp; &thinsp; &thinsp; <span class=StmtKey>default</span>:&thinsp; block0<br/><span class=SpecSymbol>}</span></div>
+ 
+在这种情况下，<span class=text_bold> case</span> 值<span class=text_italic> C1,C2,C3</span> 将对应于同一代码块<span class=text_italic> block3</span> 。
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=String>"a"</span>;<br/><span class=StmtKey>switch</span><span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>case</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=String>"a"</span>&thinsp; :&thinsp; io.write<span class=SpecSymbol>(</span><span class=String>"case 1 or a"</span><span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>default</span>&thinsp; :&thinsp; &thinsp; io.write<span class=SpecSymbol>(</span><span class=String>"case default"</span><span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+道语言的switch-case结构还允许使用值区间作为case，
+这样当switch值属于这个区间时，此case块将被执行。
+需要注意的是，如果switch值属于多个相互重叠的区间，
+那么对应下界最小的区间的case块将被执行。
+<div class="hlcode">
+<span class=StmtKey>switch</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/><span class=StmtKey>case</span>&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=Number>5</span>&thinsp; :&thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'case 1-5'</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=StmtKey>case</span>&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=Number>10</span>&thinsp; :&thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'case 5-10'</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=StmtKey>case</span>&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=Number>11</span>&thinsp; :&thinsp; a&thinsp; =&thinsp; <span class=Number>1</span>;<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+<table><tr><td><a name="2.7"><H4>2.7  其他控制</H4>
+</td><td align="right"><a href="&section=2.7"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<span class=text_bold> break</span> 可用来跳出循环。<span class=text_bold> skip</span> 可用来跳过此轮循环的余下部分，开始下轮循环。
+<span class=text_bold> skip</span> 等价于C/C++里的<span class=text_bold> continue</span> 。<br/>
+<div class="hlcode">
+<span class=StmtKey>for</span><span class=SpecSymbol>(</span>&thinsp; i=<span class=Number>0</span>;&thinsp; i&lt;<span class=Number>5</span>;&thinsp; i++&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; i&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; i&thinsp; ==&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=StmtKey>break</span>;<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+<table class="topsection"><tr><td><a name="3"><H3>3  输入输出</H3>
+</td><td align="right"><a href="&section=3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+大多数程序需要处理某种形式的输入与输出(IO, Input / Output)。道语言支持一些基本的IO
+功能，它们主要由标准库<span class=text_bold> io</span> 提供。更多信息请参看
+<a href="/page/dao_zh_std_library">道语言库方法参考</a> <br/><br/>
+例子：
+<div class="hlcode">
+<span class=Comment># 打开写文件:
+<br /></span>fout&thinsp; =&thinsp; io.open<span class=SpecSymbol>(</span>&thinsp; <span class=String>"test1.txt"</span>,&thinsp; <span class=String>"w"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><br/><span class=Comment># 写入文件:
+<br /></span>fout.write<span class=SpecSymbol>(</span>&thinsp; <span class=String>"log(10)="</span>,&thinsp; <span class=Method>math.log</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><br/><span class=Comment># 打开读文件:
+<br /></span>fin&thinsp; =&thinsp; io.open<span class=SpecSymbol>(</span>&thinsp; <span class=String>"test2.txt"</span>,&thinsp; <span class=String>"r"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><br/><span class=Comment># 当还未读到文件末尾:
+<br /></span><span class=StmtKey>while</span><span class=SpecSymbol>(</span>&thinsp; !&thinsp; fin.eof<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=Comment># 从文件读入一行:
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; line&thinsp; =&thinsp; fin.<span class=Method>read</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;&thinsp; <span class=Comment># line包含行结束符;
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=Comment># 写到标准输出:
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; io.write<span class=SpecSymbol>(</span>&thinsp; line&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span><br/><br/><span class=Comment># 从标准输入读入一行:
+<br /></span>d&thinsp; =&thinsp; io.<span class=Method>read</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; d&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table class="topsection"><tr><td><a name="4"><H3>4  函数</H3>
+</td><td align="right"><a href="&section=4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#4.1">定义</a></li>
+<li style="margin-top: 5px"><a href="#4.2">命名参数传递</a></li>
+<li style="margin-top: 5px"><a href="#4.3">参数类型与缺省值</a></li>
+<li style="margin-top: 5px"><a href="#4.4">常量参数</a></li>
+<li style="margin-top: 5px"><a href="#4.5">按引用传递参数</a></li>
+<li style="margin-top: 5px"><a href="#4.6">参数聚组</a></li>
+<li style="margin-top: 5px"><a href="#4.7">函数重载</a></li>
+<li style="margin-top: 5px"><a href="#4.8">匿名函数</a></li>
+<li style="margin-top: 5px"><a href="#4.9">发生器(Generator)和协程(Coroutine)</a></li>
+</ol></td></tr></table> <br/>
+函数是一可反复使用的代码块，它由关键字<span class=text_bold> routine</span> 定义。
+它可在被使用时接受参数，参数的名称，类型和缺省值需在定义时给定。
+它也可在使用结束时返回一个或多个结果。
+考虑到一些用户习惯，关键词<span class=text_bold> function, sub</span> 也可用来定义函数，
+其作用跟<span class=text_bold> routine</span> 完全等同。<br/>
+<table><tr><td><a name="4.1"><H4>4.1  定义</H4>
+</td><td align="right"><a href="&section=4.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; name<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>[</span>&thinsp; param1&thinsp; <span class=SpecSymbol>[</span>&thinsp; :&thinsp; type&thinsp; |&thinsp; <span class=SpecSymbol>[</span>:<span class=SpecSymbol>]</span>=&thinsp; const_expr&thinsp; <span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>[</span>,&thinsp; param2&thinsp; <span class=SpecSymbol>[</span><span class=SpecSymbol>...</span><span class=SpecSymbol>]</span>,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>[</span><span class=SpecSymbol>...</span><span class=SpecSymbol>]</span><br/><span class=SpecSymbol>}</span></div>
+ <br/>
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; func<span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; &thinsp; a&thinsp; =&thinsp; <span class=Number>10</span>;<br/>&thinsp; &thinsp; &thinsp; b&thinsp; =&thinsp; <span class=String>"test"</span>;<br/>&thinsp; &thinsp; &thinsp; <span class=StmtKey>return</span>&thinsp; a,&thinsp; b;&thinsp; <span class=Comment># return more than one results.
+<br /></span><span class=SpecSymbol>}</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <br/>r1,&thinsp; r2;<br/><span class=SpecSymbol>(</span>&thinsp; r1,&thinsp; r2&thinsp; <span class=SpecSymbol>)</span>&thinsp; =&thinsp; func<span class=SpecSymbol>(</span>&thinsp; <span class=Number>111</span>,&thinsp; <span class=String>"AAA"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>r3&thinsp; =&thinsp; func<span class=SpecSymbol>(</span>&thinsp; r1,&thinsp; r2&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"r1 = "</span>,&thinsp; r1&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"r2 = "</span>,&thinsp; r2&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"r3 = "</span>,&thinsp; r3&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table><tr><td><a name="4.2"><H4>4.2  命名参数传递</H4>
+</td><td align="right"><a href="&section=4.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+道语言函数的参数可按参数名字传递：
+<div class="hlcode">
+func<span class=SpecSymbol>(</span>&thinsp; b&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>123</span>,&thinsp; a&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=String>"ABC"</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table><tr><td><a name="4.3"><H4>4.3  参数类型与缺省值</H4>
+</td><td align="right"><a href="&section=4.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+正如道语言变量可声明为有类型的，道函数的参数也可声明为有类型，并还可声明为有缺省值。
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; MyRout<span class=SpecSymbol>(</span>&thinsp; name&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; index&thinsp; =&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"NAME  = "</span>,&thinsp; name&thinsp; <span class=SpecSymbol>)</span><br/>&thinsp; &thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"INDEX = "</span>,&thinsp; index&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>}</span></div>
+ 
+这里参数<span class=text_italic> name</span> 被声明为字符串，参数<span class=text_italic> index</span> 被声明为整数，并以零为缺省值。
+如果一个函数调用使用错误的参数，或没有数据传递给没有缺省值的参数，
+将导致报错，并终止运行。<br/><br/>
+参数缺省值可指定给参数表中的任意参数，而不管指定缺省值的参数后面的参数是否有缺省值。如，
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; MyRout2<span class=SpecSymbol>(</span>&thinsp; i=<span class=Number>0</span>,&thinsp; j&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; i,&thinsp; <span class=String>" "</span>,&thinsp; j&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>}</span><br/>MyRout2<span class=SpecSymbol>(</span>&thinsp; j&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+在这种情况下，如果你想用<span class=text_italic> i</span> 的缺省值，那么你需要将数据按参数名字传给<span class=text_italic> j</span> 。<br/>
+<table><tr><td><a name="4.4"><H4>4.4  常量参数</H4>
+</td><td align="right"><a href="&section=4.4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+要申明不为函数所修改的常量参数，只需在参数类型前添加 const 即可：
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; Test<span class=SpecSymbol>(</span>&thinsp; a&thinsp; :&thinsp; <span class=DataPrefix>const</span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; a<span class=SpecSymbol>[</span><span class=Number>1</span><span class=SpecSymbol>]</span>&thinsp; =&thinsp; <span class=Number>100</span>;&thinsp; <span class=Comment># 错误!!!
+<br /></span>&thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span><br/>a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>}</span><br/>Test<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table><tr><td><a name="4.5"><H4>4.5  按引用传递参数</H4>
+</td><td align="right"><a href="&section=4.5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+在函数调用时，如果参数名前使用了<span class=text_bold> &</span> ，
+那么该参数将作为引用被传递。
+只有基本数据类型的局部变量可作为引用被传递给函数调用，‘
+并且也只有在函数参数列表里创建引用。
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; Test<span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; p&thinsp; +=&thinsp; p;<br/><span class=SpecSymbol>}</span><br/>i&thinsp; =&thinsp; <span class=Number>10</span>;<br/>Test<span class=SpecSymbol>(</span>&thinsp; &&thinsp; i&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; i&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table><tr><td><a name="4.6"><H4>4.6  参数聚组</H4>
+</td><td align="right"><a href="&section=4.6"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+类似于Python里，道语言也支持参数聚组（grouping），
+它由一对括号定义，将括号里的参数聚集为一组。
+当一个元组被作为参数传递给有参数聚组的函数时，
+如果与参数聚组对应的元组的元素类型与组里的参数类型相符合，
+那么该元组将被展开，并将其元素传递给组里相应的参数。<br/>
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; Test<span class=SpecSymbol>(</span>&thinsp; a&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=SpecSymbol>(</span>&thinsp; b&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; c&thinsp; =&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b,&thinsp; c&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span><br/>t&thinsp; =&thinsp; <span class=SpecSymbol>(</span>&thinsp; <span class=String>'abc'</span>,&thinsp; <span class=Number>123</span>&thinsp; <span class=SpecSymbol>)</span><br/>Test<span class=SpecSymbol>(</span>&thinsp; <span class=Number>0</span>,&thinsp; t&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+<table><tr><td><a name="4.7"><H4>4.7  函数重载</H4>
+</td><td align="right"><a href="&section=4.7"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+道语言里，函数可按参数类型进行重载。也就是可对于拥有不同参数类型的函数
+使用同样的名称，函数调用时，道虚拟机根据调用中的参数选择正确的函数来运行。
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; MyRout<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; name&thinsp; =&thinsp; <span class=String>"ABC"</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"INDEX = "</span>,&thinsp; index&thinsp; <span class=SpecSymbol>)</span><br/>&thinsp; &thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"NAME  = "</span>,&thinsp; name&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>}</span><br/><br/>MyRout<span class=SpecSymbol>(</span>&thinsp; <span class=String>"DAO"</span>,&thinsp; <span class=Number>123</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=Comment># 调用上例中的MyRout()
+<br /></span>MyRout<span class=SpecSymbol>(</span>&thinsp; <span class=Number>456</span>,&thinsp; <span class=String>"script"</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=Comment># 调用此例中的MyRout()</span></div>
+ <br/>
+<table><tr><td><a name="4.8"><H4>4.8  匿名函数</H4>
+</td><td align="right"><a href="&section=4.8"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+在道语言里有匿名函数，是基本类型（也就是first-class function），
+他们按如下方式定义：
+<div class="hlcode">
+foo&thinsp; =&thinsp; <span class=CodeStruct>routine</span><span class=SpecSymbol>(</span>&thinsp; x,&thinsp; y&thinsp; :&thinsp; <span class=Number>TYPE</span>,&thinsp; z&thinsp; =&thinsp; <span class=Number>DEFAULT</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; codes;<br/><span class=SpecSymbol>}</span></div>
+ 
+除了以下三点不同外，这种函数的定义跟普通函数的定义完全一样：
+<ol>
+<li> 它不需要函数名，但当它被创建时，需要赋值给一个变量；</li>
+
+<li> 参数缺省值不必是常量，可以是任意表达式，该表达时将在函数被创建时求值；</li>
+
+<li> 函数体里可使用定义在外层函数的局部变量；根据变量的类型，他们的拷贝或
+引用将被输入到被创建的函数里。</li>
+
+</ol>
+ <br/>
+例子：
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=String>"ABC"</span>;<br/><br/>rout&thinsp; =&thinsp; <span class=CodeStruct>routine</span><span class=SpecSymbol>(</span>&thinsp; x,&thinsp; y&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; z&thinsp; =&thinsp; a+a&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; &thinsp; a&thinsp; +=&thinsp; <span class=String>"_abc"</span>;<br/>&thinsp; &thinsp; &thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"lambda "</span>,&thinsp; a&thinsp; <span class=SpecSymbol>)</span><br/>&thinsp; &thinsp; &thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"lambda "</span>,&thinsp; y&thinsp; <span class=SpecSymbol>)</span><br/>&thinsp; &thinsp; &thinsp; &thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"lambda "</span>,&thinsp; z&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>}</span><br/><br/>rout<span class=SpecSymbol>(</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=String>"XXX"</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table><tr><td><a name="4.9"><H4>4.9  发生器(Generator)和协程(Coroutine)</H4>
+</td><td align="right"><a href="&section=4.9"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+当一个函数被调用时，如果它函数名前有<span class=text_bold> @</span> 符号，
+此调用将不执行该函数，而是返回一个发生器或协程。
+在这样的函数里，可使用<span class=text_bold> yield</span> 语句来向调用者返回值。
+当<span class=text_bold> yield</span> 语句被执行时，此函数的运行将被暂停，
+并将运行控制权转给其调用者，而当调用者再次重新执行
+此函数时，函数将从暂停处继续执行。
+<span class=text_bold> yield</span> 语句执行完后，它将会象函数调用一样返回值，
+被返回的值就是其调用者作为参数传入的值。
+当函数运行至函数末尾或<span class=text_bold> return</span> 语句后，
+函数将终止运行，并且不可续。<br/>
+<div class="hlcode">
+<span class=Comment># int =&gt; tuple&lt;int,int&gt;
+<br /></span><span class=CodeStruct>routine</span>&thinsp; gen1<span class=SpecSymbol>(</span>&thinsp; a&thinsp; =&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; k&thinsp; =&thinsp; <span class=Number>0</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>while</span><span class=SpecSymbol>(</span>&thinsp; k&thinsp; ++&thinsp; &lt;&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; a&thinsp; =&thinsp; yield<span class=SpecSymbol>(</span>&thinsp; k,&thinsp; a&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; <span class=Number>0</span>,<span class=Number>0</span>;<br/><span class=SpecSymbol>}</span><br/><span class=CodeStruct>routine</span>&thinsp; gen2<span class=SpecSymbol>(</span>&thinsp; a&thinsp; =&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; gen1<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span><br/>g&thinsp; =&thinsp; @gen2<span class=SpecSymbol>(</span>&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Comment># 第一次调用时,参数可省略,
+<br /></span><span class=Comment># 创建时用到的参数将被在第一次调用时使用:
+<br /></span>io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'main1: '</span>,&thinsp; g<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;&thinsp; <br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'main2: '</span>,&thinsp; g<span class=SpecSymbol>(</span>&thinsp; <span class=Number>100</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'main3: '</span>,&thinsp; g<span class=SpecSymbol>(</span>&thinsp; <span class=Number>200</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ 
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; foo<span class=SpecSymbol>(</span>&thinsp; a&thinsp; =&thinsp; <span class=Number>0</span>,&thinsp; b&thinsp; =&thinsp; <span class=String>''</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'foo:'</span>,&thinsp; a&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; yield<span class=SpecSymbol>(</span>&thinsp; <span class=Number>2</span>&thinsp; *&thinsp; a,&thinsp; <span class=String>'by foo()'</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>routine</span>&thinsp; bar<span class=SpecSymbol>(</span>&thinsp; a&thinsp; =&thinsp; <span class=Number>0</span>,&thinsp; b&thinsp; =&thinsp; <span class=String>''</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'bar:'</span>,&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>(</span>&thinsp; r,&thinsp; s&thinsp; <span class=SpecSymbol>)</span>&thinsp; =&thinsp; foo<span class=SpecSymbol>(</span>&thinsp; a&thinsp; +&thinsp; <span class=Number>1</span>,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'bar:'</span>,&thinsp; r,&thinsp; s&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>(</span>&thinsp; r,&thinsp; s&thinsp; <span class=SpecSymbol>)</span>&thinsp; =&thinsp; yield<span class=SpecSymbol>(</span>&thinsp; a&thinsp; +&thinsp; <span class=Number>100</span>,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'bar:'</span>,&thinsp; r,&thinsp; s&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; a,&thinsp; <span class=String>'ended'</span>;<br/><span class=SpecSymbol>}</span><br/><br/>co&thinsp; =&thinsp; @bar<span class=SpecSymbol>(</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=String>"a"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; &thinsp; <br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'main: '</span>,&thinsp; co<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'main: '</span>,&thinsp; co<span class=SpecSymbol>(</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=String>'x'</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'main: '</span>,&thinsp; co<span class=SpecSymbol>(</span>&thinsp; <span class=Number>2</span>,&thinsp; <span class=String>'y'</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Comment># 协程已运行完,再调用将产生异常:
+<br /></span>io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>'main: '</span>,&thinsp; co<span class=SpecSymbol>(</span>&thinsp; <span class=Number>3</span>,&thinsp; <span class=String>'z'</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+发生器和协程也可由标准方法<span class=text_bold> stdlib.coroutine()</span> 来创建，
+不过这种情况下，函数必须同时使用标准方法<span class=text_bold> stdlib.yield()</span> 
+来返回值。
+另外，这两种方法创建的发生器或协程有个很重要的区别。
+使用前缀<span class=text_bold> @</span> 创建的发生器或协程支持类型检查，
+而使用<span class=text_bold> stdlib.coroutine()</span> 创建的不支持。<br/>
+<table class="topsection"><tr><td><a name="5"><H3>5  类和面向对象编程</H3>
+</td><td align="right"><a href="&section=5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#5.1">基类定义</a></li>
+<li style="margin-top: 5px"><a href="#5.2">类实例</a></li>
+<li style="margin-top: 5px"><a href="#5.3">类成员数据</a></li>
+<li style="margin-top: 5px"><a href="#5.4">Setters,&nbsp;Getters&nbsp;和运算符重载</a></li>
+<li style="margin-top: 5px"><a href="#5.5">重载成员方法</a></li>
+<li style="margin-top: 5px"><a href="#5.6">类继承</a></li>
+</ol></td></tr></table> <br/>
+道语言对面向对象编程(object-oriented programming, OOP)有良好的支持。
+道语言类使用关键字<span class=text_bold> class</span> 定义。
+一个类就是一组变量与函数的集合的抽象表示，这些变量和函数称为类的成员；
+成员变量的值将决定该类的特性，成员函数决定了该类的行为。
+类本身是程序员定义的抽象类型，它的值即实例就是一个具体的数据集合，此集合
+包含了类定义的成员变量。
+类实例可以以函数调用的方式调用类的构造函数创建，也可通过枚举类成员变量来创建。
+类成员的访问权限可由修饰词<span class=text_bold> private</span> （私有），<span class=text_bold> protected</span> （保护）
+和<span class=text_bold> public</span> （公开）来限定,缺省权限为公开。
+这些修饰词后可跟也可不跟冒号。<br/><br/>
+类与类之间可存在继承和包含关系。一个类（子类）可定义为另一个类（基类）的引申。
+子类可从基类继承某些特性，在基类的基础上扩充或专门化某些功能。类也可以包含其他类
+的实例为成员。<br/>
+<table><tr><td><a name="5.1"><H4>5.1  基类定义</H4>
+</td><td align="right"><a href="&section=5.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<span class=text_underline> 
+从道语言1.1开始，定义类的语法有所变化。
+现在类体将不能相函数那样接受参数，类体内也不能包含可执行语句。
+</span> <br/><br/>
+类的定义由关键字class开始申明类的名称，
+然后在由花括号所包围的类体里，申明类的成员常量，变量
+和方法等。
+<div class="hlcode">
+<span class=CodeStruct>class</span>&thinsp; MyNumber<br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=PermiPrefix>private</span><br/><br/>&thinsp; &thinsp; &thinsp; var&thinsp; <span class=Method>value</span>&thinsp; =&thinsp; <span class=Number>0</span>;<br/>&thinsp; &thinsp; &thinsp; var&thinsp; name&thinsp; :&thinsp; <span class=DataType>string</span>;<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=PermiPrefix>public</span><br/><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; MyNumber<span class=SpecSymbol>(</span>&thinsp; <span class=Method>value</span>&thinsp; =&thinsp; <span class=Number>0</span>,&thinsp; s&thinsp; =&thinsp; <span class=String>"NoName"</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Method>value</span>&thinsp; =&thinsp; <span class=Method>value</span>;<br/>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; name&thinsp; =&thinsp; s;<br/>&thinsp; &thinsp; &thinsp; <span class=SpecSymbol>}</span><br/><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; setValue<span class=SpecSymbol>(</span>&thinsp; v&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=Method>value</span>&thinsp; =&thinsp; v&thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; getValue<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>return</span>&thinsp; <span class=Method>value</span>&thinsp; <span class=SpecSymbol>}</span><br/><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; setValue<span class=SpecSymbol>(</span>&thinsp; v&thinsp; :&thinsp; <span class=DataType>float</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>routine</span>&thinsp; MyNumber<span class=SpecSymbol>::</span>setValue<span class=SpecSymbol>(</span>&thinsp; v&thinsp; :&thinsp; <span class=DataType>float</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; <span class=Method>value</span>&thinsp; =&thinsp; v;<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+类定义体里使用关键字<span class=text_bold> var</span> 申明类的成员变量。
+同普通变量类似，类成员变量也可按下面方式申明为有固定类型，
+<div class="hlcode">
+var&thinsp; variable&thinsp; :&thinsp; type;</div>
+ 
+这里<span class=text_italic> type</span> 必须是一类型名，这样<span class=text_italic> variable</span> 的类型将固定为<span class=text_italic> type</span> 的类型；
+或者<span class=text_italic> variable</span> 必须是<span class=text_italic> type</span> 的实例，如果<span class=text_italic> type</span> 也是类的话。<br/><br/>
+类的成员变量还可拥有缺省值。在类创建时，有缺省值的成员变量将被首先以缺省值填充。
+类的成员变量的缺省值可按以下方式指定，
+<div class="hlcode">
+var&thinsp; variable&thinsp; =&thinsp; init_value;<br/>var&thinsp; variable&thinsp; :&thinsp; type&thinsp; =&thinsp; init_value;</div>
+ 
+这里<span class=text_italic> init_value</span> 也必须是一常量。<br/><br/>
+在道语言里，类的定义体也是类的构造函数。和其他某些脚本语言里的类构造函数类似，
+道语言里的类构造函数并不是真正用来构造类实例，而是用来初始化类的成员数据。
+道语言里，类可拥有多个重载的构造函数，用来根据不同的构造函数调用参数以不同的方式初始化类实例。<br/>
+例子，
+<div class="hlcode">
+<span class=CodeStruct>class</span>&thinsp; MyNumber<span class=SpecSymbol>(</span>&thinsp; <span class=Method>value</span>&thinsp; =&thinsp; <span class=Number>0</span>,&thinsp; name&thinsp; =&thinsp; <span class=String>"NoName"</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=PermiPrefix>private</span><br/>&thinsp; &thinsp; &thinsp; <span class=DataPrefix>my</span>&thinsp; Value&thinsp; =&thinsp; <span class=Number>0</span>;&thinsp; <span class=Comment># value类型为整形,缺省值为零
+<br /></span>&thinsp; &thinsp; &thinsp; <span class=DataPrefix>my</span>&thinsp; Name&thinsp; :&thinsp; <span class=DataType>string</span>;&thinsp; <span class=Comment># name必须是字符串
+<br /></span><br/>&thinsp; &thinsp; &thinsp; Value&thinsp; =&thinsp; <span class=Method>value</span>;<br/>&thinsp; &thinsp; &thinsp; self.Name&thinsp; =&thinsp; name;<br/><br/>&thinsp; &thinsp; &thinsp; <span class=PermiPrefix>public</span><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; setValue<span class=SpecSymbol>(</span>&thinsp; <span class=Method>value</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; Value&thinsp; =&thinsp; <span class=Method>value</span>&thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; getValue<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>return</span>&thinsp; Value&thinsp; <span class=SpecSymbol>}</span><br/><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; setValue<span class=SpecSymbol>(</span>&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>routine</span>&thinsp; MyNumber<span class=SpecSymbol>::</span>setValue<span class=SpecSymbol>(</span>&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; Value&thinsp; =&thinsp; <span class=Method>value</span>;<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+在类的构造函数或成员函数里，可使用一特殊变量<span class=text_bold> self</span> ，它表示类的当前实例。<br/><br/>
+与C++里的类成员函数定义类似，类的成员函数可在类定义体内申明，然后在类体外定义。
+不过在道语言里，类体外定义的成员函数的参数表必须和申明时的完全一致。
+Dao里，虚拟函数也可用关键词<span class=text_bold> virtual</span> 来申明。<br/><br/>
+如果一个类成员函数里没使用类成员变量，且没调用其他使用了类成员变量的成员函数，
+那么此成员函数可按如下方式调用，
+<div class="hlcode">
+classname.method<span class=SpecSymbol>(</span><span class=SpecSymbol>...</span><span class=SpecSymbol>)</span></div>
+ <br/>
+<table><tr><td><a name="5.2"><H4>5.2  类实例</H4>
+</td><td align="right"><a href="&section=5.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+新的类实例可以由调用该类的构造函数得到，构造函数的调用方式跟普通函数调用完全一样。
+<div class="hlcode">
+obj1&thinsp; =&thinsp; MyNumber<span class=SpecSymbol>(</span><span class=Number>1</span><span class=SpecSymbol>)</span>;</div>
+ 
+类实例也可通过枚举类的成员变量创建，这种实例创建方式主要适合于比较简单的类，因为这种不需要
+复杂操作进行初始化。
+<div class="hlcode">
+obj2&thinsp; =&thinsp; MyNumber<span class=SpecSymbol>{</span>&thinsp; <span class=Number>2</span>,&thinsp; <span class=String>"enumerated"</span>&thinsp; <span class=SpecSymbol>}</span>;</div>
+ 
+在枚举成员变量时，可指定成员的名称，
+<div class="hlcode">
+obj3&thinsp; =&thinsp; MyNumber<span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; Name&thinsp; &thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=String>"enumerated"</span>;<br/>&thinsp; &thinsp; &thinsp; Value&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>3</span>;<br/><span class=SpecSymbol>}</span>;</div>
+ <br/>
+当类实例由枚举创建时，类实例先被成员变量的缺省值填充，然后使用枚举中的数据初始化相应的
+成员变量。通过枚举创建类实例比通过调用类构造函数创建类实例要快得多，调用类构造函数有一系列
+额外开销，如参数传递，函数运行时数据的分配等。
+枚举创建实例很适合于创建大量简单类的实例。<br/>
+<table><tr><td><a name="5.3"><H4>5.3  类成员数据</H4>
+</td><td align="right"><a href="&section=5.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+正如上面提到，类的成员变量由关键字<span class=text_bold> var</span> 在类体内申明。
+类的常量和静态成员可分别由<span class=text_bold> const</span> 和<span class=text_bold> static</span> 来申明。
+<div class="hlcode">
+<span class=CodeStruct>class</span>&thinsp; Klass<br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; <span class=DataPrefix>const</span>&thinsp; aClassConst&thinsp; =&thinsp; <span class=String>"KlassConst"</span>;<br/>&thinsp; &thinsp; &thinsp; static&thinsp; aClassStatic;<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+<table><tr><td><a name="5.4"><H4>5.4  Setters, Getters 和运算符重载</H4>
+</td><td align="right"><a href="&section=5.4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+相对于给私有或保护的成员变量定义<span class=text_italic> setXyz()</span> 或<span class=text_italic> getXyz()</span> 方法，
+更好的方式是定义所谓的Setters和Getters，定义这样的方法使得从外部环境可以直接
+对私有或保护的成员变量进行访问，就像访问公开成员一样。
+对于成员变量<span class=text_italic> Xyz</span> 其Setters应被定义为<span class=text_bold> .Xyz=()</span> ，
+而其Getters应被定义为<span class=text_italic> .Xyz()</span> 。
+当Setters被定义后<span class=text_italic> Xyz</span> 可由<span class=text_italic> obj.Xyz=abc</span> 设定；
+而当Getters被定义后<span class=text_italic> Xyz</span> 可由<span class=text_italic> obj.Xyz</span> 获取。
+<div class="hlcode">
+<span class=CodeStruct>class</span>&thinsp; MyNumber0<br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=PermiPrefix>private</span><br/>&thinsp; &thinsp; &thinsp; <br/>&nbsp;&nbsp;&nbsp;&nbsp; var&thinsp; <span class=Method>value</span>&thinsp; =&thinsp; <span class=Number>0</span>;<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=PermiPrefix>public</span><br/><br/>&thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; MyNumber0<span class=SpecSymbol>(</span>&thinsp; v&thinsp; =&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; &thinsp; <span class=Method>value</span>&thinsp; =&thinsp; v;<br/>&thinsp; &thinsp; <span class=SpecSymbol>}</span><br/><br/>&thinsp; &thinsp; operator&thinsp; .<span class=Method>value</span>=<span class=SpecSymbol>(</span>&thinsp; v&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=Method>value</span>&thinsp; =&thinsp; v;&thinsp; io.writeln<span class=SpecSymbol>(</span>&thinsp; <span class=String>"value is set"</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; operator&thinsp; .<span class=Method>value</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>return</span>&thinsp; <span class=Method>value</span>&thinsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/>num&thinsp; =&thinsp; MyNumber0<span class=SpecSymbol>(</span>&thinsp; <span class=Number>123</span>&thinsp; <span class=SpecSymbol>)</span><br/>num.<span class=Method>value</span>&thinsp; =&thinsp; <span class=Number>456</span><br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; num.<span class=Method>value</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+<span class=text_italic> 
+你也许已经猜到，通过Setters和Getters对类成员变量的访问会有比较大的运算开销。
+因此为了效率起见，需要从外部访问的成员变量应被设为公开。
+只有在必要时才用Setters和Getters，比如当你需要在那些成员变量被访问时作些额外工作时。
+</span> <br/><br/>
+被支持重载的运算符还包括：
+<ol>
+<li> operator =(...)  用作赋值运算;</li>
+
+<li> operator ()(...)  用作函数调用;</li>
+
+<li> operator [](...)  用作取元素;</li>
+
+<li> operator []=(...)  用作设定元素;</li>
+
+</ol>
+ 
+其运算符的重载将载后续版本中支持。<br/>
+<table><tr><td><a name="5.5"><H4>5.5  重载成员方法</H4>
+</td><td align="right"><a href="&section=5.5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+类的成员方法可以象普通函数那样被重载。类的构造函数也可被重载，给类定义于类同名的
+成员方法即可，不过在重载的类构造函数中不可使用关键词<span class=text_bold> my</span> 来定义成员变量。
+如类<span class=text_italic> MyNumber</span> 可作如下修改使得它只可从数字或该类的实例构造和赋值，
+<div class="hlcode">
+<span class=CodeStruct>class</span>&thinsp; MyNumber<br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=PermiPrefix>private</span><br/>&thinsp; &thinsp; &thinsp; var&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>int</span>;<br/><br/>&thinsp; &thinsp; &thinsp; <span class=PermiPrefix>public</span><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; MyNumber<span class=SpecSymbol>(</span>&thinsp; <span class=Method>value</span>&thinsp; =&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># accept builtin number as parameter
+<br /></span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; self.<span class=Method>value</span>&thinsp; =&thinsp; <span class=Method>value</span>;<br/>&thinsp; &thinsp; &thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; &thinsp; <span class=Comment># 接受MyNumber实例为参数的构造函数,类似于C++里的复制构造函数:
+<br /></span>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; MyNumber<span class=SpecSymbol>(</span>&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; MyNumber&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; self.<span class=Method>value</span>&thinsp; =&thinsp; <span class=Method>value</span>.<span class=Method>value</span>&thinsp; <span class=SpecSymbol>}</span><br/><br/>&thinsp; &thinsp; &thinsp; operator&thinsp; .<span class=Method>value</span>=<span class=SpecSymbol>(</span>&thinsp; v&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=Method>value</span>&thinsp; =&thinsp; v&thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; &thinsp; operator&thinsp; .<span class=Method>value</span>=<span class=SpecSymbol>(</span>&thinsp; v&thinsp; :&thinsp; MyNumber&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=Method>value</span>&thinsp; =&thinsp; v.<span class=Method>value</span>&thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; &thinsp; operator&thinsp; .<span class=Method>value</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>return</span>&thinsp; <span class=Method>value</span>&thinsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/>num1&thinsp; =&thinsp; MyNumber<span class=SpecSymbol>(</span>&thinsp; <span class=Number>123</span>&thinsp; <span class=SpecSymbol>)</span><br/>num1.<span class=Method>value</span>&thinsp; =&thinsp; <span class=Number>456</span><br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; num1.<span class=Method>value</span>&thinsp; <span class=SpecSymbol>)</span><br/><br/>num2&thinsp; =&thinsp; MyNumber<span class=SpecSymbol>(</span>&thinsp; num1&thinsp; <span class=SpecSymbol>)</span><br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; num2.<span class=Method>value</span>&thinsp; <span class=SpecSymbol>)</span><br/><br/>num2.<span class=Method>value</span>&thinsp; =&thinsp; <span class=Number>789</span><br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; num2.<span class=Method>value</span>&thinsp; <span class=SpecSymbol>)</span><br/><br/>num2.<span class=Method>value</span>&thinsp; =&thinsp; num1<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; num2.<span class=Method>value</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+<table><tr><td><a name="5.6"><H4>5.6  类继承</H4>
+</td><td align="right"><a href="&section=5.6"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+<span class=CodeStruct>class</span>&thinsp; ColorRBG<br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; var&thinsp; Red&thinsp; =&thinsp; <span class=Number>0</span>;<br/>&thinsp; &thinsp; &thinsp; var&thinsp; Green&thinsp; =&thinsp; <span class=Number>0</span>;<br/>&thinsp; &thinsp; &thinsp; var&thinsp; Blue&thinsp; =&thinsp; <span class=Number>0</span>;<br/><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; ColorRBG<span class=SpecSymbol>(</span>&thinsp; r,&thinsp; g,&thinsp; b&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; Red&thinsp; =&thinsp; r;<br/>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; Green&thinsp; =&thinsp; g;<br/>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; Blue&thinsp; =&thinsp; b;<br/>&thinsp; &thinsp; &thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; &thinsp; <br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; setRed<span class=SpecSymbol>(</span>&thinsp; r&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; Red&thinsp; =&thinsp; r;&thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; setGreen<span class=SpecSymbol>(</span>&thinsp; g&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; Green&thinsp; =&thinsp; g;&thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; setBlue<span class=SpecSymbol>(</span>&thinsp; b&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; Blue&thinsp; =&thinsp; b;&thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; &thinsp; <br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; getRed<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>return</span>&thinsp; Red;&thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; getGreen<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>return</span>&thinsp; Green;&thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; getBlue<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>return</span>&thinsp; Blue;&thinsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/>yellow&thinsp; =&thinsp; ColorRBG<span class=SpecSymbol>(</span>&thinsp; <span class=Number>255</span>,&thinsp; <span class=Number>255</span>,&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>;&thinsp; <span class=Comment># create an instance.</span></div>
+ 
+下面将定义<span class=text_italic> ColorRBG</span> 的一个派生类，
+<div class="hlcode">
+<span class=CodeStruct>class</span>&thinsp; ColorQuad&thinsp; :&thinsp; ColorRBG<br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; var&thinsp; alpha&thinsp; =&thinsp; <span class=Number>0</span>;&thinsp; <span class=Comment># alpha component for tranparency.
+<br /></span><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; ColorQuad<span class=SpecSymbol>(</span>&thinsp; r,&thinsp; g,&thinsp; b,&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; :&thinsp; ColorRBG<span class=SpecSymbol>(</span>&thinsp; r,&thinsp; g,&thinsp; b&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; alpha&thinsp; =&thinsp; a;<br/>&thinsp; &thinsp; &thinsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/>yellow2&thinsp; =&thinsp; ColorQuad<span class=SpecSymbol>(</span>&thinsp; <span class=Number>255</span>,&thinsp; <span class=Number>255</span>,&thinsp; <span class=Number>0</span>,&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>;&thinsp; <span class=Comment># not tranparent.
+<br /></span>yellow2.alpha&thinsp; =&thinsp; <span class=Number>127</span>;&thinsp; <span class=Comment># change to half tranparency.</span></div>
+ <br/>
+当从已有类派生新类时，基类必须放在派生类的参数列表后，并由<span class=text_bold> :</span> 隔开。
+如果有多个基类，这基类都应被放在<span class=text_bold> :</span> 后并被<span class=text_bold> ,</span> 隔开。
+派生类构造函数的参数可按例子所显示的方式传递给基类的构造函数。<br/><br/>
+定义派生类时，如果只有一个父类，派生类将同时继承父类的构造函数。<br/>
+<table class="topsection"><tr><td><a name="6"><H3>6  模块载入</H3>
+</td><td align="right"><a href="&section=6"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#6.1">编译时载入</a></li>
+<li style="margin-top: 5px"><a href="#6.2">运行时载入</a></li>
+<li style="margin-top: 5px"><a href="#6.3">模块目录管理</a></li>
+</ol></td></tr></table> <br/>
+当一个程序变得比较大时，经常有必要将那个程序模块化，这样会使得程序的维护变得更容易。
+道语言对程序模块化有相当的支持，道的模块既可静态载入（编译时），也可动态载入（运行时）。
+道模块既可以由道语言开发，也可由C/C++语言开发。<br/><br/>
+如果模块是由道语言开发，当模块被载入时，该模块的主代码
+（文件中不被类和函数所包含的代码）将在载入后立即被执行。
+如果模块是由C/C++语言开发，当模块被载入时，该模块的入口函数（<span class=text_italic> DaoOnLoad()</span> ）
+将在载入后立即被执行。
+当该模块被再次载入时，上次载入的模块数据将被使用，如果模块是由道语言开发，
+那么该模块的主代码将被再次执行。<br/>
+<table><tr><td><a name="6.1"><H4>6.1  编译时载入</H4>
+</td><td align="right"><a href="&section=6.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+  <br/>
+编译时模块载入由关键词<span class=text_italic> load</span> 完成，最简单的方式是：
+<div class="hlcode">
+<span class=StmtKey>load</span>&thinsp; MyModule;&thinsp; <span class=Comment># 或:load "MyModule";</span></div>
+ 
+这样载入时，道虚拟机将先在当前目录里然后在道库目录里寻找<span class=text_italic> MyModule.dao</span> ，
+如果找到则载入，否则再寻找<span class=text_italic> MyModule.so</span> 或<span class=text_italic> MyModule.dll</span> 。<br/><br/>
+模块所在的相对路径也可在<span class=text_italic> load</span> 语句中指定：
+<div class="hlcode">
+<span class=StmtKey>load</span>&thinsp; MyPath.MyModule;&thinsp; <span class=Comment># 等价于: load "MyPath/MyModule";</span></div>
+ 
+这种情况与前面类似，只不过道虚拟机将先在当前目录和道库目录里寻找子目录<span class=text_italic> MyPatch</span> 
+然后检查该目录里是否有相应于<span class=text_italic> MyModule</span> 的模块文件。
+模块的绝对路径必须以字符串的形式指定。<br/><br/>
+以上面的方式载入模块，模块中的所有全局常量，变量，函数，类和C/C++类型都将被输入到
+当前的命名空间。为了限制被输入的数据对象，可使用<span class=text_italic> import</span> ：
+<div class="hlcode">
+<span class=StmtKey>load</span>&thinsp; MyModule&thinsp; import&thinsp; name1,&thinsp; name2;</div>
+ 
+这样只有名字出现在列表中的全局数据对象被输入到当前命名空间。<br/><br/>
+如果你不希望模块中的全局数据对象被输入到当前命名空间，可以这样作：
+<div class="hlcode">
+<span class=StmtKey>load</span>&thinsp; MyModule&thinsp; <span class=CodeStruct>as</span>&thinsp; MyNS1;<br/><span class=StmtKey>load</span>&thinsp; MyModule&thinsp; import&thinsp; name1,&thinsp; name2,&thinsp; name3&thinsp; <span class=CodeStruct>as</span>&thinsp; MyNS2;</div>
+ 
+这样名为<span class=text_italic> MyNS1</span> 和<span class=text_italic> MyNS2</span> 的命名空间将被创建，
+而模块中的全局数据对象将被输入到相应的命名空间。
+而后，那些数据对象可被这样访问：<span class=text_italic> MyNS1.xyz</span> 或<span class=text_italic> MyNS1.xyz(...)</span> 。<br/><br/>
+某些情况下，C/C++模块可能依赖于另一些C/C++模块，这些被依赖的模块
+可使用<span class=text_italic> require</span> 指定，
+<div class="hlcode">
+<span class=StmtKey>load</span>&thinsp; MyModule&thinsp; <span class=StmtKey>require</span>&thinsp; AnotherMod1,&thinsp; AnotherMod2;</div>
+ 
+<span class=text_italic> require</span> 后面的模块名必须是不带目录和后缀的模块文件名。
+如果有多个从不同目录载入的模块拥有同样的模块文件名，
+只有最后被载入的那个被<span class=text_italic> require</span> 使用。<br/>
+<table><tr><td><a name="6.2"><H4>6.2  运行时载入</H4>
+</td><td align="right"><a href="&section=6.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+  <br/>
+运行时载入模块可使用标准库里的函数<span class=text_italic> stdlib.load( mod )</span> ，
+这个函数的参数<span class=text_italic> mod</span> 必须是模块名称（可以包含路径）。
+那个模块中的全局数据对象将被输入到当前命名空间。<br/>
+<table><tr><td><a name="6.3"><H4>6.3  模块目录管理</H4>
+</td><td align="right"><a href="&section=6.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+  <br/>
+在模块载入时，如果模块的相对目录被给定，那么这个目录将从当前目录
+（缺省的当前目录为道虚拟机开始运行时的目录）开始查找，然后在库目录表中查找。
+在库目录表中查找时，后加入的目录将先被查找。
+当前目录和库目录表可在编译时有<span class=text_italic> @PATH(+-path)</span> 设定：<br/>
+<ul>
+<li> 设定当前目录，
+<div class="hlcode">
+@@<span class=Number>PATH</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>"/home/guest"</span>&thinsp; <span class=SpecSymbol>)</span></div>
+</li>
+
+<li> 添加目录到库目录表里（加到其他目录之前），
+<div class="hlcode">
+@@<span class=Number>PATH</span><span class=SpecSymbol>(</span>&thinsp; +&thinsp; <span class=String>"./mypath/"</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+如果添加的是相对目录，那么这个目录将被检查是否是当前目录或库目录之一的子目录，
+如果是，这个目录将被添加。
+如果这个目录里有名为<span class=text_italic> addpath.dao</span> 文件，这个文件也将被执行。
+因此，如果此目录的子目录也需要被加入到库目录表里，
+那么这些子目录可用<span class=text_italic> @@PATH()</span> 列在<span class=text_italic> addpath.dao</span> 文件里，
+这样，当此目录被添加到库目录表里时，它的子目录也被自动地加入到库目录表里。
+<span class=text_italic> addpath.dao</span> 文件示例，
+<div class="hlcode">
+<span class=Comment># Sample addpath.dao file:
+<br /></span>@@<span class=Number>PATH</span><span class=SpecSymbol>(</span>&thinsp; +&thinsp; <span class=String>"subdir1"</span>&thinsp; <span class=SpecSymbol>)</span><br/>@@<span class=Number>PATH</span><span class=SpecSymbol>(</span>&thinsp; +&thinsp; <span class=String>"subdir2"</span>&thinsp; <span class=SpecSymbol>)</span><br/>@@<span class=Number>PATH</span><span class=SpecSymbol>(</span>&thinsp; +&thinsp; <span class=String>"subdir1/subsub"</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>...</span></div>
+</li>
+
+<li> 从库目录表里删除目录，
+<div class="hlcode">
+@@<span class=Number>PATH</span><span class=SpecSymbol>(</span>&thinsp; -&thinsp; <span class=String>"./mypath/"</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+同样地，当该目录里含有<span class=text_italic> delpath.dao</span> 文件时，该文件将被执行，
+可用来将该目录下已被添加到库目录表里子目录从库目录里删除。</li>
+
+</ul>
+ <br/>
+缺省情况下，下列目录将被按顺序加入到库目录表里：
+<ol>
+<li> 系统目录<span class=text_italic> /usr/lib/dao</span>  （或Windows下的<span class=text_italic> C:dao</span> ）；</li>
+
+<li> 用户目录<span class=text_italic> ~/dao</span> ；</li>
+
+<li> 环境变量<span class=text_italic> DAO_DIR</span> 所指定的目录，如果存在此环境变量的话。</li>
+
+</ol>
+ 
+前面已提过，在模块载入时，后加入的目录将被先查找。<br/>
+<table class="topsection"><tr><td><a name="7"><H3>7  编程小提示</H3>
+</td><td align="right"><a href="&section=7"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#7.1">处理命令行参数</a></li>
+<li style="margin-top: 5px"><a href="#7.2">类型映射</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="7.1"><H4>7.1  处理命令行参数</H4>
+</td><td align="right"><a href="&section=7.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+道语言里，命令行参数由两个全局变量保存：<span class=text_italic> CMDARG</span> 和<span class=text_italic> ARGV</span> 。
+<span class=text_italic> CMDARG</span> 是一个关联表，将参数名和参数序号映射到参数值；
+而<span class=text_italic> ARGV</span> 是一列表，按顺序保存参数值。
+例如，如果由命令行执行<span class=text_italic> dao cmdarg.dao -arg1 -arg2 abc -arg3=def arg4=10</span> ，
+那么<span class=text_italic> CMDARG</span> 和<span class=text_italic> ARGV</span> 将包含以下元素：
+<div class="hlcode">
+<span class=Number>CMDARG</span>&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; arg1&thinsp; <span class=SpecSymbol>=></span>&thinsp; arg1,&thinsp; arg2&thinsp; <span class=SpecSymbol>=></span>&thinsp; abc,&thinsp; arg3&thinsp; <span class=SpecSymbol>=></span>&thinsp; def,&thinsp; arg4&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>10</span>,&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; cmdarg.dao,&thinsp; <span class=Number>2</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; arg1,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; abc,&thinsp; <span class=Number>4</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; def,&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>}</span><br/><span class=Number>ARGV</span>&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; cmdarg.dao,&thinsp; arg1,&thinsp; abc,&thinsp; def,&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>}</span></div>
+ 
+命令行参数解析规则，
+
+<table class="sdmltable">
+<tr><th> 参数形式</th><th> 解析出的参数名</th><th> 解析出的参数值</th></tr>
+<tr class=docTableRow><td class=docTableCell> -arg</td><td class=docTableCell> arg</td><td class=docTableCell> arg</td></tr>
+<tr class=docTableRow><td class=docTableCell> -arg value</td><td class=docTableCell> arg</td><td class=docTableCell> value</td></tr>
+<tr class=docTableRow><td class=docTableCell> -arg=value</td><td class=docTableCell> arg</td><td class=docTableCell> value</td></tr>
+<tr class=docTableRow><td class=docTableCell> arg=value</td><td class=docTableCell> arg</td><td class=docTableCell> value</td></tr>
+<tr class=docTableRow><td class=docTableCell> - -arg</td><td class=docTableCell> arg</td><td class=docTableCell> arg</td></tr>
+<tr class=docTableRow><td class=docTableCell> - -arg value</td><td class=docTableCell> arg</td><td class=docTableCell> value</td></tr>
+<tr class=docTableRow><td class=docTableCell> - -arg=value</td><td class=docTableCell> arg</td><td class=docTableCell> value</td></tr>
+</table>
+ 
+虽然你可以使用<span class=text_italic> CMDARG</span> 和<span class=text_italic> ARGV</span> 来进行命令行参数处理，
+道语言支持另一种更简单明了的方式处理命令行参数。
+实际上，你并不需要专门处理命令行参数，你所要做的就是定义一个
+<span class=text_italic> main()</span> 函数，然后将所希望接受的命令行参数名用作函数参数名，
+并将所希望接受的命令行参数类型用作函数参数类型。
+这样当程序被执行时，<span class=text_italic> main()</span> 函数将被自动调用，
+并且命令行参数将被作为函数参数传递给<span class=text_italic> main()</span> 函数。
+如果命令行参数数目或类型不符合<span class=text_italic> main()</span> 函数的参数数目或类型，
+程序将被终止执行，<span class=text_italic> main()</span> 函数文档将被打印到屏幕。
+如果一个命令行参数可有缺省值，那么这个值可作为函数参数的缺省值设定。
+<div class="hlcode">
+<span class=Comment># the main function for script.dao:
+<br /></span><span class=CodeStruct>routine</span>&thinsp; main<span class=SpecSymbol>(</span>&thinsp; name&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; index=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Comment>#{
+<br />&nbsp;&nbsp;&nbsp;&nbsp;main()函数的文档,可包含如何使用此程序的信息:
+<br />&nbsp;&nbsp;&nbsp;&nbsp;使用:dao script.dao name=abc [index=0]
+<br />#}</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>...</span><br/><span class=SpecSymbol>}</span></div>
+ 
+对于这个例子，这个程序被执行时，它命令行参数必须有一字符串， 还可有一数字。
+因此，它必须按以下方式被执行：
+<div class="hlcode">
+dao&thinsp; script.dao&thinsp; xyz<br/>dao&thinsp; script.dao&thinsp; xyz&thinsp; <span class=Number>10</span><br/>dao&thinsp; script.dao&thinsp; name=xyz&thinsp; index=<span class=Number>10</span><br/>dao&thinsp; script.dao&thinsp; index=<span class=Number>10</span>&thinsp; name=xyz<br/><span class=SpecSymbol>...</span></div>
+ <br/>
+<table><tr><td><a name="7.2"><H4>7.2  类型映射</H4>
+</td><td align="right"><a href="&section=7.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+通过类型映射，大部分道基本数据类型可以方便转换为其他数据类型，例如：
+<div class="hlcode">
+num&thinsp; =&thinsp; <span class=Number>123456789</span>;<br/>str&thinsp; =&thinsp; <span class=SpecSymbol>(</span><span class=DataType>string</span><span class=SpecSymbol>)</span>&thinsp; num;<br/>ls&thinsp; =&thinsp; <span class=SpecSymbol>(</span><span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;<span class=SpecSymbol>)</span>&thinsp; str;<br/>ar&thinsp; =&thinsp; <span class=SpecSymbol>(</span><span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;<span class=SpecSymbol>)</span>&thinsp; ls;<br/>tup&thinsp; =&thinsp; <span class=SpecSymbol>(</span><span class=DataType>tuple</span>&lt;<span class=DataType>float</span>,<span class=DataType>float</span>&gt;<span class=SpecSymbol>)</span>&thinsp; ls<span class=SpecSymbol>[</span><span class=Number>0</span>:<span class=Number>1</span><span class=SpecSymbol>]</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; num&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; str&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; ls&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; ar&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; tup&thinsp; <span class=SpecSymbol>)</span>;<br/><br/>ar&thinsp; +=&thinsp; <span class=String>'a'</span><span class=SpecSymbol>[</span><span class=Number>0</span><span class=SpecSymbol>]</span>&thinsp; -&thinsp; <span class=String>'1'</span><span class=SpecSymbol>[</span><span class=Number>0</span><span class=SpecSymbol>]</span>;<br/>ls&thinsp; =&thinsp; <span class=SpecSymbol>(</span><span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;<span class=SpecSymbol>)</span>&thinsp; ar;<br/>str&thinsp; =&thinsp; <span class=SpecSymbol>(</span><span class=DataType>string</span><span class=SpecSymbol>)</span>&thinsp; ls;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; ar&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; ls&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; str&thinsp; <span class=SpecSymbol>)</span>;<br/><br/>ar2&thinsp; =&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>65</span>&thinsp; :&thinsp; <span class=Number>3</span><span class=SpecSymbol>]</span>&thinsp; :&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>]</span>;<br/>ls2&thinsp; =&thinsp; <span class=SpecSymbol>(</span><span class=DataType>list</span>&lt;<span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;&thinsp; &gt;<span class=SpecSymbol>)</span>&thinsp; ar2;<br/>ls3&thinsp; =&thinsp; <span class=SpecSymbol>(</span><span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;<span class=SpecSymbol>)</span>&thinsp; ar2;<br/>ls4&thinsp; =&thinsp; <span class=SpecSymbol>(</span><span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;<span class=SpecSymbol>)</span>&thinsp; ls2;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; ar2&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; ls2&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; ls3&thinsp; <span class=SpecSymbol>)</span>;<br/>io.writeln<span class=SpecSymbol>(</span>&thinsp; ls4&thinsp; <span class=SpecSymbol>)</span>;</div>
+<br clear=all />
+</div></body></html>

@@ -1,0 +1,25 @@
+<title>Documentations</title>
+
+<===>Dao Studio</===>
+
+<list>
+==Usage Tips (<link>html=daostudio_tips.html)
+</list>
+
+<===>Dao Language</===>
+
+<list>
+==A Quick Guide to Dao (<link>html=dao_quick_guide.html</link>)
+==Dao Typing System (<link>html=dao_data_typing.html</link>)
+==Dao Library Reference (<link>html=dao_std_library.html</link>)
+==Dao Regular Expression Matching (<link>html=dao_regex.html</link>)
+==Dao Functional Methods (<link>html=dao_functional.html</link>) 
+==Exception Handling in Dao (<link>html=dao_exception.html</link>)
+==Concurrent Programming in Dao (<link>html=dao_concurrent.html</link>)
+<red>
+Asynchronous Function Call and Message Passing Interface are not supported in Dao 1.1
+</red>
+==Dao Macro System (<link>html=dao_macro.html</link>)
+==Programming with C interface to Dao (<link>html=dao_c_interface.html</link>)
+</list>
+

@@ -1,0 +1,491 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+
+<h2>Programming with C interface to Dao</h2>
+<div align=center><p><b>Limin Fu (phoolimin<img src="/images/at.png"/>gmail<img src="/images/dot.png"/>com)</b></p></div>
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#1">Introduction</a></li>
+<li style="margin-top: 5px"><a href="#2">Build&nbsp;A&nbsp;Simple&nbsp;Extension</a></li>
+<li style="margin-top: 5px"><a href="#3">Wrapping&nbsp;C/C++&nbsp;Functions</a></li>
+<li style="margin-top: 5px"><a href="#4">Wrapping&nbsp;C/C++&nbsp;Types</a></li>
+<li style="margin-top: 5px"><a href="#5">Embedding&nbsp;Dao</a></li>
+<li style="margin-top: 5px"><a href="#6">Advanced&nbsp;Using&nbsp;of&nbsp;The&nbsp;C&nbsp;Interfaces</a></li>
+</ol></td></tr></table> <br/>
+(For Dao 1.1)<br/><br/>
+This document is licensed under
+<a href="">GNU Free Documentation License</a> .<br/>
+<table class="topsection"><tr><td><a name="1"><H3>1  Introduction</H3>
+</td><td align="right"><a href="&section=1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+This document covers the methods for extending and embedding of Dao
+through C interfaces defined in the header file <span class=text_italic> dao.h</span> .
+The C interfaces are designed in such a way that the extension or the application
+that embeds Dao can be built using only the header file <span class=text_italic> dao.h</span> , 
+namely, without linking against the Dao library.
+This is achieved though an intermediate wrapping layer,
+to skip this layer, one needs only to define <span class=text_italic> DAO_DIRECT_API</span>  before
+including <span class=text_italic> dao.h</span> .
+However, the direct interfaces and the interfaces with a wrapping layer are identical,
+so it is just a matter of choice to use the direct interface or the wrapped one.<br/><br/>
+Obviously, one can also use other header files of the Dao library,
+to interact more directly with Dao,
+but the other header files may change from release to release,
+while <span class=text_italic> dao.h</span>  is intended to be more stable.
+Using only <span class=text_italic> dao.h</span>  makes it easier for the extension or application
+to work with updated Dao library.
+Moreover, there is a tool that can wrap C/C++ libraries in
+a semi-automated way, and this tool is updated whenever <span class=text_italic> dao.h</span>  is changed.
+So if the extension is built using this tool,
+whenever <span class=text_italic> dao.h</span>  is changed, it is only necessary to run
+again this tool to generate the extension.<br/>
+<table class="topsection"><tr><td><a name="2"><H3>2  Build A Simple Extension</H3>
+</td><td align="right"><a href="&section=2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#2.1">Callable&nbsp;Function&nbsp;for&nbsp;Dao</a></li>
+<li style="margin-top: 5px"><a href="#2.2">The&nbsp;Dao&nbsp;Value&nbsp;Structure:&nbsp;DValue</a></li>
+<li style="margin-top: 5px"><a href="#2.3">A&nbsp;Simple&nbsp;and&nbsp;Complete&nbsp;Example</a></li>
+<li style="margin-top: 5px"><a href="#2.4">Adding&nbsp;Multiple&nbsp;Functions</a></li>
+</ol></td></tr></table> <br/>
+A Dao extension is a module written in C that can provide extended functionalities for Dao.
+A Dao extension should always define two mandatory variables and one mandatory function.
+The first of the two variables is an integer signature of the header file <span class=text_italic> dao.h</span> 
+that is used to build the extension, and the second is a global variable as the 
+wrapping layer for the indirect interfaces.
+These two variables can be defined using macro <span class=text_italic> DAO_INIT_MODULE</span> .
+The mandatory function is the function to be called when the module is loaded.
+This function should be named as <span class=text_italic> DaoOnLoad()</span>  with the following form,
+<div class="hlcode">
+<span class=DataType>int</span>&thinsp; DaoOnLoad(&thinsp; DaoVmSpace&thinsp; *vms,&thinsp; DaoNameSpace&thinsp; *ns&thinsp; )<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; ...<br /> }</div>
+ 
+The two parameters of this functions are a structure <span class=text_italic> DaoVmSpace</span> 
+which is the virtual machine space (VM Space) that defines an environment for the virtual
+machine,
+and a structure <span class=text_italic> DaoNameSpace</span> ,
+which is used to store the data and types defined by the module. 
+In the function body of <span class=text_italic> DaoOnLoad()</span> , one should add
+the wrapped constants, functions and C/C++ types to the <span class=text_italic> DaoNameSpace</span> . 
+The returned value of this function is not used yet, it is reserved for future use.
+Now I will first introduce the form of a C function that is callable in Dao,
+then I will show how to add such functions to the <span class=text_italic> DaoNameSpace</span> .<br/>
+<table><tr><td><a name="2.1"><H4>2.1  Callable Function for Dao</H4>
+</td><td align="right"><a href="&section=2.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+A C function that is to be called in Dao must has the following form,
+<div class="hlcode">
+<span class=DataType>void</span>&thinsp; cfunction(&thinsp; DaoContext&thinsp; *ctx,&thinsp; DValue&thinsp; *p[],&thinsp; <span class=DataType>int</span>&thinsp; <span class=Number>N</span>&thinsp; );</div>
+ 
+Where <span class=text_italic> DaoContext</span>  is the structure for storing execution context,
+and <span class=text_italic> DValue</span>  is the basic structure used in the Dao library to
+store data. <span class=text_italic> ctx</span>  is the current context that invokes the C function,
+and <span class=text_italic> p</span>  is an array of parameters passed to this call
+and <span class=text_italic> N</span>  is the number of parameters presented in the call.
+<span class=text_italic> p</span>  may contain more elements than <span class=text_italic> N</span> , if the function
+is called without one or more parameters that have default values.
+While the C function receives data directly through <span class=text_italic> p</span> ,
+the returned data for Dao must be put into <span class=text_italic> ctx</span>  using some functions.<br/>
+<table><tr><td><a name="2.2"><H4>2.2  The Dao Value Structure: DValue</H4>
+</td><td align="right"><a href="&section=2.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+The <span class=text_italic> DValue</span>  structure is shown below, and it has the follow
+simple fields:
+the <span class=text_italic> t</span>  field indicates the type of the data;
+the <span class=text_italic> sub,cst,ndef</span>  fields are mainly for internal use, and should be set to zero;
+the <span class=text_italic> v</span>  field contains the value of the data.<br/>
+<div class="hlcode">
+<span class=CodeStruct>struct</span>&thinsp; DValue<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; uchar_t&thinsp; t;&thinsp; <span class=Comment>/* type */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; uchar_t&thinsp; sub;&thinsp; <span class=Comment>/* sub-type */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; uchar_t&thinsp; cst;&thinsp; <span class=Comment>/* const */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; uchar_t&thinsp; ndef;&thinsp; <span class=Comment>/* not a default parameter */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; union&thinsp; {<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; dint&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; i;&thinsp; <span class=Comment>/* int */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; <span class=DataType>float</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; f;&thinsp; <span class=Comment>/* float */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; <span class=DataType>double</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; d;&thinsp; <span class=Comment>/* double */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; complex16&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *c;&thinsp; <span class=Comment>/* complex */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DString&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *s;&thinsp; <span class=Comment>/* string */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DLong&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *l;&thinsp; <span class=Comment>/* big integer */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoBase&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *p;&thinsp; <span class=Comment>/* NOT one of the above data types */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoArray&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *array;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoList&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *list;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoMap&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *map;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoPair&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *pair;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoTuple&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *tuple;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoRoutine&thinsp; &thinsp; &thinsp; &thinsp; *routine;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoFunction&thinsp; &thinsp; &thinsp; *func;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoObject&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *object;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoClass&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *klass;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoCData&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *cdata;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoContext&thinsp; &thinsp; &thinsp; &thinsp; *context;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoStream&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *stream;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoNameSpace&thinsp; &thinsp; *ns;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoVmProcess&thinsp; &thinsp; *vmp;<br /> &nbsp;&nbsp;&nbsp;&nbsp; }&thinsp; v&thinsp; ;<br /> };</div>
+ <br/>
+<table><tr><td><a name="2.3"><H4>2.3  A Simple and Complete Example</H4>
+</td><td align="right"><a href="&section=2.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+<span class=SpecSymbol>#include"dao.h"</span><br /> <span class=Number>DAO_INIT_MODULE</span>;<br /> <span class=DataType>void</span>&thinsp; salute(&thinsp; DaoContext&thinsp; *ctx,&thinsp; DValue&thinsp; *p[],&thinsp; <span class=DataType>int</span>&thinsp; <span class=Number>N</span>&thinsp; )<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; DaoContext_PutMBString(&thinsp; ctx,&thinsp; <span class=String>"hello"</span>&thinsp; );<br /> }<br /> <span class=DataType>int</span>&thinsp; DaoOnLoad(&thinsp; DaoVmSpace&thinsp; *vms,&thinsp; DaoNameSpace&thinsp; *ns&thinsp; )<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; DaoNameSpace_AddFunction(&thinsp; ns,&thinsp; salute,&thinsp; <span class=String>"salute()=&gt;string"</span>&thinsp; );<br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; <span class=Number>0</span>;<br /> }</div>
+ 
+In this example, there are only two functions which have not been introduced before.
+The first function <span class=text_italic> DaoContext_PutMBString()</span>  is used to put a string
+as returned value to the execution context, in this case, <span class=text_italic> salute()</span>  will return
+"hello".<br/><br/>
+There are other functions that can be used to put different types of data
+into an execution context, they all have "DaoContext_Put" as part of their names.
+Please look into the header file <span class=text_italic> dao.h</span>  for the complete list of such functions.
+The second function <span class=text_italic> DaoNameSpace_AddFunction()</span>  is used to register the <span class=text_italic> salute()</span> 
+function to the namespace <span class=text_italic> ns</span>  with function prototype defined as
+"salute()=&gt;string". The function prototype should be written in the same way
+as a Dao routine, in this case, this prototype tells the Dao VM that
+this added function will have "salute()" as its name in Dao codes,
+and it will return a string as returned value.<br/><br/>
+After compiling this code into a "mod_salute.dll" or "mod_salute.so" file, 
+one can use this module as the following,
+<div class="hlcode">
+<span class=StmtKey>load</span>&thinsp; mod_salute;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; salute<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table><tr><td><a name="2.4"><H4>2.4  Adding Multiple Functions</H4>
+</td><td align="right"><a href="&section=2.4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+If the extension defines multiple functions, these functions can be grouped together
+and added to the namespace by one call.
+To do this, one just has to create an array of <span class=text_italic> DaoFuncItem</span> ,
+in which the first field is the function pointer of the Dao-callable C function,
+and the second field is the function prototype used by Dao.
+This array must be ended by an item containing null fields.
+For example, the following is the <span class=text_italic> DaoFuncItem</span>  array for the wrapped OpenGL functions
+defined in the DaoOpenGL module,
+<div class="hlcode">
+<span class=DataPrefix>static</span>&thinsp; DaoFuncItem&thinsp; dao_Funcs[]&thinsp; =&thinsp; <br /> {<br /> &thinsp; &thinsp; {&thinsp; dao__glClearIndex,&thinsp; <span class=String>"glClearIndex( c : float )"</span>&thinsp; },<br /> &thinsp; &thinsp; {&thinsp; dao__glClearColor,&thinsp; <span class=String>"glClearColor( red : float, green : float, blue : float, alpha : float )"</span>&thinsp; },<br /> &thinsp; &thinsp; {&thinsp; dao__glClear,&thinsp; <span class=String>"glClear( mask : int )"</span>&thinsp; },<br /> &thinsp; &thinsp; {&thinsp; dao__glIndexMask,&thinsp; <span class=String>"glIndexMask( mask : int )"</span>&thinsp; },<br /> &thinsp; &thinsp; {&thinsp; dao__glColorMask,&thinsp; <span class=String>"glColorMask( red : int, green : int, blue : int, alpha : int )"</span>&thinsp; },<br /> &thinsp; &thinsp; {&thinsp; dao__glAlphaFunc,&thinsp; <span class=String>"glAlphaFunc( func : int, ref : float )"</span>&thinsp; },<br /> &thinsp; &thinsp; {&thinsp; dao__glBlendFunc,&thinsp; <span class=String>"glBlendFunc( sfactor : int, dfactor : int )"</span>&thinsp; },<br /> &thinsp; &thinsp; {&thinsp; dao__glLogicOp,&thinsp; <span class=String>"glLogicOp( opcode : int )"</span>&thinsp; },<br /> &thinsp; &thinsp; ......<br /> &thinsp; &thinsp; {&thinsp; <span class=Number>NULL</span>,&thinsp; <span class=Number>NULL</span>&thinsp; }<br /> };</div>
+ <br/>
+Then the <span class=text_italic> DaoFuncItem</span>  array can be passed to function <span class=text_italic> DaoNameSpace_AddFunctions()</span> 
+to added all the functions in the array to a namespace,
+<div class="hlcode">
+DaoNameSpace_AddFunctions(&thinsp; ns,&thinsp; dao_Funcs&thinsp; );</div>
+ <br/>
+<table class="topsection"><tr><td><a name="3"><H3>3  Wrapping C/C++ Functions</H3>
+</td><td align="right"><a href="&section=3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+To wrap a C function, one only has to create a Dao-callable C function
+and call the C function to be wrapped with simple conversions of parameter/returned values.
+For example, if we have the following <span class=text_italic> sin()</span>  function to be wrapped,
+<div class="hlcode">
+<span class=DataType>double</span>&thinsp; sin(&thinsp; <span class=DataType>double</span>&thinsp; x&thinsp; );</div>
+ 
+Then the wrapping of <span class=text_italic> sin()</span>  is as simple as the following,
+<div class="hlcode">
+<span class=DataType>void</span>&thinsp; dao_sin(&thinsp; DaoContext&thinsp; *ctx,&thinsp; DValue&thinsp; *p[],&thinsp; <span class=DataType>int</span>&thinsp; <span class=Number>N</span>&thinsp; )<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; DaoContext_PutDouble(&thinsp; ctx,&thinsp; sin(&thinsp; p[<span class=Number>0</span>]-&gt;v.d&thinsp; )&thinsp; );<br /> }<br /> ...<br /> <span class=DataType>int</span>&thinsp; DaoOnLoad(&thinsp; DaoVmSpace&thinsp; *vms,&thinsp; DaoNameSpace&thinsp; *ns&thinsp; )<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; ...<br /> &nbsp;&nbsp;&nbsp;&nbsp; DaoNameSpace_AddFunction(&thinsp; ns,&thinsp; dao_sin,&thinsp; <span class=String>"sin( x : double ) =&gt; double"</span>&thinsp; );<br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; <span class=Number>0</span>;<br /> }</div>
+ 
+One don't have to worry if the accessing of the parameter of a double value 
+by <span class=text_italic> p[0]-&gt;v.d</span>  is valid, because this functions is registered as 
+"sin( x : double ) =&gt; double",
+so that the Dao VM will perform parameter checking (at both compiling time and running time)
+and guarantee that the function will be called with a double as parameter.<br/><br/>
+<span class=text_bold> 
+Note that there is a tool that can do this type of wrapping automatically,
+please refer to the relevant documentation to see how this tool can be used.
+If used properly, this tool can also wrap C structures and C++ classes.
+</span> <br/>
+<table class="topsection"><tr><td><a name="4"><H3>4  Wrapping C/C++ Types</H3>
+</td><td align="right"><a href="&section=4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#4.1">Dao&nbsp;Typer&nbsp;Structure</a></li>
+<li style="margin-top: 5px"><a href="#4.2">A&nbsp;Simple&nbsp;Example</a></li>
+</ol></td></tr></table> <br/>
+What about using C structures or C++ classes in Dao?
+This section will explain the basics for wrapping C/C++ types.<br/>
+<table><tr><td><a name="4.1"><H4>4.1  Dao Typer Structure</H4>
+</td><td align="right"><a href="&section=4.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+Basically, a C/C++ type can be used in Dao as long as it is associated with
+a typer structure and is registered into the namespace.
+The typer structure is defined as the following,
+<div class="hlcode">
+<span class=Comment>/* Typer structure, contains type information of each Dao type: */</span><br /> <span class=CodeStruct>struct</span>&thinsp; DaoTypeBase<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; DaoTypeCore&thinsp; &thinsp; &thinsp; *priv;&thinsp; <span class=Comment>/* data used internally; */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=DataPrefix>const</span>&thinsp; <span class=DataType>char</span>&thinsp; &thinsp; &thinsp; &thinsp; *name;&thinsp; <span class=Comment>/* type name; */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; DaoNumItem&thinsp; &thinsp; &thinsp; &thinsp; *numItems;&thinsp; <span class=Comment>/* constant number list */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; DaoFuncItem&thinsp; &thinsp; &thinsp; *funcItems;&thinsp; <span class=Comment>/* method list: should end with a null item */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; <br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=Comment>/* typers for super types, to create c type hierarchy;<br />&nbsp;&nbsp;&nbsp;&nbsp; * mainly useful for wrapping c++ libraries. */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; DaoTypeBase&thinsp; &thinsp; &thinsp; *supers[&thinsp; <span class=Number>DAO_MAX_CDATA_SUPER</span>&thinsp; ];<br /> &nbsp;&nbsp;&nbsp;&nbsp; <br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=DataType>void</span>*&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; (*New)();&thinsp; &thinsp; <span class=Comment>/* function to allocate structure; */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=DataType>void</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; (*Delete)(&thinsp; <span class=DataType>void</span>&thinsp; *self&thinsp; );&thinsp; <span class=Comment>/* function to free structure; */</span><br /> };</div>
+ 
+The typer includes some basic properties of the C/C++ type, and its wrapped member
+constant numbers and methods. Normally, the function pointers to allocate and
+free the C/C++ type should also be supplied. If there is a method in the method list
+<span class=text_italic> funcItems</span>  having the same name as the type name (<span class=text_italic> name</span>  field),
+the <span class=text_italic> New</span>  field will not be used. If the <span class=text_italic> Delete</span>  field is missing,
+the type will be freed by the standard C function <span class=text_italic> free()</span> .
+Optionally, if the C/C++ type has parent type(s), the typer structures of 
+such parent types can be filled in the <span class=text_italic> supers</span>  field 
+(the last item in this field must be NULL), so that the inheritance
+relations in C/C++ are also valid in Dao, and the method invocation of parent methods
+and the casting to a parent type will be handled properly by the Dao VM.<br/><br/>
+The Dao VM stores C/C++ types in wrapped form, which is defined as structure
+<span class=text_italic> DaoCData</span> . The <span class=text_italic> DaoCData</span>  structure has a field named <span class=text_italic> data</span> , 
+which is a pointer pointing to the stored C/C++ data.
+The stored C/C++ data can be set using <span class=text_italic> DaoCData_SetData( DaoCData *cdata, void *d )</span> 
+and retrieved using <span class=text_italic> DaoCData_GetData( DaoCData *cdata )</span> .<br/>
+<table><tr><td><a name="4.2"><H4>4.2  A Simple Example</H4>
+</td><td align="right"><a href="&section=4.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Suppose we have the following simple C type name "foo" 
+and a simple C function named "bar" that operates on "foo" type,
+<div class="hlcode">
+<span class=StmtKey>typedef</span>&thinsp; <span class=CodeStruct>struct</span>&thinsp; foo&thinsp; {&thinsp; <span class=DataType>int</span>&thinsp; value;&thinsp; }&thinsp; foo;<br /> foo*&thinsp; foo_new()<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; malloc(&thinsp; <span class=Method>sizeof</span>(&thinsp; foo&thinsp; )&thinsp; );<br /> }<br /> <span class=DataType>void</span>&thinsp; bar(&thinsp; foo&thinsp; *f&thinsp; )<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; printf(&thinsp; <span class=String>"bar() is called with foo object: %p\n"</span>,&thinsp; f&thinsp; );<br /> }</div>
+ <br/>
+<table><tr><td><a name="4.2.1"><H5>4.2.1  Basic Wrapping</H5>
+</td><td align="right"><a href="&section=4.2.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+The wrapping of the "foo" is the following,
+<div class="hlcode">
+<span class=DataPrefix>static</span>&thinsp; DaoTypeBase&thinsp; fooTyper&thinsp; =<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>NULL</span>,<br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=String>"foo"</span>,<br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>NULL</span>,&thinsp; <span class=Comment>/* no constant number */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>NULL</span>,&thinsp; <span class=Comment>/* no method */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; {&thinsp; <span class=Number>NULL</span>&thinsp; },&thinsp; <span class=Comment>/* no parent type */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; foo_new,<br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>NULL</span>&thinsp; <span class=Comment>/* free by free() */</span><br /> };</div>
+ 
+The this typer can be registered in a Dao VM space by,
+<div class="hlcode">
+DaoNameSpace_AddType(&thinsp; ns,&thinsp; &&thinsp; fooTyper&thinsp; );</div>
+ 
+Then the type name can be used in Dao, for example, to create a "foo" object,
+one can do,
+<div class="hlcode">
+f&thinsp; =&thinsp; foo<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;</div>
+ <br/>
+The function <span class=text_italic> bar()</span>  can be wrapped and add into VM space by,
+<div class="hlcode">
+<span class=DataPrefix>static</span>&thinsp; <span class=DataType>void</span>&thinsp; dao_bar(&thinsp; DaoContext&thinsp; *ctx,&thinsp; DValue&thinsp; *p[],&thinsp; <span class=DataType>int</span>&thinsp; <span class=Number>N</span>&thinsp; )<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; foo&thinsp; *f&thinsp; =&thinsp; DaoCData_GetData(&thinsp; p[<span class=Number>0</span>]-&gt;v.cdata&thinsp; );<br /> &nbsp;&nbsp;&nbsp;&nbsp; bar(&thinsp; f&thinsp; );<br /> }<br /> ...<br /> DaoNameSpace_AddFunction(&thinsp; ns,&thinsp; dao_bar,&thinsp; <span class=String>"bar( f : foo )"</span>&thinsp; );<br /> ...</div>
+ <br/>
+<table><tr><td><a name="4.2.2"><H5>4.2.2  bar() As Method of foo?</H5>
+</td><td align="right"><a href="&section=4.2.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Since the "bar()" function operates on "foo" object, what about declaring "bar()"
+as a method of "foo" type, so that instead of calling "bar( foo_object )",
+one can call "foo_object.bar()"?<br/><br/>
+This can be done easily, one needs only to modify the typer of foo
+as the following,
+<div class="hlcode">
+<span class=DataPrefix>static</span>&thinsp; DaoFuncItem&thinsp; fooMeth[]&thinsp; =<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; {&thinsp; dao_bar,&thinsp; &thinsp; <span class=String>"bar( self : foo )"</span>&thinsp; },<br /> &nbsp;&nbsp;&nbsp;&nbsp; {&thinsp; <span class=Number>NULL</span>,&thinsp; <span class=Number>NULL</span>&thinsp; }<br /> };<br /> <span class=DataPrefix>static</span>&thinsp; DaoTypeBase&thinsp; fooTyper&thinsp; =<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>NULL</span>,<br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=String>"foo"</span>,<br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>NULL</span>,&thinsp; <span class=Comment>/* no constant number */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; fooMeth,&thinsp; <span class=Comment>/* one method bar() */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; {&thinsp; <span class=Number>NULL</span>&thinsp; },&thinsp; <span class=Comment>/* no parent type */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; foo_new,<br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>NULL</span>&thinsp; <span class=Comment>/* free by free() */</span><br /> };</div>
+ 
+The first parameter in the function prototype of the method must be named as
+"self", if one wants "foo_object" to be passed to "bar()" as the first parameter
+when "foo_object.bar()" is called.<br/><br/>
+With this modification, one can do the following in Dao,
+<div class="hlcode">
+f&thinsp; =&thinsp; foo<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>f.bar<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table><tr><td><a name="4.2.3"><H5>4.2.3  Setters and Getters</H5>
+</td><td align="right"><a href="&section=4.2.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Setters and getters can be easily implemented for more conveniently accessing
+fields of C/C++ types. Continue the previous example, the setter and getter of
+the "value" field of "foo" can be defined as,
+<div class="hlcode">
+<span class=DataPrefix>static</span>&thinsp; <span class=DataType>void</span>&thinsp; foo_SETF_value(&thinsp; DaoContext&thinsp; *ctx,&thinsp; DValue&thinsp; *p[],&thinsp; <span class=DataType>int</span>&thinsp; <span class=Number>N</span>&thinsp; )<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; foo&thinsp; *f&thinsp; =&thinsp; DaoCData_GetData(&thinsp; p[<span class=Number>0</span>]-&gt;v.cdata&thinsp; );<br /> &nbsp;&nbsp;&nbsp;&nbsp; f-&gt;value&thinsp; =&thinsp; p[<span class=Number>1</span>]-&gt;v.i;<br /> }<br /> <span class=DataPrefix>static</span>&thinsp; <span class=DataType>void</span>&thinsp; foo_GETF_value(&thinsp; DaoContext&thinsp; *ctx,&thinsp; DValue&thinsp; *p[],&thinsp; <span class=DataType>int</span>&thinsp; <span class=Number>N</span>&thinsp; )<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; foo&thinsp; *f&thinsp; =&thinsp; DaoCData_GetData(&thinsp; p[<span class=Number>0</span>]-&gt;v.cdata&thinsp; );<br /> &nbsp;&nbsp;&nbsp;&nbsp; DaoContext_PutInteger(&thinsp; ctx,&thinsp; f-&gt;value&thinsp; );<br /> }</div>
+ 
+Then the folloing two lines should be added to the "fooMeth",
+<div class="hlcode">
+{&thinsp; foo_SETF_value,&thinsp; &thinsp; <span class=String>".value=( self : foo, v : int )"</span>&thinsp; },<br /> {&thinsp; foo_GETF_value,&thinsp; &thinsp; <span class=String>".value( self : foo ) =&gt; int"</span>&thinsp; },</div>
+ 
+Please note that, their method prototypes are exactly the same as
+overload operators in Dao classes.<br/><br/>
+Then in Dao, the "value" of "foo" can be set and got as,
+<div class="hlcode">
+f&thinsp; =&thinsp; foo<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>f.<span class=Method>value</span>&thinsp; =&thinsp; <span class=Number>123</span>;<br/>a&thinsp; =&thinsp; f.<span class=Method>value</span>;</div>
+ <br/>
+<table class="topsection"><tr><td><a name="5"><H3>5  Embedding Dao</H3>
+</td><td align="right"><a href="&section=5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+So far, some basics of the C programming interfaces have been introduced
+in the context of extending dao, now in this section, I will give a brief
+introduction on how to embed the Dao virtual machine into other applications.
+Embedding Dao can make an appplication programmable, and allow some components
+of the application to be controlled in a programmable way, or allow the functionalities
+of the application to become extendable by the Dao language.<br/><br/>
+The interfaces I introduced so far for extending are also valid for embedding, 
+the only differences are that the macro <span class=text_italic> DAO_INIT_MODULE</span>  is 
+no longer necessary here and there is
+no need to provide function <span class=text_italic> DaoOnLoad()</span> . 
+To embed Dao, the very first thing is to include the header file "dao.h",
+similar to extending, you should define "DAO_DIRECT_API" before including "dao.h"
+if the direct interfaces are to be used. 
+If indirect interfaces are used, one global variable must be defined,
+which is <span class=text_italic> __dao</span> (two underscore symbols),
+<div class="hlcode">
+<span class=Number>DAO_DLL</span>&thinsp; DaoAPI&thinsp; __dao;</div>
+ 
+you can also simply use the macro <span class=text_italic> DAO_INIT_MODULE</span> .<br/><br/>
+If you are not going to compile Dao together with your application, 
+then the next thing is to open the Dao library file using a macro defined
+in <span class=text_italic> dao.h</span> ,
+<div class="hlcode">
+<span class=DataType>void</span>&thinsp; *handle&thinsp; =&thinsp; DaoLoadLibrary(&thinsp; <span class=String>"/usr/local/dao/dao.so"</span>&thinsp; );</div>
+ 
+then function <span class=text_italic> DaoInit()</span>  must be called to initialize the Dao library,
+this function will return a structure of <span class=text_italic> DaoVmSpace</span> , which can
+be used to load modules or compile Dao source codes.
+If direct interefaces are used, this function can be called directly,
+<div class="hlcode">
+DaoVmSpace&thinsp; *vmSpace&thinsp; =&thinsp; DaoInit(&thinsp; <span class=Number>NULL</span>&thinsp; );</div>
+ 
+Otherwise, one has to do the following,
+<div class="hlcode">
+DaoInitFunc&thinsp; pfunc&thinsp; =&thinsp; (DaoInitFunc)DaoFindSymbol(&thinsp; handle,&thinsp; <span class=String>"DaoInit"</span>&thinsp; );<br /> DaoVmSpace&thinsp; *vmSpace&thinsp; =&thinsp; (*pfunc)(&thinsp; &&thinsp; __dao&thinsp; );</div>
+ 
+In the second way, calling <span class=text_italic> DaoInit()</span>  with the address of <span class=text_italic> __dao</span>  as 
+parameter will allow the function pointer fields of <span class=text_italic> __dao</span>  to be filled,
+so that the interfaces can be accessed through a wrapper layer provided by <span class=text_italic> __dao</span> ,
+which allows the application to be built without linking against the Dao library.<br/><br/>
+At this point, you can used <span class=text_italic> DaoVmSpace_RunMain()</span> 
+to run a script file,
+<div class="hlcode">
+<span class=StmtKey>if</span>(&thinsp; !&thinsp; DaoVmSpace_RunMain(&thinsp; vmSpace,&thinsp; <span class=String>"script.dao"</span>&thinsp; )&thinsp; )&thinsp; <span class=StmtKey>return</span>;</div>
+ 
+The file "script.dao" will be searched in the searching paths of the VM space.<br/><br/>
+Or you can use <span class=text_italic> DaoVmSpace_Load()</span>  to load a script file
+to obtain a namespace structure.
+If it was already loaded before, it will execute the codes
+in the file and return the previously created namespace structure,
+otherwise it will return a new one.
+The file will also be searched in the current fold and in the searching paths of the VM space.
+<div class="hlcode">
+<span class=StmtKey>if</span>(&thinsp; !&thinsp; DaoVmSpace_Load(&thinsp; vmSpace,&thinsp; <span class=String>"script.dao"</span>&thinsp; )&thinsp; <span class=StmtKey>return</span>;</div>
+ <br/><br/>
+You may also use the following functions to obtain a namespace structure,
+<div class="hlcode">
+DaoNameSpace&thinsp; *ns&thinsp; =&thinsp; DaoNameSpace_New(&thinsp; vmSpace&thinsp; );</div>
+ <br/>
+Or,
+<div class="hlcode">
+DaoNameSpace&thinsp; *ns&thinsp; =&thinsp; DaoVmSpace_MainNameSpace(&thinsp; vmSpace&thinsp; );</div>
+ 
+to get the main namespace of a VM space structure.<br/><br/>
+Or,
+<div class="hlcode">
+DaoNameSpace&thinsp; *ns&thinsp; =&thinsp; DaoNameSpace_GetNameSpace(&thinsp; nameSpace,&thinsp; <span class=String>"name"</span>&thinsp; );</div>
+ 
+to get a namespace with given name from another namespace.
+If it already exists, return it, otherwise return a new one, and put it
+in that namespace with name "name".<br/><br/>
+As introduced before, with namespace structure, one can add types and C functions,
+or constants to the namespace.
+It can also be used to load script file that is not searched in the VM space paths,
+The functions, class, global constants and variables will be put into this namespace structure.
+<div class="hlcode">
+DaoNameSpace_Load(&thinsp; ns,&thinsp; <span class=String>"script.dao"</span>&thinsp; );</div>
+ <br/><br/>
+To compile and execute scripts, or run Dao functions, one need to create another
+type of structure <span class=text_bold> DaoVmProcess</span> , which can be obtained from DaoVmSpace
+structure or create from it,
+<div class="hlcode">
+DaoVmProcess&thinsp; *vmp&thinsp; =&thinsp; DaoVmProcess_MainProcess(&thinsp; vmSpace&thinsp; );<br /> DaoVmProcess&thinsp; *vmp2&thinsp; =&thinsp; DaoVmProcess_New(&thinsp; vmSpace&thinsp; );</div>
+ <br/><br/>
+With DaoVmProcess structure, one can compile or evaluation a script,
+or call Dao function
+<div class="hlcode">
+DString&thinsp; *src&thinsp; =&thinsp; DString_New(<span class=Number>1</span>);<br /> DString_SetMBS(&thinsp; src,&thinsp; <span class=String>"io.writeln( 'hello' )"</span>&thinsp; );<br /> DaoVmProcess_Eval(&thinsp; vmp,&thinsp; ns,&thinsp; src,&thinsp; <span class=Number>0</span>&thinsp; );<br /> <br /> DString_SetMBS(&thinsp; src,&thinsp; <span class=String>"routine hello(){ io.writeln( 'hello' ) }"</span>&thinsp; );<br /> DaoVmProcess_Compile(&thinsp; vmp,&thinsp; ns,&thinsp; src,&thinsp; <span class=Number>0</span>&thinsp; );<br /> <span class=Comment>// routine "hello()" is in the namespace "ns"<br /></span></div>
+ <br/>
+To call a Dao function,
+<div class="hlcode">
+DValue&thinsp; value&thinsp; =&thinsp; DaoNameSpace_FindData(&thinsp; ns,&thinsp; <span class=String>"myfunc"</span>&thinsp; );<br /> <span class=StmtKey>if</span>(&thinsp; value.t&thinsp; ==&thinsp; <span class=Number>DAO_ROUTINE</span>&thinsp; ){<br /> &thinsp; &thinsp; DaoVmProcess_Call(&thinsp; vmp,&thinsp; value.v.routine,&thinsp; <span class=Number>NULL</span>,&thinsp; <span class=Number>NULL</span>,&thinsp; <span class=Number>0</span>&thinsp; );<br /> }</div>
+ 
+To pass parameter(s) to the call,
+<div class="hlcode">
+DValue&thinsp; buf[<span class=Number>3</span>];<br /> DValue&thinsp; *par[<span class=Number>3</span>];<br /> <span class=StmtKey>for</span>(i=<span class=Number>0</span>;&thinsp; i&lt;<span class=Number>3</span>;&thinsp; i++)&thinsp; par[i]&thinsp; =&thinsp; &&thinsp; buf[i];<br /> buf[<span class=Number>0</span>]&thinsp; =&thinsp; DValue_NewInteger(<span class=Number>1</span>);<br /> buf[<span class=Number>2</span>]&thinsp; =&thinsp; DValue_NewFloat(<span class=Number>2</span>.<span class=Number>0</span>);<br /> buf[<span class=Number>3</span>]&thinsp; =&thinsp; DValue_NewMBString(&thinsp; <span class=String>"abc"</span>,&thinsp; <span class=Number>3</span>&thinsp; );<br /> DaoVmProcess_Call(&thinsp; vmp,&thinsp; func,&thinsp; <span class=Number>NULL</span>,&thinsp; par,&thinsp; <span class=Number>3</span>&thinsp; );<br /> DValue_ClearAll(&thinsp; buf,&thinsp; <span class=Number>3</span>&thinsp; );</div>
+ <br/><br/>
+DaoVmProcess structure can also be used to run a Dao class method,
+in case that the method needs a class instance, the instance object
+should be passed to DaoVmProcess_Call() as the third parameter.<br/><br/>
+<table class="topsection"><tr><td><a name="6"><H3>6  Advanced Using of The C Interfaces</H3>
+</td><td align="right"><a href="&section=6"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+As mentioned before, it is possible to retain or define inheritance relationships
+between C/C++ types. 
+Moreover, in Dao, one can derive sub-classes from C/C++ types just in the same way as
+deriving from Dao classes.
+It is even possible to wrap a C++ class in such way that its virtual methods can
+be overrode by Dao routines when deriving a Dao class from the C++ class.
+For C structures that contain fields of function pointers, in certain cases,
+these C structures can be wrapped as if they are C++ class and have virtual
+methods of the same name as their function pointer fields.
+These techniques are a bit complicated, and will not explain here.
+Anyone who are interested can refer to the source codes for some Dao modules 
+(e.g. module for VTK5), or can use the automated tool ("tools/autobind.dao")
+to generate such wrappers and then examine the generated codes.<br clear=all />
+</div></body></html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+<h2>
+道Dao语言1.1更新概要 (发布于2009-09-19)
+</h2>
+<span class=text_bold> 新特性：</span> 
+<ol>
+<li> 内置的函数式编程方法（如map(), reduce()等）；</li>
+
+<li> 内置的类函数式编程方法语法的数据构造方法（如string(), list()等）；</li>
+
+<li> 一些内置的数学函数；</li>
+
+<li> 增强的switch-case控制结构；</li>
+
+<li> 尾递归优化；</li>
+
+<li> 新的do{}while()循环结构；</li>
+
+<li> 类型比较运算符：?= 和 ?&lt;，以及相关的DVM_CHECK虚拟机指令；</li>
+
+<li> 断定（assert）运算符：??，用来检查上一操作是否成功，
+   或者更进一步提供操作失败时可使用的替代值；</li>
+
+<li> 单父类继承时的自动继承父类构造函数；</li>
+
+<li> 支持将脚本文件打包编译到道虚拟机可执行文件里；</li>
+
+<li> 按引用传递参数，常量参数。</li>
+
+</ol>
+ <br/><br/>
+<span class=text_bold> 重要变动与功能增强：</span> 
+<ol>
+<li> 申明局部、全局、静态、成员，常量变量的关键字；</li>
+
+<li> 类的定义方式，禁止了在类体里放可执行语句；</li>
+
+<li> 更直观的运算符重载的语法；</li>
+
+<li> 适当的词法解析以正确地处理出现在类型名中的 &gt;&gt; 和类型名后的 &gt;= 等运算符，
+   现在可以正确解析这样的代码：
+   <span class=text_italic> list&lt;list&lt;int&gt;&gt;, a : list&lt;int&gt;= {}</span> ;</li>
+
+<li> 以引用的形式保存局部变量；</li>
+
+<li> 降低了启动垃圾回收的频次，减少了单线程下的垃圾回收额外开销；</li>
+
+<li> 通过更多地直接释放内存，达到更好的垃圾回收效率；</li>
+
+<li> 在可行的情况下减少了元组创建的次数，减少了生成的垃圾对象；</li>
+
+<li> 修改了类型对象和方法的预处理；</li>
+
+<li> 将一些C/C++接口函数从 DaoVmSpace 移到了 DaoNameSpace；</li>
+
+<li> 给math.rand(), math.rand_gaussian()增加了可选参数，此数将被乘到生成的随机数上；</li>
+
+<li> 改用使用<span class=text_bold> D</span> 后缀表示双精度浮点数，而不再用双零表示；</li>
+
+<li> stdio 被改为了 io，当 stdio 还是作为 io 的别名被保留；</li>
+
+<li> stdlib 被改为了 std，当 stdlib 还是作为 stdio 的别名被保留；</li>
+
+<li> stdio.print/printf/println 被改为了 io.write/writef/writeln", 
+   print系列函数还是被作为别名被保留；</li>
+
+<li> 列表和数组的方法max()和min()的返回值还包括里最大最小值对应的下标；</li>
+
+<li> 增加更多的类型的缺省比较方式；</li>
+
+<li> 增强了从列表映射到元组；</li>
+
+<li> 在类型系统里避免了拷贝C函数，在传递参数个C函数时也避免了拷贝数据。</li>
+
+</ol>
+ <br/>
+另外还修复了不少错误。autobind.dao工具也有了更多完善。<br clear=all />
+</div></body></html>

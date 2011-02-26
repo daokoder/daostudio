@@ -1,0 +1,444 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+
+<h2>使用道语言的C函数接口编程</h2>
+<div align=center><p><b>傅利民（phoolimin<img src="/images/at.png"/>gmail<img src="/images/dot.png"/>com）</b></p></div>
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#1">简介</a></li>
+<li style="margin-top: 5px"><a href="#2">编写一个简单的C模块</a></li>
+<li style="margin-top: 5px"><a href="#3">封装C/C++函数</a></li>
+<li style="margin-top: 5px"><a href="#4">封装C/C++数据类型</a></li>
+<li style="margin-top: 5px"><a href="#5">将道嵌入到其他程序里</a></li>
+<li style="margin-top: 5px"><a href="#6">道语言的C编程接口的高级应用</a></li>
+</ol></td></tr></table> <br/><br/>
+(适用道语言1.1)<br/><br/>
+<table class="topsection"><tr><td><a name="1"><H3>1  简介</H3>
+</td><td align="right"><a href="&section=1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+本文档主要介绍如何使用道语言的C函数接口编写道语言的扩展模块，或在其他应用程序中嵌入道语言虚拟机。
+这些函数接口都由单一头文件<span class=text_italic> dao.h</span> 定义。这些函数即可以作为函数直接调用，也可以
+通过宏以函数指针的形式调用。这两种调用方式的存在使得C/C++模块或应用程序的编译比较灵活，
+即可以在避免编译时链接dao语言的库。
+要使用直接函数调用，用户必须在包含头文件<span class=text_italic> dao.h</span> 前定义DAO_DIRECT_API，
+否则间接调用将被使用。当然在开发dao扩展或嵌入dao时，也可以使用道语言库的其他头文件。
+不过这有时将使得模块的维护和升级到dao的更高版本不太方便，因为那些头文件在不同的发布中
+可能会有所不同。而头文件<span class=text_italic> dao.h</span> 将更稳定，不同版本间的<span class=text_italic> dao.h</span> 会比其他头文件
+更一致。仅使用<span class=text_italic> dao.h</span> 的模块或应用程序将更好维护，并更容易升级到更高的道语言版本。<br/>
+<table class="topsection"><tr><td><a name="2"><H3>2  编写一个简单的C模块</H3>
+</td><td align="right"><a href="&section=2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#2.1">道语言可调用的C函数</a></li>
+<li style="margin-top: 5px"><a href="#2.2">道语言数据的值结构DValue</a></li>
+<li style="margin-top: 5px"><a href="#2.3">一个简单而完整的例子</a></li>
+<li style="margin-top: 5px"><a href="#2.4">同时注册多个函数</a></li>
+</ol></td></tr></table> <br/>
+道语言的功能可以通过编写C/C++模块得到扩展，这样的模块一般都会定义一些可供道语言使用
+的C/C++函数或数据类型（如DaoOpengGL等模块），也可仅向添加一些特殊的全局变量（如DaoCGI等模块）。
+下面将通过一个极其简单的例子来介绍如何编写道语言的C模块，基于C++的模块将在后面涉及。<br/><br/>
+道语言的C模块必须定义两个必要的变量，一个是一个整数用来保存头文件<span class=text_italic> dao.h</span> 的版本标号；
+另一个是一个全局变量，用来保存一组用来实现间接接口的函数指针。
+这两个变量可用宏<span class=text_italic> DAO_INIT_MODULE</span> 来定义。模块还必须定义一个入口函数，这个函数
+将在模块被载入时被自动调用，以实现模块的初始化工作，并让模块在道虚拟机里注册它所定义
+的函数和数据类型。这个函数有如下形式：
+<div class="hlcode">
+<span class=DataType>int</span>&thinsp; DaoOnLoad(&thinsp; DaoVmSpace&thinsp; *vms,&thinsp; DaoNameSpace&thinsp; *ns&thinsp; )<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; ...<br /> }</div>
+ 
+这个函数的两个参数就是一个<span class=text_italic> DaoVmSpace（虚拟机空间）</span> 结构，这个结构保存了当前虚拟机运行的环境
+信息，如当前的命名空间等，
+和一个命名空间结构，模块可以通过这个结构注册它所定义的函数和数据类型。
+目前这种函数的返回值还没被使用。
+下面我将介绍可被道语言调用的C函数形式，及如何将这样的函数注册到<span class=text_italic> DaoNameSpace</span> 里。<br/>
+<table><tr><td><a name="2.1"><H4>2.1  道语言可调用的C函数</H4>
+</td><td align="right"><a href="&section=2.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+可以在道语言里调用的C函数必须有如下形式：
+<div class="hlcode">
+<span class=DataType>void</span>&thinsp; cfunction(&thinsp; DaoContext&thinsp; *ctx,&thinsp; DValue&thinsp; *p[],&thinsp; <span class=DataType>int</span>&thinsp; <span class=Number>N</span>&thinsp; );</div>
+ 
+这里<span class=text_italic> DaoContext</span> 是一个保存道语言函数的当前运行状态和环境的结构
+（如局部变量的值，当前虚拟机指令，当前运行函数的信息等），
+实际上<span class=text_italic> DaoContext</span> 总是对应于一个道语言函数的调用，保存着这个函数调用的栈数据。
+而<span class=text_italic> DValue</span> 是道语言库用来保存数据的基本结构。
+<span class=text_italic> ctx</span> 是当前调用这个C函数的Dao函数的栈数据，
+<span class=text_italic> p</span> 是从道运行环境传递到此C函数的一组函数调用参数，
+而<span class=text_italic> N</span> 是此函数调用中出现的参数数目。
+<span class=text_italic> p</span> 实际上可含有比<span class=text_italic> N</span> 多的元素，
+因为使用缺省值的参数没被计算在<span class=text_italic> N</span> 内。
+这个C函数直接从<span class=text_italic> p</span> 接受从道运行环境传递来的参数，
+但返回到道运行环境的值必须使用相关函数设定到<span class=text_italic> ctx</span> 里。<br/>
+<table><tr><td><a name="2.2"><H4>2.2  道语言数据的值结构DValue</H4>
+</td><td align="right"><a href="&section=2.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+下面的代码显示了<span class=text_italic> DValue</span> 的定义，这个结构包含了以下简单的
+成员域：<span class=text_italic> t</span> 表示此数据值的类型；<span class=text_italic> sub,cst,ndef</span> 被道语言库内部使用，
+一般应设定为零；<span class=text_italic> v</span> 即为值，其含义可在下面的定义中看出。<br/>
+<div class="hlcode">
+<span class=CodeStruct>struct</span>&thinsp; DValue<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; uchar_t&thinsp; t;&thinsp; <span class=Comment>/* type */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; uchar_t&thinsp; sub;&thinsp; <span class=Comment>/* sub-type */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; uchar_t&thinsp; cst;&thinsp; <span class=Comment>/* const */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; uchar_t&thinsp; ndef;&thinsp; <span class=Comment>/* not a default parameter */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; union&thinsp; {<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; dint&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; i;&thinsp; <span class=Comment>/* int */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; <span class=DataType>float</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; f;&thinsp; <span class=Comment>/* float */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; <span class=DataType>double</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; d;&thinsp; <span class=Comment>/* double */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; complex16&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *c;&thinsp; <span class=Comment>/* complex */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DString&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *s;&thinsp; <span class=Comment>/* string */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DLong&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *l;&thinsp; <span class=Comment>/* big integer */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoBase&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *p;&thinsp; <span class=Comment>/* NOT one of the above data types */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoArray&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *array;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoList&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *list;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoMap&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *map;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoPair&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *pair;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoTuple&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *tuple;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoRoutine&thinsp; &thinsp; &thinsp; &thinsp; *routine;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoFunction&thinsp; &thinsp; &thinsp; *func;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoObject&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *object;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoClass&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *klass;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoCData&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *cdata;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoContext&thinsp; &thinsp; &thinsp; &thinsp; *context;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoStream&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; *stream;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoNameSpace&thinsp; &thinsp; *ns;<br /> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DaoVmProcess&thinsp; &thinsp; *vmp;<br /> &nbsp;&nbsp;&nbsp;&nbsp; }&thinsp; v&thinsp; ;<br /> };</div>
+ <br/>
+<table><tr><td><a name="2.3"><H4>2.3  一个简单而完整的例子</H4>
+</td><td align="right"><a href="&section=2.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+<span class=SpecSymbol>#include"dao.h"</span><br /> <span class=Number>DAO_INIT_MODULE</span>;<br /> <br /> <span class=DataType>void</span>&thinsp; salute(&thinsp; DaoContext&thinsp; *ctx,&thinsp; DValue&thinsp; *p[],&thinsp; <span class=DataType>int</span>&thinsp; <span class=Number>N</span>&thinsp; )<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; DaoContext_PutMBString(&thinsp; ctx,&thinsp; <span class=String>"hello"</span>&thinsp; );<br /> }<br /> <span class=DataType>int</span>&thinsp; DaoOnLoad(&thinsp; DaoVmSpace&thinsp; *vms,&thinsp; DaoNameSpace&thinsp; *ns&thinsp; )<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; DaoNameSpace_AddFunction(&thinsp; nss,&thinsp; salute,&thinsp; <span class=String>"salute()=&gt;string"</span>&thinsp; );<br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; <span class=Number>0</span>;<br /> }</div>
+ <br/>
+这个例子使用了两个未曾介绍的函数。
+第一个函数是<span class=text_italic> DaoContext_PutMBString()</span> ，它可以被用来将一个字符串作为返回值
+设定到<span class=text_italic> ctx</span> 里，在这个例子中<span class=text_italic> salute()</span> 由这个函数设定为返回"hello"。
+还有其他类似的函数用来设定其他类型的返回值，这些函数名均以<span class=text_italic> DaoContext_Put</span> 
+开头。请参看头文件<span class=text_italic> dao.h</span> 以了解有哪些这样的函数可用。<br/><br/>
+第二个函数是<span class=text_italic> DaoNameSpace_AddFunction()</span> ，是用来注册C函数到道虚拟机里。
+这里<span class=text_italic> salute()</span> 将以"salute()=&gt;string"为函数原型注册到道虚拟机空间<span class=text_italic> vms</span> 里。
+被注册的函数的原型必须按道语言里的函数原型的方式定义。
+从这个函数原型定义，道虚拟机将知道这个C函数在道语言里以"salute()"为名字，
+并返回一个字符串为返回值。<br/><br/>
+如果这个模块被编译为名为"mod_salute.dll"或"mod_salute.so"的动态链接库，
+那么这个模块可在道语言里这样用：
+<div class="hlcode">
+<span class=StmtKey>load</span>&thinsp; mod_salute;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; salute<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table><tr><td><a name="2.4"><H4>2.4  同时注册多个函数</H4>
+</td><td align="right"><a href="&section=2.4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+如果一个模块定义了多个函数，这些函数可放在一个数组里，一起注册到道虚拟机里。
+这个数组的元素必须是<span class=text_italic> DaoFuncItem</span> ，它的第一个成员是指向C函数的指针，
+第二个成员是一字符串，定义这个C函数在道语言里的函数原型。
+这个数组必须以空值元素结束。例如，下面的代码取自DaoOpenGL模块，
+这个<span class=text_italic> DaoFuncItem</span> 数组保存了那些被封装的OpenGL函数的函数指针，
+和它们在道语言里被使用的函数原型。
+<div class="hlcode">
+<span class=DataPrefix>static</span>&thinsp; DaoFuncItem&thinsp; dao_Funcs[]&thinsp; =&thinsp; <br /> {<br /> &thinsp; &thinsp; {&thinsp; dao__glClearIndex,&thinsp; <span class=String>"glClearIndex( c : float )"</span>&thinsp; },<br /> &thinsp; &thinsp; {&thinsp; dao__glClearColor,&thinsp; <span class=String>"glClearColor( red : float, green : float, blue : float, alpha : float )"</span>&thinsp; },<br /> &thinsp; &thinsp; {&thinsp; dao__glClear,&thinsp; <span class=String>"glClear( mask : int )"</span>&thinsp; },<br /> &thinsp; &thinsp; {&thinsp; dao__glIndexMask,&thinsp; <span class=String>"glIndexMask( mask : int )"</span>&thinsp; },<br /> &thinsp; &thinsp; {&thinsp; dao__glColorMask,&thinsp; <span class=String>"glColorMask( red : int, green : int, blue : int, alpha : int )"</span>&thinsp; },<br /> &thinsp; &thinsp; {&thinsp; dao__glAlphaFunc,&thinsp; <span class=String>"glAlphaFunc( func : int, ref : float )"</span>&thinsp; },<br /> &thinsp; &thinsp; {&thinsp; dao__glBlendFunc,&thinsp; <span class=String>"glBlendFunc( sfactor : int, dfactor : int )"</span>&thinsp; },<br /> &thinsp; &thinsp; {&thinsp; dao__glLogicOp,&thinsp; <span class=String>"glLogicOp( opcode : int )"</span>&thinsp; },<br /> &thinsp; &thinsp; ......<br /> &thinsp; &thinsp; {&thinsp; <span class=Number>NULL</span>,&thinsp; <span class=Number>NULL</span>&thinsp; }<br /> };</div>
+ <br/>
+然后，<span class=text_italic> DaoFuncItem</span> 数组可作为参数传递给<span class=text_italic> DaoNameSpace_AddFunctions()</span> 函数
+来把数组里的C函数加到道虚拟机里：
+<div class="hlcode">
+DaoNameSpace_AddFunctions(&thinsp; ns,&thinsp; dao_Funcs&thinsp; );</div>
+ <br/>
+<table class="topsection"><tr><td><a name="3"><H3>3  封装C/C++函数</H3>
+</td><td align="right"><a href="&section=3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+要封装一个C/C++函数，只须定义一个道语言里可调用的C函数，
+并在这个函数里调用那个被封装的函数即可。
+当然这个函数还要做些参数和返回值转换的工作，
+不过这样的转换很简单。<br/><br/>
+作为一个简单的例子，如果我们要封装如下的<span class=text_italic> sin()</span> 函数：
+<div class="hlcode">
+<span class=DataType>double</span>&thinsp; sin(&thinsp; <span class=DataType>double</span>&thinsp; x&thinsp; );</div>
+ 
+<span class=text_italic> sin()</span> 函数的封装可以简单的实现为下面的代码：
+<div class="hlcode">
+<span class=DataType>void</span>&thinsp; dao_sin(&thinsp; DaoContext&thinsp; *ctx,&thinsp; DValue&thinsp; *p[],&thinsp; <span class=DataType>int</span>&thinsp; <span class=Number>N</span>&thinsp; )<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; DaoContext_PutDouble(&thinsp; ctx,&thinsp; p[<span class=Number>0</span>]-&gt;v.d&thinsp; );<br /> }<br /> ...<br /> <span class=DataType>int</span>&thinsp; DaoOnLoad(&thinsp; DaoVmSpace&thinsp; *vms,&thinsp; DaoNameSpace&thinsp; *ns&thinsp; )<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; ...<br /> &nbsp;&nbsp;&nbsp;&nbsp; DaoNameSpace_AddFunction(&thinsp; ns,&thinsp; dao_sin,&thinsp; <span class=String>"sin( x : double ) =&gt; double"</span>&thinsp; );<br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; <span class=Number>0</span>;<br /> }</div>
+ 
+这里双精度实数参数可由<span class=text_italic> p[0]-&gt;v.d</span> 直接获得，这个参数值的类型不需要在这里作检查，
+因为这个函数被注册为了"sin( x : double ) =&gt; double"，道虚拟机将在编译时和运行时作参数检查，
+保证这个函数以正确的参数调用。不过通常情况下，返回值的正确性必须由封装函数保证。<br/><br/>
+<span class=text_bold> 
+请注意：
+道语言库附带了一个半自动工具，可用来方便的封装C/C++函数和数据类型。
+请参看有关的文档。
+</span> <br/>
+<table class="topsection"><tr><td><a name="4"><H3>4  封装C/C++数据类型</H3>
+</td><td align="right"><a href="&section=4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#4.1">道语言Typer结构</a></li>
+<li style="margin-top: 5px"><a href="#4.2">一个简单的例子</a></li>
+</ol></td></tr></table> <br/>
+前面已经介绍了如何封装C/C++函数，那么如何才可以在道语言里使用C/C++数据类型呢？
+下面将作这方面的介绍。<br/>
+<table><tr><td><a name="4.1"><H4>4.1  道语言Typer结构</H4>
+</td><td align="right"><a href="&section=4.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+实际上，一般的C/C++数据类型都可以在道语言里使用，
+只要有个道语言的Typer结构被关联到这个类型，并被注册到道虚拟机里。
+Typer结构的定义如下：
+<div class="hlcode">
+<span class=Comment>/* Typer结构，包含类型的基本信息 */</span><br /> <span class=CodeStruct>struct</span>&thinsp; DaoTypeBase<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; DaoTypeCore&thinsp; &thinsp; &thinsp; *priv;&thinsp; <span class=Comment>/* 内部使用成员 */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=DataPrefix>const</span>&thinsp; <span class=DataType>char</span>&thinsp; &thinsp; &thinsp; &thinsp; *name;&thinsp; <span class=Comment>/* 类型名称 */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; DaoNumItem&thinsp; &thinsp; &thinsp; &thinsp; *numItems;&thinsp; <span class=Comment>/* 成员常数，以空元素结束数组 */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; DaoFuncItem&thinsp; &thinsp; &thinsp; *funcItems;&thinsp; <span class=Comment>/* 成员函数，以空元素结束数组 */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; <br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=Comment>/* 父类型的Typer结构，用于构建类型继承关系，主要在封装C++库时比较有用 */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; DaoTypeBase&thinsp; &thinsp; &thinsp; *supers[&thinsp; <span class=Number>DAO_MAX_CDATA_SUPER</span>&thinsp; ];<br /> &nbsp;&nbsp;&nbsp;&nbsp; <br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=DataType>void</span>*&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; (*New)();&thinsp; &thinsp; <span class=Comment>/* 类型的内存分配 */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=DataType>void</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; (*Delete)(&thinsp; <span class=DataType>void</span>&thinsp; *self&thinsp; );&thinsp; <span class=Comment>/* 类型的内存释放 */</span><br /> };</div>
+ 
+这个结构包含C/C++数据类型的基本属性和它的成员常数和函数等。
+通常应在这个结构里设定分配和释放类型内存的函数指针。
+但如果在成员函数里有与类型名称同名的函数，那么这样的函数（允许多个重载的函数）
+将被认为是类型的分配函数，<span class=text_italic> New</span> 所设定的内存分配函数将被忽略。
+如果<span class=text_italic> Delete</span> 所表示的内存释放函数未被设定（即被设为NULL），
+那么C标准库里的<span class=text_italic> free()</span> 函数将被使用。<br/><br/>
+如果这个结构所表示类型是从另一个类型继承而来，那么它的父类的Typer结构
+可放在<span class=text_italic> supers</span> 数组里，这个数组的最后一个元素必须是NULL。
+这样C/C++里的类型继承关系将继续在道语言里有效，
+道虚拟机将恰当的处理成员函数的调用和类型的映射。<br/><br/>
+道虚拟机将封装的C/C++数据保存在<span class=text_italic> DaoCData</span> 结构里，这个结构有名为<span class=text_italic> data</span> 
+成员，它保存着指向C/C++数据的指针。这个<span class=text_italic> data</span> 成员可由函数
+<span class=text_italic> DaoCData_SetData( DaoCData *cdata, void *d )</span> 设定，并可由函数
+<span class=text_italic> DaoCData_GetData( DaoCData *cdata )</span> 获取。<br/>
+<table><tr><td><a name="4.2"><H4>4.2  一个简单的例子</H4>
+</td><td align="right"><a href="&section=4.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+假设我们有个C类型"foo"和使用"foo"的函数"bar"：
+<div class="hlcode">
+<span class=StmtKey>typedef</span>&thinsp; <span class=CodeStruct>struct</span>&thinsp; foo&thinsp; {&thinsp; <span class=DataType>int</span>&thinsp; value;&thinsp; }&thinsp; foo;<br /> foo*&thinsp; foo_new()<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; malloc(&thinsp; <span class=Method>sizeof</span>(&thinsp; foo&thinsp; )&thinsp; );<br /> }<br /> <span class=DataType>void</span>&thinsp; bar(&thinsp; foo&thinsp; *f&thinsp; )<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; printf(&thinsp; <span class=String>"bar() is called with foo object: %p\n"</span>,&thinsp; f&thinsp; );<br /> }</div>
+ <br/>
+<table><tr><td><a name="4.2.1"><H5>4.2.1  基本封装</H5>
+</td><td align="right"><a href="&section=4.2.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+"foo"类型的基本封装如下：
+<div class="hlcode">
+<span class=DataPrefix>static</span>&thinsp; DaoTypeBase&thinsp; fooTyper&thinsp; =<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>NULL</span>,<br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=String>"foo"</span>,<br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>NULL</span>,&thinsp; <span class=Comment>/* 没有成员常数 */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>NULL</span>,&thinsp; <span class=Comment>/* 没有成员函数 */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; {&thinsp; <span class=Number>NULL</span>&thinsp; },&thinsp; <span class=Comment>/* 没有父类型 */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; foo_new,<br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>NULL</span>&thinsp; <span class=Comment>/* 由free()释放 */</span><br /> };</div>
+ 
+这个Typer结构可按如下方式注册到道虚拟机空间：
+<div class="hlcode">
+DaoNameSpace_AddType(&thinsp; ns,&thinsp; &&thinsp; fooTyper&thinsp; );</div>
+ 
+这样在道语言里就可以使用"foo"类型了，例如，"foo"对象可这样直接创建：
+<div class="hlcode">
+f&thinsp; =&thinsp; foo<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;</div>
+ <br/>
+而函数<span class=text_italic> bar()</span> 可以这样封装后注册到道虚拟机空间：
+<div class="hlcode">
+<span class=DataPrefix>static</span>&thinsp; <span class=DataType>void</span>&thinsp; dao_bar(&thinsp; DaoContext&thinsp; *ctx,&thinsp; DValue&thinsp; *p[],&thinsp; <span class=DataType>int</span>&thinsp; <span class=Number>N</span>&thinsp; )<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; foo&thinsp; *f&thinsp; =&thinsp; DaoCData_GetData(&thinsp; p[<span class=Number>0</span>]-&gt;v.cdata&thinsp; );<br /> &nbsp;&nbsp;&nbsp;&nbsp; bar(&thinsp; f&thinsp; );<br /> }<br /> ...<br /> DaoNameSpace_AddFunction(&thinsp; ns,&thinsp; dao_bar,&thinsp; <span class=String>"bar( f : foo )"</span>&thinsp; );<br /> ...</div>
+ <br/>
+<table><tr><td><a name="4.2.2"><H5>4.2.2  把bar()定义为foo的成员方法？</H5>
+</td><td align="right"><a href="&section=4.2.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+既然"bar()"函数使用了"foo"对象，那是否可把"bar()"定义为"foo"类型的成员方法，
+然后使用"foo_object.bar()"调用"bar()"函数，而不需"bar( foo_object )"这样调用？<br/><br/>
+其实这可以很容易的做到，所要做的就是修改"foo"的Typer结构如下：
+<div class="hlcode">
+<span class=DataPrefix>static</span>&thinsp; DaoFuncItem&thinsp; fooMeth[]&thinsp; =<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; {&thinsp; dao_bar,&thinsp; &thinsp; <span class=String>"bar( self : foo )"</span>&thinsp; },<br /> &nbsp;&nbsp;&nbsp;&nbsp; {&thinsp; <span class=Number>NULL</span>,&thinsp; <span class=Number>NULL</span>&thinsp; }<br /> };<br /> <span class=DataPrefix>static</span>&thinsp; DaoTypeBase&thinsp; fooTyper&thinsp; =<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>NULL</span>,<br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=String>"foo"</span>,<br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>NULL</span>,&thinsp; <span class=Comment>/* 没有成员常数 */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; fooMeth,&thinsp; <span class=Comment>/* 有一个成员方法bar() */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; {&thinsp; <span class=Number>NULL</span>&thinsp; },&thinsp; <span class=Comment>/* 没有父类型 */</span><br /> &nbsp;&nbsp;&nbsp;&nbsp; foo_new,<br /> &nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>NULL</span>&thinsp; <span class=Comment>/* 由free()释放 */</span><br /> };</div>
+ 
+成员方法的函数原型的第一个参数必须名为"self"，如果"foo_object.bar()"调用时
+"foo_object"需要作为第一个参数传递给"bar()"的话。<br/><br/>
+有了这个修改后，下面的代码将可以在道语言里使用：
+<div class="hlcode">
+f&thinsp; =&thinsp; foo<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>f.bar<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table><tr><td><a name="4.2.3"><H5>4.2.3  Setters和Getters</H5>
+</td><td align="right"><a href="&section=4.2.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+道语言的C编程接口支持给C/C++数据类型定义Setters和Getters，
+这样将可以更方便的访问C/C++数据的成员变量。
+继续前面的例子，可以给"foo"的成员变量"value"定义如下的setter和getter：
+<div class="hlcode">
+<span class=DataPrefix>static</span>&thinsp; <span class=DataType>void</span>&thinsp; foo_SETF_value(&thinsp; DaoContext&thinsp; *ctx,&thinsp; DValue&thinsp; p[],&thinsp; <span class=DataType>int</span>&thinsp; <span class=Number>N</span>&thinsp; )<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; foo&thinsp; *f&thinsp; =&thinsp; DaoCData_GetData(&thinsp; p[<span class=Number>0</span>].v.cdata&thinsp; );<br /> &nbsp;&nbsp;&nbsp;&nbsp; f.value&thinsp; =&thinsp; p[<span class=Number>1</span>].v.i;<br /> }<br /> <span class=DataPrefix>static</span>&thinsp; <span class=DataType>void</span>&thinsp; foo_GETF_value(&thinsp; DaoContext&thinsp; *ctx,&thinsp; DValue&thinsp; p[],&thinsp; <span class=DataType>int</span>&thinsp; <span class=Number>N</span>&thinsp; )<br /> {<br /> &nbsp;&nbsp;&nbsp;&nbsp; foo&thinsp; *f&thinsp; =&thinsp; DaoCData_GetData(&thinsp; p[<span class=Number>0</span>].v.cdata&thinsp; );<br /> &nbsp;&nbsp;&nbsp;&nbsp; DaoContext_PutInteger(&thinsp; ctx,&thinsp; f.value&thinsp; );<br /> }</div>
+ 
+下面这两行必须被加到"fooMeth"里：
+<div class="hlcode">
+{&thinsp; foo_SETF_value,&thinsp; &thinsp; <span class=String>".value=( self : foo, v : int )"</span>&thinsp; },<br /> {&thinsp; foo_GETF_value,&thinsp; &thinsp; <span class=String>".value( self : foo ) =&gt; int"</span>&thinsp; },</div>
+ 
+这里注册的函数原型必需和定义道类的运算符重载的函数原型一样。
+之后，"foo"的成员变量"value"的值可以这样设定和获取：
+<div class="hlcode">
+f&thinsp; =&thinsp; foo<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>f.<span class=Method>value</span>&thinsp; =&thinsp; <span class=Number>123</span>;<br/>a&thinsp; =&thinsp; f.<span class=Method>value</span>;</div>
+ <br/>
+<table class="topsection"><tr><td><a name="5"><H3>5  将道嵌入到其他程序里</H3>
+</td><td align="right"><a href="&section=5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+到目前为止，一些基本的编程接口以编写道语言的扩展模块为例子做了介绍。
+下面将简单地介绍如何将道虚拟机嵌入到其他应用程序里。
+在应用程序里嵌入道将使得程序的一些功能可由道脚本设定和控制，
+并允许它的功能可由道语言来扩展。<br/><br/>
+在这里，前面介绍的接口还是有效。
+不过宏<span class=text_italic> DAO_INIT_MODULE</span> 已变得不必要，也不需要定义入口函数<span class=text_italic> DaoOnLoad()</span> 。
+明显，要嵌入道，第一件事就是在程序里包含头文件"dao.h"，
+与编写模块类似，如果要使用直接的编程接口，
+你必须在包含"dao.h"前定义"DAO_DIRECT_API"。
+如要使用间接的接口，全局变量<span class=text_italic> __dao</span> (两条下划线)必须被定义：
+<div class="hlcode">
+<span class=Number>DAO_DLL</span>&thinsp; DaoAPI&thinsp; __dao;</div>
+ 
+要定义这个变量，也可以还是用宏<span class=text_italic> DAO_INIT_MODULE</span> 。<br/><br/>
+如果你不打算将程序链接到道语言库，下面所要做的就是手动打开
+道语言的库文件，这可以使用<span class=text_italic> dao.h</span> 里定义的一个宏：
+in <span class=text_italic> dao.h</span> ,
+<div class="hlcode">
+<span class=DataType>void</span>&thinsp; *handle&thinsp; =&thinsp; DaoLoadLibrary(&thinsp; <span class=String>"/usr/local/dao/dao.so"</span>&thinsp; );</div>
+ 
+接下来必须调用<span class=text_italic> DaoInit()</span> 函数来初始化道语言库。
+这个函数需要一个DaoAPI结构指针为参数。
+如要使用直接的接口，这个函数可被直接调用，且参数可以为NULL：
+<div class="hlcode">
+DaoVmSpace&thinsp; *vmSpace&thinsp; =&thinsp; DaoInit(&thinsp; <span class=Number>NULL</span>&thinsp; );</div>
+ 
+否则要以如下方式调用：
+<div class="hlcode">
+DaoInitFunc&thinsp; pfunc&thinsp; =&thinsp; (DaoInitFunc)DaoFindSymbol(&thinsp; handle,&thinsp; <span class=String>"DaoInit"</span>&thinsp; );<br /> DaoVmSpace&thinsp; *vmSpace&thinsp; =&thinsp; (*pfunc)(&thinsp; &&thinsp; __dao&thinsp; );</div>
+ 
+这里<span class=text_italic> __dao</span> 的地址被作为参数传递给了<span class=text_italic> DaoInit()</span> 函数。
+这样<span class=text_italic> DaoInit()</span> 不仅执行道语言库的初始化工作，它还将道语言的C编程接口的函数指针设定
+到<span class=text_italic> __dao</span> 的成员里，之后C编程接口将可通过一个间接层<span class=text_italic> __dao</span> 使用，
+这样嵌入了道的程序在编译链接时将不需要链接到道语言库。<br/><br/>
+到了这步，你可以用 DaoVmSpace_RunMain() 来执行一个脚本文件，
+<div class="hlcode">
+<span class=StmtKey>if</span>(&thinsp; !&thinsp; DaoVmSpace_RunMain(&thinsp; vmSpace,&thinsp; <span class=String>"script.dao"</span>&thinsp; )&thinsp; )&thinsp; <span class=StmtKey>return</span>;</div>
+ 
+这个脚本文件将在当前路径和 DaoVmSpace 的搜寻路径表里查找。<br/><br/>
+或者你也可用 DaoVmSpace_Load() 来载入一个脚本文件并获得一个命名空间。
+如果该文件曾被载入过，该文件所含代码将被重新执行，并返回前次载入时
+创建的命名空间。如果不曾被载入过，那么一个新的命名空间将被创建并返回。
+此脚本文件也将在当前路径和 DaoVmSpace 的搜寻路径表里查找。
+<div class="hlcode">
+<span class=StmtKey>if</span>(&thinsp; !&thinsp; DaoVmSpace_Load(&thinsp; vmSpace,&thinsp; <span class=String>"script.dao"</span>&thinsp; )&thinsp; <span class=StmtKey>return</span>;</div>
+ <br/><br/>
+你也可以用下面的函数来获得一个命名空间结构，
+<div class="hlcode">
+DaoNameSpace&thinsp; *ns&thinsp; =&thinsp; DaoNameSpace_New(&thinsp; vmSpace&thinsp; );</div>
+ <br/>
+或，
+<div class="hlcode">
+DaoNameSpace&thinsp; *ns&thinsp; =&thinsp; DaoVmSpace_MainNameSpace(&thinsp; vmSpace&thinsp; );</div>
+ 
+以获得DaoVmSpace的主命名空间。<br/><br/>
+或，
+<div class="hlcode">
+DaoNameSpace&thinsp; *ns&thinsp; =&thinsp; DaoNameSpace_GetNameSpace(&thinsp; nameSpace,&thinsp; <span class=String>"name"</span>&thinsp; );</div>
+ 
+从另一个命名空间nameSpace获得一给定名字name的命名空间，如果nameSpace没有
+名为name的命名空间，那么创建一个新的命名空间，加入到nameSpace，并赋予名字name，
+然后返回此命名空间。<br/><br/>
+如前面介绍的，封装好的C函数和类型，和常量可被加入到命名空间结构里。
+命名空间结构还可用来载入脚本文件，该文件里定义的函数和类以及全局常量变量
+都将被放在此命名空间结构里。此脚本文件将不在DaoVmSpace的搜寻路径表里查找。
+<div class="hlcode">
+DaoNameSpace_Load(&thinsp; ns,&thinsp; <span class=String>"script.dao"</span>&thinsp; );</div>
+ <br/><br/>
+为了编译和执行脚本代码，或执行道语言函数，你还需要创建类型为<span class=text_bold> DaoVmProcess</span> 
+的结构。它可从 DaoVmSpace 结构获得或创建。
+<div class="hlcode">
+DaoVmProcess&thinsp; *vmp&thinsp; =&thinsp; DaoVmProcess_MainProcess(&thinsp; vmSpace&thinsp; );<br /> DaoVmProcess&thinsp; *vmp2&thinsp; =&thinsp; DaoVmProcess_New(&thinsp; vmSpace&thinsp; );</div>
+ <br/><br/>
+使用 DaoVmSpace 结构，可按如下方式编译或运行道语言脚本代码，
+或调用道语言函数，
+<div class="hlcode">
+DString&thinsp; *src&thinsp; =&thinsp; DString_New(<span class=Number>1</span>);<br /> DString_SetMBS(&thinsp; src,&thinsp; <span class=String>"io.writeln( 'hello' )"</span>&thinsp; );<br /> DaoVmProcess_Eval(&thinsp; vmp,&thinsp; ns,&thinsp; src,&thinsp; <span class=Number>0</span>&thinsp; );<br /> <br /> DString_SetMBS(&thinsp; src,&thinsp; <span class=String>"routine hello(){ io.writeln( 'hello' ) }"</span>&thinsp; );<br /> DaoVmProcess_Compile(&thinsp; vmp,&thinsp; ns,&thinsp; src,&thinsp; <span class=Number>0</span>&thinsp; );<br /> <span class=Comment>// routine "hello()" is in the namespace "ns"<br /></span></div>
+ <br/>
+调用道语言函数：
+<div class="hlcode">
+DValue&thinsp; value&thinsp; =&thinsp; DaoNameSpace_FindData(&thinsp; ns,&thinsp; <span class=String>"myfunc"</span>&thinsp; );<br /> <span class=StmtKey>if</span>(&thinsp; value.t&thinsp; ==&thinsp; <span class=Number>DAO_ROUTINE</span>&thinsp; ){<br /> &thinsp; &thinsp; DaoVmProcess_Call(&thinsp; vmp,&thinsp; value.v.routine,&thinsp; <span class=Number>NULL</span>,&thinsp; <span class=Number>NULL</span>,&thinsp; <span class=Number>0</span>&thinsp; );<br /> }</div>
+ 
+给函数调用传递参数：
+<div class="hlcode">
+DValue&thinsp; buf[<span class=Number>3</span>];<br /> DValue&thinsp; *par[<span class=Number>3</span>];<br /> <span class=StmtKey>for</span>(i=<span class=Number>0</span>;&thinsp; i&lt;<span class=Number>3</span>;&thinsp; i++)&thinsp; par[i]&thinsp; =&thinsp; &&thinsp; buf[i];<br /> buf[<span class=Number>0</span>]&thinsp; =&thinsp; DValue_NewInteger(<span class=Number>1</span>);<br /> buf[<span class=Number>2</span>]&thinsp; =&thinsp; DValue_NewFloat(<span class=Number>2</span>.<span class=Number>0</span>);<br /> buf[<span class=Number>3</span>]&thinsp; =&thinsp; DValue_NewMBString(&thinsp; <span class=String>"abc"</span>,&thinsp; <span class=Number>3</span>&thinsp; );<br /> DaoVmProcess_Call(&thinsp; vmp,&thinsp; func,&thinsp; <span class=Number>NULL</span>,&thinsp; par,&thinsp; <span class=Number>3</span>&thinsp; );<br /> DValue_ClearAll(&thinsp; buf,&thinsp; <span class=Number>3</span>&thinsp; );</div>
+ <br/><br/>
+DaoVmProcess 结构也可用来调用道语言类的成员方法。
+如果是一个需要类实例的成员方法，类实例可作为DaoVmProcess_Call()的第三个参数传入。<br/>
+<table class="topsection"><tr><td><a name="6"><H3>6  道语言的C编程接口的高级应用</H3>
+</td><td align="right"><a href="&section=6"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+前面已提过，在封装C/C++数据类型时可定义或保留类型的继承关系，
+不仅如此，在道脚本里使用这些类型时，还可从C/C++数据类型派生出道类(class)，
+就象从道类派生一样。
+甚至，C++类可按一定方式封装，使得它们的虚函数可在道派生类中被重新定义。
+对于C结构，如它含有函数指针作为成员，某些情况下，这样的C结构可象C++类那样封装，
+使得其函数指针成员的行为象C++类的虚函数一样，也就是，可以在C结构的道派生类中定义
+成员方法，并当C结构的成员函数指针作为函数被调用时，道派生类的成员方法将被调用。
+这些技术都有点复杂，这里将不作介绍。感兴趣的可去参考一些道模块的源代码（如DaoVTK模块等），
+或使用半自动工具"tools/autobind.dao"来生成封装代码然后查看产生的代码。<br clear=all />
+</div></body></html>

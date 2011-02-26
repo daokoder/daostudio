@@ -1,0 +1,680 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DaoHelpVIM</class>
+ <widget class="QDialog" name="DaoHelpVIM">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>734</width>
+    <height>541</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>DaoStudio VIM Comman Help</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QTreeWidget" name="treeWidget">
+     <property name="columnCount">
+      <number>2</number>
+     </property>
+     <attribute name="headerDefaultSectionSize">
+      <number>200</number>
+     </attribute>
+     <attribute name="headerMinimumSectionSize">
+      <number>200</number>
+     </attribute>
+     <attribute name="headerDefaultSectionSize">
+      <number>200</number>
+     </attribute>
+     <attribute name="headerMinimumSectionSize">
+      <number>200</number>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>Command Action</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Key Combinations</string>
+      </property>
+     </column>
+     <item>
+      <property name="text">
+       <string>Mode Switch</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <item>
+       <property name="text">
+        <string>Normal Or VIM Mode</string>
+       </property>
+       <property name="text">
+        <string>shift+alt+space</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Edit Or Command Mode</string>
+       </property>
+       <property name="text">
+        <string>alt+space</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Enter Command Mode</string>
+       </property>
+       <property name="text">
+        <string>esc</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Enter Edit Mode</string>
+       </property>
+       <property name="text">
+        <string>i, o, O</string>
+       </property>
+      </item>
+     </item>
+     <item>
+      <property name="text">
+       <string>Insert</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <item>
+       <property name="text">
+        <string>At Current Cursor Position</string>
+       </property>
+       <property name="text">
+        <string>i</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>New Line Above Cursor</string>
+       </property>
+       <property name="text">
+        <string>O</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>New Line Below Cursor</string>
+       </property>
+       <property name="text">
+        <string>o</string>
+       </property>
+      </item>
+     </item>
+     <item>
+      <property name="text">
+       <string>Paste</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <item>
+       <property name="text">
+        <string>Above Cusor</string>
+       </property>
+       <property name="text">
+        <string>P</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Below Cursor</string>
+       </property>
+       <property name="text">
+        <string>p</string>
+       </property>
+      </item>
+     </item>
+     <item>
+      <property name="text">
+       <string>Undo/Redo</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <item>
+       <property name="text">
+        <string>Undo</string>
+       </property>
+       <property name="text">
+        <string>u</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Redo</string>
+       </property>
+       <property name="text">
+        <string>ctrl+r</string>
+       </property>
+      </item>
+     </item>
+     <item>
+      <property name="text">
+       <string>Page Up/Down</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <item>
+       <property name="text">
+        <string>Page Up</string>
+       </property>
+       <property name="text">
+        <string>ctrl+b</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Page Down</string>
+       </property>
+       <property name="text">
+        <string>ctrl+f</string>
+       </property>
+      </item>
+     </item>
+     <item>
+      <property name="text">
+       <string>Move</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <item>
+       <property name="text">
+        <string>Up, Down, Left, Right</string>
+       </property>
+       <property name="text">
+        <string>arrows</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Up</string>
+       </property>
+       <property name="text">
+        <string>I</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Left (One Character)</string>
+       </property>
+       <property name="text">
+        <string>J</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Down</string>
+       </property>
+       <property name="text">
+        <string>K</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Right (One Character)</string>
+       </property>
+       <property name="text">
+        <string>L, F</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>One Word Foreward</string>
+       </property>
+       <property name="text">
+        <string>w</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>One Word Backward</string>
+       </property>
+       <property name="text">
+        <string>b</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>One Token Forward</string>
+       </property>
+       <property name="text">
+        <string>f, W</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>One Token Backward</string>
+       </property>
+       <property name="text">
+        <string>j, B</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>10 Lines Down</string>
+       </property>
+       <property name="text">
+        <string>g</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>10 Lines Up</string>
+       </property>
+       <property name="text">
+        <string>h</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>100 Lines Down</string>
+       </property>
+       <property name="text">
+        <string>G</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>100 Lines Up</string>
+       </property>
+       <property name="text">
+        <string>H</string>
+       </property>
+      </item>
+     </item>
+     <item>
+      <property name="text">
+       <string>Repeated Move</string>
+      </property>
+      <property name="text">
+       <string>[digits][move]</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Copy</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <item>
+       <property name="text">
+        <string>Current Line</string>
+       </property>
+       <property name="text">
+        <string>yy</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Multiple Lines</string>
+       </property>
+       <property name="text">
+        <string>y[digits]y, [digits]yy</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Words, Tokens Or Lines</string>
+       </property>
+       <property name="text">
+        <string>y[move], y[digits][move], [digits]y[move]</string>
+       </property>
+      </item>
+     </item>
+     <item>
+      <property name="text">
+       <string>Delete</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <item>
+       <property name="text">
+        <string>Current Line</string>
+       </property>
+       <property name="text">
+        <string>dd</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Multiple Lines</string>
+       </property>
+       <property name="text">
+        <string>d[digits]d, [digits]dd</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Words, Tokens Or Lines</string>
+       </property>
+       <property name="text">
+        <string>d[move], d[digits][move], [digits]d[move]</string>
+       </property>
+      </item>
+     </item>
+     <item>
+      <property name="text">
+       <string>Indentation</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>Current Line</string>
+       </property>
+       <property name="text">
+        <string>==</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Multiple Lines</string>
+       </property>
+       <property name="text">
+        <string>[digits]==, =[digits]=</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Multiple Lines</string>
+       </property>
+       <property name="text">
+        <string>=[digits][move up/down], [digits]=[move up/down]</string>
+       </property>
+      </item>
+     </item>
+     <item>
+      <property name="text">
+       <string>Join Lines</string>
+      </property>
+      <property name="text">
+       <string>k</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Line Commenting</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>One Line Commenting</string>
+       </property>
+       <property name="text">
+        <string>cc</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>One Line Uncommenting</string>
+       </property>
+       <property name="text">
+        <string>CC</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Multiple Line Commenting</string>
+       </property>
+       <property name="text">
+        <string>[digits]cc, c[move], c[digits][move], [digits]c[move]</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Multiple Line Uncommenting</string>
+       </property>
+       <property name="text">
+        <string>[digits]CC, C[move], C[digits][move], [digits]C[move]</string>
+       </property>
+      </item>
+     </item>
+     <item>
+      <property name="text">
+       <string>Search by Line</string>
+      </property>
+      <property name="text">
+       <string>/dao-regex</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Command Goto Line</string>
+      </property>
+      <property name="text">
+       <string>:[number]</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Command Copy</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <item>
+       <property name="text">
+        <string>Current Line</string>
+       </property>
+       <property name="text">
+        <string>:.y</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>One Line</string>
+       </property>
+       <property name="text">
+        <string>:[line]y</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Lines Of Range</string>
+       </property>
+       <property name="text">
+        <string>:[start],[end]y, :[start],+[count]y, :[start],-[count]y</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>All Lines</string>
+       </property>
+       <property name="text">
+        <string>:%y</string>
+       </property>
+      </item>
+     </item>
+     <item>
+      <property name="text">
+       <string>Command Delete</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <item>
+       <property name="text">
+        <string>Current Line</string>
+       </property>
+       <property name="text">
+        <string>:.d</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>One Line</string>
+       </property>
+       <property name="text">
+        <string>:[line]d</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Lines Of Range</string>
+       </property>
+       <property name="text">
+        <string>:[start],[end]d, :[start],+[count]d, :[start],-[count]d</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>All Lines</string>
+       </property>
+       <property name="text">
+        <string>:%d</string>
+       </property>
+      </item>
+     </item>
+     <item>
+      <property name="text">
+       <string>Command Replace By Line</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <item>
+       <property name="text">
+        <string>Current Line (First Occurrence)</string>
+       </property>
+       <property name="text">
+        <string>:.s/dao-regex/text/</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Current Line (All Occurrence)</string>
+       </property>
+       <property name="text">
+        <string>:.s/dao-regex/text/g</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>One Line (First)</string>
+       </property>
+       <property name="text">
+        <string>:[line]s/dao-regex/text/</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>One Line (All)</string>
+       </property>
+       <property name="text">
+        <string>:[line]s/dao-regex/text/g</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Lines Of Range (First)</string>
+       </property>
+       <property name="text">
+        <string>:[m],[n]s/regex/text/, :[m],+[n]s/regex/text/, :[m],-[n]s/regex/text/</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Lines Of Range (All)</string>
+       </property>
+       <property name="text">
+        <string>:[m],[n]s/regex/text/g, :[m],+[n]s/regex/text/g, :[m],-[n]s/regex/text/g</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>All Lines (First)</string>
+       </property>
+       <property name="text">
+        <string>:%s/dao-regex/text/</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>All Lines (All)</string>
+       </property>
+       <property name="text">
+        <string>:%s/dao-regex/text/g</string>
+       </property>
+      </item>
+     </item>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnClose">
+       <property name="maximumSize">
+        <size>
+         <width>200</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>btnClose</sender>
+   <signal>clicked()</signal>
+   <receiver>DaoHelpVIM</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>370</x>
+     <y>511</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>105</x>
+     <y>510</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

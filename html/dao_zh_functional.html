@@ -1,0 +1,352 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+
+<h2>
+道语言函数式编程
+</h2>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#1">一般语法</a></li>
+<li style="margin-top: 5px"><a href="#2">map,&nbsp;reduce/fold,&nbsp;unfold</a></li>
+<li style="margin-top: 5px"><a href="#3">select,&nbsp;index,&nbsp;count</a></li>
+<li style="margin-top: 5px"><a href="#4">each,&nbsp;repeat</a></li>
+<li style="margin-top: 5px"><a href="#5">string,&nbsp;array,&nbsp;list</a></li>
+<li style="margin-top: 5px"><a href="#6">sort,&nbsp;apply</a></li>
+</ol></td></tr></table> <br/>
+(适用道语言1.1)<br/>
+<table class="topsection"><tr><td><a name="1"><H3>1  一般语法</H3>
+</td><td align="right"><a href="&section=1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+道语言通过一系列内置方法支持函数式编程。
+这种内置方法的一般语法是这样的：
+<div class="hlcode">
+<span class=Number>RESULT</span>&thinsp; =&thinsp; <span class=Number>METHOD</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>PARAMETER</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; |<span class=Number>VARIABLE</span>|&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>EXPRESSION</span>&thinsp; <span class=SpecSymbol>}</span><br/>结果&thinsp; =&thinsp; 方法<span class=SpecSymbol>(</span>&thinsp; 参数&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; |变量|&thinsp; <span class=SpecSymbol>{</span>&thinsp; 表达式&thinsp; <span class=SpecSymbol>}</span></div>
+ 
+这里METHOD可以是：
+<ol>
+<li> map</li>
+
+<li> reduce/fold</li>
+
+<li> unfold</li>
+
+<li> select</li>
+
+<li> index</li>
+
+<li> count</li>
+
+<li> each</li>
+
+<li> repeat</li>
+
+</ol>
+ 
+也可以是string, array或list，它们可以以这种语法用作数据构造方法。
+其他两个采用同样语法的内置方法是sort和apply。<br/><br/>
+取决于是什么METHOD, 参数PARAMETER可以是一个或多个列表，数组或其他数据类型。
+可选的VARIABLE可以根据METHOD和PARAMETER来申明。
+如果 |VARIABLE| 被省略，那么x,y,z和i,j将在需要的情况下被自动申明。<br/><br/>
+大括号里的 EXPRESSION 相当于一个内联的函数，它将被应用到PARAMETER或
+它（如果是列表或数组）的元素上。PARAMETER或其元素将通过 VARIABLE
+里申明的或自动申明的变量传递给EXPRESSION。<br/><br/>
+一个简单的例子：
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>}</span><br/>b&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>10</span>*x&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># produce { 10, 20, 30 }</span></div>
+ 
+它等价于：
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>}</span><br/>b&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; |x|&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>10</span>*x&thinsp; <span class=SpecSymbol>}</span></div>
+ <br/><br/>
+当多个列表或数组被用作参数时，
+VARIABLE 可以被相应的定义为那些列表数组的元素：
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>}</span><br/>b&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>11</span>,&thinsp; <span class=Number>22</span>,&thinsp; <span class=Number>33</span>&thinsp; <span class=SpecSymbol>}</span><br/>c&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; |x,y|&thinsp; <span class=SpecSymbol>{</span>&thinsp; x&thinsp; +&thinsp; y&thinsp; <span class=SpecSymbol>}</span></div>
+ 
+在此例中，x 被定义为了 a 的元素，而 y 则被定义为了 b 的元素。
+实际上这里还可再申明一个变量表示 x+y 被执行时当前的元素下表，如：
+<div class="hlcode">
+c&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; |x,y,i|&thinsp; <span class=SpecSymbol>{</span>&thinsp; x&thinsp; +&thinsp; y&thinsp; +&thinsp; i&thinsp; <span class=SpecSymbol>}</span></div>
+ 
+其实这里，|x,y,i| 也可被省略，这几个变量都将被自动申明。<br/><br/>
+大括号里也可使用多个表达式，它们必需由逗号分开，
+它们的值将以元组(tuple)返回：
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>}</span><br/>b&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>10</span>*x,&thinsp; x+<span class=Number>10</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># produce { (10, 11), (20, 12), (30, 13) }</span></div>
+ <br/><br/>
+要使用<span class=text_bold> 程序语句</span> ，只需在语句后面 EXPRESSION 前加关键字 <span class=text_bold> return</span> 
+即可，如：
+<div class="hlcode">
+<span class=SpecSymbol>...</span>&thinsp; ->&thinsp; |<span class=Number>VARIABLE</span>|&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>BLOCK</span>&thinsp; <span class=StmtKey>return</span>&thinsp; <span class=Number>EXPRESSION</span>&thinsp; <span class=SpecSymbol>}</span></div>
+ 
+这里 BLOCK 表示一般程序语句（不能使用再使用<span class=text_bold> return</span> 关键字）。
+例如：
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>}</span><br/>b&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; |x|&thinsp; <span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; u&thinsp; =&thinsp; <span class=Number>10</span>*x;<br/>&thinsp; &thinsp; v&thinsp; =&thinsp; x+<span class=Number>10</span>;<br/>&thinsp; &thinsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; u&thinsp; &lt;&thinsp; v&thinsp; <span class=SpecSymbol>)</span>&thinsp; u&thinsp; +=&thinsp; v;<br/>&thinsp; &thinsp; <span class=StmtKey>return</span>&thinsp; u*v<br/><span class=SpecSymbol>}</span></div>
+ <br/><br/>
+<span class=text_bold> 复合函数</span> 可以通过使用多个<span class=text_bold> -&gt;|...|{...}</span> 结构创建：
+<div class="hlcode">
+<span class=Number>RESULT</span>&thinsp; =&thinsp; <span class=Number>METHOD</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>PARAMETER</span>&thinsp; <span class=SpecSymbol>)</span><br/>&thinsp; &thinsp; ->&thinsp; |<span class=Number>VARIABLE</span>|&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>EXPRESSION</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <br/>&thinsp; &thinsp; ->&thinsp; |<span class=Number>VARIABLE</span>|&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>EXPRESSION</span>&thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; <span class=SpecSymbol>...</span></div>
+ 
+对于除了第一个之外的<span class=text_bold> -&gt;|...|{...}</span> 结构里的 VARIABLE，
+变量将根据前一结构里的 EXPRESSION 来申明。例如：
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>}</span><br/>b&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>11</span>,&thinsp; <span class=Number>22</span>,&thinsp; <span class=Number>33</span>&thinsp; <span class=SpecSymbol>}</span><br/>c&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; |x,y|&thinsp; <span class=SpecSymbol>{</span>&thinsp; x&thinsp; +&thinsp; y,&thinsp; x&thinsp; -&thinsp; y&thinsp; <span class=SpecSymbol>}</span>&thinsp; ->&thinsp; |u,v|&thinsp; <span class=SpecSymbol>{</span>&thinsp; u&thinsp; *&thinsp; v&thinsp; <span class=SpecSymbol>}</span></div>
+ 
+这里，
+<span class=text_italic> u</span> 
+被申明为
+<span class=text_italic> x+y</span> 
+的结果，
+<span class=text_italic> v</span> 
+被申明为
+ <span class=text_italic> x-y</span> 
+的结果。<br/><br/>
+<table class="topsection"><tr><td><a name="2"><H3>2  map, reduce/fold, unfold</H3>
+</td><td align="right"><a href="&section=2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#2.1">map()</a></li>
+<li style="margin-top: 5px"><a href="#2.2">reduce/fold()</a></li>
+<li style="margin-top: 5px"><a href="#2.3">unfold()</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="2.1"><H4>2.1  map()</H4>
+</td><td align="right"><a href="&section=2.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+map() 以一个或多个列表或数组作参数，并将大括号里的内联函数应用到
+列表数组的每个元素，然后把所有函数应用的结果作为列表或数组返回。
+这些作为参数的列表数组必需有同样的长度。<br/><br/>
+如前面提到的，map()可以以数组为参数并返回一个数组。
+如果（最后的那个大括号里的）内联函数返回一个标量值，
+map()返回的数组将和（第一个）参数里的数组有同样的形状，
+即拥有同样的维数且每个维数上的大小一样。
+如果一个元组，列表或数组被返回，
+map()返回的数组将相对于参数里的数组有同样的额外的纬度，
+而返回的元组列表数组等将被用来设定相应的自数组的值。<br/><br/>
+前面已经给出了一些用在列表上的map()的例子，
+这里在给些使用在数组上的例子：
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>;&thinsp; <span class=Number>3</span>,&thinsp; <span class=Number>4</span>&thinsp; <span class=SpecSymbol>]</span><br/>b&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>10</span>*x&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># produce [ 10, 20; 30, 40 ]</span></div>
+ 
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>;&thinsp; <span class=Number>3</span>,&thinsp; <span class=Number>4</span>&thinsp; <span class=SpecSymbol>]</span><br/>b&thinsp; =&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>5</span>,&thinsp; <span class=Number>6</span>;&thinsp; <span class=Number>7</span>,&thinsp; <span class=Number>8</span>&thinsp; <span class=SpecSymbol>]</span><br/>c&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; x,&thinsp; y&thinsp; <span class=SpecSymbol>}</span><br/><span class=Comment># or
+<br /></span>c&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=SpecSymbol>[</span>x,&thinsp; y<span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>}</span><br/><span class=Comment># or
+<br /></span>c&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=SpecSymbol>{</span>x,&thinsp; y<span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>}</span><br/><span class=Comment># produce 3d array: [ [ [1, 5], [2, 6] ], [ [3, 7], [4, 8] ] ]</span></div>
+ <br/><br/>
+在其他拥有函数式编程方法的语言里可以经常看到zip()函数，
+Dao没有专门支持此函数，因为此函数可以相当容易的由map()函数实现。
+如：
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>}</span><br/>b&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>11</span>,&thinsp; <span class=Number>22</span>,&thinsp; <span class=Number>33</span>&thinsp; <span class=SpecSymbol>}</span><br/>c&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; x,&thinsp; y&thinsp; <span class=SpecSymbol>}</span></div>
+ 
+这将返回一个以元组zip那两个列表里元素的列表。
+显然可以用同样的方式来zip多个列表。<br/>
+<table><tr><td><a name="2.2"><H4>2.2  reduce/fold()</H4>
+</td><td align="right"><a href="&section=2.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+fold()和等同的方法reduce()，以一个列表或数组和一个初始值（也是累积值）为参数，
+将内联的函数依次应用到列表数组的每个元素和累积值，
+然后将最后那次的函数应用的结果返回。
+如果第二个参数被省略，那么，数组列表的第一个元素将被用作初始值和累积值，
+并将内联函数应用到剩余的元素。<br/><br/>
+缺省情况下，列表数组的元素将被传递给自动申明的变量 x，而初始值或累积值将被传递给
+自动申明的 y。这两个变量也可被显示地申明为其他变量名。<br/>
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>}</span><br/>b&thinsp; =&thinsp; fold<span class=SpecSymbol>(</span>&thinsp; a,&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; x&thinsp; +&thinsp; y&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># produce 16
+<br /></span>b&thinsp; =&thinsp; fold<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; x&thinsp; +&thinsp; y&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># produce 6</span></div>
+ <br/>
+<table><tr><td><a name="2.3"><H4>2.3  unfold()</H4>
+</td><td align="right"><a href="&section=2.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+unfold()以一个初始值为参数，通过反复地将函数应用到该初始值或前次函数应用的结果，
+生成一个包含所有函数应用的列表。
+此函数应用将在某条件不成立时终止：
+<div class="hlcode">
+a&thinsp; =&thinsp; unfold<span class=SpecSymbol>(</span>&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; |x|&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>while</span>&thinsp; x&thinsp; &gt;&thinsp; <span class=Number>0</span>&thinsp; <span class=StmtKey>return</span>&thinsp; x&thinsp; -&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>}</span><br/><span class=Comment># produce: { 4, 3, 2, 1, 0 }</span></div>
+ 
+这里条件表达式必需放在关键字while之后，return之前（这里结果表达式之前必需有return关键字）.<br/><br/>
+也可有命令语句放在while之前：
+<div class="hlcode">
+a&thinsp; =&thinsp; unfold<span class=SpecSymbol>(</span>&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; |x|&thinsp; <span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; <span class=Method>stdio.println</span><span class=SpecSymbol>(</span>x<span class=SpecSymbol>)</span><br/>&thinsp; &thinsp; <span class=StmtKey>while</span>&thinsp; x&thinsp; &gt;&thinsp; <span class=Number>0</span>&thinsp; <span class=StmtKey>return</span>&thinsp; x&thinsp; -&thinsp; <span class=Number>1</span><br/><span class=SpecSymbol>}</span></div>
+ <br/>
+<table class="topsection"><tr><td><a name="3"><H3>3  select, index, count</H3>
+</td><td align="right"><a href="&section=3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+select, index, count 这几个方法可用来通过在一个或多个列表数组的元素上
+应用函数来测试某个条件是否满足，并选择，或索引，或计数那些满足条件的元素。<br/>
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>10</span>,&thinsp; <span class=Number>20</span>,&thinsp; <span class=Number>30</span>&thinsp; <span class=SpecSymbol>}</span><br/>b&thinsp; =&thinsp; select<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; x&thinsp; &gt;=&thinsp; <span class=Number>20</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># produce: { 20, 30 }
+<br /></span>c&thinsp; =&thinsp; index<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; x&thinsp; &gt;=&thinsp; <span class=Number>20</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># produce: { 1, 2 }
+<br /></span>d&thinsp; =&thinsp; count<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; x&thinsp; &gt;=&thinsp; <span class=Number>20</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># produce: 2</span></div>
+ <br/>
+应用到多个列表也可实现 zip 功能：
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>10</span>,&thinsp; <span class=Number>20</span>,&thinsp; <span class=Number>30</span>&thinsp; <span class=SpecSymbol>}</span><br/>b&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=String>'a'</span>,&thinsp; <span class=String>'b'</span>,&thinsp; <span class=String>'c'</span>&thinsp; <span class=SpecSymbol>}</span><br/>c&thinsp; =&thinsp; select<span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <br/><span class=Comment># effectively as zip, produce: { ( 10, a ), ( 20, b ), ( 30, c ) }</span></div>
+ <br/>
+<table class="topsection"><tr><td><a name="4"><H3>4  each, repeat</H3>
+</td><td align="right"><a href="&section=4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+each() 跟 map() 用法一样，只不过不返回结果。<br/><br/>
+repeat() 以一个整数为参数，将大括号里的内联函数
+执行该参数所指定的次数。缺省情况下，函数执行的序号
+可通过自动申明的变量 i 传递给函数。<br/>
+<table class="topsection"><tr><td><a name="5"><H3>5  string, array, list</H3>
+</td><td align="right"><a href="&section=5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+基于同样的语法，string(), array(), list() 也被支持为
+函数式方法，用来方便地构建复杂的字符串，列表和数组。<br/><br/>
+这些方法都以一个整数为参数，将大括号里的内联函数
+执行该参数所指定的次数，并将函数执行的结果连接为或组成字符串，列表或数组。
+缺省情况下，函数执行的序号可通过自动申明的变量 i 传递给函数。
+当然，该变量也可被声明为其他名称。<br/>
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=DataType>string</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=SpecSymbol>(</span><span class=DataType>string</span><span class=SpecSymbol>)</span>i&thinsp; +&thinsp; <span class=String>'a'</span>&thinsp; <span class=SpecSymbol>}</span><br/><span class=Comment># produce: 0a1a2a3a4a
+<br /></span><br/>b&thinsp; =&thinsp; <span class=DataType>list</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=SpecSymbol>(</span><span class=DataType>string</span><span class=SpecSymbol>)</span>i&thinsp; +&thinsp; <span class=String>'a'</span>&thinsp; <span class=SpecSymbol>}</span><br/><span class=Comment># produce: { 0a, 1a, 2a, 3a, 4a }
+<br /></span><br/>c&thinsp; =&thinsp; <span class=DataType>array</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; |x|&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>10</span>&thinsp; *&thinsp; x&thinsp; <span class=SpecSymbol>}</span><br/><span class=Comment># produce: [ 0, 10, 20, 30, 40 ]</span></div>
+ <br/>
+更复杂一点的例子：
+<div class="hlcode">
+d&thinsp; =&thinsp; <span class=DataType>list</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>&thinsp; :&thinsp; <span class=SpecSymbol>(</span>i+<span class=Number>2</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>}</span><br/><span class=Comment># produce: { { 1, 2 }, { 1, 2, 3 }, { 1, 2, 3, 4 } }
+<br /></span><br/>e&thinsp; =&thinsp; <span class=DataType>array</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>10</span>*i+<span class=Number>1</span>,&thinsp; i+<span class=Number>2</span>&thinsp; <span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>}</span><br/><span class=Comment># produce matrix: [ [1, 2], [11, 2], [21, 3] ]</span></div>
+ <br/>
+<table class="topsection"><tr><td><a name="6"><H3>6  sort, apply</H3>
+</td><td align="right"><a href="&section=6"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#6.1">sort()</a></li>
+<li style="margin-top: 5px"><a href="#6.2">apply()</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="6.1"><H4>6.1  sort()</H4>
+</td><td align="right"><a href="&section=6.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+sort() 根据内联的比较函数排序，尽量使得排序后的相邻元素满足比较函数所表达的关系。
+它以一个列表为第一个参数，和可选的整数为第二个参数。如果有第二个参数值为K，
+列表将被排列直到前面K个元素被恰当地排好，如果比较函数表示的是简单的大于或小于
+关系，那么是最大的K个或最小的K个被恰当地排好。<br/>
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>3</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>15</span>,&thinsp; <span class=Number>8</span>,&thinsp; <span class=Number>25</span>,&thinsp; <span class=Number>16</span>,&thinsp; <span class=Number>3</span>,&thinsp; <span class=Number>7</span>,&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>12</span>,&thinsp; <span class=Number>17</span>,&thinsp; <span class=Number>11</span>,&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>}</span>;<br/>sort<span class=SpecSymbol>(</span>&thinsp; a,&thinsp; <span class=Number>6</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; x&thinsp; &lt;&thinsp; y&thinsp; <span class=SpecSymbol>}</span></div>
+ 
+这里 x,y 被自动申明为了排序时需要比较的两个元素。
+它们也可被显示地申明为其他变量名。<br/>
+<table><tr><td><a name="6.2"><H4>6.2  apply()</H4>
+</td><td align="right"><a href="&section=6.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+apply() 将内联函数应用到数组的每个元素，并将元素的值替换为函数的结果。
+缺省情况下，表示数组元素的变量将被自动申明为 x，而元素的下标将被申明为 i,j。
+它们也可被显示地申明。
+要在内联函数里使用维数大于3的数组的下标，它们必须被显示地申明。<br/>
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>10</span>,&thinsp; <span class=Number>20</span>,&thinsp; <span class=Number>30</span>&thinsp; <span class=SpecSymbol>]</span><br/>apply<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; x&thinsp; +&thinsp; i&thinsp; <span class=SpecSymbol>}</span><br/><span class=Comment># a becomes: [ 10, 21, 32 ]
+<br /></span><br/>b&thinsp; =&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>;&thinsp; <span class=Number>3</span>,&thinsp; <span class=Number>4</span>&thinsp; <span class=SpecSymbol>]</span>&thinsp; :&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>]</span>;<br/>apply<span class=SpecSymbol>(</span>&thinsp; b&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; |x,i,j,k|&thinsp; <span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; <span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; x,&thinsp; i,&thinsp; j,&thinsp; k&thinsp; <span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; <span class=StmtKey>return</span>&thinsp; x&thinsp; +&thinsp; i*j*k;<br/><span class=SpecSymbol>}</span></div>
+<br clear=all />
+</div></body></html>

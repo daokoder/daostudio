@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+<h2>Dao Macro system</h2>
+<div align=center><p><b>Limin Fu (phoolimin<img src="/images/at.png"/>gmail<img src="/images/dot.png"/>com)</b></p></div> <br/>
+Dao supports a docent macro system which can be used to create new syntax or to simplify
+scripts. A set of markups can be used in a macro definition to control the syntax matching
+and transformation. These markups are similar to what are commonly used in BNF representation
+of syntax. So that defining a macro ressembles to write a BNF-like representation of the source
+syntax to be matched, and a BNF-like representation of the target syntax to be applied.<br/>
+<div class="hlcode">
+<span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; source_syntax_pattern<br/><span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; target_syntax_pattern<br/><span class=SpecSymbol>}</span></div>
+ <br/>
+The following control symbols are recognized by the Dao macro system,
+
+<table class="sdmltable">
+<tr><th> Control Tokens</th><th> Meaning</th></tr>
+<tr class=docTableRow><td class=docTableCell> ( )</td><td class=docTableCell> grouping</td></tr>
+<tr class=docTableRow><td class=docTableCell> ?</td><td class=docTableCell> optional( repeat zero or once ), must follow ( )</td></tr>
+<tr class=docTableRow><td class=docTableCell> *</td><td class=docTableCell> repeat zero or more times, must follow ( )</td></tr>
+<tr class=docTableRow><td class=docTableCell> +</td><td class=docTableCell> repeat once or more times, must follow ( )</td></tr>
+<tr class=docTableRow><td class=docTableCell> !</td><td class=docTableCell> repeat zero times, ie, the previous group should not appear, must follow ( )</td></tr>
+<tr class=docTableRow><td class=docTableCell> [ ]</td><td class=docTableCell> optional, equivalent to ( ) ?</td></tr>
+<tr class=docTableRow><td class=docTableCell> { }</td><td class=docTableCell> repeat zero or more times, equivalent to ( ) *</td></tr>
+<tr class=docTableRow><td class=docTableCell> |</td><td class=docTableCell> alternative pattern, must be inside paired control tokens such as (), [],{}</td></tr>
+</table>
+ 
+<span class=text_underline> If <span class=text_bold> ?,*,+,!</span>  follow the special grouping<span class=text_bold> [ ]</span>  or <span class=text_bold> { }</span> ,
+these special grouping is considered the same as <span class=text_bold> ( )</span></span> <br/><br/>
+The following prefixes can be used to define special variables 
+that may also be use in the patterns,
+
+<table class="sdmltable">
+<tr><th> Special Variables Prefix</th><th> Meaning</th></tr>
+<tr class=docTableRow><td class=docTableCell> $ID</td><td class=docTableCell> a valid identifier</td></tr>
+<tr class=docTableRow><td class=docTableCell> $OP</td><td class=docTableCell> a valid operater</td></tr>
+<tr class=docTableRow><td class=docTableCell> $EXP</td><td class=docTableCell> an expression or subexpression</td></tr>
+<tr class=docTableRow><td class=docTableCell> $BL</td><td class=docTableCell> a block of code may contain any type of syntax structures</td></tr>
+<tr class=docTableRow><td class=docTableCell> $VAR</td><td class=docTableCell> a temporary variable used in the target syntax pattern</td></tr>
+</table>
+ 
+The Dao parser will generate unique names for each macro application for
+temporary variables represented by <span class=text_bold> VAR</span> -prefixed literal.
+<span class=text_bold> $EXP</span> -prefixed variable normally matches a whole expression,
+but in the case that there is a normal token (neither control token, nor special variable)
+following the variable in the defintion, it may match a sub-expression.
+<span class=text_bold> $BL</span>  prefixed variable matches a set of statements (code BLock), and
+extend the matching as much as possible, similarly, if there is a normal token
+following the variable in the defintion, this normal token is used to decide
+the boundary of the code block. If <span class=text_bold> $EXP,$BL</span>  variables are followed by
+a grouping pattern, the macro system will check the patterns in the grouping to
+figure out if there is a proper stoping token for the special variables.<br/><br/>
+Normal Dao operators can be used in the syntax patterns.
+If brackets are used, they must be properly paired. To use
+an unpaired bracket, enclose it in quotes such as '(', '[', '{' etc.<br/><br/>
+For special variables with the same names in the source and targe syntax patterns, 
+it is preferable that they appear in the same grouping
+and repeating patterns in the source and target syntax. In this case,
+the syntax transformation has well defined behaviour.
+After the source pattern is matched and the tokens matching
+the special variables are extracted, the target pattern is scanned,
+and the extracted tokens are expanded at the position of the proper special variables.<br/><br/>
+Starting from a release in 2007, the core syntax of Dao no longer supports
+scoping by <span class=text_bold> do-end</span> , <span class=text_bold> else-end</span> , <span class=text_bold> routine-end</span>  and <span class=text_bold> class-end</span> 
+etc. Instead <span class=text_bold> {}</span>  should be used for scoping, as in some early releases.
+However, scoping by <span class=text_bold> do(else,routine,class,...)-end</span>  can be still supported
+by the following macros:
+<div class="hlcode">
+<span class=Comment># Syntax transformation macros
+<br /></span><br/><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># if do elif else end
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>if</span>&thinsp; $EXP_1&thinsp; <span class=StmtKey>do</span>&thinsp; \[&thinsp; $BL_1&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; \{&thinsp; <span class=StmtKey>elif</span>&thinsp; $EXP_2&thinsp; <span class=StmtKey>do</span>&thinsp; \[&thinsp; $BL_2&thinsp; \]&thinsp; \}<br/>&nbsp;&nbsp;&nbsp;&nbsp; \[&thinsp; <span class=StmtKey>else</span>&thinsp; \[&thinsp; $BL_3&thinsp; \]&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=CodeStruct>end</span><br/><span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># if(){}elif(){}else{}
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; $EXP_1&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; \[&thinsp; $BL_1&thinsp; \]&thinsp; <span class=SpecSymbol>}</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \{&thinsp; <span class=StmtKey>elif</span><span class=SpecSymbol>(</span>&thinsp; $EXP_2&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; \[&thinsp; $BL_2&thinsp; \]&thinsp; <span class=SpecSymbol>}</span>&thinsp; \}<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \[&thinsp; <span class=StmtKey>else</span><span class=SpecSymbol>{</span>&thinsp; \[&thinsp; $BL_3&thinsp; \]&thinsp; <span class=SpecSymbol>}</span>&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>if</span>&thinsp; $EXP&thinsp; <span class=StmtKey>break</span>&thinsp; <span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; $EXP&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>break</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>}</span><br/><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>if</span>&thinsp; $EXP&thinsp; <span class=StmtKey>skip</span>&thinsp; <span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; $EXP&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>skip</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>if</span>&thinsp; $EXP_1&thinsp; $ID&thinsp; \{&thinsp; $EXP_2&thinsp; \}&thinsp; ;<br/><span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; $EXP_1&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; $ID&thinsp; \{&thinsp; $EXP_2&thinsp; \}&thinsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># while do end
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>while</span>&thinsp; $EXP&thinsp; <span class=StmtKey>do</span>&thinsp; \[&thinsp; $BL&thinsp; \]&thinsp; <span class=CodeStruct>end</span><br/><span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># while(){}
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>while</span><span class=SpecSymbol>(</span>&thinsp; $EXP&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; \[&thinsp; $BL&thinsp; \]&thinsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># for in do end
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>for</span>&thinsp; $EXP_1&thinsp; <span class=StmtKey>in</span>&thinsp; $EXP_2&thinsp; \{&thinsp; ;&thinsp; $EXP_3&thinsp; <span class=StmtKey>in</span>&thinsp; $EXP_4&thinsp; \}&thinsp; <span class=StmtKey>do</span>&thinsp; \[&thinsp; $BL_1&thinsp; \]&thinsp; <span class=CodeStruct>end</span><br/><span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># for( in ){}
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>for</span><span class=SpecSymbol>(</span>&thinsp; $EXP_1&thinsp; <span class=StmtKey>in</span>&thinsp; $EXP_2&thinsp; \{&thinsp; ;&thinsp; $EXP_3&thinsp; <span class=StmtKey>in</span>&thinsp; $EXP_4&thinsp; \}&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; \[&thinsp; $BL_1&thinsp; \]&thinsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># for ; ; do end
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>for</span>&thinsp; \[&thinsp; $EXP_1&thinsp; \];&thinsp; \[&thinsp; $EXP_2&thinsp; \];&thinsp; \[&thinsp; $EXP_3&thinsp; \]&thinsp; <span class=StmtKey>do</span>&thinsp; \[&thinsp; $BL_1&thinsp; \]&thinsp; <span class=CodeStruct>end</span><br/><span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># for( ; ; ){}
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>for</span><span class=SpecSymbol>(</span>&thinsp; \[&thinsp; $EXP_1&thinsp; \];&thinsp; \[&thinsp; $EXP_2&thinsp; \];&thinsp; \[&thinsp; $EXP_3&thinsp; \]&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; \[&thinsp; $BL_1&thinsp; \]&thinsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># switch do end
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>switch</span>&thinsp; $EXP&thinsp; <span class=StmtKey>do</span>&thinsp; \[&thinsp; $BL&thinsp; \]&thinsp; <span class=CodeStruct>end</span><br/><span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># switch(){}
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>switch</span><span class=SpecSymbol>(</span>&thinsp; $EXP&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; \[&thinsp; $BL&thinsp; \]&thinsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/><span class=Comment># routine definition
+<br /></span><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=CodeStruct>routine</span>&thinsp; $ID1&thinsp; \{&thinsp; <span class=SpecSymbol>::</span>&thinsp; $ID2&thinsp; \}&thinsp; <span class=SpecSymbol>(</span>&thinsp; \[&thinsp; $BL1&thinsp; \]&thinsp; <span class=SpecSymbol>)</span>&thinsp; \(&thinsp; ;&thinsp; \)&thinsp; \!<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \(&thinsp; <span class=SpecSymbol>{</span>&thinsp; $BL2&thinsp; <span class=SpecSymbol>}</span>&thinsp; \)&thinsp; \!<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \[&thinsp; $BL3&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=CodeStruct>end</span><br/><span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=CodeStruct>routine</span>&thinsp; $ID1&thinsp; \{&thinsp; <span class=SpecSymbol>::</span>&thinsp; $ID2&thinsp; \}&thinsp; <span class=SpecSymbol>(</span>&thinsp; \[&thinsp; $BL1&thinsp; \]&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \[&thinsp; $BL3&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/><span class=Comment># class definition
+<br /></span><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=CodeStruct>class</span>&thinsp; $ID1&thinsp; \{&thinsp; <span class=SpecSymbol>::</span>&thinsp; $ID2&thinsp; \}&thinsp; \[&thinsp; <span class=SpecSymbol>(</span>&thinsp; \[&thinsp; $BL1&thinsp; \]&thinsp; <span class=SpecSymbol>)</span>&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \[&thinsp; :&thinsp; $ID3&thinsp; \{&thinsp; <span class=SpecSymbol>::</span>&thinsp; $ID4&thinsp; \}&thinsp; \[&thinsp; <span class=SpecSymbol>(</span>&thinsp; \[&thinsp; $BL2&thinsp; \]&thinsp; <span class=SpecSymbol>)</span>&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \{&thinsp; ,&thinsp; $ID5&thinsp; \{&thinsp; <span class=SpecSymbol>::</span>&thinsp; $ID6&thinsp; \}&thinsp; \[&thinsp; <span class=SpecSymbol>(</span>&thinsp; \[&thinsp; $BL3&thinsp; \]&thinsp; <span class=SpecSymbol>)</span>&thinsp; \]&thinsp; \}&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \(&thinsp; <span class=SpecSymbol>{</span>&thinsp; $BL5&thinsp; <span class=SpecSymbol>}</span>&thinsp; \)&thinsp; \!<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \[&thinsp; $BL4&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=CodeStruct>end</span><br/><span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=CodeStruct>class</span>&thinsp; $ID1&thinsp; \{&thinsp; <span class=SpecSymbol>::</span>&thinsp; $ID2&thinsp; \}&thinsp; \[&thinsp; <span class=SpecSymbol>(</span>&thinsp; \[&thinsp; $BL1&thinsp; \]&thinsp; <span class=SpecSymbol>)</span>&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \[&thinsp; :&thinsp; $ID3&thinsp; \{&thinsp; <span class=SpecSymbol>::</span>&thinsp; $ID4&thinsp; \}&thinsp; \[&thinsp; <span class=SpecSymbol>(</span>&thinsp; \[&thinsp; $BL2&thinsp; \]&thinsp; <span class=SpecSymbol>)</span>&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \{&thinsp; ,&thinsp; $ID5&thinsp; \{&thinsp; <span class=SpecSymbol>::</span>&thinsp; $ID6&thinsp; \}&thinsp; \[&thinsp; <span class=SpecSymbol>(</span>&thinsp; \[&thinsp; $BL3&thinsp; \]&thinsp; <span class=SpecSymbol>)</span>&thinsp; \]&thinsp; \}&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \[&thinsp; $BL4&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># try rescue do rescue end
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; try&thinsp; \[&thinsp; $BL_1&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; \{&thinsp; rescue&thinsp; $BL_2&thinsp; <span class=StmtKey>do</span>&thinsp; \[&thinsp; $BL_3&thinsp; \]&thinsp; \}<br/>&nbsp;&nbsp;&nbsp;&nbsp; \[&thinsp; rescue&thinsp; \[&thinsp; $BL_4&thinsp; \]&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=CodeStruct>end</span><br/><span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span>&thinsp; <span class=Comment># try{} rescue(){} rescue{}
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; try<span class=SpecSymbol>{</span>&thinsp; \[&thinsp; $BL_1&thinsp; \]&thinsp; <span class=SpecSymbol>}</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \{&thinsp; rescue<span class=SpecSymbol>(</span>&thinsp; $BL_2&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; \[&thinsp; $BL_3&thinsp; \]&thinsp; <span class=SpecSymbol>}</span>&thinsp; \}<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; \[&thinsp; rescue<span class=SpecSymbol>{</span>&thinsp; \[&thinsp; $BL_4&thinsp; \]&thinsp; <span class=SpecSymbol>}</span>&thinsp; \]<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>syntax</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>if</span>&thinsp; $EXP&thinsp; retry&thinsp; <span class=SpecSymbol>}</span><span class=CodeStruct>as</span><span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; $EXP&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; retry&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>}</span></div>
+<br clear=all />
+</div></body></html>

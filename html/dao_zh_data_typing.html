@@ -1,0 +1,301 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+
+<h2>道语言类型系统</h2>
+<div align=center><p><b>傅利民(phoolimin<img src="/images/at.png"/>gmail<img src="/images/dot.png"/>com)</b></p></div>
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#1">介绍</a></li>
+<li style="margin-top: 5px"><a href="#2">隐式类型</a></li>
+<li style="margin-top: 5px"><a href="#3">显式类型</a></li>
+</ol></td></tr></table> <br/>
+<table class="topsection"><tr><td><a name="1"><H3>1  介绍</H3>
+</td><td align="right"><a href="&section=1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+道语言的类型系统是一个介于动态与静态之间的类型系统，
+既支持显式的类型申明，也支持隐式的类型推断。
+对于类型可在编译期确定的变量，它们的操作的
+有效性也将会在编译期被检查，否则将此检查推迟到运行期进行。
+这种类型系统既提供了动态语言的灵活性，也在一定程度上提供的
+静态语言的安全性。<br/><br/>
+在大多数情况下，当一个变量被一程序语句定义时，
+道的类型系统可以根据该程序语句里的操作数操作符等
+推断出该变量的类型。
+因此在很多情况下，显式申明变量的类型是不必要的，
+只是偶尔有必要明确指定函数参数或返回的类型。
+当类型推测系统不能确定某个变量的类型时，
+它将假定此变量可以取任何值，也就是此变量的类型为<span class=text_bold> any</span> 。
+在这种情况下，用户可显式地指定该变量的类型。
+这样的好处是，这使得道编译器可以采取一定的优化。<br/><br/>
+实际上，在道语言里准确的类型信息将被用来生成更优化的虚拟机指令。
+而且允许用户写通用函数，以接受不同类型的变量为参数，
+而当此函数以某个特定类型的变量为参数调用时，
+道编译将可以以此通用函数为模板，专门生成一个支持该特定类型的函数。
+这一点有点象C++里的模板函数。<br/>
+<table class="topsection"><tr><td><a name="2"><H3>2  隐式类型</H3>
+</td><td align="right"><a href="&section=2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#2.1">基本类型</a></li>
+<li style="margin-top: 5px"><a href="#2.2">列表/映射表/元组/数值数组</a></li>
+<li style="margin-top: 5px"><a href="#2.3">函数</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="2.1"><H4>2.1  基本类型</H4>
+</td><td align="right"><a href="&section=2.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+当一个变量在申明时同时被赋值，其类型最容易被推测，
+该变量将和被赋的值有一样的类型。
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=String>"a string"</span><br/>b&thinsp; =&thinsp; <span class=Number>123</span><br/>c&thinsp; =&thinsp; <span class=Number>456</span>$<br/>d&thinsp; =&thinsp; a&thinsp; +&thinsp; a<br/>e&thinsp; =&thinsp; b&thinsp; +&thinsp; b<br/>f&thinsp; =&thinsp; c&thinsp; +&thinsp; c<br/><br/><span class=Method>stdlib.debug</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;</div>
+ 
+当程序以调试模式运行时（dao -d ...），
+标准方法<span class=text_bold> stdlib.debug()</span> 将会给出调试命令行提示（调试终端），
+在此命令行提示下，用户可以检查程序当前的运行情况，
+如当前运行的虚拟指令（<span class=text_bold> list</span> 或<span class=text_bold> l</span> 命令），
+变量的类型（<span class=text_bold> about</span> 或<span class=text_bold> a</span> ）和值（<span class=text_bold> print</span> 或<span class=text_bold> p</span> ），
+函数调用的栈（<span class=text_bold> trace</span> 或<span class=text_bold> t</span> ）。<br/><br/>
+在调试终端下可以看出，<span class=text_italic> a</span> 被推断为<span class=text_italic> string</span> 类型，
+<span class=text_italic> b</span> 为<span class=text_italic> int</span> 及<span class=text_italic> c</span> 为<span class=text_italic> complex</span> ;
+并且，这三个加法被分别编译为：
+<span class=text_italic> ADD_SS</span> ，<span class=text_italic> ADD_II</span> 和<span class=text_italic> ADD_CC</span> 。<br/>
+<table><tr><td><a name="2.2"><H4>2.2  列表/映射表/元组/数值数组</H4>
+</td><td align="right"><a href="&section=2.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+当使用枚举或值区间等方式定义列表/映射表/元组/数值数组时，
+列表等的类型由枚举或值区间表达式里的元素的类型确定。
+在进行下标操作时，结果变量的类型由列表等的类型以及下标类型确定。<br/>
+<table><tr><td><a name="2.2.1"><H5>2.2.1  列表</H5>
+</td><td align="right"><a href="&section=2.2.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># 枚举,list&lt;int&gt;
+<br /></span>b&thinsp; =&thinsp; a<span class=SpecSymbol>[</span><span class=Number>1</span><span class=SpecSymbol>]</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Comment># 单元素,int
+<br /></span>e&thinsp; =&thinsp; a<span class=SpecSymbol>[</span><span class=Number>1</span>:<span class=Number>1</span><span class=SpecSymbol>]</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Comment># 子列表,list&lt;int&gt;
+<br /></span><br/>c&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=String>"A"</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; &thinsp; <span class=Comment># list&lt;any&gt;
+<br /></span>d&thinsp; =&thinsp; c<span class=SpecSymbol>[</span><span class=Number>1</span><span class=SpecSymbol>]</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Comment># any
+<br /></span><br/>e&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>0.0</span>&thinsp; :&thinsp; <span class=Number>2.5</span>&thinsp; :&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>}</span>;&thinsp; <span class=Comment># 值区间,list&lt;int&gt;</span></div>
+ <br/>
+<table><tr><td><a name="2.2.2"><H5>2.2.2  映射表</H5>
+</td><td align="right"><a href="&section=2.2.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=String>"B"</span><span class=SpecSymbol>=></span><span class=Number>1</span>,&thinsp; <span class=String>"A"</span><span class=SpecSymbol>=></span><span class=Number>2</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># map&lt;string, int&gt;
+<br /></span>b&thinsp; =&thinsp; a<span class=SpecSymbol>[</span><span class=String>"A"</span><span class=SpecSymbol>]</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Comment># int
+<br /></span>b&thinsp; =&thinsp; a<span class=SpecSymbol>[</span><span class=String>"A"</span>:<span class=String>"B"</span><span class=SpecSymbol>]</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Comment># map&lt;string, int&gt;, slicing, sub-map
+<br /></span><br/>c&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=String>"B"</span><span class=SpecSymbol>=></span><span class=Number>1</span>,&thinsp; <span class=String>"A"</span><span class=SpecSymbol>=></span><span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># map&lt;string,any&gt;
+<br /></span>d&thinsp; =&thinsp; c<span class=SpecSymbol>[</span><span class=String>"A"</span><span class=SpecSymbol>]</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Comment># any
+<br /></span><br/>e&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=String>"B"</span><span class=SpecSymbol>=></span><span class=Number>1</span>,&thinsp; <span class=String>"A"</span><span class=SpecSymbol>=></span><span class=Number>2</span>&thinsp; <span class=SpecSymbol>}</span>,&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=String>"BB"</span><span class=SpecSymbol>=></span><span class=Number>1</span>,&thinsp; <span class=String>"AA"</span><span class=SpecSymbol>=></span><span class=Number>2</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># list&lt;map&lt;string,int&gt;&gt;</span></div>
+ <br/>
+<table><tr><td><a name="2.2.3"><H5>2.2.3  元组</H5>
+</td><td align="right"><a href="&section=2.2.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>(</span>&thinsp; <span class=String>"abc"</span>,&thinsp; <span class=Number>123</span>,&thinsp; <span class=Number>10.55</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=Comment># tuple&lt;string,int,float&gt;
+<br /></span>a&thinsp; =&thinsp; <span class=SpecSymbol>(</span>&thinsp; name<span class=SpecSymbol>=></span><span class=String>"abc"</span>,&thinsp; index<span class=SpecSymbol>=></span><span class=Number>123</span>,&thinsp; <span class=Method>value</span><span class=SpecSymbol>=></span><span class=Number>10.55</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=Comment># tuple&lt;name:string,index:int,value:float&gt;</span></div>
+ <br/>
+<table><tr><td><a name="2.2.4"><H5>2.2.4  数值数组</H5>
+</td><td align="right"><a href="&section=2.2.4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>;&thinsp; <span class=Number>4</span>,&thinsp; <span class=Number>5</span>,&thinsp; <span class=Number>6</span>&thinsp; <span class=SpecSymbol>]</span>&thinsp; <span class=Comment># array&lt;int&gt;
+<br /></span>b&thinsp; =&thinsp; a<span class=SpecSymbol>[</span><span class=Number>0</span>,<span class=Number>2</span><span class=SpecSymbol>]</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Comment># int
+<br /></span>c&thinsp; =&thinsp; a<span class=SpecSymbol>[</span><span class=Number>1</span><span class=SpecSymbol>]</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Comment># int, treat "a" as a vector
+<br /></span>d&thinsp; =&thinsp; a<span class=SpecSymbol>[</span><span class=Number>1</span>,<span class=SpecSymbol>]</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Comment># array&lt;int&gt;, slicing, second row
+<br /></span>d&thinsp; =&thinsp; a<span class=SpecSymbol>[</span>:,<span class=Number>1</span>:<span class=SpecSymbol>]</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Comment># array&lt;int&gt;, slicing, sub-matrix</span></div>
+ <br/>
+道类型系统能对空列表等作特殊处理，使得它们可以在需要时用作某特定类型的列表等使用。
+如
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>}</span><br/>a.<span class=Method>append</span><span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; a<span class=SpecSymbol>[</span><span class=Number>1</span><span class=SpecSymbol>]</span>,&thinsp; <span class=Method>stdlib.about</span><span class=SpecSymbol>(</span>&thinsp; a,&thinsp; a<span class=SpecSymbol>[</span><span class=Number>1</span><span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ 
+<span class=text_italic> a</span> 将被推断为<span class=text_italic> list&lt;list&lt;int&gt;&gt;</span> 类型，
+当一个空列表被插入中时，此空列表将自动成为特定的<span class=text_italic> list&lt;int&gt;</span> 类型。<br/>
+<table><tr><td><a name="2.3"><H4>2.3  函数</H4>
+</td><td align="right"><a href="&section=2.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+在道语言里，每个函数将会自动与一个函数类型关联，
+该函数类型将包含函数的参数名，参数类型和返回值类型等信息。
+如<span class=text_italic> routine&lt;a &lt;hlbf&gt; : &lt;/hlbf&gt; string=&gt;int&gt;</span> 表示的函数均以<span class=text_italic> a</span> 为参数名，
+<span class=text_italic> string</span> 为参数类型，<span class=text_italic> int</span> 为返回值类型。
+而<span class=text_italic> routine&lt;a &lt;hlbf&gt; = &lt;/hlbf&gt; string=&gt;int&gt;</span> 则表示，<span class=text_italic> a</span> 的参数类型为
+<span class=text_italic> string</span> 且有缺省值。
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; foo<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=Comment># routine&lt;a:?=&gt;?&gt;
+<br /></span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; b&thinsp; =&thinsp; a&thinsp; +&thinsp; a;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=Method>stdlib.debug</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; a;<br/><span class=SpecSymbol>}</span><br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=Method>stdlib.about</span><span class=SpecSymbol>(</span>foo<span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><br/>foo<span class=SpecSymbol>(</span>&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=Comment># routine&lt;a:int=&gt;int&gt;
+<br /></span>foo<span class=SpecSymbol>(</span>&thinsp; <span class=String>"ABC"</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=Comment># routine&lt;a:string=&gt;string&gt;</span></div>
+ 
+此例中，三个名为<span class=text_italic> foo()</span> 将被生成。
+其中一个是为原本类型<span class=text_italic> routine&lt;a:?=&gt;?&gt;</span> ，用于参数类型不确定的情况。
+另外两个是为函数调用<span class=text_italic> foo(1)</span> 和<span class=text_italic> foo("ABC")</span> 自动生成的，
+它们的类型分别为<span class=text_italic> routine&lt;a:int=&gt;int&gt;</span> 和<span class=text_italic> routine&lt;a:string=&gt;string&gt;</span> 。
+这两生成的函数将分别针对参数类型<span class=text_italic> int</span> 和<span class=text_italic> string</span> 作优化，
+即在它们的函数体里使用特别用于<span class=text_italic> int</span> 类型和<span class=text_italic> string</span> 类型的虚拟指令。<br/>
+<table class="topsection"><tr><td><a name="3"><H3>3  显式类型</H3>
+</td><td align="right"><a href="&section=3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#3.1">函数类型</a></li>
+</ol></td></tr></table> <br/>
+变量的类型可以按以下方式被显示的申明：
+<div class="hlcode">
+变量名&thinsp; :&thinsp; 类型名<br/>变量名&thinsp; :&thinsp; 类型名&thinsp; =&thinsp; 值</div>
+ 
+<div class="hlcode">
+a&thinsp; :&thinsp; <span class=DataType>int</span><br/>b&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; =&thinsp; <span class=String>"ABC"</span></div>
+ 
+在函数的参数列表里可以使用同样的方式申明参数的类型。<br/><br/>
+<span class=text_bold> 类型名</span> 可以是以下内置的类型关键词：
+<span class=text_bold> int</span> , <span class=text_bold> float</span> , <span class=text_bold> double</span> , <span class=text_bold> long</span> ,
+<span class=text_bold> string</span> , <span class=text_bold> complex</span> , <span class=text_bold> list</span> ,
+<span class=text_bold> map</span> , <span class=text_bold> tuple</span> , <span class=text_bold> pair</span> , <span class=text_bold> array</span> , <span class=text_bold> buffer</span> , 
+<span class=text_bold> routine</span> , 以及它们的组合。
+<span class=text_bold> 类型名</span> 也可以是道类名或载入模块里用户定义的C/C++类型名。
+<span class=text_bold> 类型名</span> 也可以是特殊的符号，如：<span class=text_bold> any</span> 表示任意类型，
+<span class=text_bold> ?</span> 表示未定义类型，以及<span class=text_bold> @X</span> 表示待定类型。
+<span class=text_bold> @X</span> 主要是被用于函数参数中，如
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; test<span class=SpecSymbol>(</span>&thinsp; a&thinsp; :&thinsp; <span class=DataType>list</span>&lt;@T&gt;,&thinsp; b&thinsp; :&thinsp; @T&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/><span class=SpecSymbol>}</span></div>
+ 
+当某种特定类型的列表作为参数<span class=text_italic> a</span> 被传递给该函数时，
+那么道类型系统将要求第二个参数<span class=text_italic> b</span> 的类型跟<span class=text_italic> a</span> 的元素的类型一致。<br/><br/>
+<table><tr><td><a name="3.1"><H4>3.1  函数类型</H4>
+</td><td align="right"><a href="&section=3.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+函数类型由关键词<span class=text_bold> routine</span> 和其他信息组成。用户通常不需要显示地定义它们。
+函数类型也可以按其他类型一样的方式使用，例如：
+<div class="hlcode">
+myfunc&thinsp; :&thinsp; <span class=CodeStruct>routine</span>&lt;p1:<span class=DataType>string</span>,p2=<span class=DataType>int</span><span class=SpecSymbol>=></span><span class=DataType>int</span>&gt;</div>
+ 
+这将申明<span class=text_italic> myfunc</span> 为一个函数，此函数将以字符串和整形为参数，并返回一个整数。
+在这个函数类型里，参数名也被给定，这将使得此函数被调用时，参数可按参数名传入。
+并且第二参数被申明为有缺省值，可在调用时省略。
+另外，<span class=text_bold> ...</span> 也可出现在函数类型的参数列表里，
+表示此函数可接受可变个数目的参数(类似于C里的valist)。<br/><br/>
+例子:
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; foo<span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; c&thinsp; =&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; c;<br/><span class=SpecSymbol>}</span><br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=Method>stdlib.about</span><span class=SpecSymbol>(</span>&thinsp; foo&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+值得注意的是，函数类型之间的匹配有些不同于普通数据类型的匹配。
+对于普通的类型，更具体的（专门的窄的）类型可以匹配到一样的或更宽泛的类型，
+反之则不行。
+而对于函数类型，情况则刚好相反，也就是只可以宽泛的函数类型匹配到
+一样的或更窄的函数类型。<br/><br/>
+下面例子将展示为什么函数类型的匹配应当这样。考虑下面的情形：
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; foo<span class=SpecSymbol>(</span>&thinsp; a&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>;&thinsp; <span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>routine</span>&thinsp; bar<span class=SpecSymbol>(</span>&thinsp; callback&thinsp; :&thinsp; <span class=CodeStruct>routine</span>&lt;any<span class=SpecSymbol>=></span>any&gt;&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; callback<span class=SpecSymbol>(</span>&thinsp; <span class=String>"ABC"</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>}</span><br/><br/>bar<span class=SpecSymbol>(</span>&thinsp; foo&thinsp; <span class=SpecSymbol>)</span>;<br/><br/>myfunc&thinsp; :&thinsp; <span class=CodeStruct>routine</span>&lt;any<span class=SpecSymbol>=></span>any&gt;&thinsp; =&thinsp; foo;<br/>myfunc<span class=SpecSymbol>(</span>&thinsp; <span class=String>"ABC"</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ 
+如果是允许更窄的函数类型<span class=text_italic> foo:routine&lt;int=&gt;?&gt;</span> 
+匹配到更宽泛的函数类型<span class=text_italic> routine&lt;any=&gt;any&gt;</span> ，
+那么，<span class=text_italic> bar()</span> 就可以以<span class=text_italic> foo</span> 为参数<span class=text_italic> callback</span> 而被调用，这时就会出现一个问题。
+因为从<span class=text_italic> bar()</span> 的参数<span class=text_italic> callback</span> 的类型看，<span class=text_italic> bar()</span> 可能会以
+任意参数如字符串等来调用<span class=text_italic> callback</span> 。如果<span class=text_italic> foo</span> 被作为参数传递给了
+<span class=text_italic> bar()</span> ，显然<span class=text_italic> callback( "ABC" )</span> 将导致一个异常。
+因此，只允许宽泛的函数类型匹配到一样的或更窄的函数类型才可以保证
+这种回调函数的安全。<br clear=all />
+</div></body></html>

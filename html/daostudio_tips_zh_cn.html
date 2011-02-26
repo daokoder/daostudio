@@ -1,0 +1,213 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+
+<h2>Dao Studio 的一些使用提示</h2><table class="topsection"><tr><td><a name="1"><H3>1  垂直分割代码编辑器，脚本终端和数据浏览器</H3>
+</td><td align="right"><a href="&section=1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+代码编辑器，脚本终端和数据浏览器被垂直布局在同一个窗口里。
+鼠标点击其中任意一个，可以将被点击的对象最大化，并将其他
+的最小化。
+如果希望禁用此特性，请按下工具条上的手动分割按钮（图案含手和上下箭头）。<br/><br/>
+<table class="topsection"><tr><td><a name="2"><H3>2  代码编辑器和脚本终端的自动词语补全</H3>
+</td><td align="right"><a href="&section=2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+在代码编辑器和脚本终端里，每当用户键入字符时，
+DaoStudio将根据已键入的字符建议一到三个的词语，
+以便补全剩余的部分。用户可按CTRL + J, K, L来选择
+被建议的第一，第二，或第三个词语来补全输入。
+键入Tab键将选择第一个建议的词语补全。<br/><br/>
+目前DaoStudio仅支持补全相应于类名，函数名，
+和全局常量变量名等词语。<br/><br/>
+<table class="topsection"><tr><td><a name="3"><H3>3  在终端里浏览脚本命令行历史</H3>
+</td><td align="right"><a href="&section=3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+使用上下键，可以浏览和调用以前输入的脚本命令。<br/>
+<table class="topsection"><tr><td><a name="4"><H3>4  在终端输入多行脚本</H3>
+</td><td align="right"><a href="&section=4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+在终端输入脚本运行时，用户可以连续输入多行脚本。
+一般情况下，当用户按回车键时，终端命令行的脚本
+将被执行。不过如果命令行的脚本里含有未配对的括号
+（包括花括号，圆括号和方括号），按回车键将允许用户
+在新的一行里输入更多的脚本，直到所有括号都配对后，
+按回车键才能执行脚本。<br/><br/>
+因此，在终端输入多行代码的最简单的方法是，
+先输入左花括号，然后输入代码，最后输入右花括号，
+再按回车键。<br/>
+<table class="topsection"><tr><td><a name="5"><H3>5  命令行终端的其他用法</H3>
+</td><td align="right"><a href="&section=5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<ul>
+<li> 打印表达式的值：<span class=text_italic> (dao) = 表达式</span></li>
+
+<li> 执行Dao脚本文件：<span class=text_italic> (dao) \script_file_name.dao </span></li>
+
+<li> 执行shell命令或外部程序：<span class=text_italic> (dao) \command </span></li>
+
+</ul>
+ <br/>
+<table class="topsection"><tr><td><a name="6"><H3>6  设置和取消调试点</H3>
+</td><td align="right"><a href="&section=6"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+在代码编辑器里鼠标右键点击行号，将会弹出菜单，
+供用户选择设置或取消调试点。
+设置在不含代码的行的调试点将被忽略。
+在程序以调试模式运行到含调试点的行时，
+程序将执行完此行后进入调试状态。<br/>
+<table class="topsection"><tr><td><a name="7"><H3>7  调试中修改程序执行点</H3>
+</td><td align="right"><a href="&section=7"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+在调试过程中，在代码编辑器里鼠标右键点击行号将弹出菜单。
+如果被点击的行在当前暂停的函数里，菜单里将出现设置程序执行点的选项。
+选择此选项，可以将程序的执行点设置在被点击的行。
+当程序被重新开始运行时，程序将从此执行点（此行）开始运行。<br/>
+<table class="topsection"><tr><td><a name="8"><H3>8  调试中编辑再继续运行(Edit&Continue)</H3>
+</td><td align="right"><a href="&section=8"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Edit&Continue是DaoStudio支持的高级调试特性，
+基于此特性，用户可以在调试时对源代码做修改，
+然后在不需从头执行程序的情况下，执行被修改
+的代码。<br/><br/>
+当程序在DaoStudio里以调试模式运行时，
+程序遇到调试点进入调试状态后，
+用户可在修改代码后继续运行程序。
+不过这种修改将仅限于定义当前调试点的当前函数。<br/><br/>
+在代码被修改后，如果程序的执行点（调试点后）在修改的位置之后，
+那么程序的执行点将被自动地调到第一行被修改的代码处，
+以保证在程序被继续执行时将执行被修改过的代码。
+当然用户也可以将执行点设置在该函数的其他处。<br/><br/>
+当用户点击调试按钮后，被修改的函数将被重新编译，
+然后程序将从新的执行点开始运行。
+函数修改前的局部变量的数据将被恰当的使用到新的编译后的函数里。<br/><br/>
+<table class="topsection"><tr><td><a name="9"><H3>9  数据浏览和修改</H3>
+</td><td align="right"><a href="&section=9"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+数据浏览的主要入口在DaoStudio的左侧“数据列表”条目下。
+通常情况下，只有脚本终端所用的命名空间被列在其下。
+而当程序以调试模式运行并被暂停进入调试状态时，
+当前运行的虚拟机进程也将被列在“数据列表”条目下。<br/><br/>
+如果用户点击“数据列表”所列的任一对象，
+此数据对象将被显示在数据浏览器里。
+数据对象的基本信息和数据值将被显示在数据浏览器左侧。
+如果此对象为基本数据类型，那么，此对象的数据可被修改。
+如果此对象为聚合类型如列表，映射表，函数或类实例等，
+那么此对象的成员数据或数据项等将被显示在数据浏览器右侧的表格里。<br/><br/>
+当用户点击浏览器右侧的表格单元时，此单元所表示的数据对象
+将被加入到“数据列表”里。
+“数据列表”实际上被组织为栈结构：
+点击浏览器右侧的数据表格单元将新的浏览数据加到栈顶；
+而点击栈里的浏览数据将把栈里位于此数据之上的数据从栈里移出。<br clear=all />
+</div></body></html>

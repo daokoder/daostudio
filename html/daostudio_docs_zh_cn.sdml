@@ -1,0 +1,25 @@
+
+<title>文档主页</title>
+
+<===>Dao Studio</===>
+
+<list>
+==使用提示(<link>html=daostudio_tips_zh_cn.html</link>)
+</list>
+
+<===>道语言</===>
+
+<list>
+==道语言简明教程(<link>html=dao_zh_quick_guide.html</link>)
+==道类型系统(<link>html=dao_zh_data_typing.html</link>)
+==道标准函数库(<link>html=dao_zh_std_library.html</link>)
+==道正则表达式(<link>html=dao_zh_regex.html</link>)
+==道语言函数式编程(<link>html=dao_zh_functional.html</link> )
+==道异常处理(<link>html=dao_zh_exception.html</link>)
+==道并行计算(<link>html=dao_zh_concurrent.html</link>)
+<red>
+Dao 1.1 暂不支持异步函数调用和消息传递接口（MPI）
+</red>
+==道宏系统(<link>html=dao_zh_macro.html</link>)
+==使用道语言的C函数接口编程(<link>html=dao_zh_c_interface.html</link>)
+</list>

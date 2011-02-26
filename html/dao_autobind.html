@@ -1,0 +1,208 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+<h2>Automatic Binding of C/C++ Libraries</h2>
+ <br/>
+It is possible to use an automatic tool to generate wrapping of
+C/C++ libraries directly from their header files.
+This tools is normally included in Dao releases as <span class=text_italic> autobind.dao</span>  
+under the fold of <span class=text_italic> tools</span> .
+This document will brief explain how to use this tool.<br/><br/>
+The arguments of <span class=text_italic> autobind.dao</span> :
+<ul>
+<li><span class=text_bold> inputfiles</span> :
+	the list of header file names delimited by comma without white spaces.
+	these header files will be parsed by the tool to generate wrapping codes.
+<div class="hlcode text_italic"> 
+mgl_data.h,mgl_font.h,mgl.h,mgl_ab.h,mgl_zb.h
+</div> <br/>
+	If these header files are dependent on other headers, 
+	which however should be excluded from wrapping,
+	one can also include them in the parameter,
+	and separate them by colon from the other files:
+<div class="hlcode text_italic"> 
+mgl_data.h:mgl_font.h,mgl.h,mgl_ab.h,mgl_zb.h
+</div> 
+	This way can be used to divide a big library into smaller parts
+	and wrap them separately.
+	Here one may wrap <span class=text_italic> mgl_data.h</span>  separately, which is compiled
+	into <span class=text_italic> DaoMglData</span>  (with suffix <span class=text_italic> so</span>  or <span class=text_italic> dll</span> ), 
+	and wrap the rest dependently on <span class=text_italic> mgl_data.h</span>  
+	and compile the wrapping as <span class=text_italic> DaoMGL</span> ,
+	so that, <span class=text_italic> DaoMglData</span>  can be used independently,
+	while using <span class=text_italic> DaoMGL</span>  has to require <span class=text_italic> DaoMglData</span> .
+	Namely, when one load <span class=text_italic> DaoMGL</span> , one has to use,
+<div class="hlcode">
+<span class=StmtKey>load</span>&thinsp; DaoMglData;<br/><span class=StmtKey>load</span>&thinsp; DaoMGL&thinsp; <span class=StmtKey>require</span>&thinsp; DaoMglData;</div>
+</li>
+
+<li><span class=text_bold> wrap_name</span> : the wrapping name.
+	By default, it is taken as the name of the first wrapped file
+	in parameter <span class=text_bold> inputfiles</span> .
+	One may use this argument to set a preferred wrapping,
+	for example, in above example, one may set <span class=text_italic> wrap_name=MGL</span> .</li>
+
+<li><span class=text_bold> lang</span> : the language of the source codes in the header files.
+	Currently it only supports <span class=text_italic> c</span>  and <span class=text_italic> cpp</span> .</li>
+
+<li><span class=text_bold> fixing</span> : a text file containing patterns which should be used
+	to handle library-specific codes.<br/><br/>
+	In each line of this file, there should be a pair of patterns enclosed
+	in two pairs of <span class=text_bold> '</span>  and delimited by a tab.
+	In each pair of patterns, the first should be a pattern written
+	as Dao regular expression, and the second should be a normal string
+	that may contain back references to the groups in the first pattern.
+	For each header files, this tool will search the codes that match
+	the first pattern, and transform them into the second string with
+	substitutions for the back references.
+	If one wants a pair of patterns should be applied certain file,
+	one may put the file name in a single line above that line.<br/>
+	
+	Here is an example taken from the <span class=text_bold> fixing</span>  of DaoVTK module,
+<div class="hlcode">
+<span class=String>'VTK_%w+_EXPORT'</span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=String>''</span><br/><span class=String>'VTK_BYTE_SWAP_DECL %s* %b() %s* ;'</span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=String>''</span><br/><span class=String>'([^\n]*) vtkSetMacro %s*%(%s*(%w+)%s*,%s*(%w+)%s*%)'</span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=String>'%1 virtual void Set%2(%3 _arg)'</span><br/><span class=String>'([^\n]*) vtkGetMacro %s*%(%s*(%w+)%s*,%s*(%w+)%s*%)'</span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=String>'%1 virtual %3 Get%2()'</span><br/><br/>vtkInstantiator.h<br/><span class=String>'static [^;]* CreateFunction [^;]*;'</span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=String>''</span><br/><br/>vtkOStreamWrapper.h<br/><span class=String>'static [^;]* UseEndl [^%{%}]* %b{}'</span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=String>''</span><br/><br/>vtkLightKit.h<br/><span class=String>'static [^;]* GetSubType [^%{%}]* %b()'</span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=String>''</span></div>
+ 
+	In this example, the first two lines indicate that some codes should be removed,
+	and the third and fourth tell the tool how to expand two macros!
+	The other patterns are applied only to certain files.</li>
+
+<li><span class=text_bold> dir_input</span> : the fold of the input header files.</li>
+
+<li><span class=text_bold> dir_output</span> : the output fold for the wrapped codes.</li>
+
+<li><span class=text_bold> dir_inc</span> : include directory,
+	which is the directory that should prefix the header files
+	in the generated codes.<br/><br/>
+	For example, one may has,
+<div class="hlcode">
+inputfiles=gl.h&thinsp; dir_input=/usr/include/<span class=Number>GL</span>&thinsp; dir_inc=<span class=Number>GL</span></div>
+ 
+then the <span class=text_italic> gl.h</span>  header file will be included in the generated codes as
+<div class="hlcode">
+<span class=SpecSymbol>#include</span>&lt;<span class=Number>GL</span>/gl.h&gt;</div>
+</li>
+
+<li><span class=text_bold> include</span> : for dependent wrapping, it should include
+	the wrapping names of the modules on which this wrapping is dependent on.<br/><br/>
+	For example, when wrapping VTK5, the common part is wrapped as
+	<span class=text_bold> wrap_name=vtkCommon</span> ,
+	the part for filtering is wrapped as <span class=text_bold> wrap_name=vtkFiltering</span> ,
+	which is dependent on <span class=text_bold> vtkCommon</span> ,
+	then the <span class=text_bold> include</span>  should be set as <span class=text_bold> include=vtkCommon</span> 
+	when wrapping <span class=text_bold> vtkFiltering</span> .</li>
+
+</ul>
+<br clear=all />
+</div></body></html>

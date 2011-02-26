@@ -1,0 +1,1395 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+
+<h2>道语言标准库手册</h2>
+<div align=center><p><b>傅利民(phoolimin<img src="/images/at.png"/>gmail<img src="/images/dot.png"/>com)</b></p></div>
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#1">介绍</a></li>
+<li style="margin-top: 5px"><a href="#2">字符串</a></li>
+<li style="margin-top: 5px"><a href="#3">复数</a></li>
+<li style="margin-top: 5px"><a href="#4">列表</a></li>
+<li style="margin-top: 5px"><a href="#5">映射表</a></li>
+<li style="margin-top: 5px"><a href="#6">数值数组</a></li>
+<li style="margin-top: 5px"><a href="#7">cdata</a></li>
+<li style="margin-top: 5px"><a href="#8">标准库(std，即原来的stdlib)</a></li>
+<li style="margin-top: 5px"><a href="#9">标准输入输出库(io，即原来的stdio)和流(stream)</a></li>
+<li style="margin-top: 5px"><a href="#10">数学库(math)</a></li>
+<li style="margin-top: 5px"><a href="#11">反映reflection</a></li>
+</ol></td></tr></table> <br/>
+(适用于道语言1.1)<br/><br/>
+此文档基于
+<a href="">GNU Free Documentation License</a> 协议发布.<br/>
+<table class="topsection"><tr><td><a name="1"><H3>1  介绍</H3>
+</td><td align="right"><a href="&section=1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+此文档介绍道语言的标准库和基本数据类型所提供的方法或函数。
+在参数列表里，
+<span class=text_italic> par : Xyz</span>  表示参数 <span class=text_italic> par</span>  的类型为 <span class=text_italic> Xyz</span> ；
+<span class=text_italic> par = Xyz</span>  表示参数 <span class=text_italic> par</span>  有缺省值，其类型为 <span class=text_italic> Xyz</span> 。
+有些方法为不同的参数类型提供了重载，这些方法都有同样的函数名，
+但带不同的参数类型。
+有些方法可用 <span class=text_bold> use library</span> 
+输入到当前名字域。这样他们就可以被直接调用：
+<div class="hlcode">
+use&thinsp; <span class=Method>math</span><br/>a&thinsp; =&thinsp; cos<span class=SpecSymbol>(</span>&thinsp; <span class=Number>1.5</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+下面文档中，函数原型一般以以下形式出现：
+<div class="hlcode">
+type.method<span class=SpecSymbol>(</span>&thinsp; parameter_list&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+但实际的函数原型定义如下：
+<div class="hlcode">
+method<span class=SpecSymbol>(</span>&thinsp; self&thinsp; :&thinsp; type,&thinsp; parameter_list&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+<table class="topsection"><tr><td><a name="2"><H3>2  字符串</H3>
+</td><td align="right"><a href="&section=2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#2.1">方法列表</a></li>
+<li style="margin-top: 5px"><a href="#2.2">方法细节</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="2.1"><H5>2.1  方法列表</H5>
+</td><td align="right"><a href="&section=2.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+chop<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>erase<span class=SpecSymbol>(</span>&thinsp; start=<span class=Number>0</span>,&thinsp; n=-<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><br/>find<span class=SpecSymbol>(</span>&thinsp; str&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; from=<span class=Number>0</span>,&thinsp; reverse=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/><span class=Method>insert</span><span class=SpecSymbol>(</span>&thinsp; str&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; index=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/>replace<span class=SpecSymbol>(</span>&thinsp; str1&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; str2&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; index=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/>replace<span class=SpecSymbol>(</span>&thinsp; str1&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; table&thinsp; :&thinsp; <span class=DataType>map</span>&lt;<span class=DataType>string</span>,<span class=DataType>string</span>&gt;,&thinsp; max=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/>expand<span class=SpecSymbol>(</span>&thinsp; keys&thinsp; :<span class=DataType>map</span>&lt;<span class=DataType>string</span>,<span class=DataType>string</span>&gt;,&thinsp; spec=<span class=String>'$'</span>,&thinsp; keep=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><br/>expand<span class=SpecSymbol>(</span>&thinsp; keys&thinsp; :&thinsp; <span class=DataType>tuple</span>,&thinsp; spec=<span class=String>'$'</span>,&thinsp; keep=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><br/>resize<span class=SpecSymbol>(</span>&thinsp; <span class=Method>size</span>&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>size</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>split<span class=SpecSymbol>(</span>&thinsp; sep&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; quote=<span class=String>""</span>,&thinsp; rm=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;<br/>tokenize<span class=SpecSymbol>(</span>&thinsp; seps&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; quotes=<span class=String>""</span>,&thinsp; backslash=<span class=Number>0</span>,&thinsp; simplify=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;<br/>tonumber<span class=SpecSymbol>(</span>&thinsp; base=<span class=Number>10</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>double</span><br/>tolower<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span><br/>toupper<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span><br/>encrypt<span class=SpecSymbol>(</span>&thinsp; <span class=Method>key</span>&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; hex=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span><br/>decrypt<span class=SpecSymbol>(</span>&thinsp; <span class=Method>key</span>&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; hex=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ <br/>
+字符串还提供了一些基于正则表达式的方法，请参看<a href="">道正则表达式</a> 。<br/>
+<table><tr><td><a name="2.2"><H5>2.2  方法细节</H5>
+</td><td align="right"><a href="&section=2.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+<span class=DataType>string</span>.chop<span class=SpecSymbol>(</span>&thinsp; utf=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+截掉字符串末尾的换行符。如果utf=1，不构成有效UTF-8编码的字符也将被截掉。<br/><br/>
+<div class="hlcode">
+<span class=DataType>string</span>.erase<span class=SpecSymbol>(</span>&thinsp; start=<span class=Number>0</span>,&thinsp; n=-<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+从下标start起删除n个字节的字符。
+如果n=-1，删除所有后面的字符。<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.find<span class=SpecSymbol>(</span>&thinsp; str&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; from=<span class=Number>0</span>,&thinsp; reverse=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+从下标from开始，查找子字符串<span class=text_italic> str</span> ；
+如果reverse值非零，从后面反向查找。
+如果找到了str，返回其起始下标，否则，返回-1。<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.<span class=Method>insert</span><span class=SpecSymbol>(</span>&thinsp; str&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; index=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+在下标 <span class=text_italic> index</span> 处插入子字符串 <span class=text_italic> str</span> 。<br/><br/>
+<div class="hlcode">
+<span class=DataType>string</span>.replace<span class=SpecSymbol>(</span>&thinsp; str1&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; str2&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; index=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将子字符串 <span class=text_italic> str1</span>  替换为 <span class=text_italic> str2</span>  。
+如果 <span class=text_italic> index</span>  大于等于1，替换第 <span class=text_italic> index</span>  个。
+如果<span class=text_italic> index</span> 等于零， 替换所有的<span class=text_italic> str1</span> 。<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.replace<span class=SpecSymbol>(</span>&thinsp; table&thinsp; :&thinsp; <span class=DataType>map</span>&lt;<span class=DataType>string</span>,<span class=DataType>string</span>&gt;,&thinsp; max=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将字符串里所出现的table的元素键字符串替换为table的元素值字符串。
+如果max为零，优先替换短的键，否则优先替换长的。<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.expand<span class=SpecSymbol>(</span>&thinsp; keys&thinsp; :&thinsp; <span class=DataType>map</span>&lt;<span class=DataType>string</span>,<span class=DataType>string</span>&gt;,&thinsp; spec=<span class=String>'$'</span>,&thinsp; keep=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+替换字符串中$(name)形式的占位变量。
+这里$是个特殊字符，由参数spec传入。
+对于每个占位变量，如果它的名字出现在keys的键中，那么它将被替换为
+该键的值。如果它的名字没有在keys找到，那么，
+如果keep等于零，它将被替换为空字符串，否则它将被保留。<br/>
+<div class="hlcode">
+tpl&thinsp; =&thinsp; <span class=String>'The quick brown $(A) jumps over the lazy $(B)'</span>;<br/>str&thinsp; =&thinsp; tpl.expand<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=String>'A'</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=String>'fox'</span>,&thinsp; <span class=String>'B'</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=String>'dog'</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; str&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<div class="hlcode">
+<span class=DataType>string</span>.expand<span class=SpecSymbol>(</span>&thinsp; keys&thinsp; :&thinsp; <span class=DataType>tuple</span>,&thinsp; spec=<span class=String>'$'</span>,&thinsp; keep=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+替换字符串中$(name)形式的占位变量。
+这里$是个特殊字符，由参数spec传入。
+对于每个占位变量，如果它的名字出现在keys的元素名中，那么它将被替换为
+该元素的值。如果它的名字没有在keys找到，那么，
+如果keep等于零，它将被替换为空字符串，否则它将被保留。<br/>
+<div class="hlcode">
+tpl&thinsp; =&thinsp; <span class=String>'The quick brown $(A) jumps over the lazy $(B)'</span>;<br/>str&thinsp; =&thinsp; tpl.expand<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>(</span>&thinsp; <span class=Number>A</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=String>'fox'</span>,&thinsp; <span class=Number>B</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=String>'dog'</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; str&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<div class="hlcode">
+<span class=DataType>string</span>.resize<span class=SpecSymbol>(</span>&thinsp; <span class=Method>size</span>&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将字符串的长度变为 <span class=text_italic> n</span> ，
+并将新增的字节填为空格字符。<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.<span class=Method>size</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/><span class=Method>size</span><span class=SpecSymbol>(</span>&thinsp; self&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+返回字符串的长度。<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.split<span class=SpecSymbol>(</span>&thinsp; sep=<span class=String>''</span>,&thinsp; quote=<span class=String>''</span>,&thinsp; rm=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;</div>
+ 
+分割字符串。如果分割字符串<span class=text_italic> sep</span> 为空，将字符串按UTF-8编码分割，
+使得每个子字符串对应一个有效的UTF-8编码；
+如果不为空，则以<span class=text_italic> sep</span> 分割标志将字符串分割为子字符串。
+如果quote包含了引号，在一对引号中出现的<span class=text_italic> sep</span> 将不被用作分割标志。
+如果<span class=text_italic> rm</span> 非零，分割出的子字符串首尾的引号将被除掉。
+返回一字符串列表。<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.tokenize<span class=SpecSymbol>(</span>&thinsp; seps&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; quotes=<span class=String>""</span>,&thinsp; backslash=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;</div>
+ 
+词句分解（译名？）：根据一组分割字符，将一个字符串分解为子字符串。
+<span class=text_italic> seps</span> 里的每个字符都被当作一个分割字符。
+引号也可由<span class=text_italic> quotes</span> 指定，以避免在被引号引起来的字符部分里分割。
+如果<span class=text_italic> backslash</span> 非零，反斜杠后的分割符或引号将不做处理。
+分割字符，引号和反斜杠将在结果字符串列表里保留。
+如果<span class=text_italic> simplify</span> 非零，那么每个结果子字符串首尾的空白字符将被移除，
+然后空子字符串也将从结果字符串列表里移除。<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.tonumber<span class=SpecSymbol>(</span>&thinsp; base=<span class=Number>10</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>double</span></div>
+ 
+以<span class=text_italic> base</span> 为进制将字符串转换为数。<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.tolower<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+将字符串里大写字母转换为小写。返回该字符串本身。<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.toupper<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+将字符串里小写字母转换为大写。返回该字符串本身。<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.encrypt<span class=SpecSymbol>(</span>&thinsp; <span class=Method>key</span>&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; hex=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+使用密钥<span class=text_italic> key</span> 将字符串用XXTEA加密算法加密。
+如果<span class=text_italic> hex</span> 非零，用16进制数字表示加密后的数据。
+返回该字符串本身。<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.decrypt<span class=SpecSymbol>(</span>&thinsp; <span class=Method>key</span>&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; hex=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+使用密钥<span class=text_italic> key</span> 将XXTEA加密数据解密。
+如果<span class=text_italic> hex</span> 非零，加密数据的每两个相邻的字符当作一个16进制数。
+返回该字符串本身。<br/>
+<table class="topsection"><tr><td><a name="3"><H3>3  复数</H3>
+</td><td align="right"><a href="&section=3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#3.1">方法列表</a></li>
+<li style="margin-top: 5px"><a href="#3.2">方法细节</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="3.1"><H5>3.1  方法列表</H5>
+</td><td align="right"><a href="&section=3.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+imag<span class=SpecSymbol>(</span>&thinsp; v=<span class=Number>0.00</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>double</span><br/>real<span class=SpecSymbol>(</span>&thinsp; v=<span class=Number>0.00</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>double</span></div>
+ <br/>
+<table><tr><td><a name="3.2"><H5>3.2  方法细节</H5>
+</td><td align="right"><a href="&section=3.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+<span class=DataType>complex</span>.imag<span class=SpecSymbol>(</span>&thinsp; v=<span class=Number>0.00</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>double</span></div>
+ 
+如果不带参数调用，返回该复数的虚部。
+如果带参数，将该复数的虚部设为<span class=text_italic> v</span> ，并返回原先的虚部值。<br/>
+<div class="hlcode">
+<span class=DataType>complex</span>.real<span class=SpecSymbol>(</span>&thinsp; v=<span class=Number>0.00</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>double</span></div>
+ 
+如果不带参数调用，返回该复数的实部。
+如果带参数，将该复数的实部设为<span class=text_italic> v</span> ，并返回原先的实部值。<br/>
+<table class="topsection"><tr><td><a name="4"><H3>4  列表</H3>
+</td><td align="right"><a href="&section=4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#4.1">方法列表</a></li>
+<li style="margin-top: 5px"><a href="#4.2">方法细节</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="4.1"><H5>4.1  方法列表</H5>
+</td><td align="right"><a href="&section=4.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+<span class=Method>append</span><span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>clear</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>dequeue<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>enqueue<span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM&thinsp; <span class=SpecSymbol>)</span><br/>erase<span class=SpecSymbol>(</span>&thinsp; start=<span class=Number>0</span>,&thinsp; n=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><br/>front<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; @ITEM<br/><span class=Method>insert</span><span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM,&thinsp; pos=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/>max<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;@ITEM,<span class=DataType>int</span>&gt;<br/>min<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;@ITEM,<span class=DataType>int</span>&gt;<br/><span class=Method>pop</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>popback<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>popfront<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>push</span><span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM&thinsp; <span class=SpecSymbol>)</span><br/>pushback<span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM&thinsp; <span class=SpecSymbol>)</span><br/>pushfront<span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM&thinsp; <span class=SpecSymbol>)</span><br/>resize<span class=SpecSymbol>(</span>&thinsp; <span class=Method>size</span>&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>size</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>ranka<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;<br/>rankd<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;<br/>sorta<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@ITEM&gt;<br/>sortd<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@ITEM&gt;<br/>sum<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; @ITEM<br/>top<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; @ITEM</div>
+ <br/>
+以表达式为参数的<span class=text_bold> sort()</span> 方法现已被支持为一个内置函数，
+请参看<a href="/page/dao_functional_methods">这里</a> 。<br/>
+<table><tr><td><a name="4.2"><H5>4.2  方法细节</H5>
+</td><td align="right"><a href="&section=4.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.<span class=Method>append</span><span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将<span class=text_italic> item</span> 附加到列表末尾。<br/>
+这里<span class=text_italic> item</span> 的类型为<span class=text_bold> @ITEM</span> ，表示此类型必须跟列表所能容纳的元素类型一致，
+否则<span class=text_italic> item</span> 将不能被添加到列表里。
+实际上，这里<span class=text_bold> @ITEM</span> 表示一个待定类型，当一列表调用此方法时，
+<span class=text_bold> @ITEM</span> 将被初始化为列表的元素类型，然后在检查<span class=text_italic> item</span> 的参数类型时，
+<span class=text_italic> item</span> 将必须匹配到<span class=text_bold> @ITEM</span> 类型，即列表的元素类型。<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.<span class=Method>clear</span><span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+清空列表。<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.dequeue<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将列表用作队列：取出并移除队列的首元素。<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.enqueue<span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将列表用作队列：将<span class=text_italic> item</span> 添加到队列的末尾。<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.erase<span class=SpecSymbol>(</span>&thinsp; start=<span class=Number>0</span>,&thinsp; n=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+从下标<span class=text_italic> start</span> 开始，删除<span class=text_italic> n</span> 个元素。<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.front<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; @ITEM</div>
+ 
+取出列表的首元素。<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.<span class=Method>insert</span><span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM,&thinsp; pos=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将元素<span class=text_italic> item</span> 插入到列表的<span class=text_italic> pos</span> 位子。<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.max<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;@ITEM,<span class=DataType>int</span>&gt;</div>
+ 
+返回列表的最大值及其下标。<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.min<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;@ITEM,<span class=DataType>int</span>&gt;</div>
+ 
+返回列表的最小值及其下标。<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.<span class=Method>pop</span><span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+移除列表的末尾元素。<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.popback<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+移除列表的末尾元素。<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.popfront<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+移除列表的首元素。<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.<span class=Method>push</span><span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将<span class=text_italic> item</span> 附加到列表末尾。<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.pushback<span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将<span class=text_italic> item</span> 附加到列表末尾。<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.pushfront<span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将<span class=text_italic> item</span> 附加到列表开头。<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.ranka<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;<br/><span class=DataType>list</span>&lt;@ITEM&gt;.rankd<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;</div>
+ 
+按升序或降序排名。
+如果<span class=text_italic> k</span> 不为零，排名最小或最大的<span class=text_italic> k</span> 个元素。<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.resize<span class=SpecSymbol>(</span>&thinsp; <span class=Method>size</span>&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将列表的大小改为<span class=text_italic> size</span> ，新增的部分将被填<span class=text_bold> nil</span> 值。<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.<span class=Method>size</span><span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+返回列表的大小。<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.sorta<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@ITEM&gt;<br/><span class=DataType>list</span>&lt;@ITEM&gt;.sortd<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@ITEM&gt;</div>
+ 
+按升序或降序排列。
+如果<span class=text_italic> k</span> 不为零，排列最小或最大的<span class=text_italic> k</span> 个元素。<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.sum<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; @ITEM</div>
+ 
+返回列表的和（或连结）。列表必须是数字或字符串。<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.top<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; @ITEM</div>
+ 
+返回列表的末尾元素。<br/>
+<table class="topsection"><tr><td><a name="5"><H3>5  映射表</H3>
+</td><td align="right"><a href="&section=5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#5.1">方法列表</a></li>
+<li style="margin-top: 5px"><a href="#5.2">方法细节</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="5.1"><H5>5.1  方法列表</H5>
+</td><td align="right"><a href="&section=5.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+<span class=Method>clear</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>erase<span class=SpecSymbol>(</span>&thinsp; from&thinsp; :&thinsp; @KEY=nil,&thinsp; to&thinsp; :&thinsp; @KEY=nil&thinsp; <span class=SpecSymbol>)</span><br/>find<span class=SpecSymbol>(</span>&thinsp; <span class=Method>key</span>&thinsp; :&thinsp; @KEY,&thinsp; type=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;<span class=DataType>int</span>,@KEY,@VALUE&gt;<br/><span class=Method>insert</span><span class=SpecSymbol>(</span>&thinsp; <span class=Method>key</span>&thinsp; :&thinsp; @KEY,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; @VALUE&thinsp; <span class=SpecSymbol>)</span><br/>keys<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@KEY&gt;<br/>keys<span class=SpecSymbol>(</span>&thinsp; from&thinsp; :&thinsp; @KEY&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@KEY&gt;<br/>keys<span class=SpecSymbol>(</span>&thinsp; from&thinsp; :&thinsp; @KEY,&thinsp; to&thinsp; :&thinsp; @KEY&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@KEY&gt;<br/><span class=Method>size</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>values<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@VALUE&gt;<br/>values<span class=SpecSymbol>(</span>&thinsp; from&thinsp; :&thinsp; @KEY&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@VALUE&gt;<br/>values<span class=SpecSymbol>(</span>&thinsp; from&thinsp; :&thinsp; @KEY,&thinsp; to&thinsp; :&thinsp; @KEY&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@VALUE&gt;</div>
+ <br/>
+<table><tr><td><a name="5.2"><H5>5.2  方法细节</H5>
+</td><td align="right"><a href="&section=5.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+<span class=DataType>map</span>&lt;@KEY,@VALUE&gt;.<span class=Method>clear</span><span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+清除映射表的所有键值对。<br/>
+<div class="hlcode">
+<span class=DataType>map</span>&lt;@KEY,@VALUE&gt;.erase<span class=SpecSymbol>(</span>&thinsp; from&thinsp; :&thinsp; @KEY=nil,&thinsp; to&thinsp; :&thinsp; @KEY=nil&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将键区间<span class=text_italic> from</span> 到<span class=text_italic> to</span> （包括<span class=text_italic> from</span> 和<span class=text_italic> to</span> ）之间的所有
+键值对删除。如果第二个参数被省略，仅删除等于<span class=text_italic> from</span> 的键值。
+如果两个参数均被省略，删除所有的键值。<br/>
+<div class="hlcode">
+find<span class=SpecSymbol>(</span>&thinsp; <span class=Method>key</span>&thinsp; :&thinsp; @KEY,&thinsp; type=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;<span class=DataType>int</span>,@KEY,@VALUE&gt;<br/><span class=DataType>map</span>&lt;@KEY,@VALUE&gt;.find<span class=SpecSymbol>(</span>&thinsp; <span class=Method>key</span>&thinsp; :&thinsp; @KEY,&thinsp; type=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;<span class=DataType>int</span>,@KEY,@VALUE&gt;</div>
+ 
+如果<span class=text_italic> type=0</span> ，查找键等于<span class=text_italic> key</span> 的元素；
+如果<span class=text_italic> type&lt;0</span> ，查找键小于等于<span class=text_italic> key</span> 的最大键值元素；
+如果<span class=text_italic> type&gt;0</span> ，查找键大于等于<span class=text_italic> key</span> 的最小键值元素；
+返回一个三元组，其第一个元素是个整数，1表示键被找到，0表示没有；
+第二个和第三个元素是被找到的键和值。<br/>
+<div class="hlcode">
+<span class=DataType>map</span>&lt;@KEY,@VALUE&gt;.<span class=Method>insert</span><span class=SpecSymbol>(</span>&thinsp; <span class=Method>key</span>&thinsp; :&thinsp; @KEY,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; @VALUE&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+插入一键值对。<br/>
+<div class="hlcode">
+<span class=DataType>map</span>&lt;@KEY,@VALUE&gt;.<span class=Method>key</span><span class=SpecSymbol>(</span>&thinsp; from&thinsp; :&thinsp; @KEY=nil,&thinsp; to&thinsp; :&thinsp; @KEY=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@KEY&gt;</div>
+ 
+作为列表返回所有键区间<span class=text_italic> from</span> 到<span class=text_italic> to</span> 之间的<span class=text_bold> 键</span> 。
+参数的意义跟<span class=text_bold> erase()</span> 方法的参数意义等同。<br/>
+<div class="hlcode">
+keys<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@KEY&gt;<br/>keys<span class=SpecSymbol>(</span>&thinsp; from&thinsp; :&thinsp; @KEY&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@KEY&gt;<br/>keys<span class=SpecSymbol>(</span>&thinsp; from&thinsp; :&thinsp; @KEY,&thinsp; to&thinsp; :&thinsp; @KEY&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@KEY&gt;</div>
+ 
+作为列表返回所有键，或从<span class=text_italic> from</span> 开始的键，
+或<span class=text_italic> from</span> 到<span class=text_italic> to</span> 之间的键。<br/>
+<div class="hlcode">
+<span class=DataType>map</span>&lt;@KEY,@VALUE&gt;.<span class=Method>size</span><span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+Return the number of elements in the map.<br/>
+<div class="hlcode">
+<span class=DataType>map</span>&lt;@KEY,@VALUE&gt;.<span class=Method>value</span><span class=SpecSymbol>(</span>&thinsp; from&thinsp; :&thinsp; @KEY=nil,&thinsp; to&thinsp; :&thinsp; @VALUE=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@VALUE&gt;</div>
+ 
+作为列表返回所有键区间<span class=text_italic> from</span> 到<span class=text_italic> to</span> 之间的<span class=text_bold> 值</span> 。
+参数的意义跟<span class=text_bold> erase()</span> 方法的参数意义等同。
+<div class="hlcode">
+values<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@VALUE&gt;<br/>values<span class=SpecSymbol>(</span>&thinsp; from&thinsp; :&thinsp; @KEY&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@VALUE&gt;<br/>values<span class=SpecSymbol>(</span>&thinsp; from&thinsp; :&thinsp; @KEY,&thinsp; to&thinsp; :&thinsp; @KEY&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@VALUE&gt;</div>
+ 
+作为列表返回所有值，或键从<span class=text_italic> from</span> 开始的值，
+或键在<span class=text_italic> from</span> 和<span class=text_italic> to</span> 之间的值。<br/>
+<table class="topsection"><tr><td><a name="6"><H3>6  数值数组</H3>
+</td><td align="right"><a href="&section=6"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#6.1">方法列表</a></li>
+<li style="margin-top: 5px"><a href="#6.2">方法细节</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="6.1"><H5>6.1  方法列表</H5>
+</td><td align="right"><a href="&section=6.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+dim<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;<br/>dim<span class=SpecSymbol>(</span>&thinsp; i&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>index<span class=SpecSymbol>(</span>&thinsp; i&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;<br/><span class=Method>size</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>resize<span class=SpecSymbol>(</span>&thinsp; dims&thinsp; :&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;&thinsp; <span class=SpecSymbol>)</span><br/>reshape<span class=SpecSymbol>(</span>&thinsp; dims&thinsp; :&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;&thinsp; <span class=SpecSymbol>)</span><br/>sorta<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/>sortd<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/>ranka<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;<br/>rankd<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;<br/>max<span class=SpecSymbol>(</span>&thinsp; slice=<span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;@ITEM,<span class=DataType>int</span>&gt;<br/>min<span class=SpecSymbol>(</span>&thinsp; slice=<span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;@ITEM,<span class=DataType>int</span>&gt;<br/>sum<span class=SpecSymbol>(</span>&thinsp; slice=<span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; @ITEM<br/>varn<span class=SpecSymbol>(</span>&thinsp; slice=<span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>double</span><br/>fft<span class=SpecSymbol>(</span>&thinsp; inv=-<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+以表达式为参数的<span class=text_bold> apply()</span> 方法现已被支持为一个内置函数，
+请参看<a href="/page/dao_functional_methods">这里</a> 。
+而<span class=text_bold> noapply()</span> 方法则被移除。<br/>
+<table><tr><td><a name="6.2"><H5>6.2  方法细节</H5>
+</td><td align="right"><a href="&section=6.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.dim<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;</div>
+ 
+以整数向量的形式返回多维数组的每个维数的大小。<br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.dim<span class=SpecSymbol>(</span>&thinsp; i&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+返回第i维的大小。<br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.index<span class=SpecSymbol>(</span>&thinsp; i&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;</div>
+ 
+将数组元素的一维下标（将多维数组当作向量）转换为多维下标。<br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.<span class=Method>size</span><span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+返回数组的所有元素个数。<br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.resize<span class=SpecSymbol>(</span>&thinsp; dims&thinsp; :&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将数组的大小改为每维大小由<span class=text_italic> dims</span> 指定的多维数组。<br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.reshape<span class=SpecSymbol>(</span>&thinsp; dims&thinsp; :&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将数组的形状改为每维大小由<span class=text_italic> dims</span> 指定的多维数组。<br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.rank<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;</div>
+ 
+与<span class=text_bold> list.rank()</span> 相似。<br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.sort<span class=SpecSymbol>(</span>&thinsp; type=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将数组当作向量，如果<span class=text_italic> type</span> 非零，升序排列，否则，降序排列。<br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.max<span class=SpecSymbol>(</span>&thinsp; slice=<span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;@ITEM,<span class=DataType>int</span>&gt;</div>
+ 
+返回数组里由<span class=text_italic> slice</span> 指定的子数组里元素的最大值及其一维下标，如果<span class=text_italic> slice</span> 为空或被省略，
+返回整个数组里元素的最大值。
+<div class="hlcode">
+mat&thinsp; =&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>1.5</span>,&thinsp; <span class=Number>2.5</span>,&thinsp; <span class=Number>3</span>,&thinsp; <span class=Number>4</span>;&thinsp; <span class=Number>5</span>,&thinsp; <span class=Number>6</span>,&thinsp; <span class=Number>7</span>,&thinsp; <span class=Number>8</span>;&thinsp; <span class=Number>9</span>,&thinsp; <span class=Number>0</span>,&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>&thinsp; <span class=SpecSymbol>]</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; mat.max<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>{</span>&thinsp; &thinsp; <span class=Number>1</span>:,&thinsp; <span class=Number>1</span>:<span class=Number>2</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;&thinsp; <span class=Comment># 第二行,第二三列</span></div>
+ <br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.min<span class=SpecSymbol>(</span>&thinsp; slice=<span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;@ITEM,<span class=DataType>int</span>&gt;</div>
+ 
+返回数组里由<span class=text_italic> slice</span> 指定的子数组里元素的最小值及其一维下标，如果<span class=text_italic> slice</span> 为空或被省略，
+返回整个数组里元素的最小值。<br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.sum<span class=SpecSymbol>(</span>&thinsp; slice=<span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; @ITEM</div>
+ 
+返回数组里由<span class=text_italic> slice</span> 指定的子数组里元素的和，如果<span class=text_italic> slice</span> 为空或被省略，
+返回整个数组里元素的和。<br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.varn<span class=SpecSymbol>(</span>&thinsp; slice=<span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>double</span></div>
+ 
+返回数组里由<span class=text_italic> slice</span> 指定的子数组里元素的样本方差，如果<span class=text_italic> slice</span> 为空或被省略，
+返回整个数组里元素的样本方差。<br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;<span class=DataType>complex</span>&gt;.fft<span class=SpecSymbol>(</span>&thinsp; inv=-<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+快速傅立叶变换。<br/><br/>
+<table class="topsection"><tr><td><a name="7"><H3>7  cdata</H3>
+</td><td align="right"><a href="&section=7"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#7.1">方法列表</a></li>
+<li style="margin-top: 5px"><a href="#7.2">方法细节</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="7.1"><H5>7.1  方法列表</H5>
+</td><td align="right"><a href="&section=7.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+cdata<span class=SpecSymbol>(</span>&thinsp; <span class=Method>size</span>&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; cdata<br/>copydata<span class=SpecSymbol>(</span>&thinsp; buf&thinsp; :&thinsp; cdata&thinsp; <span class=SpecSymbol>)</span><br/>getbyte<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>getdouble<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>double</span><br/>getfloat<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>float</span><br/>getint<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>getshort<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>getstring<span class=SpecSymbol>(</span>&thinsp; mbs=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span><br/>resize<span class=SpecSymbol>(</span>&thinsp; <span class=Method>size</span>&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><br/>setbyte<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><br/>setdouble<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span><br/>setfloat<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>float</span>&thinsp; <span class=SpecSymbol>)</span><br/>setint<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><br/>setshort<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><br/>setstring<span class=SpecSymbol>(</span>&thinsp; <span class=DataType>string</span>&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>size</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ <br/>
+<table><tr><td><a name="7.2"><H5>7.2  方法细节</H5>
+</td><td align="right"><a href="&section=7.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+cdata<span class=SpecSymbol>(</span>&thinsp; <span class=Method>size</span>&thinsp; =&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; cdata</div>
+ 
+创建一个大小为<span class=text_italic> size</span> 字节的内存块。<br/>
+<div class="hlcode">
+cdata.copydata<span class=SpecSymbol>(</span>&thinsp; buf&thinsp; :cdata&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+从内存块<span class=text_italic> buf</span> 复制数据。<br/>
+<div class="hlcode">
+cdata.getbyte<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+返回内存块的第<span class=text_italic> index</span> 个字节。
+字节的符号性由<span class=text_italic> signed</span> 确定。<br/>
+<div class="hlcode">
+cdata.getdouble<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>double</span></div>
+ 
+将内存块当作双精度浮点数数组，返回其第<span class=text_italic> index</span> 元素。<br/>
+<div class="hlcode">
+cdata.getfloat<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span><span class=DataType>float</span></div>
+ 
+将内存块当作单精度浮点数数组，返回其第<span class=text_italic> index</span> 元素。<br/>
+<div class="hlcode">
+cdata.getint<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+将内存块当作整数数组，返回其第<span class=text_italic> index</span> 元素。
+整数的符号性由<span class=text_italic> signed</span> 确定。<br/>
+<div class="hlcode">
+cdata.getshort<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+将内存块当作短整数数组，返回其第<span class=text_italic> index</span> 元素。
+整数的符号性由<span class=text_italic> signed</span> 确定。<br/>
+<div class="hlcode">
+cdata.getstring<span class=SpecSymbol>(</span>&thinsp; mbs=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+将内存块当作字符串返回，如果<span class=text_italic> mbs=1</span> ，作为多字节字符串(Multi-Bytes String)，
+否则作为宽字节字符串(Wide Character String)。<br/>
+<div class="hlcode">
+cdata.resize<span class=SpecSymbol>(</span>&thinsp; <span class=Method>size</span>&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将内存块的大小改为<span class=text_italic> size</span> 字节。<br/>
+<div class="hlcode">
+cdata.setbyte<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将内存块的第<span class=text_italic> index</span> 字节设为<span class=text_italic> value</span> 。
+字节的符号性由<span class=text_italic> signed</span> 确定。<br/>
+<div class="hlcode">
+cdata.setdouble<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>double</span>,&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将内存块当作双精度浮点数数组，将内存块的第<span class=text_italic> index</span> 元素设为<span class=text_italic> value</span> 。<br/>
+<div class="hlcode">
+cdata.setfloat<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>float</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将内存块当作单精度浮点数数组，将内存块的第<span class=text_italic> index</span> 元素设为<span class=text_italic> value</span> 。<br/>
+<div class="hlcode">
+cdata.setint<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将内存块当作整数数组，将内存块的第<span class=text_italic> index</span> 元素设为<span class=text_italic> value</span> 。
+整数的符号性由<span class=text_italic> signed</span> 确定。<br/>
+<div class="hlcode">
+cdata.setshort<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将内存块当作短整数数组，将内存块的第<span class=text_italic> index</span> 元素设为<span class=text_italic> value</span> 。
+整数的符号性由<span class=text_italic> signed</span> 确定。<br/>
+<div class="hlcode">
+cdata.setstring<span class=SpecSymbol>(</span>&thinsp; <span class=DataType>string</span>&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+使用字符串填充内存块。<br/>
+<div class="hlcode">
+cdata.<span class=Method>size</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+返回内存块的大小，按字节数。<br/>
+<table class="topsection"><tr><td><a name="8"><H3>8  标准库(std，即原来的stdlib)</H3>
+</td><td align="right"><a href="&section=8"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#8.1">方法列表</a></li>
+<li style="margin-top: 5px"><a href="#8.2">方法细节</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="8.1"><H5>8.1  方法列表</H5>
+</td><td align="right"><a href="&section=8.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+<span class=Method>stdlib.about</span><span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span><br/><span class=Method>stdlib.callable</span><span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/><span class=Method>stdlib.compile</span><span class=SpecSymbol>(</span>&thinsp; source&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>stdlib.copy</span><span class=SpecSymbol>(</span>&thinsp; object&thinsp; :&thinsp; @OBJECT&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; @OBJECT<br/><span class=Method>stdlib.ctimef</span><span class=SpecSymbol>(</span>&thinsp; time=<span class=Number>0</span>,&thinsp; format=<span class=String>'%Y-%M-%D, %H:%I:%S'</span>,&thinsp; namemap&thinsp; :&thinsp; <span class=DataType>map</span>&lt;<span class=DataType>string</span>,<span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;&gt;&thinsp; =<span class=SpecSymbol>{</span><span class=SpecSymbol>=></span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span><br/><span class=Method>stdlib.ctime</span><span class=SpecSymbol>(</span>&thinsp; time=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;year:<span class=DataType>int</span>,month:<span class=DataType>int</span>,day:<span class=DataType>int</span>,wday:<span class=DataType>int</span>,hour:<span class=DataType>int</span>,minute:<span class=DataType>int</span>,second:<span class=DataType>int</span>&gt;<br/><span class=Method>stdlib.debug</span><span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>stdlib.error</span><span class=SpecSymbol>(</span>&thinsp; info&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>stdlib.eval</span><span class=SpecSymbol>(</span>&thinsp; source&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=DataType>stream</span>=<span class=Method>stdio</span><span class=SpecSymbol>)</span><br/><span class=Method>stdlib.exit</span><span class=SpecSymbol>(</span>&thinsp; code=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>stdlib.gcmax</span><span class=SpecSymbol>(</span>&thinsp; limit=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/><span class=Method>stdlib.gcmin</span><span class=SpecSymbol>(</span>&thinsp; limit=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/><span class=Method>stdlib.listmeth</span><span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>stdlib.enable_fe</span><span class=SpecSymbol>(</span>&thinsp; flags&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/><span class=Method>stdlib.disable_fe</span><span class=SpecSymbol>(</span>&thinsp; flags&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/><span class=Method>stdlib.load</span><span class=SpecSymbol>(</span>&thinsp; file&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>stdlib.pack</span><span class=SpecSymbol>(</span>&thinsp; number&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span><br/><span class=Method>stdlib.pack</span><span class=SpecSymbol>(</span>&thinsp; <span class=DataType>list</span>&thinsp; :<span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span><br/><span class=Method>stdlib.sleep</span><span class=SpecSymbol>(</span>&thinsp; seconds&thinsp; :&thinsp; <span class=DataType>float</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>stdlib.system</span><span class=SpecSymbol>(</span>&thinsp; command&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>stdlib.time</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/><span class=Method>stdlib.time</span><span class=SpecSymbol>(</span>&thinsp; tm&thinsp; :&thinsp; <span class=DataType>tuple</span>&lt;year:<span class=DataType>int</span>,month:<span class=DataType>int</span>,day:<span class=DataType>int</span>,wday:<span class=DataType>int</span>,hour:<span class=DataType>int</span>,minute:<span class=DataType>int</span>,second:<span class=DataType>int</span>&gt;&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/><span class=Method>stdlib.tokenize</span><span class=SpecSymbol>(</span>&thinsp; source&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;<br/><span class=Method>stdlib.unpack</span><span class=SpecSymbol>(</span>&thinsp; <span class=DataType>string</span>&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;<br/><span class=Method>stdlib.warn</span><span class=SpecSymbol>(</span>&thinsp; info&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+<table><tr><td><a name="8.2"><H5>8.2  方法细节</H5>
+</td><td align="right"><a href="&section=8.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+about<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+返回参数变量的类型名和变量的内存地址。<br/>
+<div class="hlcode">
+callable<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+检测一个对象是否可以作为函数调用。<br/>
+<div class="hlcode">
+compile<span class=SpecSymbol>(</span>&thinsp; source&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+编译source表示的道代码，并返回主函数。<br/>
+<div class="hlcode">
+copy<span class=SpecSymbol>(</span>&thinsp; object&thinsp; :&thinsp; @OBJECT&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; @OBJECT</div>
+ 
+返回对象的深拷贝。（TODO：可能实现不完全！）<br/>
+<div class="hlcode">
+ctime<span class=SpecSymbol>(</span>&thinsp; time=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;year:<span class=DataType>int</span>,month:<span class=DataType>int</span>,day:<span class=DataType>int</span>,wday:<span class=DataType>int</span>,hour:<span class=DataType>int</span>,minute:<span class=DataType>int</span>,second:<span class=DataType>int</span>&gt;</div>
+ 
+将以秒记的时间(从Epoch(1970年1月1日00:00:00 UTC)开始计数，通常由std.time()返回)time转换为日历时间，返回为元组。<br/>
+<div class="hlcode">
+ctimef<span class=SpecSymbol>(</span>&thinsp; time=<span class=Number>0</span>,&thinsp; format=<span class=String>'%Y-%M-%D, %H:%I:%S'</span>,&thinsp; namemap&thinsp; :&thinsp; <span class=DataType>map</span>&lt;<span class=DataType>string</span>,<span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;&gt;&thinsp; =<span class=SpecSymbol>{</span><span class=SpecSymbol>=></span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+将以秒记的时间time转换为日历时间，其格式由format指定，
+年份月份和日期等的表示形式（某语言的词汇）可由namemap指定。<br/>
+<div class="hlcode">
+debug<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+如果调用时带参数，返回参数变量的类型名和内存地址。
+如果不带参数，程序将进入调试终端。
+此函数仅在程序以调试模式运行时有效。<br/>
+<div class="hlcode">
+<span class=Method>error</span><span class=SpecSymbol>(</span>&thinsp; info&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将info作为错误信息打印，并终止当前虚拟进程。<br/>
+<div class="hlcode">
+eval<span class=SpecSymbol>(</span>&thinsp; source&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=DataType>stream</span>=<span class=Method>stdio</span><span class=SpecSymbol>)</span></div>
+ 
+编译并执行source所表示道代码，并使用流对象stream作为标准输出输入流。<br/>
+<div class="hlcode">
+<span class=Method>exit</span><span class=SpecSymbol>(</span>&thinsp; code=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+退出程序，并向父进程返回code作为状态。<br/>
+<div class="hlcode">
+gcmax<span class=SpecSymbol>(</span>&thinsp; limit=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+返回当前内存垃圾回收器GC上限值。如果调用时还带参数，
+那么该上限值将被设置为参数所指定的值。<br/><br/>
+此上限的作用是，当GC在处理的垃圾对象超过此上限时，其他程序线程将被暂停，
+直到这些垃圾被处理完。一般情况下，运行GC的线程与其他程序并行运行。<br/>
+<div class="hlcode">
+gcmin<span class=SpecSymbol>(</span>&thinsp; limit=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+返回当前内存垃圾回收器GC下限值。如果调用时还带参数，
+那么该下限值将被设置为参数所指定的值。<br/><br/>
+此下限的作用是，当程序产生的垃圾对象数目小于此下限时，GC将不工作并进入休眠
+状态，直到垃圾数目超过此下限时被唤醒再开始工作。<br/>
+<div class="hlcode">
+listmeth<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+列出对象object可用的方法。<br/>
+<div class="hlcode">
+<span class=StmtKey>load</span><span class=SpecSymbol>(</span>&thinsp; file&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+从文件file载入并运行道代码。<br/>
+<div class="hlcode">
+pack<span class=SpecSymbol>(</span>&thinsp; number&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+将整数按字符编码转换成字符。<br/>
+<div class="hlcode">
+pack<span class=SpecSymbol>(</span>&thinsp; <span class=DataType>list</span>&thinsp; :<span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+将整数列表按字符编码转换成字符串。<br/>
+<div class="hlcode">
+sleep<span class=SpecSymbol>(</span>&thinsp; seconds&thinsp; :&thinsp; <span class=DataType>float</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+让当前运行的线程暂停seconds秒，最短暂停时间可以小于1秒。<br/>
+<div class="hlcode">
+system<span class=SpecSymbol>(</span>&thinsp; command&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+运行系统命令。<br/>
+<div class="hlcode">
+time<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+返回当前时间，从Epoch(1970年1月1日00:00:00 UTC)到当前的秒数。<br/>
+<div class="hlcode">
+time<span class=SpecSymbol>(</span>&thinsp; tm&thinsp; :&thinsp; <span class=DataType>tuple</span>&lt;year:<span class=DataType>int</span>,month:<span class=DataType>int</span>,day:<span class=DataType>int</span>,wday:<span class=DataType>int</span>,hour:<span class=DataType>int</span>,minute:<span class=DataType>int</span>,second:<span class=DataType>int</span>&gt;&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+将日历时间转换为移秒记的时间（从Epoch(1970年1月1日00:00:00 UTC)开始计数）。<br/>
+<div class="hlcode">
+tokenize<span class=SpecSymbol>(</span>&thinsp; source&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;</div>
+ 
+词法解析道代码。<br/>
+<div class="hlcode">
+unpack<span class=SpecSymbol>(</span>&thinsp; <span class=DataType>string</span>&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;</div>
+ 
+将字符串按字符编码转换为整数列表。<br/>
+<div class="hlcode">
+<span class=Method>warn</span><span class=SpecSymbol>(</span>&thinsp; info&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+打印警告信息，并在信息里包含此语句所在的程序源文件名和行号。<br/>
+<table class="topsection"><tr><td><a name="9"><H3>9  标准输入输出库(io，即原来的stdio)和流(stream)</H3>
+</td><td align="right"><a href="&section=9"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#9.1">方法列表</a></li>
+<li style="margin-top: 5px"><a href="#9.2">方法细节</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="9.1"><H5>9.1  方法列表</H5>
+</td><td align="right"><a href="&section=9.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+close<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>eof<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>flush<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>getstring<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>isopen<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>name<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>open<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>open<span class=SpecSymbol>(</span>&thinsp; file&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; mode&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><br/>popen<span class=SpecSymbol>(</span>&thinsp; cmd&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; mode&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><br/>write<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/>writeln<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/>writef<span class=SpecSymbol>(</span>&thinsp; format&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>print</span><span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>println</span><span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/>printf<span class=SpecSymbol>(</span>&thinsp; format&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>read</span><span class=SpecSymbol>(</span>&thinsp; count=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>string</span><br/><span class=Method>read</span><span class=SpecSymbol>(</span>&thinsp; file&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>string</span><br/>seek<span class=SpecSymbol>(</span>&thinsp; pos&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; from&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><br/>sstream<span class=SpecSymbol>(</span>&thinsp; mbs=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><br/>tell<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+<table><tr><td><a name="9.2"><H5>9.2  方法细节</H5>
+</td><td align="right"><a href="&section=9.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+close<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+关闭流。<br/>
+<div class="hlcode">
+eof<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Check if the end of the stream is reached.
+检查流位置指示是否已经到了流末尾。<br/>
+<div class="hlcode">
+flush<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将所有缓存的输出写入到设备。<br/>
+<div class="hlcode">
+getstring<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+如果流对象是字符流，作为字符串返回输出到流的数据。<br/>
+<div class="hlcode">
+isopen<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+检查（文件）流是否打开。<br/>
+<div class="hlcode">
+name<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+返回文件流的文件名。<br/>
+<div class="hlcode">
+open<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+打开一个临时文件流。<br/>
+<div class="hlcode">
+open<span class=SpecSymbol>(</span>&thinsp; file&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; mode&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+以模式mode打开文件file。
+模式含义跟C语言里的fopen()一样。<br/>
+<div class="hlcode">
+popen<span class=SpecSymbol>(</span>&thinsp; cmd&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; mode&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+打开一个命令管道，模式可以是r或w。<br/>
+<div class="hlcode">
+write<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>print</span><span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将参数变量的值输出到流里。<br/>
+<div class="hlcode">
+writeln<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>println</span><span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将参数变量的值输出到流里。
+并且在参数变量的输出之间添加空格，在输出末尾添加换行符。<br/>
+<div class="hlcode">
+writef<span class=SpecSymbol>(</span>&thinsp; format&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/>printf<span class=SpecSymbol>(</span>&thinsp; format&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+格式输出，格式format的含义跟C语言里的printf()一样。<br/>
+<div class="hlcode">
+<span class=Method>read</span><span class=SpecSymbol>(</span>&thinsp; count=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>string</span></div>
+ 
+如果count大于0，从流里读取count字节的数据；
+如果count小于0，读取流里所有的数据；
+否则从流中读取一行，并包括换行符。<br/>
+<div class="hlcode">
+<span class=Method>read</span><span class=SpecSymbol>(</span>&thinsp; file&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>string</span></div>
+ 
+从文件file里读取所有数据。<br/>
+<div class="hlcode">
+seek<span class=SpecSymbol>(</span>&thinsp; pos&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; from&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+将流位置指示定位于相对于<span class=text_italic> from</span> 的位置<span class=text_italic> pos</span> ，
+<span class=text_italic> from</span> 可以是stdio.SEEK_CUR， stdio.SEEK_SET 或 stdio.SEEK_END。<br/>
+<div class="hlcode">
+sstream<span class=SpecSymbol>(</span>&thinsp; mbs=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+创建一个字符串流，内部使用的缓存可以是MBS或WCS，取决于参数mbs。<br/>
+<div class="hlcode">
+tell<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+返回流位置指示的当前位置。<br/>
+<table class="topsection"><tr><td><a name="10"><H3>10  数学库(math)</H3>
+</td><td align="right"><a href="&section=10"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#10.1">方法列表</a></li>
+</ol></td></tr></table> <br/>
+从道语言1.1开始，这些数学函数，除了<span class=text_bold> srand()</span>  和 <span class=text_bold> pow()</span> 之外，
+都被作为内置函数被支持。<br/>
+<table><tr><td><a name="10.1"><H5>10.1  方法列表</H5>
+</td><td align="right"><a href="&section=10.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+<span class=Method>math.abs</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.abs</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.acos</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.arg</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.asin</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.atan</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.ceil</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.ceil</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.cos</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.cos</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.cosh</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.cosh</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.exp</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.exp</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.floor</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.floor</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.imag</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.log</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.log</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.norm</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.pow</span><span class=SpecSymbol>(</span>&thinsp; p1&thinsp; :&thinsp; <span class=DataType>double</span>,&thinsp; p2&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.pow</span><span class=SpecSymbol>(</span>&thinsp; p1&thinsp; :&thinsp; <span class=DataType>double</span>,&thinsp; p2&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.pow</span><span class=SpecSymbol>(</span>&thinsp; p1&thinsp; :&thinsp; <span class=DataType>complex</span>,&thinsp; p2&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.pow</span><span class=SpecSymbol>(</span>&thinsp; p1&thinsp; :&thinsp; <span class=DataType>complex</span>,&thinsp; p2&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.real</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.sin</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.sin</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.sinh</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.sinh</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.sqrt</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.sqrt</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.srand</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.rand</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.tan</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.tan</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.tanh</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.tanh</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+<table class="topsection"><tr><td><a name="11"><H3>11  反映reflection</H3>
+</td><td align="right"><a href="&section=11"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#11.1">方法列表</a></li>
+<li style="margin-top: 5px"><a href="#11.2">方法细节</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="11.1"><H5>11.1  方法列表</H5>
+</td><td align="right"><a href="&section=11.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+namespace<span class=SpecSymbol>(</span>&thinsp; object=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; any<br/>name<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span><br/>type<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; any<br/>base<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;any&gt;<br/>doc<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; newdoc=<span class=String>''</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span><br/>constant<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; restrict=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>map</span>&lt;<span class=DataType>string</span>,<span class=DataType>tuple</span>&lt;<span class=Method>value</span>:any,type:any&gt;&thinsp; &gt;<br/>variable<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; restrict=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>map</span>&lt;<span class=DataType>string</span>,<span class=DataType>tuple</span>&lt;<span class=Method>value</span>:any,type:any&gt;&thinsp; &gt;<br/>constant<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; name:<span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>tuple</span>&lt;<span class=Method>value</span>:any,type:any&gt;<br/>variable<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; name:<span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>tuple</span>&lt;<span class=Method>value</span>:any,type:any&gt;<br/><span class=CodeStruct>class</span><span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; any<br/><span class=CodeStruct>routine</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; any<br/><span class=CodeStruct>routine</span><span class=SpecSymbol>(</span>&thinsp; rout&thinsp; :&thinsp; any&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;any&gt;<br/>param<span class=SpecSymbol>(</span>&thinsp; rout&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>list</span>&lt;<span class=DataType>tuple</span>&lt;name:<span class=DataType>string</span>,type:any,deft:<span class=DataType>int</span>,<span class=Method>value</span>:any&gt;&thinsp; &gt;<br/>isa<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; name&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>isa<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; type&thinsp; :&thinsp; any&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>self<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; any<br/>argc<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>argv<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;any&gt;<br/>argv<span class=SpecSymbol>(</span>&thinsp; i&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; any</div>
+ <br/>
+<table><tr><td><a name="11.2"><H5>11.2  方法细节</H5>
+</td><td align="right"><a href="&section=11.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+namespace<span class=SpecSymbol>(</span>&thinsp; object=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; any</div>
+ 
+如果object是一个对象或函数，返回定义它的名字空间，
+返回当前名字空间。<br/>
+<div class="hlcode">
+name<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+如果object是一个类，类成员方法或函数，返回它们的名字。<br/>
+<div class="hlcode">
+type<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; any</div>
+ 
+返回object的类型。<br/>
+<div class="hlcode">
+base<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;any&gt;</div>
+ 
+如果object是一个类，返回其直接父类；
+如果object是一个对象，返回其直接父对象。<br/>
+<div class="hlcode">
+doc<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; newdoc=<span class=String>''</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+返回函数或类的文档。
+如果newdoc参数被使用，那么设置它们的文档。
+一般，函数和类体左花括号之前的注释被认为是它们的文档。<br/>
+<div class="hlcode">
+constant<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; restrict=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>map</span>&lt;<span class=DataType>string</span>,<span class=DataType>tuple</span>&lt;<span class=Method>value</span>:any,type:any&gt;&thinsp; &gt;</div>
+ 
+返回object的成员常量。object可以是名字空间，类或类实例。
+如果restrict为零，返回所有常量，否则，仅返回公共常量。
+返回的值为从成员名到成员值和类型的映射表。<br/>
+<div class="hlcode">
+variable<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; restrict=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>map</span>&lt;<span class=DataType>string</span>,<span class=DataType>tuple</span>&lt;<span class=Method>value</span>:any,type:any&gt;&thinsp; &gt;</div>
+ 
+返回object的成员变量。object可以是名字空间，类或类实例。
+如果restrict为零，返回所有变量，否则，仅返回公共变量。
+返回的值为从成员名到成员值和类型的映射表。<br/>
+<div class="hlcode">
+constant<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; name:<span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>tuple</span>&lt;<span class=Method>value</span>:any,type:any&gt;</div>
+ 
+作为元组返回object的成员常量name的值和类型。
+如果value参数被使用了，将常量的值设为value。
+object的所有常量都能通过这种方式访问和修改。<br/>
+<div class="hlcode">
+variable<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; name:<span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>tuple</span>&lt;<span class=Method>value</span>:any,type:any&gt;</div>
+ 
+作为元组返回object的成员变量name的值和类型。
+如果value参数被使用了，将变量的值设为value。
+object的所有变量都能通过这种方式访问和修改。<br/>
+<div class="hlcode">
+<span class=CodeStruct>class</span><span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; any</div>
+ 
+如果object是个类成员函数，返回定义它的类；
+如果object是个类实例，返回它的原型类。<br/>
+<div class="hlcode">
+<span class=CodeStruct>routine</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; any</div>
+ 
+返回当前运行的函数。<br/>
+<div class="hlcode">
+<span class=CodeStruct>routine</span><span class=SpecSymbol>(</span>&thinsp; rout&thinsp; :&thinsp; any&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;any&gt;</div>
+ 
+以列表返回rout的重载函数。<br/>
+<div class="hlcode">
+param<span class=SpecSymbol>(</span>&thinsp; rout&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>list</span>&lt;<span class=DataType>tuple</span>&lt;name:<span class=DataType>string</span>,type:any,deft:<span class=DataType>int</span>,<span class=Method>value</span>:any&gt;&thinsp; &gt;</div>
+ 
+返回函数的参数定义信息：参数名name，类型type，缺省值value。
+元组的deft元素表示value是否是参数的缺省值。<br/>
+<div class="hlcode">
+isa<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; name&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+检查object的类型是否为类型名name所表示的类型。
+name既可以是一个有效的类型名（如int, float, list&lt;int&gt;等），
+也可以是以下一些类别名称。例如，如果name参数值是class，
+而object参数是一个类，那么此函数将返回真值。
+&lt;table&gt;
+^ 名称 ^ 类别 ^
+| class | 道类 |
+| object | 道类实例 |
+| routine | 道函数 |
+| function | C函数 |
+| namespace | 名字空间 |
+| tuple | 元组 |
+| list | 列表 |
+| map | 映射表 |
+| array | 数组 |
+&lt;/table&gt;<br/>
+&lt;code dao&gt;
+isa( object, type : any ) =&gt; int
+&lt;/code&gt;
+检查object的类型是否为类型名type。
+这里type应该是一个由reflect.type()所返回的对象。<br/>
+&lt;code dao&gt;
+argc() =&gt; int
+&lt;/code&gt;
+返回当前运行函数的参数数目。<br/>
+&lt;code dao&gt;
+argv() =&gt; list&lt;any&gt;
+&lt;/code&gt;
+返回当前运行函数的参数值。<br/>
+&lt;code dao&gt;
+argv( i : int ) =&gt; any
+&lt;/code&gt;
+返回当前运行函数的第i个参数值。<br/>
+&lt;code dao&gt;
+self( object )
+&lt;/code&gt;
+返回类实例的向下映射对象（子类对象）。
+&lt;code dao&gt;
+class Base
+{
+	routine Meth(){ stdio.println( reflect.self( self ) ) }
+}
+class Sub : Base {}
+o = Sub();
+o.Meth();
+&lt;/code&gt;
+在此例中，reflect.self( self )中的self参数将是一个从Sub实例向上映射得到的
+Base实例，而reflect.self( self )将返回原来的Sub实例。<br/>
+&lt;code dao&gt;
+trace(  )
+&lt;/code&gt;
+打印当前的函数调用栈。<br/>
+&lt;=====&gt;协程&lt;/=====&gt;<br/>
+此库对象提供几个使用协程的基本方法。
+不过道语言对协程有语法支持，使用通过语法支持的协程更方便。<br/>
+&lt;===&gt;方法列表&lt;/===&gt;
+&lt;code dao&gt;
+coroutine.create( object, ... )
+coroutine.resume( object, ... )
+coroutine.status( object )
+coroutine.yield( ... )
+&lt;/code&gt;<br/>
+&lt;===&gt;方法细节&lt;/===&gt;
+&lt;code dao&gt;
+create( object, ... )
+&lt;/code&gt;
+创建一个协程对象，object参数必须是一个函数或函数名。
+协程的初始状态是暂停，必须使用coroutine.resume()使它继续运行。
+额外的参数将被传递给被创建的协程，如果参数类型不符合object的参数类型，
+将抛出一个异常。<br/>
+&lt;code dao&gt;
+resume( object, ... )
+&lt;/code&gt;
+继续一个被暂停的协程。额外的resume()参数将变成yield()的返回值。
+继续一个已终止运行（由return返回或执行到了函数末尾）将抛出一个异常。<br/>
+&lt;code dao&gt;
+status( object )
+&lt;/code&gt;
+返回协程的状态。返回值将是以下字符串之一：
+&lt;table&gt;
+| suspended | running | aborted | finished | not_a_coroutine |
+&lt;/table&gt;<br/>
+&lt;code dao&gt;
+yield( ... )
+&lt;/code&gt;
+暂停当前协程的运行，将执行权返回给其调用者。
+yield()的参数将变成resume()的返回值。<br/>
+&lt;=====&gt;多线程库&lt;/=====&gt;<br/>
+道语言的多线程库名为mtlib。<br/>
+&lt;===&gt;方法列表&lt;/===&gt;
+&lt;code dao&gt;
+mtlib.thread( object, ... ) =&gt; thread
+mtlib.mutex(  ) =&gt; mutex
+mtlib.condition(  ) =&gt; condition
+mtlib.semaphore(  ) =&gt; semaphore
+mtlib.exit(  )
+mtlib.mydata(  ) =&gt; map&lt;string,any&gt;
+mtlib.self(  ) =&gt; thread
+mtlib.testcancel(  )
+&lt;/code&gt;<br/>
+&lt;===&gt;方法细节&lt;/===&gt;
+&lt;code dao&gt;
+condition(  ) =&gt; condition
+&lt;/code&gt;
+创建一个条件变量。<br/>
+&lt;code dao&gt;
+thread( object, ... )
+&lt;/code&gt;
+创建一个线程对象。
+object参数必须是一个道函数或C函数，mtlib.thread()的额外参数将被传递给object。<br/>
+&lt;code dao&gt;
+exit(  )
+&lt;/code&gt;
+终止当前线程。<br/>
+&lt;code dao&gt;
+mutex(  ) =&gt; mutex
+&lt;/code&gt;
+创建一个互斥子。<br/>
+&lt;code dao&gt;
+mydata(  ) =&gt; map&lt;string,any&gt;
+&lt;/code&gt;
+获得一个线程专有映射表。<br/>
+&lt;code dao&gt;
+self(  ) =&gt; thread
+&lt;/code&gt;
+返回当前线程对象。<br/>
+&lt;code dao&gt;
+semaphore(  ) =&gt; semaphore
+&lt;/code&gt;
+创建一个信号标。<br/>
+&lt;code dao&gt;
+testcancel(  )
+&lt;/code&gt;
+创建一个线程取消点。如果thread.cancel()在此函数之前被调用了，
+那么此函数将终止当前线程。<br/>
+&lt;=====&gt;线程对象&lt;/=====&gt;<br/>
+&lt;===&gt;方法列表&lt;/===&gt;
+&lt;code dao&gt;
+cancel(  )
+detach(  )
+join(  )
+mydata(  ) =&gt; map&lt;string,any&gt;
+&lt;/code&gt;<br/>
+&lt;===&gt;方法细节&lt;/===&gt;
+&lt;code dao&gt;
+thread.cancel(  )
+&lt;/code&gt;
+取消线程对象的运行。<br/>
+&lt;code dao&gt;
+thread.detach(  )
+&lt;/code&gt;
+线程对象剥离，其他使用thread.join()等待该线程结束的线程将不在等待。<br/>
+&lt;code dao&gt;
+thread.join(  )
+&lt;/code&gt;
+暂停当前线程，等待线程对象的结束。<br/>
+&lt;code dao&gt;
+thread.mydata(  ) =&gt; map&lt;string,any&gt;
+&lt;/code&gt;
+获得线程对象专有的映射表。<br/>
+&lt;=====&gt;互斥子&lt;/=====&gt;<br/>
+&lt;===&gt;方法列表&lt;/===&gt;
+&lt;code dao&gt;
+lock(  )
+trylock(  )
+unlock(  )
+&lt;/code&gt;<br/>
+&lt;===&gt;方法细节&lt;/===&gt;
+&lt;code dao&gt;
+mutex.lock(  )
+&lt;/code&gt;
+给互斥子上锁。<br/>
+&lt;code dao&gt;
+mutex.trylock(  )
+&lt;/code&gt;
+尝试给互斥子上锁，如果哦成功返回真值，否则假值。<br/>
+&lt;code dao&gt;
+mutex.unlock(  )
+&lt;/code&gt;
+给互斥子开锁。<br/>
+&lt;=====&gt;条件变量&lt;/=====&gt;<br/>
+&lt;===&gt;方法列表&lt;/===&gt;
+&lt;code dao&gt;
+broadcast(  )
+signal(  )
+timedwait( mtx : mutex, seconds : float )
+wait( mtx : mutex )
+&lt;/code&gt;<br/>
+&lt;code dao&gt;
+condition.broadcast(  )
+&lt;/code&gt;
+唤醒所有在此条件变量上等待的线程。<br/>
+&lt;code dao&gt;
+condition.signal(  )
+&lt;/code&gt;
+随机唤醒在此条件变量上等待的一个线程。<br/>
+&lt;code dao&gt;
+condition.timedwait( mtx : mutex, seconds : float )
+&lt;/code&gt;
+定时等待此条件变量，使用mutex保护，最长等待时间为seconds（可以是小数）。<br/>
+&lt;code dao&gt;
+condition.wait( mtx : mutex )
+&lt;/code&gt;
+等待此条件变量，使用mutex保护。<br/>
+&lt;=====&gt;信号标&lt;/=====&gt;<br/>
+&lt;===&gt;方法列表&lt;/===&gt;
+&lt;code dao&gt;
+getvalue(  )
+post(  )
+setvalue( n : int )
+wait(  )
+&lt;/code&gt;<br/>
+&lt;===&gt;方法细节&lt;/===&gt;
+&lt;code dao&gt;
+semaphore.getvalue(  )
+&lt;/code&gt;
+返回信号标的资源计数。<br/>
+&lt;code dao&gt;
+semaphore.post(  )
+&lt;/code&gt;
+释放信号标的一个资源。<br/>
+&lt;code dao&gt;
+semaphore.setvalue( n : int )
+&lt;/code&gt;
+设置信号标的资源计数。<br/>
+&lt;code dao&gt;
+semaphore.wait(  )
+&lt;/code&gt;
+请求获取信号标的一个资源，如果未获取到，暂停当前线程，知道有资源可用再继续。
+not available.<br/>
+&lt;=====&gt;网络&lt;/=====&gt;<br/>
+&lt;===&gt;方法列表&lt;/===&gt;
+&lt;code dao&gt;
+network.FD_CLR( fd : int, set :fd_set )
+network.FD_ISSET( fd : int, set :fd_set )
+network.FD_SET( fd : int, set :fd_set )
+network.FD_ZERO( set :fd_set )
+network.accept( socket : int )=&gt;int
+network.bind( port : int )=&gt;int
+network.close( socket : int )
+network.connect( host : string, port : int )=&gt;int
+network.gethost( host : string )=&gt;map&lt;string,string&gt;
+network.getpeername( socket : int )=&gt;string
+network.listen( socket : int, backlog =10 )=&gt;int
+network.receive( socket : int, maxlen =1000 )=&gt;string
+network.receive_dao( socket : int )=&gt;list&lt;any&gt;
+network.select( nfd : int, setr :fd_set, setr :fd_set, setr :fd_set, tv : float )=&gt;int
+network.send( socket : int, data : string )=&gt;int
+network.send_dao( socket : int, ... )=&gt;int
+&lt;/code&gt;<br/>
+&lt;===&gt;网络文件描述集处理&lt;/===&gt;
+网络文件描述集可由fd_set()创建。
+&lt;code dao&gt;
+network.FD_CLR( fd : int, set :fd_set )
+&lt;/code&gt;
+从集set中删除fd。<br/>
+&lt;code dao&gt;
+network.FD_ISSET( fd : int, set :fd_set )
+&lt;/code&gt;
+检查fd是否在集set中。<br/>
+&lt;code dao&gt;
+network.FD_SET( fd : int, set :fd_set )
+&lt;/code&gt;
+将fd添加到集set里。<br/>
+&lt;code dao&gt;
+network.FD_ZERO( set :fd_set )
+&lt;/code&gt;
+清空集。<br/>
+&lt;===&gt;方法细节&lt;/===&gt;
+&lt;code dao&gt;
+network.accept( socket : int )=&gt;int
+&lt;/code&gt;
+接受一个来自套接字socket的连接。<br/>
+&lt;code dao&gt;
+network.bind( port : int )=&gt;int
+&lt;/code&gt;
+绑定到端口。<br/>
+&lt;code dao&gt;
+netork.close( socket : int )
+&lt;/code&gt;
+关闭套接字。<br/>
+&lt;code dao&gt;
+netork.connect( host : string, port : int )=&gt;int
+&lt;/code&gt;
+Connect to &lt;%&gt;host&lt;/%&gt; through &lt;%&gt;port&lt;/%&gt;.
+连接到主机host的port端口，如果成功返回连接套接字，否则返回－1。<br/>
+&lt;code dao&gt;
+network.gethost( host : string )=&gt;map&lt;string,string&gt;
+&lt;/code&gt;
+Get host information (names and addresses).
+返回主机信息。<br/>
+&lt;code dao&gt;
+network.getpeername( socket : int )=&gt;string
+&lt;/code&gt;
+返回套接字socket连接者信息。<br/>
+&lt;code dao&gt;
+netork.listen( socket : int, backlog =10 )=&gt;int
+&lt;/code&gt;
+接听套接字。<br/>
+&lt;code dao&gt;
+network.receive( socket : int, maxlen =1000 )=&gt;string
+&lt;/code&gt;
+从套接字socket接收最多maxlen字节的未加工数据。<br/>
+&lt;code dao&gt;
+network.receive_dao( socket : int )=&gt;list&lt;any&gt;
+&lt;/code&gt;
+从套接字socket接收道类型数据。返回的列表可包含整数，浮点数，字符串
+和数值数组等。
+此函数必须与network.send_dao()配套使用。<br/>
+&lt;code dao&gt;
+network.select( nfd : int, setr :fd_set, setw :fd_set, sete :fd_set, tv : float )=&gt;int
+&lt;/code&gt;<br/>
+从glibc引用的文档（待翻译）：
+&lt;cite&gt;
+The select function blocks the calling process until there is activity on any of the specified sets of file descriptors, or until the timeout period has expired.<br/><br/>
+The file descriptors specified by the read-fds argument are checked to see if they are ready for reading; the write-fds file descriptors are checked to see if they are ready for writing; and the except-fds file descriptors are checked for exceptional conditions. You can pass a null pointer for any of these arguments if you are not interested in checking for that kind of condition.<br/><br/>
+A file descriptor is considered ready for reading if it is not at end of file. A server socket is considered ready for reading if there is a pending connection which can be accepted with accept; see section Accepting Connections. A client socket is ready for writing when its connection is fully established; see section Making a Connection.
+&lt;/cite&gt;<br/>
+&lt;code dao&gt;
+network.send( socket : int, data : string )=&gt;int
+&lt;/code&gt;
+发送字符串表示的未加工数据。<br/>
+&lt;code dao&gt;
+network.send_dao( socket : int, ... )=&gt;int
+&lt;/code&gt;
+发送道数据，附加了数据类型，长度等信息，以便接收端重构数据类型。<br/>
+&lt;=====&gt;消息传递接口&lt;/=====&gt;<br/>
+&lt;===&gt;方法列表&lt;/===&gt;
+&lt;code dao&gt;
+mpi.receive( timeout=-1.0 )=&gt;list&lt;any&gt;
+mpi.receive( pid : string, timeout=-1.0 )=&gt;list&lt;any&gt;
+mpi.send( object, ... )
+mpi.spawn( pid : string, proc : string, timeout=-1.0, ... )
+&lt;/code&gt;<br/>
+&lt;===&gt;方法细节&lt;/===&gt;
+&lt;code dao&gt;
+mpi.receive( timeout=-1.0 )=&gt;list&lt;any&gt;
+&lt;/code&gt;
+Receive message with timeout. No possitive timeout means infinite waiting.
+Return a list of received data.
+限时接收消息。负数表示永远等待。以列表返回接收的数据。<br/>
+&lt;code dao&gt;
+mpi.receive( pid : string, timeout=-1.0 )=&gt;&lt;any&gt;
+&lt;/code&gt;
+Receive message from process &lt;%&gt;pid&lt;/%&gt; with timeout.
+从特定的虚拟进程限时接收消息。<br/>
+&lt;code dao&gt;
+mpi.send( object, ... )
+&lt;/code&gt;
+如果object是一虚拟进程，把其余的参数作为消息发送给它；
+如果object是一个可调用对象，以其余参数作为object的参数异步调用object。<br/>
+&lt;code dao&gt;
+mpi.spawn( pid : string, proc : string, timeout=-1.0, ... )
+&lt;/code&gt;
+产生一个虚拟进程，或系统进程。
+如果没有在给定的时间内成功产生进程，此函数抛出异常。
+如果是在同一个系统进程里产生虚拟进程，此函数还将返回一个虚拟进程对象。
+pid和proc必须遵循以下规则;
+&lt;table&gt;
+^pid ^proc ^其他参数 ^含义
+|""|函数名|函数参数|创建本系统进程里的一个无名虚拟进程的对象|
+|"vm_proc"|同上|同上|创建本系统进程里的一个名为"vm_proc"的虚拟进程的对象，可以被不同计算机上的不同进程访问|
+|"@os_proc"|Dao程序文件名|除timeout外无其他参数|创建本机有名系统进程，全局可用|
+|"vm_proc@os_proc"|同"vm_proc"|同"vm_proc"|在系统进程"os_proc"里创建名为"vm_proc"的虚拟进程，全局可用|
+|"@os_proc@@host"|同"@os_proc"|同"os_proc"|在主机"host"上创建名为"os_proc"的系统进程，全局可用|
+|"vm_proc@os_proc @@host"|同"vm_proc"|同"vm_proc"|在主机"host"上的系统进程里创建名为"vm_proc"的虚拟进程，全局可用|
+&lt;/table&gt;<br clear=all />
+</div></body></html>

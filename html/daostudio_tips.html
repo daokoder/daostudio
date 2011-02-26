@@ -1,0 +1,213 @@
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<html><body><div class="body">
+
+<h2>Some tips of using Dao Studio</h2><table class="topsection"><tr><td><a name="1"><H3>1  Vertical arranging of the code editor, script console and data browser</H3>
+</td><td align="right"><a href="&section=1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+The code editor, script console and data browser are splitted
+vertically in the same window. Mouse click on any of them will
+maximize the clicked widget and minimize the others.
+If the user wants to disable this feature,
+the manual splitting button (with up and down arrows near to a hand) 
+in the tool bar must be pressed down.<br/>
+<table class="topsection"><tr><td><a name="2"><H3>2  Automatic word completion in code editor or console:</H3>
+</td><td align="right"><a href="&section=2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Inside the code editor or console, whenever the user types
+an identifier, the software will propose upto 3 words that
+matching the typed letters. Then the user can type
+CTRL + J, K, L, to complete the unfinished identifier with the first,
+second and third proposed word respectively.
+Typing the tabular key will complete with the first propsed word.<br/><br/>
+Currently words corresponding to names of classes, functions, 
+global constants and variables can be completed in this way.<br/><br/>
+<table class="topsection"><tr><td><a name="3"><H3>3  Browsing command history in console</H3>
+</td><td align="right"><a href="&section=3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+The previously input scripts in the console can be browsed and retrived
+by using up and down keys.<br/>
+<table class="topsection"><tr><td><a name="4"><H3>4  Multiple line commands in console</H3>
+</td><td align="right"><a href="&section=4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+In the console, when the return key is pressed, normally, 
+the scripts in the command line will be sent to the console to execute.
+However, if there is an unclosed (not paired) left braces, 
+brackets or squared brackets, the input will be expanded to an extra line
+to allow typing unfinished scripts.<br/><br/>
+So the simplest way to type multiple lines of scripts in the console is to
+type a left brace first, and type a block of scripts, 
+then type a right brace before entring the scripts.<br/>
+<table class="topsection"><tr><td><a name="5"><H3>5  Other usage of the console</H3>
+</td><td align="right"><a href="&section=5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<ul>
+<li> Print the value of an expression: <span class=text_italic> (dao) = expression</span></li>
+
+<li> Execute a Dao script: <span class=text_italic> (dao) \script_file_name.dao </span></li>
+
+<li> Execute a shell command: <span class=text_italic> (dao) \command </span></li>
+
+</ul>
+ <br/>
+<table class="topsection"><tr><td><a name="6"><H3>6  Set and unset break points for debugging</H3>
+</td><td align="right"><a href="&section=6"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Right click on a line number will popup a menu to set or unset a break point.
+Break points set on lines without codes will be ignored.
+The program will enter debugging mode after execution the line with break point.
+Resuming of the program will start with the next line.<br/>
+<table class="topsection"><tr><td><a name="7"><H3>7  Reset execution point during debugging</H3>
+</td><td align="right"><a href="&section=7"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+During debugging, right click on a line number inside the 
+current function being executed will popup a menu with extra option
+to set the execution point at the current line.
+When the execution of the program is resumed, the execution will start
+from the new execution point.<br/>
+<table class="topsection"><tr><td><a name="8"><H3>8  Edit and continue during debugging</H3>
+</td><td align="right"><a href="&section=8"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Edit&Continue is an advanced feature of Dao Studio,
+which allows the user to modify the sources and then execute it
+without restart the program from the beginning.<br/><br/>
+When a program is run inside Dao Studio in debugging mode,
+the source codes can be modified during the pause by a break point.
+Such modification is limited inside the current function
+where the program is paused.<br/><br/>
+After modification, if the execution point is after the modification positions,
+the execution point will be automatically set to the first modified line.
+The execution point can also be set manually by right click the mouse on
+a line number.<br/><br/>
+When the user click the debugging button to resume the program,
+the modified function will be re-compiled, and the execution
+will be started from the new execution point.
+Some of the values of local variables will be reused whenever possible.<br/><br/>
+<table class="topsection"><tr><td><a name="9"><H3>9  Data browsing and modification</H3>
+</td><td align="right"><a href="&section=9"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+The main entry to data browsing is listed as "Data List"
+inside the left panel. Normally only the namespace of the script console
+is listed there, but during program debugging, the executing virtual
+process will also be listed there.<br/><br/>
+If the user clicks on the namespace or process entry, 
+the data object of the clicked entity will be displayed in the data browser,
+the basic information and value of the data object is display in the left side.
+If the data object is of a basic data type, its value can be modified there.
+And if it is an aggregated type such as list, map, function or class instance etc.,
+its components will be displayed as tables in the right side.<br/><br/>
+Then the user can click on one of the data components,
+the clicked one will be added onto the "Data List" in the left panel.
+The "Data List" is actually organized as a stack:
+click on a data component from the data browser will push the data component
+onto the stack;
+and click on one item inside the stack will erase all the items above it.<br clear=all />
+</div></body></html>

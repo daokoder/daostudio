@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DaoMonitor</class>
+ <widget class="QMainWindow" name="DaoMonitor">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>902</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>Bitstream Vera Sans</family>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Dao Program Monitor</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../daostudio.qrc">
+    <normaloff>:/images/daostudio2.png</normaloff>:/images/daostudio2.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QToolBox" name="toolBox">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>200</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>200</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="sizeIncrement">
+       <size>
+        <width>1</width>
+        <height>1</height>
+       </size>
+      </property>
+      <property name="baseSize">
+       <size>
+        <width>100</width>
+        <height>100</height>
+       </size>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Plain</enum>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="pageDataList">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>196</width>
+         <height>450</height>
+        </rect>
+       </property>
+       <attribute name="icon">
+        <iconset resource="../daostudio.qrc">
+         <normaloff>:/images/dao.png</normaloff>:/images/dao.png</iconset>
+       </attribute>
+       <attribute name="label">
+        <string>Data List</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_6">
+        <item>
+         <widget class="QListWidget" name="wgtDataList"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="pageClassList">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>104</width>
+         <height>104</height>
+        </rect>
+       </property>
+       <attribute name="icon">
+        <iconset resource="../daostudio.qrc">
+         <normaloff>:/images/daofile.png</normaloff>:/images/daofile.png</iconset>
+       </attribute>
+       <attribute name="label">
+        <string>Class List</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QListWidget" name="wgtClassList"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="pageFunctionList">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>104</width>
+         <height>104</height>
+        </rect>
+       </property>
+       <attribute name="icon">
+        <iconset resource="../daostudio.qrc">
+         <normaloff>:/images/book.png</normaloff>:/images/book.png</iconset>
+       </attribute>
+       <attribute name="label">
+        <string>Function List</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QListWidget" name="wgtFunctionList"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QSplitter" name="splitter">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionOpen">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="toolTip">
+    <string>Undo/Backward</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="toolTip">
+    <string>Redo/Forward</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="icon">
+    <iconset resource="../daostudio.qrc">
+     <normaloff>:/images/copy.png</normaloff>:/images/copy.png</iconset>
+   </property>
+   <property name="text">
+    <string>Copy</string>
+   </property>
+  </action>
+  <action name="actionCut">
+   <property name="icon">
+    <iconset resource="../daostudio.qrc">
+     <normaloff>:/images/cut.png</normaloff>:/images/cut.png</iconset>
+   </property>
+   <property name="text">
+    <string>Cut</string>
+   </property>
+  </action>
+  <action name="actionPaste">
+   <property name="icon">
+    <iconset resource="../daostudio.qrc">
+     <normaloff>:/images/paste.png</normaloff>:/images/paste.png</iconset>
+   </property>
+   <property name="text">
+    <string>Paste</string>
+   </property>
+  </action>
+  <action name="actionFind">
+   <property name="icon">
+    <iconset resource="../daostudio.qrc">
+     <normaloff>:/images/find.png</normaloff>:/images/find.png</iconset>
+   </property>
+   <property name="text">
+    <string>Find</string>
+   </property>
+  </action>
+  <action name="actionReplace">
+   <property name="icon">
+    <iconset resource="../daostudio.qrc">
+     <normaloff>:/images/replace.png</normaloff>:/images/replace.png</iconset>
+   </property>
+   <property name="text">
+    <string>Replace</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About DaoStudio</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>New</string>
+   </property>
+  </action>
+  <action name="actionStart">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../daostudio.qrc">
+     <normaloff>:/images/start.png</normaloff>:/images/start.png</iconset>
+   </property>
+   <property name="text">
+    <string>Start</string>
+   </property>
+  </action>
+  <action name="actionStop">
+   <property name="icon">
+    <iconset resource="../daostudio.qrc">
+     <normaloff>:/images/stop.png</normaloff>:/images/stop.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stop</string>
+   </property>
+  </action>
+  <action name="actionSave_as">
+   <property name="text">
+    <string>Save as</string>
+   </property>
+  </action>
+  <action name="actionMSplit">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../daostudio.qrc">
+     <normaloff>:/images/msplit2.png</normaloff>:/images/msplit2.png</iconset>
+   </property>
+   <property name="text">
+    <string>Manual Split</string>
+   </property>
+   <property name="toolTip">
+    <string>Manual Split code editor, console and data widget</string>
+   </property>
+  </action>
+  <action name="actionState">
+   <property name="icon">
+    <iconset resource="../daostudio.qrc">
+     <normaloff>:/images/greenball.png</normaloff>:/images/greenball.png</iconset>
+   </property>
+   <property name="text">
+    <string>State</string>
+   </property>
+  </action>
+  <action name="actionDebug">
+   <property name="icon">
+    <iconset resource="../daostudio.qrc">
+     <normaloff>:/images/debug.png</normaloff>:/images/debug.png</iconset>
+   </property>
+   <property name="text">
+    <string>Start/Resume Debugging</string>
+   </property>
+   <property name="toolTip">
+    <string>Start/Resume Debugging</string>
+   </property>
+  </action>
+  <action name="actionTips">
+   <property name="text">
+    <string>Usage Tips</string>
+   </property>
+  </action>
+  <action name="actionDocs">
+   <property name="text">
+    <string>Documentations</string>
+   </property>
+  </action>
+  <action name="actionPrint">
+   <property name="text">
+    <string>Print</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../daostudio.qrc"/>
+ </resources>
+ <connections/>
+</ui>

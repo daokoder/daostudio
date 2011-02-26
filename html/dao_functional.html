@@ -1,0 +1,371 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+
+<h2>Dao built-in methods for functional-style programming</h2>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#1">General&nbsp;Syntax</a></li>
+<li style="margin-top: 5px"><a href="#2">map,&nbsp;reduce/fold,&nbsp;unfold</a></li>
+<li style="margin-top: 5px"><a href="#3">select,&nbsp;index,&nbsp;count</a></li>
+<li style="margin-top: 5px"><a href="#4">each,&nbsp;repeat</a></li>
+<li style="margin-top: 5px"><a href="#5">string,&nbsp;array,&nbsp;list</a></li>
+<li style="margin-top: 5px"><a href="#6">sort,&nbsp;apply</a></li>
+</ol></td></tr></table> <br/>
+(For version 1.1)<br/>
+<table class="topsection"><tr><td><a name="1"><H3>1  General Syntax</H3>
+</td><td align="right"><a href="&section=1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+The general syntax for such built-in methods is the following,
+<div class="hlcode">
+<span class=Number>RESULT</span>&thinsp; =&thinsp; <span class=Number>METHOD</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>PARAMETER</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; |<span class=Number>VARIABLE</span>|&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>EXPRESSION</span>&thinsp; <span class=SpecSymbol>}</span></div>
+ 
+where METHOD can be any of,
+<ol>
+<li> map</li>
+
+<li> reduce/fold</li>
+
+<li> unfold</li>
+
+<li> select</li>
+
+<li> index</li>
+
+<li> count</li>
+
+<li> each</li>
+
+<li> repeat</li>
+
+</ol>
+ 
+It can also be <span class=text_bold> string</span> , <span class=text_bold> array</span>  or <span class=text_bold> list</span>  for data construction
+with such syntax. Another two methods adopted such syntax are <span class=text_bold> sort</span>  and <span class=text_bold> apply</span> .<br/><br/>
+Depends on the METHOD, the PARAMETER can be one or more list, array, or any other types.
+Optional VARIABLE can be declared according to the METHOD and PARAMETER,
+if <span class=text_bold> |VARIABLE|</span>  is not present, <span class=text_bold> x,y,z</span>  and/or <span class=text_bold> i,j</span>  will be
+declared automatically when necessary.<br/><br/>
+The EXPRESSION placed inside the braces is the (inlined) function to be applied to 
+the PARAMETER or the items of PARAMETER if it is a list or array,
+which is passed to the EXPRESSION through parameter(s) declared in VARIABLE
+or declared automatically.<br/><br/>
+A simple example,
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>}</span><br/>b&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>10</span>*x&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># produce { 10, 20, 30 }</span></div>
+ 
+which is equivalent to,
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>}</span><br/>b&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; |x|&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>10</span>*x&thinsp; <span class=SpecSymbol>}</span></div>
+ <br/><br/>
+When multiple lists/arrays are used as parameters,
+the variables can be declared accordingly as the items of the lists/arrays,
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>}</span><br/>b&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>11</span>,&thinsp; <span class=Number>22</span>,&thinsp; <span class=Number>33</span>&thinsp; <span class=SpecSymbol>}</span><br/>c&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; |x,y|&thinsp; <span class=SpecSymbol>{</span>&thinsp; x&thinsp; +&thinsp; y&thinsp; <span class=SpecSymbol>}</span></div>
+ 
+in this example, 
+<span class=text_italic> x</span>  is declared as the item of <span class=text_italic> a</span> 
+and
+<span class=text_italic> y</span>  as the item of <span class=text_italic> b</span> .
+Here <span class=text_italic> |x,y|</span>  can be omitted.<br/><br/>
+Multiple expressions can also be used and must be separated by commas,
+and the result of the expressions will be a tuple,
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>}</span><br/>b&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>10</span>*x,&thinsp; x+<span class=Number>10</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># produce { (10, 11), (20, 12), (30, 13) }</span></div>
+ <br/><br/>
+To use statements inside the braces, it is necessary to place a 
+<span class=text_bold> return</span>  keyword before EXPRESSION as the following,
+<div class="hlcode">
+<span class=SpecSymbol>...</span>&thinsp; ->&thinsp; |<span class=Number>VARIABLE</span>|&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>BLOCK</span>&thinsp; <span class=StmtKey>return</span>&thinsp; <span class=Number>EXPRESSION</span>&thinsp; <span class=SpecSymbol>}</span></div>
+ 
+for example,
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>}</span><br/>b&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; |x|&thinsp; <span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; u&thinsp; =&thinsp; <span class=Number>10</span>*x;<br/>&thinsp; &thinsp; v&thinsp; =&thinsp; x+<span class=Number>10</span>;<br/>&thinsp; &thinsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; u&thinsp; &lt;&thinsp; v&thinsp; <span class=SpecSymbol>)</span>&thinsp; u&thinsp; +=&thinsp; v;<br/>&thinsp; &thinsp; <span class=StmtKey>return</span>&thinsp; u*v<br/><span class=SpecSymbol>}</span></div>
+ 
+No other <span class=text_bold> return</span>  keyword can be used.<br/><br/>
+Function composition can be done by appending more <span class=text_bold> -&gt;|...|{...}</span> 
+structures one after another,
+<div class="hlcode">
+<span class=Number>RESULT</span>&thinsp; =&thinsp; <span class=Number>METHOD</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>PARAMETER</span>&thinsp; <span class=SpecSymbol>)</span><br/>&thinsp; &thinsp; ->&thinsp; |<span class=Number>VARIABLE</span>|&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>EXPRESSION</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <br/>&thinsp; &thinsp; ->&thinsp; |<span class=Number>VARIABLE</span>|&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>EXPRESSION</span>&thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; <span class=SpecSymbol>...</span></div>
+ 
+For the VARIABLE in the <span class=text_bold> -&gt;|...|{...}</span>  structures after the first,
+variables can be declared according to the EXPRESSION in the previous 
+stucture. For example,
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>}</span><br/>b&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>11</span>,&thinsp; <span class=Number>22</span>,&thinsp; <span class=Number>33</span>&thinsp; <span class=SpecSymbol>}</span><br/>c&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; |x,y|&thinsp; <span class=SpecSymbol>{</span>&thinsp; x&thinsp; +&thinsp; y,&thinsp; x&thinsp; -&thinsp; y&thinsp; <span class=SpecSymbol>}</span>&thinsp; ->&thinsp; |u,v|&thinsp; <span class=SpecSymbol>{</span>&thinsp; u&thinsp; *&thinsp; v&thinsp; <span class=SpecSymbol>}</span></div>
+ 
+Here, 
+<span class=text_italic> u</span>  is declared as the result of <span class=text_italic> x+y</span> 
+and
+<span class=text_italic> v</span>  as the result of <span class=text_italic> x-y</span> .<br/>
+<table class="topsection"><tr><td><a name="2"><H3>2  map, reduce/fold, unfold</H3>
+</td><td align="right"><a href="&section=2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#2.1">map()</a></li>
+<li style="margin-top: 5px"><a href="#2.2">reduce/fold()</a></li>
+<li style="margin-top: 5px"><a href="#2.3">unfold()</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="2.1"><H4>2.1  map()</H4>
+</td><td align="right"><a href="&section=2.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+map() take one or more lists/arrays as parameter(s),
+and apply a (inlined) function to each of the items of the lists/arrays,
+then return the results of the function applications as a list/array.
+When more than one list/array are used as parameters,
+they should have the same size.<br/><br/>
+As mentioned, map() can also take array(s) as parameters, 
+and return an array as result.
+If a simple scalar type is returned as result in the (last) braces,
+an array of the same shape as the (first) parameter array.
+If a tupe, list, or array etc. is returned as result,
+the final resulting array has additional dimensions over
+the (first) parameter array, such that, the result of each
+function application is used to set the value of the corresponding slice
+of the final array.<br/><br/>
+Some examples on list have been given in the previous section,
+here some examples on array will be shown,
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>;&thinsp; <span class=Number>3</span>,&thinsp; <span class=Number>4</span>&thinsp; <span class=SpecSymbol>]</span><br/>b&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>10</span>*x&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># produce [ 10, 20; 30, 40 ]</span></div>
+ 
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>;&thinsp; <span class=Number>3</span>,&thinsp; <span class=Number>4</span>&thinsp; <span class=SpecSymbol>]</span><br/>b&thinsp; =&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>5</span>,&thinsp; <span class=Number>6</span>;&thinsp; <span class=Number>7</span>,&thinsp; <span class=Number>8</span>&thinsp; <span class=SpecSymbol>]</span><br/>c&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; x,&thinsp; y&thinsp; <span class=SpecSymbol>}</span><br/><span class=Comment># or
+<br /></span>c&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=SpecSymbol>[</span>x,&thinsp; y<span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>}</span><br/><span class=Comment># or
+<br /></span>c&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=SpecSymbol>{</span>x,&thinsp; y<span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>}</span><br/><span class=Comment># produce 3d array: [ [ [1, 5], [2, 6] ], [ [3, 7], [4, 8] ] ]</span></div>
+ <br/><br/>
+The zip() function which is often seen in some other languages is
+not supported in Dao, because it can easily achieved by map(),
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>}</span><br/>b&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>11</span>,&thinsp; <span class=Number>22</span>,&thinsp; <span class=Number>33</span>&thinsp; <span class=SpecSymbol>}</span><br/>c&thinsp; =&thinsp; <span class=DataType>map</span><span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; x,&thinsp; y&thinsp; <span class=SpecSymbol>}</span></div>
+ 
+which will return a list of tuples "zipping" the two list.
+Clearly it can also be used to zip multiple lists.<br/>
+<table><tr><td><a name="2.2"><H4>2.2  reduce/fold()</H4>
+</td><td align="right"><a href="&section=2.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+fold() with its alias reduce(), takes a list/array and an initial
+value (the accumulator) as parameter, and apply the (inlined) function 
+to each item of the list/array and the accumulator,
+and then the value of the accumulator after the last function application
+is returned. If the second parameter is omitted, 
+the first item of the list is used as the initial value,
+and the function is applied to the rest of items.<br/><br/>
+By default, the item of the list/array is passed as parameter/varaible <span class=text_bold> x</span> 
+and the initial value (accumulator) as <span class=text_bold> y</span> , to the function application.
+Other parameter/variable names can also be used explicitly as described before.<br/>
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>}</span><br/>b&thinsp; =&thinsp; fold<span class=SpecSymbol>(</span>&thinsp; a,&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; x&thinsp; +&thinsp; y&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># produce 16
+<br /></span>b&thinsp; =&thinsp; fold<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; x&thinsp; +&thinsp; y&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># produce 6</span></div>
+ <br/>
+<table><tr><td><a name="2.3"><H4>2.3  unfold()</H4>
+</td><td align="right"><a href="&section=2.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+unfold() takes an initial value as parameter,
+and generates a list from this initial value,
+by applying the function to the initial value and then to
+the result of the previous function application
+until a condition become false,
+<div class="hlcode">
+a&thinsp; =&thinsp; unfold<span class=SpecSymbol>(</span>&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; |x|&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=StmtKey>while</span>&thinsp; x&thinsp; &gt;&thinsp; <span class=Number>0</span>&thinsp; <span class=StmtKey>return</span>&thinsp; x&thinsp; -&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>}</span><br/><span class=Comment># produce: { 4, 3, 2, 1, 0 }</span></div>
+ 
+where the condition expression must be placed after the <span class=text_bold> while</span>  keyword,
+and the <span class=text_bold> return</span>  keyword must also be used after the condition
+expression and before the expression(s) to generate results.<br/><br/>
+Statements can also be used before the <span class=text_bold> while</span>  keyword.
+<div class="hlcode">
+a&thinsp; =&thinsp; unfold<span class=SpecSymbol>(</span>&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; |x|&thinsp; <span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; <span class=Method>stdio.println</span><span class=SpecSymbol>(</span>x<span class=SpecSymbol>)</span><br/>&thinsp; &thinsp; <span class=StmtKey>while</span>&thinsp; x&thinsp; &gt;&thinsp; <span class=Number>0</span>&thinsp; <span class=StmtKey>return</span>&thinsp; x&thinsp; -&thinsp; <span class=Number>1</span><br/><span class=SpecSymbol>}</span></div>
+ <br/>
+<table class="topsection"><tr><td><a name="3"><H3>3  select, index, count</H3>
+</td><td align="right"><a href="&section=3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<span class=text_bold> select, index, count</span>  are the methods
+test a condition as function application over the items of 
+the parameter lists/arrays, and select, or index, or count
+the items that makes the condition true.<br/>
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>10</span>,&thinsp; <span class=Number>20</span>,&thinsp; <span class=Number>30</span>&thinsp; <span class=SpecSymbol>}</span><br/>b&thinsp; =&thinsp; select<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; x&thinsp; &gt;=&thinsp; <span class=Number>20</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># produce: { 20, 30 }
+<br /></span>c&thinsp; =&thinsp; index<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; x&thinsp; &gt;=&thinsp; <span class=Number>20</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># produce: { 1, 2 }
+<br /></span>d&thinsp; =&thinsp; count<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; x&thinsp; &gt;=&thinsp; <span class=Number>20</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># produce: 2</span></div>
+ <br/>
+These methods can also be applied to multiple lists,
+or to array(s),
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>10</span>,&thinsp; <span class=Number>20</span>,&thinsp; <span class=Number>30</span>&thinsp; <span class=SpecSymbol>}</span><br/>b&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=String>'a'</span>,&thinsp; <span class=String>'b'</span>,&thinsp; <span class=String>'c'</span>&thinsp; <span class=SpecSymbol>}</span><br/>c&thinsp; =&thinsp; select<span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <br/><span class=Comment># effectively as zip, produce: { ( 10, a ), ( 20, b ), ( 30, c ) }</span></div>
+ <br/>
+<table class="topsection"><tr><td><a name="4"><H3>4  each, repeat</H3>
+</td><td align="right"><a href="&section=4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<span class=text_bold> each()</span>  is the same as <span class=text_bold> map()</span>  except that
+no result is returned.<br/><br/>
+<span class=text_bold> repeat</span>  takes an integer number as parameter,
+and evaluate the BLOCK/EXPRESSION that number of times.<br/>
+<table class="topsection"><tr><td><a name="5"><H3>5  string, array, list</H3>
+</td><td align="right"><a href="&section=5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Based on the same idea as the above functional methods,
+<span class=text_bold> string, array, list</span>  are provided as convenient
+way to contruct complex string, array, list with simple
+and flexible codes.<br/><br/>
+These methods take a number as parameter, and evaluate
+the (inlined) function this number of times, and return
+the results as concatenated string, list or array.
+By default, the index of the function evaluation
+is passed as <span class=text_bold> i</span>  to the function.
+Of course the variable for index can also be declared explicitly.<br/>
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=DataType>string</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=SpecSymbol>(</span><span class=DataType>string</span><span class=SpecSymbol>)</span>i&thinsp; +&thinsp; <span class=String>'a'</span>&thinsp; <span class=SpecSymbol>}</span><br/><span class=Comment># produce: 0a1a2a3a4a
+<br /></span><br/>b&thinsp; =&thinsp; <span class=DataType>list</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=SpecSymbol>(</span><span class=DataType>string</span><span class=SpecSymbol>)</span>i&thinsp; +&thinsp; <span class=String>'a'</span>&thinsp; <span class=SpecSymbol>}</span><br/><span class=Comment># produce: { 0a, 1a, 2a, 3a, 4a }
+<br /></span><br/>c&thinsp; =&thinsp; <span class=DataType>array</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; |x|&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>10</span>&thinsp; *&thinsp; x&thinsp; <span class=SpecSymbol>}</span><br/><span class=Comment># produce: [ 0, 10, 20, 30, 40 ]</span></div>
+ <br/>
+Slightly more complex examples:
+<div class="hlcode">
+d&thinsp; =&thinsp; <span class=DataType>list</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>&thinsp; :&thinsp; <span class=SpecSymbol>(</span>i+<span class=Number>2</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>}</span><br/><span class=Comment># produce: { { 1, 2 }, { 1, 2, 3 }, { 1, 2, 3, 4 } }
+<br /></span><br/>e&thinsp; =&thinsp; <span class=DataType>array</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>10</span>*i+<span class=Number>1</span>,&thinsp; i+<span class=Number>2</span>&thinsp; <span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>}</span><br/><span class=Comment># produce matrix: [ [1, 2], [11, 2], [21, 3] ]</span></div>
+ <br/>
+<table class="topsection"><tr><td><a name="6"><H3>6  sort, apply</H3>
+</td><td align="right"><a href="&section=6"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#6.1">sort()</a></li>
+<li style="margin-top: 5px"><a href="#6.2">apply()</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="6.1"><H4>6.1  sort()</H4>
+</td><td align="right"><a href="&section=6.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+sort() sorts a list according to a comparison function, 
+it takes a list as the first parameter and optionally a number
+as the second parameter. If the second parameter is presented, the list
+will be partially sorted such that only the first some number of items
+will be properly sorted, which can be used to search for the largest/smallest
+<span class=text_italic> K</span>  items among a list.<br/><br/>
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>3</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>15</span>,&thinsp; <span class=Number>8</span>,&thinsp; <span class=Number>25</span>,&thinsp; <span class=Number>16</span>,&thinsp; <span class=Number>3</span>,&thinsp; <span class=Number>7</span>,&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>12</span>,&thinsp; <span class=Number>17</span>,&thinsp; <span class=Number>11</span>,&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>}</span>;<br/>sort<span class=SpecSymbol>(</span>&thinsp; a,&thinsp; <span class=Number>6</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; x&thinsp; &lt;&thinsp; y&thinsp; <span class=SpecSymbol>}</span></div>
+ 
+where <span class=text_italic> x,y</span>  are declared as the variables representing
+the two items to be compared during sorting.
+These variables can be declared explicitly as well.<br/>
+<table><tr><td><a name="6.2"><H4>6.2  apply()</H4>
+</td><td align="right"><a href="&section=6.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+apply() evaluates a function for each element of an array,
+and replace the value of the element by the result of the evaluation.
+By default the variable representing the element value
+is declared automatically as <span class=text_italic> x</span> , and the indices
+as variables <span class=text_italic> i,j</span> . The can also be declared explicitly as well.
+For arrays with dimension higher than 2, one must declare
+variables explicitly to get all components of the multi-dimensional
+index passed in.<br/>
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>10</span>,&thinsp; <span class=Number>20</span>,&thinsp; <span class=Number>30</span>&thinsp; <span class=SpecSymbol>]</span><br/>apply<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; <span class=SpecSymbol>{</span>&thinsp; x&thinsp; +&thinsp; i&thinsp; <span class=SpecSymbol>}</span><br/><span class=Comment># a becomes: [ 10, 21, 32 ]
+<br /></span><br/>b&thinsp; =&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>;&thinsp; <span class=Number>3</span>,&thinsp; <span class=Number>4</span>&thinsp; <span class=SpecSymbol>]</span>&thinsp; :&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>]</span>;<br/>apply<span class=SpecSymbol>(</span>&thinsp; b&thinsp; <span class=SpecSymbol>)</span>&thinsp; ->&thinsp; |x,i,j,k|&thinsp; <span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; <span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; x,&thinsp; i,&thinsp; j,&thinsp; k&thinsp; <span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; <span class=StmtKey>return</span>&thinsp; x&thinsp; +&thinsp; i*j*k;<br/><span class=SpecSymbol>}</span></div>
+<br clear=all />
+</div></body></html>

@@ -1,0 +1,27 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>images/dao.png</file>
+    <file>images/dao2.png</file>
+    <file>images/daostudio.png</file>
+    <file>images/daostudio2.png</file>
+    <file>images/daofile.png</file>
+    <file>images/daofile2.png</file>
+    <file>images/copy.png</file>
+    <file>images/cut.png</file>
+    <file>images/paste.png</file>
+    <file>images/find.png</file>
+    <file>images/replace.png</file>
+    <file>images/book.png</file>
+    <file>images/book2.png</file>
+    <file>images/plot.png</file>
+    <file>images/plot2.png</file>
+    <file>images/start.png</file>
+    <file>images/debug.png</file>
+    <file>images/stop.png</file>
+    <file>images/msplit.png</file>
+    <file>images/msplit2.png</file>
+    <file>images/redball.png</file>
+    <file>images/greenball.png</file>
+    <file>images/violaball.png</file>
+</qresource>
+</RCC>

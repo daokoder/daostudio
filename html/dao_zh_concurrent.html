@@ -1,0 +1,450 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+
+<h2>道语言的并行计算</h2>
+<div align=center><p><b>傅利民(phoolimin<img src="/images/at.png"/>gmail<img src="/images/dot.png"/>com)</b></p></div>
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#1">使用协程</a></li>
+<li style="margin-top: 5px"><a href="#2">使用系统线程</a></li>
+<li style="margin-top: 5px"><a href="#3">3.&nbsp;With&nbsp;Asynchronous&nbsp;Function&nbsp;Calls</a></li>
+<li style="margin-top: 5px"><a href="#4">4.&nbsp;With&nbsp;Message&nbsp;Passing&nbsp;Mechanism&nbsp;Based&nbsp;The&nbsp;Actor&nbsp;Model</a></li>
+</ol></td></tr></table> <br/>
+<table class="topsection"><tr><td><a name="1"><H3>1  使用协程</H3>
+</td><td align="right"><a href="&section=1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+道语言支持协程coroutine实现协作式多线程。
+道语言里一个协程对象实际上就是一个虚拟机进程，可被暂停或继续其运行状态。
+道语言有两种方式支持协程：
+第一种方式跟Lua里的协程很相似，使用coroutine库里的create(),yield(),resume()
+等方法来创建和使用协程；
+另一种方式是基于道语言对它的语法支持，这种方式用起来更方便，
+并且可以有效利用道语言的类型系统进行类型检查。<br/><br/>
+这里首先介绍Lua相似的协程使用方式
+（可参考<a href="http://www.lua.org/manual/5.1/manual.html#2.11">Lua文档</a> 以了解更多）。
+但这种方式跟Lua的并不完全一致，
+请参看<a href="/page/dao_zh_std_library">道语言的标准库文档</a> 
+以了解有关区别。<br/><br/>
+下面这个例子修改自Lua文档里的协程例子:
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; foo<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; &thinsp; <span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>"foo: "</span>,&thinsp; a&thinsp; <span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; &thinsp; &thinsp; <span class=StmtKey>return</span>&thinsp; <span class=Method>coroutine.yield</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>2</span>&thinsp; *&thinsp; a&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>routine</span>&thinsp; bar<span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; &thinsp; <span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>"co-body: "</span>,&thinsp; a,&thinsp; <span class=String>"\t"</span>,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; &thinsp; &thinsp; r&thinsp; =&thinsp; foo<span class=SpecSymbol>(</span>&thinsp; a&thinsp; +&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; &thinsp; &thinsp; <span class=SpecSymbol>(</span>&thinsp; r,&thinsp; s&thinsp; <span class=SpecSymbol>)</span>&thinsp; =&thinsp; <span class=Method>coroutine.yield</span><span class=SpecSymbol>(</span>&thinsp; a+b,&thinsp; a-b&thinsp; <span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; &thinsp; &thinsp; <span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>"co-body: "</span>,&thinsp; r,&thinsp; <span class=String>"\t"</span>,&thinsp; s&thinsp; <span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; &thinsp; &thinsp; <span class=StmtKey>return</span>&thinsp; b,&thinsp; <span class=String>"end"</span>;<br/><span class=SpecSymbol>}</span><br/><br/>co&thinsp; =&thinsp; <span class=Method>coroutine.create</span><span class=SpecSymbol>(</span>&thinsp; bar,&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>)</span><br/><br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>"main"</span>,&thinsp; <span class=Method>coroutine.resume</span><span class=SpecSymbol>(</span>&thinsp; co&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>"main"</span>,&thinsp; <span class=Method>coroutine.resume</span><span class=SpecSymbol>(</span>&thinsp; co,&thinsp; <span class=String>"r"</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>"main"</span>,&thinsp; <span class=Method>coroutine.resume</span><span class=SpecSymbol>(</span>&thinsp; co,&thinsp; <span class=String>"x"</span>,&thinsp; <span class=String>"y"</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Comment># 最后这个调用将导致异常,因为协程已运行到了末尾:
+<br /></span><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>"main"</span>,&thinsp; <span class=Method>coroutine.resume</span><span class=SpecSymbol>(</span>&thinsp; co,&thinsp; <span class=String>"x"</span>,&thinsp; <span class=String>"y"</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+这里create()函数创建一个协程对象，其第一个参数必须是一个函数或函数名。
+额外的参数将被传递给被创建的协程，如果参数类型不符合object的参数类型，
+将抛出一个异常。
+协程的初始状态是暂停，必须使用coroutine.resume()使它继续运行。
+额外的resume()参数将变成yield()的返回值。
+在协程运行时，可用yield()暂停当前协程的运行，将执行权返回给其调用者。
+yield()的参数将变成resume()的返回值。<br/><br/>
+使用协程的另一种方法是使用道语言对其的语法支持。
+当一个函数被调用时，如果它函数名前有<span class=text_bold> @</span> 符号，
+此调用将不执行该函数，而是返回一个发生器或协程。
+在这样的函数里，可使用<span class=text_bold> yield</span> 语句来
+暂停当前运行的协程并向其调用者返回值。
+当调用者再次重新执行此协程时，协程将从暂停处继续执行。
+<span class=text_bold> yield</span> 语句执行完后，它将会象函数调用一样返回值，
+被返回的值就是其调用者作为参数传入的值。
+当函数运行至函数末尾或<span class=text_bold> return</span> 语句后，
+函数将终止运行，并且不可续。<br/>
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; foo<span class=SpecSymbol>(</span>&thinsp; a&thinsp; =&thinsp; <span class=Number>0</span>,&thinsp; b&thinsp; =&thinsp; <span class=String>''</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>'foo:'</span>,&thinsp; a&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; yield<span class=SpecSymbol>(</span>&thinsp; <span class=Number>2</span>&thinsp; *&thinsp; a,&thinsp; <span class=String>'by foo()'</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>routine</span>&thinsp; bar<span class=SpecSymbol>(</span>&thinsp; a&thinsp; =&thinsp; <span class=Number>0</span>,&thinsp; b&thinsp; =&thinsp; <span class=String>''</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>'bar:'</span>,&thinsp; a,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>(</span>&thinsp; r,&thinsp; s&thinsp; <span class=SpecSymbol>)</span>&thinsp; =&thinsp; foo<span class=SpecSymbol>(</span>&thinsp; a&thinsp; +&thinsp; <span class=Number>1</span>,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>'bar:'</span>,&thinsp; r,&thinsp; s&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>(</span>&thinsp; r,&thinsp; s&thinsp; <span class=SpecSymbol>)</span>&thinsp; =&thinsp; yield<span class=SpecSymbol>(</span>&thinsp; a&thinsp; +&thinsp; <span class=Number>100</span>,&thinsp; b&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>'bar:'</span>,&thinsp; r,&thinsp; s&thinsp; <span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; a,&thinsp; <span class=String>'ended'</span>;<br/><span class=SpecSymbol>}</span><br/><br/>co&thinsp; =&thinsp; @bar<span class=SpecSymbol>(</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=String>"a"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; &thinsp; <br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>'main: '</span>,&thinsp; co<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>'main: '</span>,&thinsp; co<span class=SpecSymbol>(</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=String>'x'</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>'main: '</span>,&thinsp; co<span class=SpecSymbol>(</span>&thinsp; <span class=Number>2</span>,&thinsp; <span class=String>'y'</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Comment># 协程已运行完,再调用将产生异常:
+<br /></span><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>'main: '</span>,&thinsp; co<span class=SpecSymbol>(</span>&thinsp; <span class=Number>3</span>,&thinsp; <span class=String>'z'</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table class="topsection"><tr><td><a name="2"><H3>2  使用系统线程</H3>
+</td><td align="right"><a href="&section=2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#2.1">创建线程</a></li>
+<li style="margin-top: 5px"><a href="#2.2">异步处理</a></li>
+<li style="margin-top: 5px"><a href="#2.3">取消线程</a></li>
+<li style="margin-top: 5px"><a href="#2.4">线程专有数据</a></li>
+</ol></td></tr></table> <br/>
+道语言对多线程编程有内在的支持。
+道语言里对多线程的操作主要是通过mtlib，
+它可用来创建线程，互斥子，条件变量和信号标等，
+也可以通过它来进行其他线程操作。<br/>
+<table><tr><td><a name="2.1"><H4>2.1  创建线程</H4>
+</td><td align="right"><a href="&section=2.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+在道语言里创建线程是件极其简单的事，只要这样即可，
+<div class="hlcode">
+thread_id&thinsp; =&thinsp; mtlib.thread<span class=SpecSymbol>(</span>&thinsp; <span class=CodeStruct>function</span>&thinsp; /&thinsp; object.method,&thinsp; p1,&thinsp; p2,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/>thread_id&thinsp; =&thinsp; mtlib.thread<span class=SpecSymbol>(</span>&thinsp; function_curry&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+这里mtlib.thread()的第一个参数必须是一个函数或方法，
+其余的参数将被传递给其函数参数。
+如果function函数或object.method方法有重载的版本，
+mtlib.thread()将根据其额外参数的类型确定具体的哪个函数将被使用。<br/>
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; MyRout<span class=SpecSymbol>(</span>&thinsp; name&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; <span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>"string parameter = "</span>,&thinsp; name&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>}</span><br/><span class=CodeStruct>routine</span>&thinsp; MyRout<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; <span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>"int parameter = "</span>,&thinsp; index&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>class</span>&thinsp; MyType<br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; <span class=PermiPrefix>public</span><br/><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; show<span class=SpecSymbol>(</span>&thinsp; name&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>"show string: "</span>,&thinsp; name&thinsp; <span class=SpecSymbol>)</span>;&thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; &thinsp; <span class=CodeStruct>routine</span>&thinsp; show<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>"show number: "</span>,&thinsp; index&thinsp; <span class=SpecSymbol>)</span>;&thinsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/>t1&thinsp; =&thinsp; mtlib.thread<span class=SpecSymbol>(</span>&thinsp; MyRout,&thinsp; <span class=String>"DAO"</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Comment># or: t1 = mtlib.thread( MyRout{ "DAO" } )
+<br /></span>t2&thinsp; =&thinsp; mtlib.thread<span class=SpecSymbol>(</span>&thinsp; MyRout,&thinsp; <span class=Number>111</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Comment># or: t2 = mtlib.thread( MyRout{ 111 } )
+<br /></span>t1.<span class=StmtKey>join</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>t2.<span class=StmtKey>join</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/><br/>mt&thinsp; =&thinsp; MyType<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>t1&thinsp; =&thinsp; mtlib.thread<span class=SpecSymbol>(</span>&thinsp; mt.show<span class=SpecSymbol>{</span>&thinsp; <span class=String>"DAO"</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span><br/>t2&thinsp; =&thinsp; mtlib.thread<span class=SpecSymbol>(</span>&thinsp; mt.show<span class=SpecSymbol>{</span>&thinsp; <span class=Number>111</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span><br/>t1.<span class=StmtKey>join</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>t2.<span class=StmtKey>join</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table><tr><td><a name="2.2"><H4>2.2  异步处理</H4>
+</td><td align="right"><a href="&section=2.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+如果一个程序在没有异步处理下运行多个线程，其执行的结果可能是不确定的。
+为了让多线程程序给出可预测和合乎需要的结果，程序员可用互斥子，条件变量
+和信号标等来进行适当的异步处理。<br/>
+<table><tr><td><a name="2.2.1"><H5>2.2.1  互斥子</H5>
+</td><td align="right"><a href="&section=2.2.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+互斥子可被用来协调多个线程对一共享数据的读取与修改。它总处于两种状态：
+已锁和未锁。互斥子只能被一个线程上锁，只能被上锁的线程来解锁，且只能解
+一次，多次解锁将导致互斥子不可用。当一个线程试图去给一个已锁的互斥子
+上锁时，该线程将被阻塞（进入等待状态），直到该互斥子被另一线程解锁。<br/>
+互斥子可由库对象mtlib创建:
+<div class="hlcode">
+mutex&thinsp; =&thinsp; mtlib.mutex<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;</div>
+ 
+然后可由下面的方法上锁和解锁，
+<div class="hlcode">
+mutex.lock<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; mutex.unlock<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; mutex.trylock<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table><tr><td><a name="2.2.2"><H5>2.2.2  条件变量</H5>
+</td><td align="right"><a href="&section=2.2.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+条件变量是一种可以根据某个条件来进行异步处理的装置。它允许一个线程在
+一个条件未满足时进入等待状态，直到条件满足时被另一线程唤醒。其基本的操作
+有：等待（当条件未满足时）和释放信号（当条件满足时，用于唤醒一个或多个
+在此条件变量上等待的线程）。<br/>
+<div class="hlcode">
+condvar&thinsp; =&thinsp; mtlib.condition<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;</div>
+ <br/>
+条件变量总应该和一互斥子在一起使用。
+在条件变量上等待可用，
+<div class="hlcode">
+mtx.lock<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span><br/>&thinsp; &thinsp; condvar.wait<span class=SpecSymbol>(</span>&thinsp; mtx&thinsp; <span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; mtx.unlock<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;</div>
+ <br/>
+如果要给等待限时可用，
+<div class="hlcode">
+mtx.lock<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span><br/>&thinsp; &thinsp; condvar.timedwait<span class=SpecSymbol>(</span>&thinsp; mtx,&thinsp; seconds&thinsp; <span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; mtx.unlock<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;</div>
+ 
+其中seconds可以是小数，如condvar.timedwait(mtx,0.005)将最多等待5毫秒。<br/>
+<table><tr><td><a name="2.2.3"><H5>2.2.3  信号标</H5>
+</td><td align="right"><a href="&section=2.2.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+信号标可用来限制资源的使用。它有一个计数器，当它的计数大于0时，
+它允许一个线程来递减它的计数，并让此线程（获取一份信号标所保护
+的资源）继续执行。如果信号标的计数已为0，任何试图递减其计数以
+获取资源的线程将阻塞，直到信号标的计数变为大于0。如果一线程递减
+了一信号标的计数，当它完成相关操作时，它应递增该信号标的计数，
+以释放资源。创建信号标时需要给出初始计数，
+<div class="hlcode">
+sema&thinsp; =&thinsp; mtlib.semaphore<span class=SpecSymbol>(</span>&thinsp; count&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+To access a resource guarded by a semaphore, use,
+要获取信号标资源可用，
+<div class="hlcode">
+sema.wait<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span></div>
+ 
+当信号标资源被成功获取时，其计算将减一。<br/>
+To release the resource, use
+要释放资源可用，
+<div class="hlcode">
+sema.post<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span></div>
+ 
+此方法的调用将使信号标计算增一。<br/>
+<table><tr><td><a name="2.3"><H4>2.3  取消线程</H4>
+</td><td align="right"><a href="&section=2.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+道语言里线程都是可被取消的，要取消一线程可用，
+<div class="hlcode">
+thread.cancel<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span></div>
+ 
+这里thread是要被取消的线程对象。<br/><br/>
+在目前的道语言实现里,只有两个函数condition.wait()和condition.timedwait()
+以及其他某些跟系统相关的函数调用是线程取消点。
+其他地方的线程取消点必须由以下方法显式插入，
+<div class="hlcode">
+mtlib.testcancel<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span></div>
+ 
+来保证线程可被取消。
+线程取消后的清理工作完全由道解释器完成。<br/>
+<table><tr><td><a name="2.4"><H4>2.4  线程专有数据</H4>
+</td><td align="right"><a href="&section=2.4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+线程库对象mtlib为每个线程创建了一个线程专有哈希表，
+此哈希表可由mtlib.mydata()获得，它也可由线程对象的方法
+thread.mydata()获得:
+<div class="hlcode">
+mtlib.mydata<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span><span class=SpecSymbol>[</span>&thinsp; <span class=Method>key</span>&thinsp; <span class=SpecSymbol>]</span>&thinsp; =&thinsp; data;<br/>&thinsp; &thinsp; mtlib.self<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>.mydata<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span><span class=SpecSymbol>[</span>&thinsp; <span class=Method>key</span>&thinsp; <span class=SpecSymbol>]</span>&thinsp; =&thinsp; data;</div>
+ <br/>
+例子，
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; MyRout<span class=SpecSymbol>(</span>&thinsp; name&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; <span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>"string parameter = "</span>,&thinsp; name&thinsp; <span class=SpecSymbol>)</span><br/>&thinsp; &thinsp; &thinsp; mtlib.mydata<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span><span class=SpecSymbol>[</span><span class=String>"data"</span><span class=SpecSymbol>]</span>&thinsp; =&thinsp; name;<br/><span class=SpecSymbol>}</span><br/><br/>t1&thinsp; =&thinsp; mtlib.thread<span class=SpecSymbol>(</span>&thinsp; MyRout,&thinsp; <span class=String>"DAO"</span>&thinsp; <span class=SpecSymbol>)</span><br/>t2&thinsp; =&thinsp; mtlib.thread<span class=SpecSymbol>(</span>&thinsp; MyRout,&thinsp; <span class=String>"LANGUAGE"</span>&thinsp; <span class=SpecSymbol>)</span><br/>t1.<span class=StmtKey>join</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>t2.<span class=StmtKey>join</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/><br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; t1.mydata<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span><span class=SpecSymbol>[</span><span class=String>"data"</span><span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; t2.mydata<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span><span class=SpecSymbol>[</span><span class=String>"data"</span><span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table class="topsection"><tr><td><a name="3"><H3>3  3. With Asynchronous Function Calls</H3>
+</td><td align="right"><a href="&section=3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Probably, the simplest way to create multi-threaded programs in Dao is
+to use asynchronous function calls (AFC). The way of using AFC is almost identical to that
+of normal function calls, with the exception that the keyword <span class=text_bold> async</span>  must follow
+the call.
+<div class="hlcode">
+myfunc<span class=SpecSymbol>(</span>&thinsp; myparams&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=StmtKey>async</span>;<br/>myobj.mymeth<span class=SpecSymbol>(</span>&thinsp; myparams&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=StmtKey>async</span>;</div>
+ 
+Any functions or methods can be invoked in such asynchronous way!<br/><br/>
+Normally AFC is executed in a seperated native thread,
+which can be either an idle thread available from the thread pool,
+or a new thread created on the fly.
+There is a limit on the size of the thread pool.
+If this limit is reached, and there is no idle thread available from the pool,
+the AFCs are scheduled to run when some threads become idle.<br/><br/>
+Though any functions or methods can be invoked asynchronously,
+this does not mean they can really be running concurrently in the same time.
+If multiple AFCs are invoked for the methods of the same class instance,
+the Dao VM will schedule them to be run sequentially, to guarantee that the
+members of the class instance will be accessed and/or modified sequentially.
+In fact, the AFC mechanism is implemented on the top of the Actor Model (see below).
+In this case, the functions, class instances, C objects and virtual machine process etc.
+are the actors. As an intrinsic synchronization mechanism,
+one principle of the Actor Model is that an actor must
+process/respond sequentially (to) the messages sent to itself.<br/><br/>
+However, the Dao VM does not have internal synchronization for data shared in other ways
+such as parameter passing or global variables etc.
+For such shared data, mutex, condition variable and semaphore can be used
+for synchronization.
+If the current thread has to wait for the completion of
+all the AFCs invoked by itself before preceeding, keyword <span class=text_bold> join</span>  can be used together
+with keyword <span class=text_bold> async</span>  in the last AFC to join all the AFCs with the current thread.<br/><br/>
+There is another keyword that can also be used with <span class=text_bold> async</span> , that is, <span class=text_bold> hurry</span> .
+Note that, although the garbage collector (GC) of the Dao VM runs concurrently with the program
+threads, there is a limit on the number of garbage candidates that can be handled by
+the collector. Once this limit is reached, the program threads are blocked until the collector
+finishs processing garbages, with the exception of the main thread that is never blocked.
+If an AFC is used to handle "urgent" task, <span class=text_bold> hurry</span>  can be used to indicate that
+the thread running this AFC should not be blocked by the GC.<br/><br/>
+The return value of AFC is a future value, which is a class instance of a Dao class named
+<span class=text_bold> FutureValue</span> . When the AFC is finished, the <span class=text_bold> Value</span>  field of this future
+class instance is set with the returned values of the AFC.<br/>
+Example,
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; test<span class=SpecSymbol>(</span>&thinsp; name&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; &thinsp; i&thinsp; =&thinsp; <span class=Number>0</span>;<br/>&thinsp; &thinsp; &thinsp; &thinsp; <span class=StmtKey>while</span><span class=SpecSymbol>(</span>&thinsp; i&thinsp; &lt;&thinsp; <span class=Number>5</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; name,&thinsp; <span class=String>" : "</span>,&thinsp; i&thinsp; <span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Method>stdlib.sleep</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; i&thinsp; ++&thinsp; ;<br/>&thinsp; &thinsp; &thinsp; &thinsp; <span class=SpecSymbol>}</span><br/>&thinsp; &thinsp; &thinsp; &thinsp; <span class=StmtKey>return</span>&thinsp; <span class=String>"future_value_"</span>+name;<br/><span class=SpecSymbol>}</span><br/><br/>a&thinsp; =&thinsp; test<span class=SpecSymbol>(</span>&thinsp; <span class=String>"AAA"</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=StmtKey>async</span>;<br/>b&thinsp; =&thinsp; test<span class=SpecSymbol>(</span>&thinsp; <span class=String>"BBB"</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=StmtKey>async</span>;<br/><br/><span class=DataType>list</span>&thinsp; =&thinsp; <span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>;<br/><span class=DataType>list</span>.<span class=Method>append</span><span class=SpecSymbol>(</span>&thinsp; test<span class=SpecSymbol>(</span>&thinsp; <span class=String>"CCC"</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=StmtKey>async</span>&thinsp; <span class=StmtKey>join</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; b&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=DataType>list</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; a.Value&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; b.Value&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=DataType>list</span><span class=SpecSymbol>[</span><span class=Number>0</span><span class=SpecSymbol>]</span>.Value&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+There following is two simple implementations of parallel merge sort algorithm:
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; merge<span class=SpecSymbol>(</span>&thinsp; list1,&thinsp; list2&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=DataType>list</span>&thinsp; =&thinsp; <span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>N</span>&thinsp; =&thinsp; list1.<span class=Method>size</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>M</span>&thinsp; =&thinsp; list2.<span class=Method>size</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; i&thinsp; =&thinsp; <span class=Number>0</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; j&thinsp; =&thinsp; <span class=Number>0</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>while</span><span class=SpecSymbol>(</span>&thinsp; i&thinsp; &lt;&thinsp; <span class=Number>N</span>&thinsp; &&&thinsp; j&thinsp; &lt;&thinsp; <span class=Number>M</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; list1<span class=SpecSymbol>[</span>i<span class=SpecSymbol>]</span>&thinsp; &lt;&thinsp; list2<span class=SpecSymbol>[</span>j<span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; <span class=DataType>list</span>.<span class=Method>append</span><span class=SpecSymbol>(</span>&thinsp; list1<span class=SpecSymbol>[</span>i<span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>)</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; i&thinsp; ++;<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>}</span><span class=StmtKey>else</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; <span class=DataType>list</span>.<span class=Method>append</span><span class=SpecSymbol>(</span>&thinsp; list2<span class=SpecSymbol>[</span>j<span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>)</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; j&thinsp; ++;<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>}</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>}</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; i&thinsp; &lt;&thinsp; <span class=Number>N</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=DataType>list</span>&thinsp; +=&thinsp; list1<span class=SpecSymbol>[</span>&thinsp; i&thinsp; :&thinsp; <span class=SpecSymbol>]</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; j&thinsp; &lt;&thinsp; <span class=Number>M</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=DataType>list</span>&thinsp; +=&thinsp; list2<span class=SpecSymbol>[</span>&thinsp; j&thinsp; :&thinsp; <span class=SpecSymbol>]</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; <span class=DataType>list</span>;<br/><span class=SpecSymbol>}</span><br/><span class=CodeStruct>routine</span>&thinsp; merge_front<span class=SpecSymbol>(</span>&thinsp; list1,&thinsp; list2,&thinsp; front,&thinsp; back&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>N</span>&thinsp; =&thinsp; list1.<span class=Method>size</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>M</span>&thinsp; =&thinsp; list2.<span class=Method>size</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>S</span>&thinsp; =&thinsp; <span class=Number>N</span>+<span class=Number>M</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; i&thinsp; =&thinsp; <span class=Number>0</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; j&thinsp; =&thinsp; <span class=Number>0</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>while</span><span class=SpecSymbol>(</span>&thinsp; i&thinsp; &lt;&thinsp; <span class=Number>N</span>&thinsp; &&&thinsp; j&thinsp; &lt;&thinsp; <span class=Number>M</span>&thinsp; &&&thinsp; front.<span class=Method>size</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>+back.<span class=Method>size</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&lt;<span class=Number>S</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; list1<span class=SpecSymbol>[</span>i<span class=SpecSymbol>]</span>&thinsp; &lt;&thinsp; list2<span class=SpecSymbol>[</span>j<span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; front.<span class=Method>append</span><span class=SpecSymbol>(</span>&thinsp; list1<span class=SpecSymbol>[</span>i<span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>)</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; i&thinsp; ++;<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>}</span><span class=StmtKey>else</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; front.<span class=Method>append</span><span class=SpecSymbol>(</span>&thinsp; list2<span class=SpecSymbol>[</span>j<span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>)</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; j&thinsp; ++;<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>}</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><span class=CodeStruct>routine</span>&thinsp; merge_back<span class=SpecSymbol>(</span>&thinsp; list1,&thinsp; list2,&thinsp; front,&thinsp; back&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>N</span>&thinsp; =&thinsp; list1.<span class=Method>size</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>M</span>&thinsp; =&thinsp; list2.<span class=Method>size</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>S</span>&thinsp; =&thinsp; <span class=Number>N</span>+<span class=Number>M</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; i&thinsp; =&thinsp; <span class=Number>N</span>-<span class=Number>1</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; j&thinsp; =&thinsp; <span class=Number>M</span>-<span class=Number>1</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>while</span><span class=SpecSymbol>(</span>&thinsp; i&thinsp; &gt;=<span class=Number>0</span>&thinsp; &&&thinsp; j&thinsp; &gt;=<span class=Number>0</span>&thinsp; &&&thinsp; front.<span class=Method>size</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>+back.<span class=Method>size</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&lt;<span class=Number>S</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; list1<span class=SpecSymbol>[</span>i<span class=SpecSymbol>]</span>&thinsp; &gt;&thinsp; list2<span class=SpecSymbol>[</span>j<span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; back.pushfront<span class=SpecSymbol>(</span>&thinsp; list1<span class=SpecSymbol>[</span>i<span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>)</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; i&thinsp; --;<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>}</span><span class=StmtKey>else</span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; back.pushfront<span class=SpecSymbol>(</span>&thinsp; list2<span class=SpecSymbol>[</span>j<span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>)</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; j&thinsp; --;<br/>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>}</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>routine</span>&thinsp; sort<span class=SpecSymbol>(</span>&thinsp; <span class=DataType>list</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=Number>N</span>&thinsp; =&thinsp; <span class=DataType>list</span>.<span class=Method>size</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>if</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>N</span>&thinsp; <=&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=StmtKey>return</span>&thinsp; <span class=DataType>list</span>;<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp; sublist1&thinsp; =&thinsp; sort<span class=SpecSymbol>(</span>&thinsp; <span class=DataType>list</span><span class=SpecSymbol>[</span>&thinsp; :&thinsp; <span class=Number>N</span>/<span class=Number>2</span>-<span class=Number>1</span>&thinsp; <span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=StmtKey>async</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; sublist2&thinsp; =&thinsp; sort<span class=SpecSymbol>(</span>&thinsp; <span class=DataType>list</span><span class=SpecSymbol>[</span>&thinsp; <span class=Number>N</span>/<span class=Number>2</span>&thinsp; :&thinsp; <span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=StmtKey>async</span>&thinsp; <span class=StmtKey>join</span>;<br/><br/><span class=Comment>#&nbsp;&nbsp;&nbsp;&nbsp;return merge( sublist1.Value, sublist2.Value );
+<br /></span>&nbsp;&nbsp;&nbsp;&nbsp; front&thinsp; =&thinsp; <span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; back&thinsp; =&thinsp; <span class=SpecSymbol>{</span><span class=SpecSymbol>}</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; merge_front<span class=SpecSymbol>(</span>&thinsp; sublist1.Value,&thinsp; sublist2.Value,&thinsp; front,&thinsp; back&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=StmtKey>async</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; merge_back<span class=SpecSymbol>(</span>&thinsp; sublist1.Value,&thinsp; sublist2.Value,&thinsp; front,&thinsp; back&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=StmtKey>async</span>&thinsp; <span class=StmtKey>join</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; front&thinsp; +&thinsp; back<span class=SpecSymbol>[</span>&thinsp; front.<span class=Method>size</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>+back.<span class=Method>size</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>-<span class=Number>N</span>&thinsp; :&thinsp; <span class=SpecSymbol>]</span>;<br/><span class=SpecSymbol>}</span><br/><br/><span class=DataType>list</span>&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>213</span>,<span class=Number>1</span>,<span class=Number>35</span>,<span class=Number>27</span>,<span class=Number>49</span>,<span class=Number>55</span>,<span class=Number>63</span>,<span class=Number>75</span>,<span class=Number>87</span>,<span class=Number>99</span>,<span class=Number>115</span>,<span class=Number>103</span>&thinsp; <span class=SpecSymbol>}</span>;<br/>sorted&thinsp; =&thinsp; sort<span class=SpecSymbol>(</span>&thinsp; <span class=DataType>list</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; sorted&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<table class="topsection"><tr><td><a name="4"><H3>4  4. With Message Passing Mechanism Based The Actor Model</H3>
+</td><td align="right"><a href="&section=4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#4.1">Spawn&nbsp;Process</a></li>
+<li style="margin-top: 5px"><a href="#4.2">Send&nbsp;Message</a></li>
+<li style="margin-top: 5px"><a href="#4.3">Receive&nbsp;Message</a></li>
+<li style="margin-top: 5px"><a href="#4.4">Example</a></li>
+</ol></td></tr></table> <br/>
+(实验阶段)<br/>
+With Message Passing Interface APIs provided in library
+<a href="libref#MessagePassingInterface">MPI|http://xdao.org/weblet.dao?WIKI</a> ,
+one can easily do concurrent and distributed programming in Dao.
+In the MPI library, there are 3 principle functions: spawn(), send() and receive().
+With spawn(), one can create lightweighted virtual machine processes or real operation
+system processes, in the local or remove computers; and with send() and receive(),
+a process can send message to or receive message from other process.<br/><br/>
+The Dao MPI uses network sockets
+to do all the inter- OS process and inter-computer communications.
+When a Dao program is started with a process name specified with "-pNAME" or "--proc-name=NAME"
+in the command shell, it will bind to a port for accepting communications from other
+processes. By default, it will try to bind to port number 4115 (D:4, A:1, O:15),
+if this port is already used, it will try other port to bind. In each computer,
+the process that binds to port 4115 is the master process, which must be running
+if Dao program from other computer need to spawn a VM/OS process on this computer.<br/><br/>
+Each named OS process running Dao program is identified by the host name and the port it binds to.
+VM processes within an OS process are identified by names.
+In general, to be usable by the Dao MPI, the process name (actor address) has the form of
+"vm_proc@os_proc@@host" ( "os_proc" is mapped to the port number),
+which is called "pid" (process identifier) for simpilicity.
+A pid does not need to have the full form, some parts can be omitted.
+See also <a href="libref#MessagePassingInterface">MPI|http://xdao.org/weblet.dao?WIKI</a> .
+The following figure displays the relationships between process at different scope.<br/>
+<img src="dao_mpi_schema.png|4in"/> <br/>
+Each VM process will be running or schedule to run in a seperated thread drawing from
+a thread pool or created on the fly, and return the thread to the pool when mpi.receive()
+is called. Each OS thread may run different VM processes at different time.<br/><br/>
+Message Passing Interfaces are available in library <span class=text_bold> mpi</span> .<br/>
+<table><tr><td><a name="4.1"><H5>4.1  Spawn Process</H5>
+</td><td align="right"><a href="&section=4.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+The prototype of <span class=text_bold> mpi.spawn()</span>  is
+<div class="hlcode">
+mpi.spawn<span class=SpecSymbol>(</span>&thinsp; pid&thinsp; :<span class=DataType>string</span>,&thinsp; proc&thinsp; :<span class=DataType>string</span>,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+If <span class=text_italic> pid</span>  is of form <span class=text_italic> "", "vm_proc", "vm_proc@os_proc", "vm_proc@os_proc@@host"</span> ,
+a VM process will be spawned, and <span class=text_italic> proc</span>  should be the name of the routine to be spawned.
+The rest of the parameters will be passed to the routine when the process is created
+( currently passing additional parameter is not supported for pid form
+<span class=text_italic> "vm_proc@os_proc", "vm_proc@os_proc@@host"</span>  ).
+If the pid is an empty string, then spawned VM process has no pid, and must be accessed by
+the process handle returned by <span class=text_bold> mpi.spawn()</span> .<br/><br/>
+If <span class=text_italic> pid</span>  is of form <span class=text_italic> "@os_proc", "@os_proc@@host"</span> , an OS process will be spawn
+in the current computer or a host in the network,
+and <span class=text_italic> proc</span>  should be the name of the Dao script file to be executed.
+The rest parameter is the timeout for spawning.
+If the OS process does not spawn successfully within the timeout, an exception will be raised.
+The default value of the timeout is -1. No positive timeout means infinite waiting.<br/>
+<table><tr><td><a name="4.2"><H5>4.2  Send Message</H5>
+</td><td align="right"><a href="&section=4.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+The prototype of <span class=text_bold> mpi.send()</span>  is
+<div class="hlcode">
+mpi.send<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+If <span class=text_italic> object</span>  is a process identifier, send the rest of parameters as message to it;
+If <span class=text_italic> object</span>  is a callable object, this object is scheduled to be called asynchronously
+with the rest parameters. Note, message is sent out asynchronously,
+and only number, string, complex number and numeric array can
+sent through this interface.<br/><br/>
+If the process identified by <span class=text_italic> object</span> , can not be found, an exception will be raised.
+But if the process is already dead, no exception will be raised, it is up to the user
+to implement such checking.<br/>
+<table><tr><td><a name="4.3"><H5>4.3  Receive Message</H5>
+</td><td align="right"><a href="&section=4.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+The prototype of <span class=text_bold> mpi.receive()</span>  is
+<div class="hlcode">
+mpi.receive<span class=SpecSymbol>(</span>&thinsp; timeout=-<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><br/>mpi.receive<span class=SpecSymbol>(</span>&thinsp; pid&thinsp; :<span class=DataType>string</span>,&thinsp; timeout=-<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+If <span class=text_bold> mpi.receive()</span>  is called without parameters, the calling process will wait for
+messages from any process, and will be paused definitely until a message arrives.
+The received message including the pid of the sender will be packed into a list
+and returned by this API.
+To avoid it waiting for infinite long time, a timeout can be passed as parameter to
+<span class=text_bold> mpi.receive()</span> , in this case, if no message arrive within the timeout,
+<span class=text_bold> mpi.receive()</span>  will return with an empty list.<br/><br/>
+If one want to receive message from a specific process, the pid of that process can be
+passed to <span class=text_bold> mpi.receive()</span>  as the first parameter. Messages from other process will
+be stored in the "mailbox", until <span class=text_bold> mpi.receive()</span>  has received
+and processed a message from that specific process. A timeout can also be specified
+as the second parameter.
+By passing the pid of the expected process to <span class=text_bold> mpi.receive()</span> , synchronous communication
+can be realized.<br/>
+<table><tr><td><a name="4.4"><H5>4.4  Example</H5>
+</td><td align="right"><a href="&section=4.4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+File <span class=text_italic> mpi_spawn.dao</span> ,
+<div class="hlcode">
+<span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>"===================="</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>mpi.spawn<span class=SpecSymbol>(</span>&thinsp; <span class=String>"@pid"</span>,&thinsp; <span class=String>"mpi_script.dao"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>mpi.spawn<span class=SpecSymbol>(</span>&thinsp; <span class=String>"vmp@pid"</span>,&thinsp; <span class=String>"test"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><br/>mpi.send<span class=SpecSymbol>(</span>&thinsp; <span class=String>"@pid"</span>,&thinsp; <span class=String>"TO MAIN"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>mpi.send<span class=SpecSymbol>(</span>&thinsp; <span class=String>"@pid"</span>,&thinsp; <span class=String>"TO MAIN"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; mpi.receive<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>"===================="</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>mpi.spawn<span class=SpecSymbol>(</span>&thinsp; <span class=String>"@pid1"</span>,&thinsp; <span class=String>"mpi_script.dao"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>mpi.spawn<span class=SpecSymbol>(</span>&thinsp; <span class=String>"vmp@pid"</span>,&thinsp; <span class=String>"test"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>mpi.send<span class=SpecSymbol>(</span>&thinsp; <span class=String>"vmp@pid"</span>,&thinsp; <span class=String>"MESSAGE"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><br/>mpi.spawn<span class=SpecSymbol>(</span>&thinsp; <span class=String>"@pid2@@localhost"</span>,&thinsp; <span class=String>"mpi_script.dao"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Comment>#mpi.spawn( "@@pid2@@pid", "mpi_script.dao" );
+<br /></span><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>"here!!!!!!!!!!!!!!!!!!!!!!!!!!"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>mpi.spawn<span class=SpecSymbol>(</span>&thinsp; <span class=String>"vmp@pid2@@localhost"</span>,&thinsp; <span class=String>"test"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>mpi.send<span class=SpecSymbol>(</span>&thinsp; <span class=String>"vmp@pid2@@localhost"</span>,&thinsp; <span class=String>"ANOTHER"</span>,&thinsp; <span class=Number>123.456</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ 
+File <span class=text_italic> mpi_script.dao</span> ,
+<div class="hlcode">
+<span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>"mpi_script.dao spawned"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><br/><span class=CodeStruct>routine</span>&thinsp; test<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; &thinsp; <span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>"start test"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; &thinsp; &thinsp; i&thinsp; =&thinsp; <span class=Number>0</span>;<br/>&thinsp; &thinsp; &thinsp; &thinsp; <span class=StmtKey>while</span><span class=SpecSymbol>(</span>&thinsp; i&thinsp; &lt;&thinsp; <span class=Number>10</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; msg&thinsp; =&thinsp; mpi.receive<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>"test() "</span>,msg&thinsp; <span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; mpi.send<span class=SpecSymbol>(</span>&thinsp; msg<span class=SpecSymbol>[</span><span class=Number>0</span><span class=SpecSymbol>]</span>,&thinsp; <span class=String>"FROM test()"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; i&thinsp; ++;<br/>&thinsp; &thinsp; &thinsp; &thinsp; <span class=SpecSymbol>}</span><br/><span class=SpecSymbol>}</span><br/><br/>msg&thinsp; =&thinsp; mpi.receive<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; msg&thinsp; <span class=SpecSymbol>)</span>;<br/>mpi.send<span class=SpecSymbol>(</span>&thinsp; msg<span class=SpecSymbol>[</span><span class=Number>0</span><span class=SpecSymbol>]</span>,&thinsp; <span class=String>"CONFIRMED"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>mpi.send<span class=SpecSymbol>(</span>&thinsp; <span class=String>"main"</span>,&thinsp; <span class=String>"message from main"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/>mpi.send<span class=SpecSymbol>(</span>&thinsp; <span class=String>"main"</span>,&thinsp; <span class=String>"message from main"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; mpi.receive<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; mpi.receive<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; mpi.receive<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>"xxxxxxxxxxxxxxxx"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><br/><span class=StmtKey>while</span><span class=SpecSymbol>(</span>&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=Method>stdlib.sleep</span><span class=SpecSymbol>(</span><span class=Number>10</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>}</span></div>
+ 
+File <span class=text_italic> mpi_send.dao</span> ,
+<div class="hlcode">
+mpi.send<span class=SpecSymbol>(</span>&thinsp; <span class=String>"vmp@pid"</span>,&thinsp; <span class=String>"FROM ANOTHER OS PROCESS"</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; mpi.receive<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+Run <span class=text_italic> dao -pmaster mpi_spawn.dao</span>  first, then run <span class=text_italic> dao -ptest mpi_send.dao</span> .<br clear=all />
+</div></body></html>

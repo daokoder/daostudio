@@ -1,0 +1,338 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+
+<h2>道正则表达式</h2>
+<div align=center><p><b>傅利民(phoolimin<img src="/images/at.png"/>gmail<img src="/images/dot.png"/>com)</b></p></div>
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#1">介绍</a></li>
+<li style="margin-top: 5px"><a href="#2">字符类</a></li>
+<li style="margin-top: 5px"><a href="#3">模式项</a></li>
+<li style="margin-top: 5px"><a href="#4">模式项重复</a></li>
+<li style="margin-top: 5px"><a href="#5">模式组和扑获</a></li>
+<li style="margin-top: 5px"><a href="#6">字符串函数</a></li>
+<li style="margin-top: 5px"><a href="#7">例子</a></li>
+</ol></td></tr></table> <br/>
+<table class="topsection"><tr><td><a name="1"><H3>1  介绍</H3>
+</td><td align="right"><a href="&section=1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+正则表达式是一个用单个字符串表示的句法规则，
+用以描述或者匹配符合该规则的所有字符串。
+正则表达式主要被用来进行字符串操作，
+如在字符串里查找，提取或替换符合某规则的子字符串。<br/><br/>
+从最新的发布开始，道语言不再从语法上支持正则表达式，
+正则表达式的功能改由字符串方法支持。
+而且新的正则表达式的语法也有所改变，变得更象Lua语言所支持的
+正则表达式（主要区别在于字符类的表示符号）。<br/>
+<table class="topsection"><tr><td><a name="2"><H3>2  字符类</H3>
+</td><td align="right"><a href="&section=2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+一个字符类表示从属某类的所有字符：
+<ul>
+<li> x  : 普通字符表示它自己，特殊字符 &lt;hlbf&gt; ^$()%.[]*+-?{}&lt;&gt; &lt;/hlbf&gt; 不在此之列；</li>
+
+<li> .  : 点表示所有字符；</li>
+
+<li> %a  : 所有字母符号；</li>
+
+<li> %s  : 所有空白字符；</li>
+
+<li> %k  : 所有控制字符；</li>
+
+<li> %p  : 所有标点符号；</li>
+
+<li> %d  : 所有数字；</li>
+
+<li> %x  : 所有十六进制数字；</li>
+
+<li> %c  : 所有小写字母；</li>
+
+<li> %w  : 所有字母，数字加'_'；</li>
+
+<li> %A  : 所有非字母字符， &lt;hlbf&gt; %a &lt;/hlbf&gt; 的补集;</li>
+
+<li> %S  : 所有非空白字符， &lt;hlbf&gt; %s &lt;/hlbf&gt; 的补集;</li>
+
+<li> %K  : 所有非控制字符， &lt;hlbf&gt; %k &lt;/hlbf&gt; 的补集;</li>
+
+<li> %P  : 所有非标点符号字符， &lt;hlbf&gt; %p &lt;/hlbf&gt; 的补集;</li>
+
+<li> %D  : 所有非数字， &lt;hlbf&gt; %d &lt;/hlbf&gt; 的补集;</li>
+
+<li> %X  : 所有非十六进制数字的字符， &lt;hlbf&gt; %x &lt;/hlbf&gt; 的补集;</li>
+
+<li> %C  : 大写字母；</li>
+
+<li> %W  :  &lt;hlbf&gt; %w &lt;/hlbf&gt; 的补集;</li>
+
+<li> %<span class=text_bold> x</span>  : 表示字符<span class=text_bold> x</span> , 这里<span class=text_bold> x</span> 是一非数字，非字母的字符；
+<span class=text_bold> x</span> 也可以是字母字符，如果它不是<span class=text_bold> b</span> 或者<span class=text_bold> B</span> ，
+也不表示某个字符类；</li>
+
+<li> [set]  : 表示 &lt;hlbf&gt; set &lt;/hlbf&gt; 中所有字符的并集；
+ &lt;hlbf&gt; set &lt;/hlbf&gt; 可以以<span class=text_bold> x-y</span> 的形式包含一从<span class=text_bold> x</span> 到<span class=text_bold> y</span> 区间上的所有字符;
+上面的字符类也可出现在 &lt;hlbf&gt; set &lt;/hlbf&gt; 里；</li>
+
+<li> [^set]  :  &lt;hlbf&gt; [set] &lt;/hlbf&gt; 的补集。</li>
+
+</ul>
+ <br/>
+<table class="topsection"><tr><td><a name="3"><H3>3  模式项</H3>
+</td><td align="right"><a href="&section=3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+模式项可以是：
+<ul>
+<li>  单个字符类；</li>
+
+<li> ^  : 匹配字符串开头；</li>
+
+<li> $  : 匹配字符串结尾；</li>
+
+<li> %n  : 匹配第<span class=text_bold> n</span> 个模式组的子字符串；<span class=text_bold> n</span> 可以是一个或多个数字；</li>
+
+<li> %bxy  : 匹配一平衡配对的字符<span class=text_bold> x</span> 和<span class=text_bold> y</span> ；
+这里平衡表示，从相同的匹配位置开始，被匹配的子字符串必须包含相同且最少数目的
+<span class=text_bold> x</span> 和<span class=text_bold> y</span> ；
+类似于Lua的字符串模式语法；</li>
+
+<li> %B{pattern1}{pattern2}  : 匹配一平衡配对的模式<span class=text_bold> pattern1</span> 和<span class=text_bold> pattern2</span> ;
+类似于 &lt;hlbf&gt; %bxy &lt;/hlbf&gt; ；</li>
+
+</ul>
+ <br/>
+<table class="topsection"><tr><td><a name="4"><H3>4  模式项重复</H3>
+</td><td align="right"><a href="&section=4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+模式项 &lt;hlbf&gt; e &lt;/hlbf&gt; 可以选择性的被忽略或重复匹配，规则如下：
+<ul>
+<li> e?  : 匹配零次或一次；</li>
+
+<li> e*  : 匹配零次或任意次数；</li>
+
+<li> e+  : 匹配一次或多次；</li>
+
+<li> e{n}  : 匹配<span class=text_bold> n</span> 次；</li>
+
+<li> e{n,}  : 匹配至少<span class=text_bold> n</span> 次；</li>
+
+<li> e{,n}  : 匹配至多<span class=text_bold> n</span> 次；</li>
+
+<li> e{n,m}  : 匹配至少<span class=text_bold> n</span> 次，且最多<span class=text_bold> m</span> 次；</li>
+
+</ul>
+ <br/>
+<table class="topsection"><tr><td><a name="5"><H3>5  模式组和扑获</H3>
+</td><td align="right"><a href="&section=5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+在正则表达式里，可以用括号将一个或多个模式项括起来形成一个子模式，即模式组(group)。
+一个模式组里可包含多个可选子模式，以<span class=text_bold> |</span> 分开。
+如果用<span class=text_italic> (|pattern)</span> 或<span class=text_italic> (pattern|)</span> 包含一个空的可选子模式，
+那么这个模式组可在字符串匹配过程中被跳过。
+如果正则表达式里含有多个模式组，那么按模式组的左括号所出现的顺序，
+每个模式组都会自动获得一个标号。例如，在<span class=text_italic> (%a+)%s*(%d+(%a+))</span> 里，
+第一个<span class=text_italic> (%a+)</span> 将拥有标号1，<span class=text_italic> (%d+(%a+))</span> 拥有标号2，
+而第二个<span class=text_italic> (%a+)</span> 将拥有标号3。
+为了方便起见，整个正则表达式所表达的模式也被自动定义为一个模式组，
+标号为0。<br/><br/>
+当一个字符串被匹配到一个正则表达式时，那些与其中的模式组相匹配的
+子字符串将被标记（扑获），以便于被引用或提取。
+如在进行字符串匹配或替换时，<span class=text_bold> %n</span> 可被用作表示
+第<span class=text_bold> n</span> 个模式组所匹配的子字符串。<br/><br/>
+当一个正则表达式可以有多种方式匹配到一个字符串里起始于同一个下标的子字符串时，
+匹配长度最长的匹配方式将被选中，并返回相应的结果。
+匹配长度将被定义为该表达式里所有模式组所匹配的子字符串的长度的和。
+根据这种定义，如果需要给予某个模式组更高的匹配优先权，那么可以
+给该模式组增加更多层括号。
+例如<span class=text_italic> (%d%w*)(%w*%d)</span> 可以有两种方式匹配到<span class=text_italic> 1a2</span> ，
+一种是将<span class=text_italic> 1a</span> 匹配给<span class=text_italic> (%d%w*)</span> 及<span class=text_italic> 2</span> 匹配给<span class=text_italic> (%w*%d)</span> ；
+另一种是将<span class=text_italic> 1</span> 匹配给<span class=text_italic> (%d%w*)</span> 及<span class=text_italic> a2</span> 匹配给<span class=text_italic> (%w*%d)</span> 。
+如果在<span class=text_italic> (%w*%d)</span> 外再添加一层括号，即<span class=text_italic> (%d%w*)((%w*%d))</span> ，
+那么它与<span class=text_italic> 1a2</span> 的匹配将变得唯一，也就是将<span class=text_italic> a</span> 匹配到后面的组里。<br/>
+<table class="topsection"><tr><td><a name="6"><H3>6  字符串函数</H3>
+</td><td align="right"><a href="&section=6"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#6.1">pfind():&nbsp;查找匹配模式的子字符串</a></li>
+<li style="margin-top: 5px"><a href="#6.2">match():&nbsp;匹配模式</a></li>
+<li style="margin-top: 5px"><a href="#6.3">extract():&nbsp;提取子字符串</a></li>
+<li style="margin-top: 5px"><a href="#6.4">capture():&nbsp;扑获模式组</a></li>
+<li style="margin-top: 5px"><a href="#6.5">change():&nbsp;替换子字符串</a></li>
+</ol></td></tr></table> <br/>
+象Lua里一样，正则表达式的功能需要通过字符串的成员方法使用。
+正则表达式需要以字符串的形式作为参数传递给那些方法。
+每个正则表达式字符串都在第一次使用时被编译为一内部表达结构，
+并与之一一对应。每当正则表达式字符串被使用时，其相应的内部表达结构
+将被取用，以避免多次编译正则表达式。
+实际上，每个正则表达式字符串在每一个虚拟进程里仅被编译一次。<br/>
+<table><tr><td><a name="6.1"><H5>6.1  pfind(): 查找匹配模式的子字符串</H5>
+</td><td align="right"><a href="&section=6.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+<span class=DataType>string</span>.pfind<span class=SpecSymbol>(</span>&thinsp; pt&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; index=<span class=Number>0</span>,&thinsp; start=<span class=Number>0</span>,&thinsp; <span class=CodeStruct>end</span>=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>list</span>&lt;<span class=DataType>tuple</span>&lt;<span class=DataType>int</span>,<span class=DataType>int</span>&gt;&thinsp; &gt;</div>
+ <br/>
+此方法查找匹配于模式<span class=text_italic> pt</span> 的子字符串的位置（下标和长度）。
+如果<span class=text_italic> index</span> 大于零，查找第<span class=text_italic> index</span> 个匹配的子字符串，
+否则查找所有的。此查找从字符串下标<span class=text_italic> start</span> 开始，直到下标<span class=text_italic> end</span> 结束。
+如果<span class=text_italic> end</span> 等于零，一直查找到字符串末尾。<br/>
+<table><tr><td><a name="6.2"><H5>6.2  match(): 匹配模式</H5>
+</td><td align="right"><a href="&section=6.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+<span class=DataType>string</span>.match<span class=SpecSymbol>(</span>&thinsp; pt&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; start=<span class=Number>0</span>,&thinsp; <span class=CodeStruct>end</span>=<span class=Number>0</span>,&thinsp; substring=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>=></span><span class=DataType>tuple</span>&lt;start:<span class=DataType>int</span>,<span class=CodeStruct>end</span>:<span class=DataType>int</span>,substring:<span class=DataType>string</span>&gt;</div>
+ <br/>
+从字符串下标<span class=text_italic> start</span> 开始查找匹配于模式<span class=text_italic> pt</span> 的子字符串,
+直到下标<span class=text_italic> end</span> 结束。如果<span class=text_italic> end</span> 等于零，一直查找到字符串末尾。
+如果<span class=text_italic> substring</span> 非零，返回元组的<span class=text_italic> substring</span> 成员将保存匹配的子字符串。<br/>
+<table><tr><td><a name="6.3"><H5>6.3  extract(): 提取子字符串</H5>
+</td><td align="right"><a href="&section=6.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+<span class=DataType>string</span>.extract<span class=SpecSymbol>(</span>&thinsp; pt&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; matched=<span class=Number>1</span>,&thinsp; mask=<span class=String>''</span>,&thinsp; rev=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;</div>
+ <br/>
+如果只使用参数<span class=text_italic> pt</span> （<span class=text_italic> matched</span> 为正），此方法将从<span class=text_italic> string</span> 里提取所有
+能匹配到模式<span class=text_italic> pt</span> 的子字符串。
+当<span class=text_italic> matched</span> 为负时，字符串将<span class=text_italic> string</span> 被与模式<span class=text_italic> pt</span> 相匹配的子字符串
+所分割（所匹配子字符串的互补），并返回分割后的子字符串；
+当<span class=text_italic> matched</span> 为零时，返回所匹配子字符串及其互补。<br/><br/>
+如果另一个模式<span class=text_italic> mask</span> 也作为参数传入给此方法（且<span class=text_italic> rev</span> 是零），
+对于模式<span class=text_italic> pt</span> 的查找将被局限于与<span class=text_italic> mask</span> 匹配的子字符串里；
+如果<span class=text_italic> rev</span> 不是零，与<span class=text_italic> mask</span> 匹配的子字符串将从对于模式<span class=text_italic> pt</span> 的查找中被排除。<br/>
+<table><tr><td><a name="6.4"><H5>6.4  capture(): 扑获模式组</H5>
+</td><td align="right"><a href="&section=6.4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+<span class=DataType>string</span>.capture<span class=SpecSymbol>(</span>&thinsp; pt&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; start=<span class=Number>0</span>,&thinsp; <span class=CodeStruct>end</span>=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;</div>
+ <br/>
+查找与模式<span class=text_italic> pt</span> 匹配的子字符串，获取并返回
+与模式<span class=text_italic> pt</span> 里模式组相匹配的子字符串。
+返回的列表里的第i个元素对应于与第i个模式组相匹配的子字符串。<br/>
+<table><tr><td><a name="6.5"><H5>6.5  change(): 替换子字符串</H5>
+</td><td align="right"><a href="&section=6.5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+<span class=DataType>string</span>.change<span class=SpecSymbol>(</span>&thinsp; pt&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; s&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; index=<span class=Number>0</span>,&thinsp; start=<span class=Number>0</span>,&thinsp; <span class=CodeStruct>end</span>=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>int</span></div>
+ <br/>
+将所有与模式<span class=text_italic> pt</span> 的子字符串替换为字符串<span class=text_italic> s</span> 。
+<span class=text_italic> s</span> 可以包含对模式组的向后引用，例如，
+如果<span class=text_italic> s = 'abc%1'</span> ，这表示<span class=text_italic> s</span> 将是<span class=text_italic> abc</span> 与匹配于
+<span class=text_italic> pt</span> 里标号为1的模式组的子字符串的连接。<br/><br/>
+如果参数<span class=text_italic> index</span> 为正，仅替换第<span class=text_italic> index</span> 个匹配的子字符串。
+如果<span class=text_italic> end</span> 为正，替换将被局限于下标从<span class=text_italic> start</span> 到<span class=text_italic> end</span> 
+的子字符串里。<br/><br/>
+返回被替换的子字符串数目。<br/><br/>
+<table class="topsection"><tr><td><a name="7"><H3>7  例子</H3>
+</td><td align="right"><a href="&section=7"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+s&thinsp; =&thinsp; <span class=String>'abc123def456'</span>;<br/><br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; s.pfind<span class=SpecSymbol>(</span>&thinsp; <span class=String>'%d+'</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; s.match<span class=SpecSymbol>(</span>&thinsp; <span class=String>'%d+'</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; s.extract<span class=SpecSymbol>(</span>&thinsp; <span class=String>'%d+'</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; s.extract<span class=SpecSymbol>(</span>&thinsp; <span class=String>'%d+'</span>,&thinsp; -<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; s.extract<span class=SpecSymbol>(</span>&thinsp; <span class=String>'%d+'</span>,&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; s.capture<span class=SpecSymbol>(</span>&thinsp; <span class=String>'(%a+)(%d+)'</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><br/>s.change<span class=SpecSymbol>(</span>&thinsp; <span class=String>'(%a+)'</span>,&thinsp; <span class=String>'==%1=='</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; s&thinsp; <span class=SpecSymbol>)</span>;<br/><br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; s.extract<span class=SpecSymbol>(</span>&thinsp; <span class=String>'%d+'</span>,&thinsp; <span class=Number>1</span>,&thinsp; <span class=String>'==%d+=='</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+<br clear=all />
+</div></body></html>

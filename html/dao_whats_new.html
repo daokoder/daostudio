@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+<h2>
+What's new in Dao 1.1 (released on 2009-09-19)
+</h2>
+<span class=text_bold> New features:</span> 
+<ol>
+<li> Some built-in methods for functional programming (such as map(), reduce() etc.);</li>
+
+<li> Some built-in functional style methods for data construction (such as string(), list() etc.)</li>
+
+<li> Some math functions are also supported as built-in functions;</li>
+
+<li> Enhanced switch-case statement;</li>
+
+<li> New do{}while() statement;</li>
+
+<li> Tail call optimization;</li>
+
+<li> Type checking operators: ?=, ?&lt;, and the associated VM instruction DVM_CHECK;</li>
+
+<li> Operation asserting operator: ??, to check if the last operation is successful, 
+   and/or provide an alternative if not successful;</li>
+
+<li> Automatic inheritance of constructors from single parent class/cdata;</li>
+
+<li> DaoVmSpace_AddVirtualFile(), and daoMainv.c to support packing script files into the Dao
+   interpreter executable.</li>
+
+<li> Parameter passing by reference, and constant parameters;</li>
+
+</ol>
+ <br/><br/>
+<span class=text_bold> Important enhancement and changes:</span> 
+<ol>
+<li> Keywords for declaring local/global constant, variables, instance variables;</li>
+
+<li> Class definition: class body no longer allows statements;</li>
+
+<li> Syntax for operator overloading;</li>
+
+<li> Proper parsing &gt;&gt; in type names, and &gt;= after type names, such as:
+   <span class=text_italic> list&lt;list&lt;int&gt;&gt;, a : list&lt;int&gt;= {}</span> ;</li>
+
+<li> Storage for local variables as references;</li>
+
+<li> Decreased GC frequency to greatly decrease the GC overhead for singel threaded version;</li>
+
+<li> Improved GC by freeing more data directly, and by add tuple type to GC scanning process;</li>
+
+<li> Reduced tuple creation when possible;</li>
+
+<li> Revised type and function preparation methods for loading C modules;</li>
+
+<li> Some C/C++ interface functions are moved from type DaoVmSpace to DaoNameSpace;</li>
+
+<li> math.rand(), math.rand_gaussian() now take a parameter which is multiply to the
+    standard distribution (even and normal);</li>
+
+<li> Constant number literal should now use 'D' to mark double precision instead of 
+    using double '0';</li>
+
+<li> "stdio" is changed to "io", and "stdio" is kept as an alias to "io" for compatiblity;</li>
+
+<li> "stdlib" is changed to "std", and "stdlib" is kept as an alias to "std" for compatiblity;</li>
+
+<li> "stdio.print/printf/println" are changed to "io.write/writef/writeln", aliases are kept
+    for compatiblity;</li>
+
+<li> Passing parameter as references for simple data types is back;</li>
+
+<li> Now max() and min() methods of list and array return a tuple to include the value and index;
+    And for list, a larger range of types are allowed for comparison;</li>
+
+<li> Improved cast to tuples;</li>
+
+<li> Disabled duplication of C functions, and disable data copying for parameters passed to C functions;</li>
+
+</ol>
+ <br/>
+There are also a number of bug fixings.
+The <span class=text_bold> autobind.dao</span>  tool is also improved.<br clear=all />
+</div></body></html>

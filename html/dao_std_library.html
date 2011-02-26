@@ -1,0 +1,1423 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+
+<h2>Dao Library Reference</h2>
+<div align=center><p><b>Limin Fu (phoolimin<img src="/images/at.png"/>gmail<img src="/images/dot.png"/>com)</b></p></div>
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#1">introduction</a></li>
+<li style="margin-top: 5px"><a href="#2">string</a></li>
+<li style="margin-top: 5px"><a href="#3">complex</a></li>
+<li style="margin-top: 5px"><a href="#4">list</a></li>
+<li style="margin-top: 5px"><a href="#5">map</a></li>
+<li style="margin-top: 5px"><a href="#6">numeric&nbsp;array</a></li>
+<li style="margin-top: 5px"><a href="#7">cdata</a></li>
+<li style="margin-top: 5px"><a href="#8">std&nbsp;(was&nbsp;stdlib)</a></li>
+<li style="margin-top: 5px"><a href="#9">stream&nbsp;and&nbsp;io&nbsp;(was&nbsp;stdio)&nbsp;library</a></li>
+<li style="margin-top: 5px"><a href="#10">math</a></li>
+<li style="margin-top: 5px"><a href="#11">reflection</a></li>
+<li style="margin-top: 5px"><a href="#12">coroutine</a></li>
+<li style="margin-top: 5px"><a href="#13">multi-threading&nbsp;library</a></li>
+<li style="margin-top: 5px"><a href="#14">thread&nbsp;object</a></li>
+<li style="margin-top: 5px"><a href="#15">mutex</a></li>
+<li style="margin-top: 5px"><a href="#16">condition&nbsp;variable</a></li>
+<li style="margin-top: 5px"><a href="#17">semaphore</a></li>
+<li style="margin-top: 5px"><a href="#18">network</a></li>
+<li style="margin-top: 5px"><a href="#19">message&nbsp;passing&nbsp;interface</a></li>
+</ol></td></tr></table> <br/>
+(For Dao 1.1)<br/><br/>
+This document is licensed under
+<a href="">GNU Free Documentation License</a> .<br/>
+<table class="topsection"><tr><td><a name="1"><H3>1  introduction</H3>
+</td><td align="right"><a href="&section=1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+This documentation introduces the standard libraries for a number of applications
+and the standard methods for various data types.
+In the method parameter lists, <span class=text_italic> par : Xyz</span>  means parameter <span class=text_italic> par</span>  
+should be of the type of <span class=text_italic> Xyz</span> ;
+<span class=text_italic> par = Xyz</span>  means that <span class=text_italic> par</span>  has default value <span class=text_italic> Xyz</span> . 
+There are also a number of overloaded methods,
+which have the same name, but with different parameter lists.
+Some methods of one library can be imported to the current namespace by using
+"use library;" statement so that the methods can be used directly, e.g.,
+<div class="hlcode">
+use&thinsp; <span class=Method>math</span><br/>a&thinsp; =&thinsp; cos<span class=SpecSymbol>(</span>&thinsp; <span class=Number>1.5</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+In the following, the prototypes of methods usually appear as for clarity:
+<div class="hlcode">
+type.method<span class=SpecSymbol>(</span>&thinsp; parameter_list&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+but the real prototypes are defined the following form:
+<div class="hlcode">
+method<span class=SpecSymbol>(</span>&thinsp; self&thinsp; :&thinsp; type,&thinsp; parameter_list&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+<table class="topsection"><tr><td><a name="2"><H3>2  string</H3>
+</td><td align="right"><a href="&section=2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#2.1">Method&nbsp;list:</a></li>
+<li style="margin-top: 5px"><a href="#2.2">Method&nbsp;details:</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="2.1"><H5>2.1  Method list:</H5>
+</td><td align="right"><a href="&section=2.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+chop<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>erase<span class=SpecSymbol>(</span>&thinsp; start=<span class=Number>0</span>,&thinsp; n=-<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><br/>find<span class=SpecSymbol>(</span>&thinsp; str&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; from=<span class=Number>0</span>,&thinsp; reverse=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/><span class=Method>insert</span><span class=SpecSymbol>(</span>&thinsp; str&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; index=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/>replace<span class=SpecSymbol>(</span>&thinsp; str1&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; str2&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; index=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/>replace<span class=SpecSymbol>(</span>&thinsp; str1&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; table&thinsp; :&thinsp; <span class=DataType>map</span>&lt;<span class=DataType>string</span>,<span class=DataType>string</span>&gt;,&thinsp; max=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/>expand<span class=SpecSymbol>(</span>&thinsp; keys&thinsp; :<span class=DataType>map</span>&lt;<span class=DataType>string</span>,<span class=DataType>string</span>&gt;,&thinsp; spec=<span class=String>'$'</span>,&thinsp; keep=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><br/>expand<span class=SpecSymbol>(</span>&thinsp; keys&thinsp; :&thinsp; <span class=DataType>tuple</span>,&thinsp; spec=<span class=String>'$'</span>,&thinsp; keep=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><br/>resize<span class=SpecSymbol>(</span>&thinsp; <span class=Method>size</span>&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>size</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>split<span class=SpecSymbol>(</span>&thinsp; sep&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; quote=<span class=String>""</span>,&thinsp; rm=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;<br/>tokenize<span class=SpecSymbol>(</span>&thinsp; seps&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; quotes=<span class=String>""</span>,&thinsp; backslash=<span class=Number>0</span>,&thinsp; simplify=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;<br/>tonumber<span class=SpecSymbol>(</span>&thinsp; base=<span class=Number>10</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>double</span><br/>tolower<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span><br/>toupper<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span><br/>encrypt<span class=SpecSymbol>(</span>&thinsp; <span class=Method>key</span>&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; hex=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span><br/>decrypt<span class=SpecSymbol>(</span>&thinsp; <span class=Method>key</span>&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; hex=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ <br/>
+There are a few other methods that use regular expression pattern
+for string operation, please refer to the <a href="">Dao Regex Tutorial</a> .<br/>
+<table><tr><td><a name="2.2"><H5>2.2  Method details:</H5>
+</td><td align="right"><a href="&section=2.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+<span class=DataType>string</span>.chop<span class=SpecSymbol>(</span>&thinsp; utf=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Chop off new line symbol from the end of a string.
+If utf=1, chop off the characters that do not form a valid UTF-8 encoding.<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.erase<span class=SpecSymbol>(</span>&thinsp; start=<span class=Number>0</span>,&thinsp; n=-<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Erase <span class=text_italic> n</span>  characters starting from index <span class=text_italic> start</span> .
+If n=-1, erase all the rest.<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.find<span class=SpecSymbol>(</span>&thinsp; str&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; from=<span class=Number>0</span>,&thinsp; reverse=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+Find substring <span class=text_italic> str</span> , starting from <span class=text_italic> from</span> ; search backward if <span class=text_italic> reverse</span>  is true.
+Return the index of the occurrence of <span class=text_italic> str</span> , return -1 if not found.<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.<span class=Method>insert</span><span class=SpecSymbol>(</span>&thinsp; str&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; index=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Insert substring <span class=text_italic> str</span>  at <span class=text_italic> index</span> <br/>
+<div class="hlcode">
+<span class=DataType>string</span>.replace<span class=SpecSymbol>(</span>&thinsp; str1&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; str2&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; index=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Replace the <span class=text_italic> index</span> -th occurrence of substring <span class=text_italic> str1</span>  to substring <span class=text_italic> str2</span> ;
+the index starts from 1, which means the first, and 0 means all.<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.replace<span class=SpecSymbol>(</span>&thinsp; table&thinsp; :&thinsp; <span class=DataType>map</span>&lt;<span class=DataType>string</span>,<span class=DataType>string</span>&gt;,&thinsp; max=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Replace the occurrence of the keys of <span class=text_italic> table</span>  by the corresponding values.
+If <span class=text_italic> max</span>  is zero, replace the shorter key first, otherwise,
+replace the longer first.<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.expand<span class=SpecSymbol>(</span>&thinsp; keys&thinsp; :&thinsp; <span class=DataType>map</span>&lt;<span class=DataType>string</span>,<span class=DataType>string</span>&gt;,&thinsp; spec=<span class=String>'$'</span>,&thinsp; keep=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+If the string contains place holders in form of <span class=text_italic> $(name)</span> ,
+where <span class=text_italic> $</span>  is the special character passed in by <span class=text_italic> spec</span> ,
+this method will expand or fill at each place holder by the value string
+from <span class=text_italic> keys</span>  with key equal to the name of the place holder.<br/><br/>
+If <span class=text_italic> keep</span>  is zero, place holders with names not found in <span class=text_italic> keys</span> 
+will be replaced by empty string, namely, removing the place holders;
+otherwise the are kept.<br/>
+<div class="hlcode">
+tpl&thinsp; =&thinsp; <span class=String>'The quick brown $(A) jumps over the lazy $(B)'</span>;<br/>str&thinsp; =&thinsp; tpl.expand<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=String>'A'</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=String>'fox'</span>,&thinsp; <span class=String>'B'</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=String>'dog'</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; str&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<div class="hlcode">
+<span class=DataType>string</span>.expand<span class=SpecSymbol>(</span>&thinsp; keys&thinsp; :&thinsp; <span class=DataType>tuple</span>,&thinsp; spec=<span class=String>'$'</span>,&thinsp; keep=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+If the string contains place holders in form of <span class=text_italic> $(name)</span> ,
+where <span class=text_italic> $</span>  is the special character passed in by <span class=text_italic> spec</span> ,
+this method will expand or fill at each place holder by the item value string
+from <span class=text_italic> keys</span>  with item field name equal to the name of the place holder.<br/>
+If <span class=text_italic> keep</span>  is zero, place holders with names not found in <span class=text_italic> keys</span> 
+will be replaced by empty string, namely, removing the place holders;
+otherwise the are kept.<br/>
+<div class="hlcode">
+tpl&thinsp; =&thinsp; <span class=String>'The quick brown $(A) jumps over the lazy $(B)'</span>;<br/>str&thinsp; =&thinsp; tpl.expand<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>(</span>&thinsp; <span class=Number>A</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=String>'fox'</span>,&thinsp; <span class=Number>B</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=String>'dog'</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; str&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+<div class="hlcode">
+<span class=DataType>string</span>.resize<span class=SpecSymbol>(</span>&thinsp; <span class=Method>size</span>&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Resize the string to have length <span class=text_italic></span> , and the extended part are filled with blank space.<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.<span class=Method>size</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+Return the length of a string.<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.split<span class=SpecSymbol>(</span>&thinsp; sep&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; quote=<span class=String>""</span>,&thinsp; rm=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;</div>
+ 
+Split the string by seperator <span class=text_italic> sep</span> , and return the tokens as a list. 
+Quotation symbols may also be specified to avoid breaking the string inside 
+a pair of quotes. If the quotations symbols appear in the
+begin and end of a token and <span class=text_italic> rm</span>  is true, they are removed.
+The seperators are not included in the result list.<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.tokenize<span class=SpecSymbol>(</span>&thinsp; seps&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; quotes=<span class=String>""</span>,&thinsp; backslash=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;</div>
+ 
+Tokenize the string by a set of separators. 
+Each character in <span class=text_italic> seps</span>  is treated as a separator.
+Quotation symbols may also be specified to avoid breaking the string inside a pair of quotes.
+If <span class=text_italic> backslash</span>  is true, the separators and quotes preceded by a backslash are considered as normal characters.
+The separators, quotes and backslashes are not removed from the result tokens.
+If <span class=text_italic> simplify</span>  is true, the blank spaces are removed from the beginning and end of
+each token, and then empty tokens are remove from the resulting list.<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.tonumber<span class=SpecSymbol>(</span>&thinsp; base=<span class=Number>10</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>double</span></div>
+ 
+Convert the string to a number with base equal to <span class=text_italic> base</span> .<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.tolower<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+Convert the string to lower case.
+Return <span class=text_italic> self</span>  string.<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.toupper<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+Convert the string to upper case.
+Return <span class=text_italic> self</span>  string.<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.encrypt<span class=SpecSymbol>(</span>&thinsp; <span class=Method>key</span>&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; hex=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+Encrypt the string with <span class=text_italic> key</span>  using XXTEA algorithm.
+If <span class=text_italic> hex</span>  is true, store the encrypted string as hex digits.
+Return <span class=text_italic> self</span>  string.<br/>
+<div class="hlcode">
+<span class=DataType>string</span>.decrypt<span class=SpecSymbol>(</span>&thinsp; <span class=Method>key</span>&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; hex=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+Decrypt the string with <span class=text_italic> key</span>  using XXTEA algorithm.
+If <span class=text_italic> hex</span>  is true, the <span class=text_italic> self</span>  string is interpreted as hex digits.
+Return <span class=text_italic> self</span>  string.<br/>
+<table class="topsection"><tr><td><a name="3"><H3>3  complex</H3>
+</td><td align="right"><a href="&section=3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#3.1">Method&nbsp;list:</a></li>
+<li style="margin-top: 5px"><a href="#3.2">Method&nbsp;details:</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="3.1"><H5>3.1  Method list:</H5>
+</td><td align="right"><a href="&section=3.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+imag<span class=SpecSymbol>(</span>&thinsp; v=<span class=Number>0.00</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>double</span><br/>real<span class=SpecSymbol>(</span>&thinsp; v=<span class=Number>0.00</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>double</span></div>
+ <br/>
+<table><tr><td><a name="3.2"><H5>3.2  Method details:</H5>
+</td><td align="right"><a href="&section=3.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+<span class=DataType>complex</span>.imag<span class=SpecSymbol>(</span>&thinsp; v=<span class=Number>0.00</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>double</span></div>
+ 
+If it is called with parameters, set the imaginary part of the complex.
+No matter if it is called with or without parameters, 
+return the imaginary part before modification.<br/>
+<div class="hlcode">
+<span class=DataType>complex</span>.real<span class=SpecSymbol>(</span>&thinsp; v=<span class=Number>0.00</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>double</span></div>
+ 
+If it is called with parameters, set the real part of the complex.
+No matter if it is called with or without parameters, 
+return the real part before modification.<br/>
+<table class="topsection"><tr><td><a name="4"><H3>4  list</H3>
+</td><td align="right"><a href="&section=4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#4.1">Method&nbsp;list:</a></li>
+<li style="margin-top: 5px"><a href="#4.2">Method&nbsp;details:</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="4.1"><H5>4.1  Method list:</H5>
+</td><td align="right"><a href="&section=4.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+<span class=Method>append</span><span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>clear</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>dequeue<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>enqueue<span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM&thinsp; <span class=SpecSymbol>)</span><br/>erase<span class=SpecSymbol>(</span>&thinsp; start=<span class=Number>0</span>,&thinsp; n=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><br/>front<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; @ITEM<br/><span class=Method>insert</span><span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM,&thinsp; pos=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/>max<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;@ITEM,<span class=DataType>int</span>&gt;<br/>min<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;@ITEM,<span class=DataType>int</span>&gt;<br/><span class=Method>pop</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>popback<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>popfront<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>push</span><span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM&thinsp; <span class=SpecSymbol>)</span><br/>pushback<span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM&thinsp; <span class=SpecSymbol>)</span><br/>pushfront<span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM&thinsp; <span class=SpecSymbol>)</span><br/>resize<span class=SpecSymbol>(</span>&thinsp; <span class=Method>size</span>&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>size</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>ranka<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;<br/>rankd<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;<br/>sorta<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@ITEM&gt;<br/>sortd<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@ITEM&gt;<br/>sum<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; @ITEM<br/>top<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; @ITEM</div>
+ <br/>
+The <span class=text_bold> sort()</span>  method that can take an expression as parameter
+is now supported as a built-in method, please read <a href="/page/dao_functional_methods">here</a> .<br/>
+<table><tr><td><a name="4.2"><H5>4.2  Method details:</H5>
+</td><td align="right"><a href="&section=4.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.<span class=Method>append</span><span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Append <span class=text_italic> item</span>  to the list.<br/>
+Here <span class=text_bold> @ITEM</span>  indicates the <span class=text_italic> item</span>  parameter will have the same type as the list,
+so <span class=text_italic> append( item : @ITEM )</span>  will only allow appending an item of the same type as the
+type of items of the list.<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.<span class=Method>clear</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span></div>
+ 
+Remove all items from the list.<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.dequeue<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span></div>
+ 
+Use the list as a queue, get the first item in the queue.<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.enqueue<span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Use the list as a queue, push <span class=text_italic> item</span>  in the end of the queue.<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.erase<span class=SpecSymbol>(</span>&thinsp; start=<span class=Number>0</span>,&thinsp; n=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Erase <span class=text_italic> n</span>  items from the list starting from index <span class=text_italic> start</span> .<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.front<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; @ITEM</div>
+ 
+Get the first item in the front.<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.<span class=Method>insert</span><span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM,&thinsp; pos=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Insert <span class=text_italic> item</span>  at position <span class=text_italic> pos</span> .<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.max<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; &lt;@ITEM,<span class=DataType>int</span>&gt;</div>
+ 
+Return the max item and its index in the list. <br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.min<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; &lt;@ITEM,<span class=DataType>int</span>&gt;</div>
+ 
+Return the min item and its index in the list.<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.<span class=Method>pop</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Pop out one item from the end of the list.<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.popback<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Pop out one item from the end of the list.<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.popfront<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Pop out one item from the begin of the list.<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.<span class=Method>push</span><span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Push <span class=text_italic> item</span>  to the end of the list.<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.pushback<span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Push <span class=text_italic> item</span>  to the end of the list.<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.pushfront<span class=SpecSymbol>(</span>&thinsp; item&thinsp; :&thinsp; @ITEM&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Push <span class=text_italic> item</span>  to the begin of the list.<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.ranka<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;<br/><span class=DataType>list</span>&lt;@ITEM&gt;.rankd<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;</div>
+ 
+Ascending or descending ranking of the list.
+If <span class=text_italic> k</span>  is not zero, rank the smallest or largest <span class=text_italic> k</span>  items.<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.resize<span class=SpecSymbol>(</span>&thinsp; <span class=Method>size</span>&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Resize the list to have size <span class=text_italic> size</span> . Extended part is filled with nil.<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.<span class=Method>size</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+Return the size of the list.<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.sorta<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@ITEM&gt;<br/><span class=DataType>list</span>&lt;@ITEM&gt;.sortd<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@ITEM&gt;</div>
+ 
+Ascending or descending sorting of the list.
+If <span class=text_italic> k</span>  is not zero, sort the smallest or largest <span class=text_italic> k</span>  items.<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.sum<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; @ITEM</div>
+ 
+Return the sum of the list. Only for lists contain numbers, strings or complex numbers.<br/>
+<div class="hlcode">
+<span class=DataType>list</span>&lt;@ITEM&gt;.top<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; @ITEM</div>
+ 
+Get the last item in the list.<br/>
+<table class="topsection"><tr><td><a name="5"><H3>5  map</H3>
+</td><td align="right"><a href="&section=5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#5.1">Method&nbsp;list:</a></li>
+<li style="margin-top: 5px"><a href="#5.2">Method&nbsp;details:</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="5.1"><H5>5.1  Method list:</H5>
+</td><td align="right"><a href="&section=5.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+<span class=Method>clear</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>erase<span class=SpecSymbol>(</span>&thinsp; from&thinsp; :&thinsp; @KEY=nil,&thinsp; to&thinsp; :&thinsp; @KEY=nil&thinsp; <span class=SpecSymbol>)</span><br/>find<span class=SpecSymbol>(</span>&thinsp; <span class=Method>key</span>&thinsp; :&thinsp; @KEY,&thinsp; type=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;<span class=DataType>int</span>,@KEY,@VALUE&gt;<br/><span class=Method>insert</span><span class=SpecSymbol>(</span>&thinsp; <span class=Method>key</span>&thinsp; :&thinsp; @KEY,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; @VALUE&thinsp; <span class=SpecSymbol>)</span><br/>keys<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@KEY&gt;<br/>keys<span class=SpecSymbol>(</span>&thinsp; from&thinsp; :&thinsp; @KEY&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@KEY&gt;<br/>keys<span class=SpecSymbol>(</span>&thinsp; from&thinsp; :&thinsp; @KEY,&thinsp; to&thinsp; :&thinsp; @KEY&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@KEY&gt;<br/><span class=Method>size</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>values<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@VALUE&gt;<br/>values<span class=SpecSymbol>(</span>&thinsp; from&thinsp; :&thinsp; @KEY&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@VALUE&gt;<br/>values<span class=SpecSymbol>(</span>&thinsp; from&thinsp; :&thinsp; @KEY,&thinsp; to&thinsp; :&thinsp; @KEY&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@VALUE&gt;</div>
+ <br/>
+<table><tr><td><a name="5.2"><H5>5.2  Method details:</H5>
+</td><td align="right"><a href="&section=5.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+<span class=DataType>map</span>&lt;@KEY,@VALUE&gt;.<span class=Method>clear</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Erase all the element pairs from the map.<br/>
+<div class="hlcode">
+<span class=DataType>map</span>&lt;@KEY,@VALUE&gt;.erase<span class=SpecSymbol>(</span>&thinsp; from&thinsp; :&thinsp; @KEY=nil,&thinsp; to&thinsp; :&thinsp; @KEY=nil&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Erase key-value pairs between key <span class=text_italic> from</span>  and key <span class=text_italic> to</span>  (inclusive).
+If the second parameter is omited, erase the element with key equal to <span class=text_italic> from</span> .
+If both parameters are omited, it will erase all elements.<br/>
+<div class="hlcode">
+<span class=DataType>map</span>&lt;@KEY,@VALUE&gt;.find<span class=SpecSymbol>(</span>&thinsp; <span class=Method>key</span>&thinsp; :&thinsp; @KEY,&thinsp; type=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;<span class=DataType>int</span>,@KEY,@VALUE&gt;</div>
+ 
+If <span class=text_italic> type=0</span> , find the key equal to <span class=text_italic> key</span> ;
+If <span class=text_italic> type&lt;0</span> , find the maximum key lesser than or equal to <span class=text_italic> key</span> ;
+If <span class=text_italic> type&gt;0</span> , find the minimum key greater than or equal to <span class=text_italic> key</span> ;
+return a tuple of an integer, the key and value of the found element, 
+the integer is 1 if found; 0, otherwise.<br/>
+<div class="hlcode">
+<span class=DataType>map</span>&lt;@KEY,@VALUE&gt;.<span class=Method>insert</span><span class=SpecSymbol>(</span>&thinsp; <span class=Method>key</span>&thinsp; :&thinsp; @KEY,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; @VALUE&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Insert a pair of element.<br/>
+<div class="hlcode">
+keys<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@KEY&gt;<br/>keys<span class=SpecSymbol>(</span>&thinsp; from&thinsp; :&thinsp; @KEY&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@KEY&gt;<br/>keys<span class=SpecSymbol>(</span>&thinsp; from&thinsp; :&thinsp; @KEY,&thinsp; to&thinsp; :&thinsp; @KEY&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@KEY&gt;</div>
+ 
+Return all keys, or keys starting from <span class=text_italic> from</span> ,
+or keys between <span class=text_italic> from</span>  and <span class=text_italic> to</span> .<br/>
+<div class="hlcode">
+<span class=DataType>map</span>&lt;@KEY,@VALUE&gt;.<span class=Method>size</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+Return the number of elements in the map.<br/>
+<div class="hlcode">
+values<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@VALUE&gt;<br/>values<span class=SpecSymbol>(</span>&thinsp; from&thinsp; :&thinsp; @KEY&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@VALUE&gt;<br/>values<span class=SpecSymbol>(</span>&thinsp; from&thinsp; :&thinsp; @KEY,&thinsp; to&thinsp; :&thinsp; @KEY&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;@VALUE&gt;</div>
+ 
+Return all values, or values with keys starting from <span class=text_italic> from</span> ,
+or with keys between <span class=text_italic> from</span>  and <span class=text_italic> to</span> .<br/>
+<table class="topsection"><tr><td><a name="6"><H3>6  numeric array</H3>
+</td><td align="right"><a href="&section=6"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#6.1">Method&nbsp;list:</a></li>
+<li style="margin-top: 5px"><a href="#6.2">Method&nbsp;details:</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="6.1"><H5>6.1  Method list:</H5>
+</td><td align="right"><a href="&section=6.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+dim<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;<br/>dim<span class=SpecSymbol>(</span>&thinsp; i&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>index<span class=SpecSymbol>(</span>&thinsp; i&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;<br/><span class=Method>size</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>resize<span class=SpecSymbol>(</span>&thinsp; dims&thinsp; :&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;&thinsp; <span class=SpecSymbol>)</span><br/>reshape<span class=SpecSymbol>(</span>&thinsp; dims&thinsp; :&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;&thinsp; <span class=SpecSymbol>)</span><br/>sorta<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/>sortd<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/>ranka<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;<br/>rankd<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;<br/>max<span class=SpecSymbol>(</span>&thinsp; slice=<span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;@ITEM,<span class=DataType>int</span>&gt;<br/>min<span class=SpecSymbol>(</span>&thinsp; slice=<span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;@ITEM,<span class=DataType>int</span>&gt;<br/>sum<span class=SpecSymbol>(</span>&thinsp; slice=<span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; @ITEM<br/>varn<span class=SpecSymbol>(</span>&thinsp; slice=<span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>double</span><br/>fft<span class=SpecSymbol>(</span>&thinsp; inv=-<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+The <span class=text_bold> apply()</span>  method that can take an expression as parameter
+is now supported as a built-in method, please read <a href="/page/dao_functional_methods">here</a> .
+The <span class=text_bold> noapply()</span>  method is removed.<br/>
+<table><tr><td><a name="6.2"><H5>6.2  Method details:</H5>
+</td><td align="right"><a href="&section=6.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+dim<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;<br/>dim<span class=SpecSymbol>(</span>&thinsp; &thinsp; self&thinsp; :&thinsp; <span class=DataType>array</span>&lt;@ITEM&gt;&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;</div>
+ 
+Return the sizes of each dimension as a vector.
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.dim<span class=SpecSymbol>(</span>&thinsp; i&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+Return the size of the i-th dimension of the array. <br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.index<span class=SpecSymbol>(</span>&thinsp; i&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;</div>
+ 
+Convert a flat index of the array to the corresponding multi-dimsional index.<br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.<span class=Method>size</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+return the number of elements in the array.<br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.resize<span class=SpecSymbol>(</span>&thinsp; dims&thinsp; :&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Resize the array to dimension as specified by <span class=text_italic> dims</span> .<br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.reshape<span class=SpecSymbol>(</span>&thinsp; dims&thinsp; :&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Reshape the array to dimension as specified by <span class=text_italic> dims</span> .<br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.ranka<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;<br/><span class=DataType>array</span>&lt;@ITEM&gt;.rankd<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>array</span>&lt;<span class=DataType>int</span>&gt;</div>
+ 
+Ascending or descending ranking of the array.
+If <span class=text_italic> k</span>  is not zero, rank the smallest or largest <span class=text_italic> k</span>  items.<br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.sorta<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=DataType>array</span>&lt;@ITEM&gt;.sortd<span class=SpecSymbol>(</span>&thinsp; k=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Ascending or descending sorting of the array.
+If <span class=text_italic> k</span>  is not zero, sort the smallest or largest <span class=text_italic> k</span>  items.<br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.max<span class=SpecSymbol>(</span>&thinsp; slice=<span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;@ITEM,<span class=DataType>int</span>&gt;</div>
+ 
+Return the max value and its flat index of the elements specified by <span class=text_italic> slice</span>  as sub-array.
+If <span class=text_italic> slice</span>  is empty or omitted, return the max value of the array.
+<div class="hlcode">
+mat&thinsp; =&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>1.5</span>,&thinsp; <span class=Number>2.5</span>,&thinsp; <span class=Number>3</span>,&thinsp; <span class=Number>4</span>;&thinsp; <span class=Number>5</span>,&thinsp; <span class=Number>6</span>,&thinsp; <span class=Number>7</span>,&thinsp; <span class=Number>8</span>;&thinsp; <span class=Number>9</span>,&thinsp; <span class=Number>0</span>,&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>&thinsp; <span class=SpecSymbol>]</span>;<br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; mat.max<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>{</span>&thinsp; &thinsp; <span class=Number>1</span>:,&thinsp; <span class=Number>1</span>:<span class=Number>2</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ 
+This example prints the maximum value and its index of the elements in a sub-matrix
+formed by rows starting from the second row, and the second and third columns.<br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.min<span class=SpecSymbol>(</span>&thinsp; slice=<span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;@ITEM,<span class=DataType>int</span>&gt;</div>
+ 
+Return the min value and its flat index of the elements specified by <span class=text_italic> slice</span> . 
+If <span class=text_italic> slice</span>  is empty or omitted, return the min value of the array.<br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.sum<span class=SpecSymbol>(</span>&thinsp; slice=<span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; @ITEM</div>
+ 
+Return the sum value of the elements specified by <span class=text_italic> slice</span> . If <span class=text_italic> slice</span>  is empty
+or omitted, return the sum value of the array.<br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;@ITEM&gt;.varn<span class=SpecSymbol>(</span>&thinsp; slice=<span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>double</span></div>
+ 
+Return the sample variance of the elements specified by <span class=text_italic> slice</span> . If <span class=text_italic> slice</span>  is empty
+or omitted, return the sample variance of the array.<br/>
+<div class="hlcode">
+<span class=DataType>array</span>&lt;<span class=DataType>complex</span>&gt;.fft<span class=SpecSymbol>(</span>&thinsp; inv=-<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Fast Fourior Transform.<br/>
+<table class="topsection"><tr><td><a name="7"><H3>7  cdata</H3>
+</td><td align="right"><a href="&section=7"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#7.1">Method&nbsp;list:</a></li>
+<li style="margin-top: 5px"><a href="#7.2">Method&nbsp;details:</a></li>
+</ol></td></tr></table> <br/>
+The <span class=text_bold> cdata</span> (previously named as <span class=text_bold> buffer</span> ) data type represents a block of memory.<br/>
+<table><tr><td><a name="7.1"><H5>7.1  Method list:</H5>
+</td><td align="right"><a href="&section=7.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+cdata<span class=SpecSymbol>(</span>&thinsp; <span class=Method>size</span>&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; cdata<br/>copydata<span class=SpecSymbol>(</span>&thinsp; buf&thinsp; :&thinsp; buffer&thinsp; <span class=SpecSymbol>)</span><br/>getbyte<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>getdouble<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>double</span><br/>getfloat<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>float</span><br/>getint<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>getshort<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>getstring<span class=SpecSymbol>(</span>&thinsp; mbs=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span><br/>resize<span class=SpecSymbol>(</span>&thinsp; <span class=Method>size</span>&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><br/>setbyte<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><br/>setdouble<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span><br/>setfloat<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>float</span>&thinsp; <span class=SpecSymbol>)</span><br/>setint<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><br/>setshort<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><br/>setstring<span class=SpecSymbol>(</span>&thinsp; <span class=DataType>string</span>&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>size</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ <br/>
+<table><tr><td><a name="7.2"><H5>7.2  Method details:</H5>
+</td><td align="right"><a href="&section=7.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+buffer<span class=SpecSymbol>(</span>&thinsp; <span class=Method>size</span>&thinsp; =&thinsp; <span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; buffer</div>
+ 
+Create a buffer of <span class=text_italic> size</span>  bytes.<br/>
+<div class="hlcode">
+buffer.copydata<span class=SpecSymbol>(</span>&thinsp; buf&thinsp; :buffer&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Copy data from buffer <span class=text_italic> buf</span> .
+<div class="hlcode">
+buffer.getbyte<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+Get one byte with specified <span class=text_italic> index</span> ;
+if <span class=text_italic> signed=1</span> , the byte is interpreted as signed.
+<div class="hlcode">
+buffer.getdouble<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>double</span></div>
+ 
+Get double floating number with specified <span class=text_italic> index</span> .
+<div class="hlcode">
+buffer.getfloat<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>float</span></div>
+ 
+Get single floating number with specified <span class=text_italic> index</span> .
+<div class="hlcode">
+buffer.getint<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+Get integer with specified <span class=text_italic> index</span> .
+if <span class=text_italic> signed=1</span> , the integer is interpreted as signed.
+<div class="hlcode">
+buffer.getshort<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+Get short integer with specified <span class=text_italic> index</span> .
+if <span class=text_italic> signed=1</span> , the short integer is interpreted as signed.
+<div class="hlcode">
+buffer.getstring<span class=SpecSymbol>(</span>&thinsp; mbs=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+Interprete the buffer as a string; Return MBS string if <span class=text_italic> mbs=1</span> , otherwise return WCS.
+<div class="hlcode">
+buffer.resize<span class=SpecSymbol>(</span>&thinsp; <span class=Method>size</span>&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Resize the buffer to <span class=text_italic> size</span>  bytes;
+<div class="hlcode">
+buffer.setbyte<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Set one byte specified <span class=text_italic> index</span>  with <span class=text_italic> value</span> ;
+if <span class=text_italic> signed=1</span> , the byte is interpreted as signed.
+<div class="hlcode">
+buffer.setdouble<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>double</span>,&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Set one double specified <span class=text_italic> index</span>  with <span class=text_italic> value</span> ;
+<div class="hlcode">
+buffer.setfloat<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>float</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Set one float specified <span class=text_italic> index</span>  with <span class=text_italic> value</span> ;
+<div class="hlcode">
+buffer.setint<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Set one integer specified <span class=text_italic> index</span>  with <span class=text_italic> value</span> ;
+if <span class=text_italic> signed=1</span> , the integer is interpreted as signed.
+<div class="hlcode">
+buffer.setshort<span class=SpecSymbol>(</span>&thinsp; index&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=Method>value</span>&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; signed=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Set one short integer specified <span class=text_italic> index</span>  with <span class=text_italic> value</span> ;
+if <span class=text_italic> signed=1</span> , the short integer is interpreted as signed.
+<div class="hlcode">
+buffer.setstring<span class=SpecSymbol>(</span>&thinsp; <span class=DataType>string</span>&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+buffer.<span class=Method>size</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+Return the size of the buffer in bytes.<br/>
+<table class="topsection"><tr><td><a name="8"><H3>8  std (was stdlib)</H3>
+</td><td align="right"><a href="&section=8"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#8.1">Method&nbsp;list:</a></li>
+<li style="margin-top: 5px"><a href="#8.2">Method&nbsp;details:</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="8.1"><H5>8.1  Method list:</H5>
+</td><td align="right"><a href="&section=8.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+<span class=Method>stdlib.about</span><span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span><br/><span class=Method>stdlib.callable</span><span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/><span class=Method>stdlib.compile</span><span class=SpecSymbol>(</span>&thinsp; source&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>stdlib.copy</span><span class=SpecSymbol>(</span>&thinsp; object&thinsp; :&thinsp; @OBJECT&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; @OBJECT<br/><span class=Method>stdlib.ctimef</span><span class=SpecSymbol>(</span>&thinsp; time=<span class=Number>0</span>,&thinsp; format=<span class=String>'%Y-%M-%D, %H:%I:%S'</span>,&thinsp; namemap&thinsp; :&thinsp; <span class=DataType>map</span>&lt;<span class=DataType>string</span>,<span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;&gt;&thinsp; =<span class=SpecSymbol>{</span><span class=SpecSymbol>=></span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span><br/><span class=Method>stdlib.ctime</span><span class=SpecSymbol>(</span>&thinsp; time=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;year:<span class=DataType>int</span>,month:<span class=DataType>int</span>,day:<span class=DataType>int</span>,wday:<span class=DataType>int</span>,hour:<span class=DataType>int</span>,minute:<span class=DataType>int</span>,second:<span class=DataType>int</span>&gt;<br/><span class=Method>stdlib.debug</span><span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>stdlib.error</span><span class=SpecSymbol>(</span>&thinsp; info&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>stdlib.eval</span><span class=SpecSymbol>(</span>&thinsp; source&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=DataType>stream</span>=<span class=Method>stdio</span><span class=SpecSymbol>)</span><br/><span class=Method>stdlib.exit</span><span class=SpecSymbol>(</span>&thinsp; code=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>stdlib.gcmax</span><span class=SpecSymbol>(</span>&thinsp; limit=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/><span class=Method>stdlib.gcmin</span><span class=SpecSymbol>(</span>&thinsp; limit=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/><span class=Method>stdlib.listmeth</span><span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>stdlib.enable_fe</span><span class=SpecSymbol>(</span>&thinsp; flags&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/><span class=Method>stdlib.disable_fe</span><span class=SpecSymbol>(</span>&thinsp; flags&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/><span class=Method>stdlib.load</span><span class=SpecSymbol>(</span>&thinsp; file&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>stdlib.pack</span><span class=SpecSymbol>(</span>&thinsp; number&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span><br/><span class=Method>stdlib.pack</span><span class=SpecSymbol>(</span>&thinsp; <span class=DataType>list</span>&thinsp; :<span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span><br/><span class=Method>stdlib.sleep</span><span class=SpecSymbol>(</span>&thinsp; seconds&thinsp; :&thinsp; <span class=DataType>float</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>stdlib.system</span><span class=SpecSymbol>(</span>&thinsp; command&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>stdlib.time</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/><span class=Method>stdlib.time</span><span class=SpecSymbol>(</span>&thinsp; tm&thinsp; :&thinsp; <span class=DataType>tuple</span>&lt;year:<span class=DataType>int</span>,month:<span class=DataType>int</span>,day:<span class=DataType>int</span>,wday:<span class=DataType>int</span>,hour:<span class=DataType>int</span>,minute:<span class=DataType>int</span>,second:<span class=DataType>int</span>&gt;&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/><span class=Method>stdlib.tokenize</span><span class=SpecSymbol>(</span>&thinsp; source&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;<br/><span class=Method>stdlib.unpack</span><span class=SpecSymbol>(</span>&thinsp; <span class=DataType>string</span>&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;<br/><span class=Method>stdlib.warn</span><span class=SpecSymbol>(</span>&thinsp; info&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+<table><tr><td><a name="8.2"><H5>8.2  Method details:</H5>
+</td><td align="right"><a href="&section=8.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+about<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+Return the type name and address of the parameters.
+<div class="hlcode">
+callable<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+Tell if the object is callable.
+<div class="hlcode">
+compile<span class=SpecSymbol>(</span>&thinsp; source&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Compile the source code and return a routine object.
+<div class="hlcode">
+copy<span class=SpecSymbol>(</span>&thinsp; object&thinsp; :&thinsp; @OBJECT&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; @OBJECT</div>
+ 
+Return a deep copy of the object.
+(TODO: the implementation might be incomplete.)<br/>
+<div class="hlcode">
+ctime<span class=SpecSymbol>(</span>&thinsp; time=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>tuple</span>&lt;year:<span class=DataType>int</span>,month:<span class=DataType>int</span>,day:<span class=DataType>int</span>,wday:<span class=DataType>int</span>,hour:<span class=DataType>int</span>,minute:<span class=DataType>int</span>,second:<span class=DataType>int</span>&gt;</div>
+ 
+Convert <span class=text_italic> time</span>  returned from <span class=text_bold> stdlib.time()</span>  into calendar time as a tuple.<br/>
+<div class="hlcode">
+ctimef<span class=SpecSymbol>(</span>&thinsp; time=<span class=Number>0</span>,&thinsp; format=<span class=String>'%Y-%M-%D, %H:%I:%S'</span>,&thinsp; namemap&thinsp; :&thinsp; <span class=DataType>map</span>&lt;<span class=DataType>string</span>,<span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;&gt;&thinsp; =<span class=SpecSymbol>{</span><span class=SpecSymbol>=></span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+Convert <span class=text_italic> time</span>  returned from <span class=text_bold> stdlib.time()</span>  into calendar time with
+specified <span class=text_italic> format</span> ; the names for year, month and date etc. can be specified
+in <span class=text_italic> namemap</span> 
+<div class="hlcode">
+debug<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+If called with parameters, return the type name and address of the parameters.
+If called without parameters, the debugging console will be prompted up.
+It only has effects in debugging running mode.
+<div class="hlcode">
+<span class=Method>error</span><span class=SpecSymbol>(</span>&thinsp; info&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Print <span class=text_italic> info</span>  as error information and abort current virtual machine process.
+<div class="hlcode">
+eval<span class=SpecSymbol>(</span>&thinsp; source&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=DataType>stream</span>=<span class=Method>stdio</span><span class=SpecSymbol>)</span></div>
+ 
+Evaluate the source, and use <span class=text_italic> stream</span>  as the standard IO device.
+<div class="hlcode">
+<span class=Method>exit</span><span class=SpecSymbol>(</span>&thinsp; code=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Exit with <span class=text_italic> code</span> .
+<div class="hlcode">
+gcmax<span class=SpecSymbol>(</span>&thinsp; limit=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+Return the current maximum GC threshold.
+If there is the parameter, the threshold is changed to <span class=text_italic> limit</span> .
+The maximum GC threshold is the upper bound of number of candidate garbage objects,
+if this limit is exceeded, all the mutator threads are blocked until their are waked up
+by the garbage collector after finishing to precess a certain part of the garbages.
+Normally, the garbage collection thread runs concurrently with the mutator threads,
+or is blocked if there are too few garbage.
+<div class="hlcode">
+gcmin<span class=SpecSymbol>(</span>&thinsp; limit=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+Return the current minimum GC threshold.
+If there is the parameter, the threshold is changed to <span class=text_italic> limit</span> .
+The minimum GC threshold is the lower bound of number of candidate garbage objects
+for the garbage collector to wake up and start garbage collecting.
+<div class="hlcode">
+listmeth<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+List the available methods for the object.
+<div class="hlcode">
+<span class=StmtKey>load</span><span class=SpecSymbol>(</span>&thinsp; file&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Load and execute scripts from a file.
+<div class="hlcode">
+pack<span class=SpecSymbol>(</span>&thinsp; number&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+Convert the number into a character.
+<div class="hlcode">
+pack<span class=SpecSymbol>(</span>&thinsp; <span class=DataType>list</span>&thinsp; :<span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+Convert the list of numbers into a string.
+<div class="hlcode">
+sleep<span class=SpecSymbol>(</span>&thinsp; seconds&thinsp; :&thinsp; <span class=DataType>float</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Let the current thread to sleep for <span class=text_italic> seconds</span> (may lesser than 1) seconds.
+<div class="hlcode">
+system<span class=SpecSymbol>(</span>&thinsp; command&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Run a system command.
+<div class="hlcode">
+time<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+Return current time.
+<div class="hlcode">
+time<span class=SpecSymbol>(</span>&thinsp; tm&thinsp; :&thinsp; <span class=DataType>tuple</span>&lt;year:<span class=DataType>int</span>,month:<span class=DataType>int</span>,day:<span class=DataType>int</span>,wday:<span class=DataType>int</span>,hour:<span class=DataType>int</span>,minute:<span class=DataType>int</span>,second:<span class=DataType>int</span>&gt;&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+Convert calendar time to time in seconds (as returned by time()).
+<div class="hlcode">
+tokenize<span class=SpecSymbol>(</span>&thinsp; source&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>string</span>&gt;</div>
+ 
+Tokenize Dao source code.
+<div class="hlcode">
+unpack<span class=SpecSymbol>(</span>&thinsp; <span class=DataType>string</span>&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;<span class=DataType>int</span>&gt;</div>
+ 
+Unpack string into a list of number.
+<div class="hlcode">
+<span class=Method>warn</span><span class=SpecSymbol>(</span>&thinsp; info&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Print a warning, with file name and line number information.<br/>
+<table class="topsection"><tr><td><a name="9"><H3>9  stream and io (was stdio) library</H3>
+</td><td align="right"><a href="&section=9"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#9.1">Method&nbsp;list:</a></li>
+<li style="margin-top: 5px"><a href="#9.2">Method&nbsp;details:</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="9.1"><H5>9.1  Method list:</H5>
+</td><td align="right"><a href="&section=9.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+close<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>eof<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>flush<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>getstring<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>isopen<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>name<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>open<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>open<span class=SpecSymbol>(</span>&thinsp; file&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; mode&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><br/>popen<span class=SpecSymbol>(</span>&thinsp; cmd&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; mode&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><br/>write<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/>writeln<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/>writef<span class=SpecSymbol>(</span>&thinsp; format&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>print</span><span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>println</span><span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/>printf<span class=SpecSymbol>(</span>&thinsp; format&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>read</span><span class=SpecSymbol>(</span>&thinsp; count=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>string</span><br/><span class=Method>read</span><span class=SpecSymbol>(</span>&thinsp; file&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>string</span><br/>seek<span class=SpecSymbol>(</span>&thinsp; pos&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; from&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><br/>sstream<span class=SpecSymbol>(</span>&thinsp; mbs=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><br/>tell<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+<table><tr><td><a name="9.2"><H5>9.2  Method details:</H5>
+</td><td align="right"><a href="&section=9.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+close<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Close a file stream.<br/>
+<div class="hlcode">
+eof<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Check if the end of the stream is reached.<br/>
+<div class="hlcode">
+flush<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Flush the stream to cause all buffered output to be written to the device.<br/>
+<div class="hlcode">
+getstring<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Get output string from a string stream.<br/>
+<div class="hlcode">
+isopen<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Check if a file stream is open.<br/>
+<div class="hlcode">
+name<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Get the file name of a file stream<br/>
+<div class="hlcode">
+open<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Open a temporary file stream.<br/>
+<div class="hlcode">
+open<span class=SpecSymbol>(</span>&thinsp; file&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; mode&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Open a file stream on <span class=text_italic> file</span>  with mode <span class=text_italic> mode</span> .
+The supported mode is exactly the same as what is supported in standard C function <span class=text_italic> fopen()</span> .<br/>
+<div class="hlcode">
+popen<span class=SpecSymbol>(</span>&thinsp; cmd&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; mode&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Open a pipe in mode <span class=text_italic> mode</span>  to execute command <span class=text_italic> cmd</span> .<br/>
+<div class="hlcode">
+write<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>print</span><span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Print to the stream.<br/>
+<div class="hlcode">
+writeln<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>println</span><span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Print to the stream with a line break symbol.<br/>
+<div class="hlcode">
+writef<span class=SpecSymbol>(</span>&thinsp; format&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/>printf<span class=SpecSymbol>(</span>&thinsp; format&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Formated printing, <span class=text_italic> format</span>  can be specified in the same way as in C.<br/>
+<div class="hlcode">
+<span class=Method>read</span><span class=SpecSymbol>(</span>&thinsp; count=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>string</span><br/><span class=Method>read</span><span class=SpecSymbol>(</span>&thinsp; file&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>string</span></div>
+ 
+If <span class=text_italic> count</span>  is positive, read <span class=text_italic> count</span>  number of bytes from the stream;
+if <span class=text_italic> count</span>  is negative, read all bytes from the stream;
+otherwise, read one line from the stream including the line break symbol.<br/>
+<div class="hlcode">
+<span class=Method>read</span><span class=SpecSymbol>(</span>&thinsp; file&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>string</span></div>
+ 
+Read the whole file from <span class=text_italic> file</span> .<br/>
+<div class="hlcode">
+seek<span class=SpecSymbol>(</span>&thinsp; pos&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; from&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Seek stream position with offset <span class=text_italic> pos</span>  from <span class=text_italic> from</span> ;
+<span class=text_italic> from</span>  can be "stdio.SEEK_CUR", "stdio.SEEK_SET" or "stdio.SEEK_END";<br/>
+<div class="hlcode">
+sstream<span class=SpecSymbol>(</span>&thinsp; mbs=<span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Create a string stream; the internal string buffer can be MBS or WCS depends on parameter <span class=text_italic> mbs</span> .<br/>
+<div class="hlcode">
+tell<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Tell the current stream position.<br/>
+<table class="topsection"><tr><td><a name="10"><H3>10  math</H3>
+</td><td align="right"><a href="&section=10"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#10.1">Method&nbsp;list:</a></li>
+</ol></td></tr></table> <br/>
+These math functions except <span class=text_bold> srand()</span>  and <span class=text_bold> pow()</span> ,
+they are also supported as builtin functions since Dao 1.1.<br/>
+<table><tr><td><a name="10.1"><H5>10.1  Method list:</H5>
+</td><td align="right"><a href="&section=10.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+<span class=Method>math.abs</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.abs</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.acos</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.arg</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.asin</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.atan</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.ceil</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.ceil</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.cos</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.cos</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.cosh</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.cosh</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.exp</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.exp</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.floor</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.floor</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.imag</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.log</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.log</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.norm</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.pow</span><span class=SpecSymbol>(</span>&thinsp; p1&thinsp; :&thinsp; <span class=DataType>double</span>,&thinsp; p2&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.pow</span><span class=SpecSymbol>(</span>&thinsp; p1&thinsp; :&thinsp; <span class=DataType>double</span>,&thinsp; p2&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.pow</span><span class=SpecSymbol>(</span>&thinsp; p1&thinsp; :&thinsp; <span class=DataType>complex</span>,&thinsp; p2&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.pow</span><span class=SpecSymbol>(</span>&thinsp; p1&thinsp; :&thinsp; <span class=DataType>complex</span>,&thinsp; p2&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.real</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.sin</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.sin</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.sinh</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.sinh</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.sqrt</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.sqrt</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.srand</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.rand</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.tan</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.tan</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.tanh</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>double</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+<span class=Method>math.tanh</span><span class=SpecSymbol>(</span>&thinsp; p&thinsp; :&thinsp; <span class=DataType>complex</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+<table class="topsection"><tr><td><a name="11"><H3>11  reflection</H3>
+</td><td align="right"><a href="&section=11"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#11.1">Method&nbsp;list:</a></li>
+<li style="margin-top: 5px"><a href="#11.2">Method&nbsp;details:</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="11.1"><H5>11.1  Method list:</H5>
+</td><td align="right"><a href="&section=11.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+namespace<span class=SpecSymbol>(</span>&thinsp; object=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; any<br/>name<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span><br/>type<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; any<br/>base<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;any&gt;<br/>doc<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; newdoc=<span class=String>''</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span><br/>constant<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; restrict=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>map</span>&lt;<span class=DataType>string</span>,<span class=DataType>tuple</span>&lt;<span class=Method>value</span>:any,type:any&gt;&thinsp; &gt;<br/>variable<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; restrict=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>map</span>&lt;<span class=DataType>string</span>,<span class=DataType>tuple</span>&lt;<span class=Method>value</span>:any,type:any&gt;&thinsp; &gt;<br/>constant<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; name:<span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>tuple</span>&lt;<span class=Method>value</span>:any,type:any&gt;<br/>variable<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; name:<span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>tuple</span>&lt;<span class=Method>value</span>:any,type:any&gt;<br/><span class=CodeStruct>class</span><span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; any<br/><span class=CodeStruct>routine</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; any<br/><span class=CodeStruct>routine</span><span class=SpecSymbol>(</span>&thinsp; rout&thinsp; :&thinsp; any&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;any&gt;<br/>param<span class=SpecSymbol>(</span>&thinsp; rout&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>list</span>&lt;<span class=DataType>tuple</span>&lt;name:<span class=DataType>string</span>,type:any,deft:<span class=DataType>int</span>,<span class=Method>value</span>:any&gt;&thinsp; &gt;<br/>isa<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; name&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>isa<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; type&thinsp; :&thinsp; any&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>self<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; any<br/>argc<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>argv<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;any&gt;<br/>argv<span class=SpecSymbol>(</span>&thinsp; i&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; any</div>
+ <br/>
+<table><tr><td><a name="11.2"><H5>11.2  Method details:</H5>
+</td><td align="right"><a href="&section=11.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+namespace<span class=SpecSymbol>(</span>&thinsp; object=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; any</div>
+ 
+If object is a routine or class, return the namespace where it is defined;
+otherwise, return the current namespace.<br/>
+<div class="hlcode">
+name<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+Get the name of a routine, function, method or class.<br/>
+<div class="hlcode">
+type<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; any</div>
+ 
+return the type of the object.<br/>
+<div class="hlcode">
+base<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;any&gt;</div>
+ 
+If <span class=text_italic> object</span>  is a class, return its direct parent classes;
+If <span class=text_italic> object</span>  is a class instance, return its direct parent instances;<br/>
+<div class="hlcode">
+doc<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; newdoc=<span class=String>''</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+return the documentation string of a routine or class;
+if "newdoc" is passed, set the documentation string to "newdoc";<br/>
+<div class="hlcode">
+constant<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; restrict=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>map</span>&lt;<span class=DataType>string</span>,<span class=DataType>tuple</span>&lt;<span class=Method>value</span>:any,type:any&gt;&thinsp; &gt;</div>
+ 
+Return the constant fields of object, if "restrict" is not zero and
+there are private or protected fields in "object", only return the public ones.
+The return value is a map, mapping from field name and field value and type.<br/>
+<div class="hlcode">
+variable<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; restrict=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>map</span>&lt;<span class=DataType>string</span>,<span class=DataType>tuple</span>&lt;<span class=Method>value</span>:any,type:any&gt;&thinsp; &gt;</div>
+ 
+Return the variable fields of object, if "restrict" is not zero and
+there are private or protected fields in "object", only return the public ones.
+The return value is a map, mapping from field name and field value and type.<br/>
+<div class="hlcode">
+constant<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; name:<span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>tuple</span>&lt;<span class=Method>value</span>:any,type:any&gt;</div>
+ 
+Return a tuple of value and type for constant field "name" in object.
+If "value" is passed in, set the field value to "value".
+All field can be accessed and modified by this function.<br/>
+<div class="hlcode">
+variable<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; name:<span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>tuple</span>&lt;<span class=Method>value</span>:any,type:any&gt;</div>
+ 
+Return a tuple of value and type for variable field "name" in object.
+If "value" is passed in, set the field value to "value".
+All field can be accessed and modified by this function.<br/>
+<div class="hlcode">
+<span class=CodeStruct>class</span><span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; any</div>
+ 
+If <span class=text_italic> object</span>  is a routine, return its host class which defines this routine as a method;
+If <span class=text_italic> object</span>  is a class instance, return its class prototype.<br/>
+<div class="hlcode">
+<span class=CodeStruct>routine</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; any</div>
+ 
+return the current routine that is running.<br/>
+<div class="hlcode">
+<span class=CodeStruct>routine</span><span class=SpecSymbol>(</span>&thinsp; rout&thinsp; :&thinsp; any&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;any&gt;</div>
+ 
+return the list of overloaded routines with the same name as routine "rout".<br/>
+<div class="hlcode">
+param<span class=SpecSymbol>(</span>&thinsp; rout&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span><span class=DataType>list</span>&lt;<span class=DataType>tuple</span>&lt;name:<span class=DataType>string</span>,type:any,deft:<span class=DataType>int</span>,<span class=Method>value</span>:any&gt;&thinsp; &gt;</div>
+ 
+return the parameter list of "rout".
+The returned list contains tuples composed of parameter name, type, and default value.
+The "value" field is set to nil, if the parameter has no default value.
+The "deft" field of the tuples indicates whether the "value" is a default value or not, 
+in case that a nil value is set as default.<br/>
+<div class="hlcode">
+isa<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; name&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+Check if object is of type indicated by <span class=text_italic> name</span> .
+Normally <span class=text_italic> name</span>  should be a valid type name such as
+<span class=text_bold> int</span> , <span class=text_bold> float</span> , <span class=text_bold> list&lt;int&gt;</span>  or a class name etc.
+It can also be one of the name listed in the following table,
+to check if <span class=text_italic> object</span>  is in a category of certain types. For example,
+when "class" is passed as <span class=text_italic> name</span> , <span class=text_italic> isa()</span>  will return true,
+if <span class=text_italic> object</span>  is a class.
+
+<table class="sdmltable">
+<tr><th> name</th><th> type</th></tr>
+<tr class=docTableRow><td class=docTableCell> class</td><td class=docTableCell> a class</td></tr>
+<tr class=docTableRow><td class=docTableCell> object</td><td class=docTableCell> a class instance</td></tr>
+<tr class=docTableRow><td class=docTableCell> routine</td><td class=docTableCell> a Dao routine</td></tr>
+<tr class=docTableRow><td class=docTableCell> function</td><td class=docTableCell> a C function</td></tr>
+<tr class=docTableRow><td class=docTableCell> namespace</td><td class=docTableCell> a namespace</td></tr>
+<tr class=docTableRow><td class=docTableCell> tuple</td><td class=docTableCell> a tuple</td></tr>
+<tr class=docTableRow><td class=docTableCell> list</td><td class=docTableCell> a list</td></tr>
+<tr class=docTableRow><td class=docTableCell> map</td><td class=docTableCell> a map</td></tr>
+<tr class=docTableRow><td class=docTableCell> array</td><td class=docTableCell> an array</td></tr>
+</table>
+ <br/>
+<div class="hlcode">
+isa<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; type&thinsp; :&thinsp; any&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+Check if <span class=text_italic> object</span>  is of type <span class=text_italic> type</span> , which is a type object
+that can be returned by <span class=text_italic> reflect.type()</span> .<br/>
+<div class="hlcode">
+argc<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+Return the argument count of the current function call.<br/>
+<div class="hlcode">
+argv<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>list</span>&lt;any&gt;</div>
+ 
+Return the argument values as a list of the current function call.<br/>
+<div class="hlcode">
+argv<span class=SpecSymbol>(</span>&thinsp; i&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; any</div>
+ 
+Return the i-th argument value of the current function call.<br/>
+<div class="hlcode">
+self<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Return the mapping-down class instance of the class instance <span class=text_italic> object</span> <br/>
+<div class="hlcode">
+trace<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Print the trace of calling stack.<br/>
+<table class="topsection"><tr><td><a name="12"><H3>12  coroutine</H3>
+</td><td align="right"><a href="&section=12"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#12.1">Method&nbsp;list:</a></li>
+<li style="margin-top: 5px"><a href="#12.2">Method&nbsp;details:</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="12.1"><H5>12.1  Method list:</H5>
+</td><td align="right"><a href="&section=12.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+<span class=Method>coroutine.create</span><span class=SpecSymbol>(</span>&thinsp; object,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>coroutine.resume</span><span class=SpecSymbol>(</span>&thinsp; object,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>coroutine.status</span><span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span><br/><span class=Method>coroutine.yield</span><span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+<table><tr><td><a name="12.2"><H5>12.2  Method details:</H5>
+</td><td align="right"><a href="&section=12.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+create<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Create a coroutine object which is actually a virtual machine process with its own calling stack
+of contexts. <span class=text_italic> object</span>  must be a routine or context (function closure);
+The addition parameters will be passed to the created coroutine object
+in the same way as normal function call.
+The coroutine object is created in suspending status, and should be executed by calling
+<span class=text_bold> coroutine.resume()</span> .<br/>
+Create coroutine with wrong parameters will raise an exception.<br/>
+<div class="hlcode">
+resume<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Resume the coroutine object.
+The additional parameters to <span class=text_bold> resume()</span>  will become results from <span class=text_bold> yield()</span> .<br/>
+Resuming a coroutine that has reach its end will raise an exception.<br/>
+<div class="hlcode">
+status<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Return the status of the coroutine object as a string, which can be one of
+
+<table class="sdmltable">
+<tr class=docTableRow><td class=docTableCell> suspended</td><td class=docTableCell> running</td><td class=docTableCell> aborted</td><td class=docTableCell> finished</td><td class=docTableCell> not_a_coroutine</td></tr>
+</table>
+ <br/>
+<div class="hlcode">
+yield<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Yield current coroutine execution. Any parameters in <span class=text_bold> yield</span>  will become the result from
+<span class=text_bold> resume()</span> .<br/>
+<table class="topsection"><tr><td><a name="13"><H3>13  multi-threading library</H3>
+</td><td align="right"><a href="&section=13"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#13.1">Method&nbsp;list:</a></li>
+<li style="margin-top: 5px"><a href="#13.2">Method&nbsp;details:</a></li>
+</ol></td></tr></table> <br/>
+The multi-threading library in Dao is provided by the library object "mtlib".<br/><br/>
+<table><tr><td><a name="13.1"><H5>13.1  Method list:</H5>
+</td><td align="right"><a href="&section=13.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+mtlib.thread<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; thread<br/>mtlib.mutex<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; mutex<br/>mtlib.condition<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; condition<br/>mtlib.semaphore<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; semaphore<br/>mtlib.<span class=Method>exit</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>mtlib.mydata<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>map</span>&lt;<span class=DataType>string</span>,any&gt;<br/>mtlib.self<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; thread<br/>mtlib.testcancel<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+<table><tr><td><a name="13.2"><H5>13.2  Method details:</H5>
+</td><td align="right"><a href="&section=13.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+condition<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; condition</div>
+ 
+Create a condition variable.<br/>
+<div class="hlcode">
+thread<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Create a thread object. <span class=text_italic> object</span>  must be a Dao routine or context, which will receive
+parameters from the additional part of the parameters for <span class=text_bold> thread.create()</span> .<br/>
+<div class="hlcode">
+<span class=Method>exit</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Exit current thread.<br/>
+<div class="hlcode">
+mutex<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; mutex</div>
+ 
+Create a mutex.<br/>
+<div class="hlcode">
+mydata<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>map</span>&lt;<span class=DataType>string</span>,any&gt;</div>
+ 
+Get thread specific data as a map.<br/>
+<div class="hlcode">
+self<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; thread</div>
+ <br/>
+<div class="hlcode">
+semaphore<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; semaphore</div>
+ 
+Create a semaphore object.<br/>
+<div class="hlcode">
+testcancel<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Create a cancel point. If <span class=text_bold> cancel()</span>  is called before this point, calling this function
+will terminate the current thread.<br/>
+<table class="topsection"><tr><td><a name="14"><H3>14  thread object</H3>
+</td><td align="right"><a href="&section=14"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#14.1">Method&nbsp;list:</a></li>
+<li style="margin-top: 5px"><a href="#14.2">Method&nbsp;details:</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="14.1"><H5>14.1  Method list:</H5>
+</td><td align="right"><a href="&section=14.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+cancel<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>detach<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/><span class=StmtKey>join</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>mydata<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>map</span>&lt;<span class=DataType>string</span>,any&gt;</div>
+ <br/>
+<table><tr><td><a name="14.2"><H5>14.2  Method details:</H5>
+</td><td align="right"><a href="&section=14.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+cancel<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Cancel the execution of the thread object.<br/>
+<div class="hlcode">
+detach<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Detach the execution of the thread object.<br/>
+<div class="hlcode">
+<span class=StmtKey>join</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Join the execution of the thread object with the current thread.<br/>
+<div class="hlcode">
+mydata<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>map</span>&lt;<span class=DataType>string</span>,any&gt;</div>
+ 
+Get thread specific data as a map.<br/>
+<table class="topsection"><tr><td><a name="15"><H3>15  mutex</H3>
+</td><td align="right"><a href="&section=15"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#15.1">Method&nbsp;list:</a></li>
+<li style="margin-top: 5px"><a href="#15.2">Method&nbsp;details:</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="15.1"><H5>15.1  Method list:</H5>
+</td><td align="right"><a href="&section=15.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+lock<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>trylock<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>unlock<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+<table><tr><td><a name="15.2"><H5>15.2  Method details:</H5>
+</td><td align="right"><a href="&section=15.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+lock<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Lock the mutext.<br/>
+<div class="hlcode">
+trylock<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Try to locke the mutex. Return true if successful, otherwise, false.<br/>
+<div class="hlcode">
+unlock<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Unlock the mutex.<br/>
+<table class="topsection"><tr><td><a name="16"><H3>16  condition variable</H3>
+</td><td align="right"><a href="&section=16"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#16.1">Method&nbsp;list:</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="16.1"><H5>16.1  Method list:</H5>
+</td><td align="right"><a href="&section=16.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+broadcast<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>signal<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>timedwait<span class=SpecSymbol>(</span>&thinsp; mtx&thinsp; :&thinsp; mutex,&thinsp; seconds&thinsp; :&thinsp; <span class=DataType>float</span>&thinsp; <span class=SpecSymbol>)</span><br/>wait<span class=SpecSymbol>(</span>&thinsp; mtx&thinsp; :&thinsp; mutex&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+<div class="hlcode">
+broadcast<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Wake all threads blocked on the condition variable.<br/>
+<div class="hlcode">
+signal<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Wake one thread(randomly) blocked on the condition variable.<br/>
+<div class="hlcode">
+timedwait<span class=SpecSymbol>(</span>&thinsp; mtx&thinsp; :&thinsp; mutex,&thinsp; seconds&thinsp; :&thinsp; <span class=DataType>float</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Block the current thread on the condition variable with timeout, which can be a decimal number.<br/>
+<div class="hlcode">
+wait<span class=SpecSymbol>(</span>&thinsp; mtx&thinsp; :&thinsp; mutex&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Block the current thread on the condition variable.<br/>
+<table class="topsection"><tr><td><a name="17"><H3>17  semaphore</H3>
+</td><td align="right"><a href="&section=17"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#17.1">Method&nbsp;list:</a></li>
+<li style="margin-top: 5px"><a href="#17.2">Method&nbsp;details:</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="17.1"><H5>17.1  Method list:</H5>
+</td><td align="right"><a href="&section=17.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+getvalue<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>post<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span><br/>setvalue<span class=SpecSymbol>(</span>&thinsp; n&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><br/>wait<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+<table><tr><td><a name="17.2"><H5>17.2  Method details:</H5>
+</td><td align="right"><a href="&section=17.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+getvalue<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Get the available resource count of the semaphore.<br/>
+<div class="hlcode">
+post<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Release one resource of the semaphore.<br/>
+<div class="hlcode">
+setvalue<span class=SpecSymbol>(</span>&thinsp; n&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Set the total number of resource of the semaphore.<br/>
+<div class="hlcode">
+wait<span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Require one resource of the semaphore. The current thread will be blocked if the resource is
+not available.<br/>
+<table class="topsection"><tr><td><a name="18"><H3>18  network</H3>
+</td><td align="right"><a href="&section=18"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#18.1">Method&nbsp;list:</a></li>
+<li style="margin-top: 5px"><a href="#18.2">Network&nbsp;File&nbsp;Description&nbsp;Set&nbsp;Handling</a></li>
+<li style="margin-top: 5px"><a href="#18.3">Method&nbsp;details:</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="18.1"><H5>18.1  Method list:</H5>
+</td><td align="right"><a href="&section=18.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+network.<span class=Number>FD_CLR</span><span class=SpecSymbol>(</span>&thinsp; fd&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; set&thinsp; :fd_set&thinsp; <span class=SpecSymbol>)</span><br/>network.<span class=Number>FD_ISSET</span><span class=SpecSymbol>(</span>&thinsp; fd&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; set&thinsp; :fd_set&thinsp; <span class=SpecSymbol>)</span><br/>network.<span class=Number>FD_SET</span><span class=SpecSymbol>(</span>&thinsp; fd&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; set&thinsp; :fd_set&thinsp; <span class=SpecSymbol>)</span><br/>network.<span class=Number>FD_ZERO</span><span class=SpecSymbol>(</span>&thinsp; set&thinsp; :fd_set&thinsp; <span class=SpecSymbol>)</span><br/>network.accept<span class=SpecSymbol>(</span>&thinsp; socket&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><br/>network.bind<span class=SpecSymbol>(</span>&thinsp; port&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><br/>network.close<span class=SpecSymbol>(</span>&thinsp; socket&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><br/>network.connect<span class=SpecSymbol>(</span>&thinsp; host&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; port&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><br/>network.gethost<span class=SpecSymbol>(</span>&thinsp; host&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><br/>network.getpeername<span class=SpecSymbol>(</span>&thinsp; socket&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><br/>network.listen<span class=SpecSymbol>(</span>&thinsp; socket&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; backlog&thinsp; =<span class=Number>10</span>&thinsp; <span class=SpecSymbol>)</span><br/>network.receive<span class=SpecSymbol>(</span>&thinsp; socket&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; maxlen&thinsp; =<span class=Number>1000</span>&thinsp; <span class=SpecSymbol>)</span><br/>network.receive_dao<span class=SpecSymbol>(</span>&thinsp; socket&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><br/>network.select<span class=SpecSymbol>(</span>&thinsp; nfd&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; setr&thinsp; :fd_set,&thinsp; setr&thinsp; :fd_set,&thinsp; setr&thinsp; :fd_set,&thinsp; tv&thinsp; :&thinsp; <span class=DataType>float</span>&thinsp; <span class=SpecSymbol>)</span><br/>network.send<span class=SpecSymbol>(</span>&thinsp; socket&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; data&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span><br/>network.send_dao<span class=SpecSymbol>(</span>&thinsp; socket&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<table><tr><td><a name="18.2"><H5>18.2  Network File Description Set Handling</H5>
+</td><td align="right"><a href="&section=18.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+File description set can be created by: <span class=text_italic> fd_set()</span> 
+<div class="hlcode">
+<span class=Number>FD_CLR</span><span class=SpecSymbol>(</span>&thinsp; fd&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; set&thinsp; :fd_set&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Remove <span class=text_italic> fd</span>  from <span class=text_italic> set</span> .
+<div class="hlcode">
+<span class=Number>FD_ISSET</span><span class=SpecSymbol>(</span>&thinsp; fd&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; set&thinsp; :fd_set&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Check if <span class=text_italic> fd</span>  is in <span class=text_italic> set</span> .
+<div class="hlcode">
+<span class=Number>FD_SET</span><span class=SpecSymbol>(</span>&thinsp; fd&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; set&thinsp; :fd_set&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Add <span class=text_italic> fd</span>  to <span class=text_italic> set</span> .
+<div class="hlcode">
+<span class=Number>FD_ZERO</span><span class=SpecSymbol>(</span>&thinsp; set&thinsp; :fd_set&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Clear the set.<br/>
+<table><tr><td><a name="18.3"><H5>18.3  Method details:</H5>
+</td><td align="right"><a href="&section=18.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+accept<span class=SpecSymbol>(</span>&thinsp; socket&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Accept a connection from the socket.
+<div class="hlcode">
+bind<span class=SpecSymbol>(</span>&thinsp; port&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Bind to the port.
+<div class="hlcode">
+close<span class=SpecSymbol>(</span>&thinsp; socket&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+<div class="hlcode">
+connect<span class=SpecSymbol>(</span>&thinsp; host&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; port&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Connect to <span class=text_italic> host</span>  through <span class=text_italic> port</span> .
+<div class="hlcode">
+gethost<span class=SpecSymbol>(</span>&thinsp; host&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Get host information (names and addresses).
+<div class="hlcode">
+getpeername<span class=SpecSymbol>(</span>&thinsp; socket&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Get peer information.
+<div class="hlcode">
+listen<span class=SpecSymbol>(</span>&thinsp; socket&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; backlog&thinsp; =<span class=Number>10</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Listen to the socket.
+<div class="hlcode">
+receive<span class=SpecSymbol>(</span>&thinsp; socket&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; maxlen&thinsp; =<span class=Number>1000</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Receive raw data from the socket.
+<div class="hlcode">
+receive_dao<span class=SpecSymbol>(</span>&thinsp; socket&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Receive data from the socket, and create and return proper Dao data.
+It should be used in pair with <span class=text_italic> send_dao()</span> .
+<div class="hlcode">
+select<span class=SpecSymbol>(</span>&thinsp; nfd&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; setr&thinsp; :fd_set,&thinsp; setw&thinsp; :fd_set,&thinsp; sete&thinsp; :fd_set,&thinsp; tv&thinsp; :&thinsp; <span class=DataType>float</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Quoted from glibc documentation:<br/>
+
+<table class="sdmltable">
+<tr class=docTableRow><td class=docTableCell> The select function blocks the calling process until there is activity on any of the specified sets of file descriptors, or until the timeout period has expired.</td></tr>
+<tr class=docTableRow><td class=docTableCell> The file descriptors specified by the read-fds argument are checked to see if they are ready for reading; the write-fds file descriptors are checked to see if they are ready for writing; and the except-fds file descriptors are checked for exceptional conditions. You can pass a null pointer for any of these arguments if you are not interested in checking for that kind of condition.</td></tr>
+<tr class=docTableRow><td class=docTableCell> A file descriptor is considered ready for reading if it is not at end of file. A server socket is considered ready for reading if there is a pending connection which can be accepted with accept; see section Accepting Connections. A client socket is ready for writing when its connection is fully established; see section Making a Connection.</td></tr>
+</table>
+ <br/>
+<div class="hlcode">
+send<span class=SpecSymbol>(</span>&thinsp; socket&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; data&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Send raw data to the socket.
+<div class="hlcode">
+send_dao<span class=SpecSymbol>(</span>&thinsp; socket&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Send Dao data to the socket, with data type information attached to the network packets.<br/>
+<table class="topsection"><tr><td><a name="19"><H3>19  message passing interface</H3>
+</td><td align="right"><a href="&section=19"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#19.1">Method&nbsp;list:</a></li>
+<li style="margin-top: 5px"><a href="#19.2">Method&nbsp;details:</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="19.1"><H5>19.1  Method list:</H5>
+</td><td align="right"><a href="&section=19.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+mpi.receive<span class=SpecSymbol>(</span>&thinsp; timeout=-<span class=Number>1.0</span>&thinsp; <span class=SpecSymbol>)</span><br/>mpi.receive<span class=SpecSymbol>(</span>&thinsp; pid&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; timeout=-<span class=Number>1.0</span>&thinsp; <span class=SpecSymbol>)</span><br/>mpi.send<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span><br/>mpi.spawn<span class=SpecSymbol>(</span>&thinsp; pid&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; proc&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; timeout=-<span class=Number>1.0</span>,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+<table><tr><td><a name="19.2"><H5>19.2  Method details:</H5>
+</td><td align="right"><a href="&section=19.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+receive<span class=SpecSymbol>(</span>&thinsp; timeout=-<span class=Number>1.0</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Receive message with timeout. No possitive timeout means infinite waiting.
+Return a list of received data.
+<div class="hlcode">
+receive<span class=SpecSymbol>(</span>&thinsp; pid&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; timeout=-<span class=Number>1.0</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Receive message from process <span class=text_italic> pid</span>  with timeout.
+<div class="hlcode">
+send<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+If <span class=text_italic> object</span>  is a process, send the rest of parameters as message to it;
+If <span class=text_italic> object</span>  is a callable object, this object is scheduled to be called asynchronously
+with the rest parameters.
+<div class="hlcode">
+spawn<span class=SpecSymbol>(</span>&thinsp; pid&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; proc&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+Spawn a virtual machine(VM) or operation system(OS) process.
+If a OS process or a VM process wthin another OS process is not spawned
+successfully within the timeout, an exception will be raised.
+Return a process handle if it created a local (within the same OS process)
+VM process.
+<span class=text_italic> pid</span>  must be one of the form in the following table:
+
+<table class="sdmltable">
+<tr><th> pid</th><th> proc</th><th> the rest parameters</th><th> meaning</th></tr>
+<tr class=docTableRow><td class=docTableCell> ""</td><td class=docTableCell> routine name</td><td class=docTableCell> parameters for the routine</td><td class=docTableCell> VM process without name, accessable within the same OS process by its handle</td></tr>
+<tr class=docTableRow><td class=docTableCell> "vm_proc"</td><td class=docTableCell> as above</td><td class=docTableCell> as above</td><td class=docTableCell> named VM process, globally accessable by different OS processes on different computers</td></tr>
+<tr class=docTableRow><td class=docTableCell> "@os_proc"</td><td class=docTableCell> Dao script file name</td><td class=docTableCell> timeout (default -1.0)</td><td class=docTableCell> named OS process, globally accessable</td></tr>
+<tr class=docTableRow><td class=docTableCell> "vm_proc@os_proc"</td><td class=docTableCell> as "vm_proc"</td><td class=docTableCell> as "vm_proc"</td><td class=docTableCell> named VM process within a OS process named "os_proc", globally accessable</td></tr>
+<tr class=docTableRow><td class=docTableCell> "@os_proc@@host"</td><td class=docTableCell> Dao script file name</td><td class=docTableCell> timeout (default -1.0)</td><td class=docTableCell> named OS process on network "host", globally accessable</td></tr>
+<tr class=docTableRow><td class=docTableCell> "vm_proc@os_proc@@host"</td><td class=docTableCell> as "vm_proc"</td><td class=docTableCell> as "vm_proc"</td><td class=docTableCell> named VM process within a OS process named "os_proc@@host", globally accessable</td></tr>
+</table>
+<br clear=all />
+</div></body></html>

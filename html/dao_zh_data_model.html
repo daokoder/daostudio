@@ -1,0 +1,274 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+
+<h2>使用DaoDataModel模块处理数据库</h2>
+<div align=center><p><b>傅利民(phoolimin<img src="/images/at.png"/>gmail<img src="/images/dot.png"/>com)</b></p></div>
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#1">连接数据库</a></li>
+<li style="margin-top: 5px"><a href="#2">创建数据表</a></li>
+<li style="margin-top: 5px"><a href="#3">插入记录</a></li>
+<li style="margin-top: 5px"><a href="#4">数据库查询</a></li>
+<li style="margin-top: 5px"><a href="#5">Other&nbsp;Methods</a></li>
+</ol></td></tr></table> <br/><br/>
+<span class=text_bold> DaoDataModel</span> 是一个可以将道类映射到数据库表
+并对数据库进行操作的模块（目前此模块只支持MYSQL数据库）。
+通过建立道类到数据库表的对应关系，数据库操作变得很简单。<br/><br/>
+例如，如果有以下类，
+<div class="hlcode">
+<span class=StmtKey>load</span>&thinsp; DaoDataModel;<br/><span class=Comment># class that can be mapped to a database table
+<br /></span><span class=CodeStruct>class</span>&thinsp; Gene<br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=DataPrefix>my</span>&thinsp; id&thinsp; &thinsp; &thinsp; :&thinsp; <span class=Number>INT_PRIMARY_KEY_AUTO_INCREMENT</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=DataPrefix>my</span>&thinsp; name&thinsp; :&thinsp; <span class=Number>VARCHAR100</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=DataPrefix>my</span>&thinsp; seq&thinsp; &thinsp; :&thinsp; <span class=Number>TEXT</span>;<br/><span class=SpecSymbol>}</span></div>
+ 
+这里类型INT_PRIMARY_KEY_AUTO_INCREMENT,VARCHAR100,TEXT
+由DaoDataModel模块定义，以便处理道语言类型到数据库储存类型之间的
+数据转换。这些类型均被定义为道语言内置类型的别名：
+<ul>
+<li><span class=text_bold> int</span> 整型作为整数域：
+<div class="hlcode">
+<span class=Number>INT</span><br/><span class=Number>TINYINT</span><br/><span class=Number>SMALLINT</span><br/><span class=Number>MEDIUMINT</span><br/><span class=Number>INT_PRIMARY_KEY</span><br/><span class=Number>INT_PRIMARY_KEY_AUTO_INCREMENT</span></div>
+</li>
+
+<li><span class=text_bold> string</span> 字符串类型作为字符域：
+<div class="hlcode">
+<span class=Number>CHAR10</span><br/><span class=Number>CHAR20</span><br/><span class=Number>CHAR50</span><br/><span class=Number>CHAR100</span><br/><span class=Number>CHAR200</span><br/><span class=Number>VARCHAR10</span><br/><span class=Number>VARCHAR20</span><br/><span class=Number>VARCHAR50</span><br/><span class=Number>VARCHAR100</span><br/><span class=Number>VARCHAR200</span></div>
+</li>
+
+<li><span class=text_bold> string</span> 字符串类型作为文本或二进制数据域：
+<div class="hlcode">
+<span class=Number>TEXT</span><br/><span class=Number>MEDIUMTEXT</span><br/><span class=Number>LONGTEXT</span><br/><span class=Number>BLOB</span><br/><span class=Number>MEDIUMBLOB</span><br/><span class=Number>LONGBLOB</span></div>
+</li>
+
+</ul>
+ <br/>
+<table class="topsection"><tr><td><a name="1"><H3>1  连接数据库</H3>
+</td><td align="right"><a href="&section=1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+对应MYSQL数据库，可以按下面的方式连接，
+<div class="hlcode">
+<span class=Comment># connect database
+<br /></span>model&thinsp; =&thinsp; DataModel<span class=SpecSymbol>(</span>&thinsp; <span class=String>'数据库名'</span>,&thinsp; <span class=String>'主机名'</span>,&thinsp; <span class=String>'用户名'</span>,&thinsp; <span class=String>'密码'</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ 
+此函数的原型是，
+<div class="hlcode">
+DataModel<span class=SpecSymbol>(</span>&thinsp; name&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; host=<span class=String>''</span>,&thinsp; user=<span class=String>''</span>,&thinsp; pwd=<span class=String>''</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span>DataModel</div>
+ <br/>
+<table class="topsection"><tr><td><a name="2"><H3>2  创建数据表</H3>
+</td><td align="right"><a href="&section=2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+如果更类Gene相关联的数据表还不存在，可以按以下方式创建，
+<div class="hlcode">
+<span class=Comment># create a table for class Gene
+<br /></span>model.CreateTable<span class=SpecSymbol>(</span>&thinsp; Gene&thinsp; <span class=SpecSymbol>)</span>;</div>
+ 
+一个名叫Gene将被创建。<br/><br/>
+此方法的原型是，
+<div class="hlcode">
+DataModel.CreateTable<span class=SpecSymbol>(</span>&thinsp; klass&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/><br/>
+如果类含有一个名为__TABLE_NAME__的特殊的字符串常量，那么与此类对应的数据库表
+的名字将是字符串__TABLE_NAME__的值。
+类还可以含有另一个特殊的字符串常量，名为__TABLE_PROPERTY__，
+它可以包含数据库表的一些额外信息，如某些域的限定（如UNIQUE等）。<br/>
+<table class="topsection"><tr><td><a name="3"><H3>3  插入记录</H3>
+</td><td align="right"><a href="&section=3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+如要在Gene表中插入一个或多个记录，只需将Gene的实例直接插入到模型中即可，
+<div class="hlcode">
+gene&thinsp; =&thinsp; Gene<span class=SpecSymbol>{</span>&thinsp; <span class=Number>0</span>,&thinsp; <span class=String>'RAS'</span>,&thinsp; <span class=String>'...AATCCG...'</span>&thinsp; <span class=SpecSymbol>}</span>;<br/><span class=Comment># insert a record into the table
+<br /></span>model.Insert<span class=SpecSymbol>(</span>&thinsp; gene&thinsp; <span class=SpecSymbol>)</span>;</div>
+ 
+此方法知道应该在那个数据表里插入记录。
+当类实例被成功插入时，如果此类包含一个类型为INT_PRIMARY_KEY_AUTO_INCREMENT
+的成员，那么那些被插入的实例的此成员值将被设为相应记录的序号，
+在上面的例子里，gene.id将被设为与实例gene对应的记录的序号。<br/><br/>
+要一次插入多个记录，只需要将一个类实例列表作为参数传递给Insert()方法即可。
+此方法将返回一个数据操作手柄，使用此手柄，可继续插入多个记录，同时避免反复
+编译同样的SQL语言。<br/><br/>
+类似的，还有Delete()方法，
+<div class="hlcode">
+DataModel.Insert<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>DataModel.Delete<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler</div>
+ <br/>
+<table class="topsection"><tr><td><a name="4"><H3>4  数据库查询</H3>
+</td><td align="right"><a href="&section=4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+查找名为RAS的基因，
+<div class="hlcode">
+<span class=Comment># SELECT * FROM Gene WHERE name = 'RAS';
+<br /></span>hd&thinsp; =&thinsp; model.Select<span class=SpecSymbol>(</span>&thinsp; Gene&thinsp; <span class=SpecSymbol>)</span>.Where<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>.<span class=Number>EQ</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>'name'</span>,&thinsp; <span class=String>'RAS'</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Comment># query and store the result into 'gene' object:
+<br /></span>hd.QueryOnce<span class=SpecSymbol>(</span>&thinsp; gene&thinsp; <span class=SpecSymbol>)</span>;</div>
+ 
+此模块使用一系列函数调用来构造SQL查询语句。
+首先需要针对查询类型使用以下函数之一，
+<div class="hlcode">
+DataModel.Select<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>DataModel.Update<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler</div>
+ 
+这两个函数均以一个或多个道语言类为参数，那么查询将在这些类所对应的数据库表
+中进行。在它们的参数列表里，每个类后面还可跟一个整数参数N，表示查询仅限于
+该类/表的前面N个域。例如
+<div class="hlcode">
+hd&thinsp; =&thinsp; model.Select<span class=SpecSymbol>(</span>&thinsp; Gene,&thinsp; <span class=Number>2</span>&thinsp; <span class=SpecSymbol>)</span>.Where<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>.<span class=Number>EQ</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>'name'</span>,&thinsp; <span class=String>'RAS'</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ 
+这将生成如下SQL语句，
+<div class="hlcode">
+<span class=Comment># SELECT id,name FROM Gene WHERE name = 'RAS';</span></div>
+ <br/>
+然后，前面生成的手柄可用来准备查询的SQL语句，
+<div class="hlcode">
+<span class=Comment># WHERE
+<br /></span>Handler.Where<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># SET field=value, or, SET field=?
+<br /></span>Handler.Set<span class=SpecSymbol>(</span>&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># SET field=field+value, or, SET field=field+?
+<br /></span>Handler.Add<span class=SpecSymbol>(</span>&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># field=value, or, field=?
+<br /></span>Handler.<span class=Number>EQ</span><span class=SpecSymbol>(</span>&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># field!=value, or, field!=?
+<br /></span>Handler.<span class=Number>NE</span><span class=SpecSymbol>(</span>&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.<span class=Number>GT</span><span class=SpecSymbol>(</span>&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.<span class=Number>GE</span><span class=SpecSymbol>(</span>&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.<span class=Number>LT</span><span class=SpecSymbol>(</span>&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.<span class=Number>LE</span><span class=SpecSymbol>(</span>&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># SET table.field=value, or, SET table.field=?
+<br /></span>Handler.Set<span class=SpecSymbol>(</span>&thinsp; table,&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.Add<span class=SpecSymbol>(</span>&thinsp; table,&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.<span class=Number>EQ</span><span class=SpecSymbol>(</span>&thinsp; table,&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.<span class=Number>NE</span><span class=SpecSymbol>(</span>&thinsp; table,&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.<span class=Number>GT</span><span class=SpecSymbol>(</span>&thinsp; table,&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.<span class=Number>GE</span><span class=SpecSymbol>(</span>&thinsp; table,&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.<span class=Number>LT</span><span class=SpecSymbol>(</span>&thinsp; table,&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.<span class=Number>LE</span><span class=SpecSymbol>(</span>&thinsp; table,&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># field IN ( values ), or, field IN ?
+<br /></span>Handler.In<span class=SpecSymbol>(</span>&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; values=<span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.In<span class=SpecSymbol>(</span>&thinsp; table,&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; values=<span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># OR
+<br /></span>Handler.Or<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.And<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.Not<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># (
+<br /></span>Handler.LBrace<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># )
+<br /></span>Handler.RBrace<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># table1.field1=table2.field2
+<br /></span>Handler.Match<span class=SpecSymbol>(</span>&thinsp; table1,&thinsp; table2,&thinsp; field1=<span class=String>''</span>,&thinsp; field2=<span class=String>''</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># ORDER BY field ASC/DESC
+<br /></span>Handler.Sort<span class=SpecSymbol>(</span>&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; desc=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># ORDER BY table.field ASC/DESC
+<br /></span>Handler.Sort<span class=SpecSymbol>(</span>&thinsp; table,&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; desc=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># LIMIT limit, or, LIMIT limit OFFSET offset
+<br /></span>Handler.Range<span class=SpecSymbol>(</span>&thinsp; limit&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; offset=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler</div>
+ 
+对于有可选参数value的函数，如果此参数被省略，那么一个占位变量（名称?）
+将被用在SQL语句的相应位置。在查询前，需要使用下面的函数将查询用的数据
+捆绑到占位变量上，
+<div class="hlcode">
+Handler.Bind<span class=SpecSymbol>(</span>&thinsp; <span class=Method>value</span>,&thinsp; index=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler</div>
+ 
+调用此函数时，可使用参数index来指定数据应该被绑定到哪个占位变量。
+如果不用此参数，数据将被按顺序绑定到相应的占位变量。<br/><br/>
+最后查询时，需使用下面的方法之一，
+<div class="hlcode">
+Handler.Query<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>Handler.QueryOnce<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+此二方法以类实例为参数，当查询成功时，结果数据将被存在类实例的成员变量里，
+并返回1，否则返回0。如果一个查询命中多个记录，可反复调用Query()获取结果数据。
+调用Query()之后还应调用Handler.Done()重置模型，
+如果调用的是QueryOnce()则不必再调用Handler.Done()。<br/>
+<table class="topsection"><tr><td><a name="5"><H3>5  Other Methods</H3>
+</td><td align="right"><a href="&section=5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+DataModel.Query<span class=SpecSymbol>(</span>&thinsp; sql&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+执行任意查询，返回查询状况。<br/>
+<div class="hlcode">
+Handler.sqlstring<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+返回手柄的构造的SQL语句。<br/>
+<div class="hlcode">
+Handler.Insert<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+如果手柄是DataModel.Insert()调用生成的，此手柄可被用来插入更多的记录<br clear=all />
+</div></body></html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+
+<h2>Database Handling by DaoDataModel</h2>
+<div align=center><p><b>Limin Fu (phoolimin<img src="/images/at.png"/>gmail<img src="/images/dot.png"/>com)</b></p></div>
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#1">Connect&nbsp;Database</a></li>
+<li style="margin-top: 5px"><a href="#2">Create&nbsp;Table</a></li>
+<li style="margin-top: 5px"><a href="#3">Insert&nbsp;Record</a></li>
+<li style="margin-top: 5px"><a href="#4">Query&nbsp;Database</a></li>
+<li style="margin-top: 5px"><a href="#5">Other&nbsp;Methods</a></li>
+</ol></td></tr></table> <br/><br/>
+<span class=text_bold> DaoDataModel</span>  is a module to map Dao classes to
+database tables (currently works only with MySQL).
+With such mapping, the handling of database with Dao
+becomes very simple.<br/><br/>
+For example, there is such class,
+<div class="hlcode">
+<span class=StmtKey>load</span>&thinsp; DaoDataModel;<br/><span class=Comment># class that can be mapped to a database table
+<br /></span><span class=CodeStruct>class</span>&thinsp; Gene<br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=DataPrefix>my</span>&thinsp; id&thinsp; &thinsp; &thinsp; :&thinsp; <span class=Number>INT_PRIMARY_KEY_AUTO_INCREMENT</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=DataPrefix>my</span>&thinsp; name&thinsp; :&thinsp; <span class=Number>VARCHAR100</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=DataPrefix>my</span>&thinsp; seq&thinsp; &thinsp; :&thinsp; <span class=Number>TEXT</span>;<br/><span class=SpecSymbol>}</span></div>
+ 
+Here, the type <span class=text_bold> INT_PRIMARY_KEY_AUTO_INCREMENT,VARCHAR100,TEXT</span> 
+are defined by the DaoDataModel module, to allow the module
+interprete properly the class fields and corresponding database record fields.
+Those types provided by DaoDataModel are defined as aliases of 
+the built-in data types,
+<ul>
+<li><span class=text_bold> int</span>  type as integer fields:
+<div class="hlcode">
+<span class=Number>INT</span><br/><span class=Number>TINYINT</span><br/><span class=Number>SMALLINT</span><br/><span class=Number>MEDIUMINT</span><br/><span class=Number>INT_PRIMARY_KEY</span><br/><span class=Number>INT_PRIMARY_KEY_AUTO_INCREMENT</span></div>
+</li>
+
+<li><span class=text_bold> string</span>  type as character fields:
+<div class="hlcode">
+<span class=Number>CHAR10</span><br/><span class=Number>CHAR20</span><br/><span class=Number>CHAR50</span><br/><span class=Number>CHAR100</span><br/><span class=Number>CHAR200</span><br/><span class=Number>VARCHAR10</span><br/><span class=Number>VARCHAR20</span><br/><span class=Number>VARCHAR50</span><br/><span class=Number>VARCHAR100</span><br/><span class=Number>VARCHAR200</span></div>
+</li>
+
+<li><span class=text_bold> string</span>  type as text and blob fields:
+<div class="hlcode">
+<span class=Number>TEXT</span><br/><span class=Number>MEDIUMTEXT</span><br/><span class=Number>LONGTEXT</span><br/><span class=Number>BLOB</span><br/><span class=Number>MEDIUMBLOB</span><br/><span class=Number>LONGBLOB</span></div>
+</li>
+
+</ul>
+ <br/>
+<table class="topsection"><tr><td><a name="1"><H3>1  Connect Database</H3>
+</td><td align="right"><a href="&section=1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+For MySQL database, one can connect to the database by,
+<div class="hlcode">
+<span class=Comment># connect database
+<br /></span>model&thinsp; =&thinsp; DataModel<span class=SpecSymbol>(</span>&thinsp; <span class=String>'dbname'</span>,&thinsp; <span class=String>'host'</span>,&thinsp; <span class=String>'user'</span>,&thinsp; <span class=String>'password'</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ 
+The prototype of DataModel() is,
+<div class="hlcode">
+DataModel<span class=SpecSymbol>(</span>&thinsp; name&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; host=<span class=String>''</span>,&thinsp; user=<span class=String>''</span>,&thinsp; pwd=<span class=String>''</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>=></span>DataModel</div>
+ <br/>
+<table class="topsection"><tr><td><a name="2"><H3>2  Create Table</H3>
+</td><td align="right"><a href="&section=2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+If the data table corresponding to class <span class=text_bold> Gene</span>  does not exist yet,
+one can create it by,
+<div class="hlcode">
+<span class=Comment># create a table for class Gene
+<br /></span>model.CreateTable<span class=SpecSymbol>(</span>&thinsp; Gene&thinsp; <span class=SpecSymbol>)</span>;</div>
+ 
+A table named <span class=text_bold> Gene</span>  will be created.<br/><br/>
+Prototype of the method,
+<div class="hlcode">
+DataModel.CreateTable<span class=SpecSymbol>(</span>&thinsp; klass&thinsp; <span class=SpecSymbol>)</span></div>
+ <br/>
+If a class has a special constant string field named <span class=text_bold> __TABLE_NAME__</span> ,
+the name of database table corresponding to the class will be the value of 
+<span class=text_bold> __TABLE_NAME__</span> .
+A class may also contain another constant string field named
+<span class=text_bold> __TABLE_PROPERTY__</span> ,
+which indicates the property of the table or contains extra constraints
+on some fields.<br/>
+<table class="topsection"><tr><td><a name="3"><H3>3  Insert Record</H3>
+</td><td align="right"><a href="&section=3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+Then one can insert to the database an instance of class <span class=text_bold> Gene</span>  
+as a record by,
+<div class="hlcode">
+gene&thinsp; =&thinsp; Gene<span class=SpecSymbol>{</span>&thinsp; <span class=Number>0</span>,&thinsp; <span class=String>'RAS'</span>,&thinsp; <span class=String>'...AATCCG...'</span>&thinsp; <span class=SpecSymbol>}</span>;<br/><span class=Comment># insert a record into the table
+<br /></span>model.Insert<span class=SpecSymbol>(</span>&thinsp; gene&thinsp; <span class=SpecSymbol>)</span>;</div>
+ 
+The module knows which table to insert. After inserting, 
+if the class has a field with type <span class=text_bold> INT_PRIMARY_KEY_AUTO_INCREMENT</span> ,
+that instance field (in this case it is <span class=text_italic> gene.id</span> ) will be filled
+with id of the inserted record.<br/><br/>
+One can also insert multiple records at once by pass a list of class instances
+to the <span class=text_bold> Insert()</span>  method.
+This method will return a database handler, with which one can insert more
+records to avoid repeatedly compile SQL statements internally.<br/><br/>
+Similarly there is Delete(),
+<div class="hlcode">
+DataModel.Insert<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>DataModel.Delete<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler</div>
+ <br/>
+<table class="topsection"><tr><td><a name="4"><H3>4  Query Database</H3>
+</td><td align="right"><a href="&section=4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+Then one can perform querying by,
+<div class="hlcode">
+<span class=Comment># SELECT * FROM Gene WHERE name = 'RAS';
+<br /></span>hd&thinsp; =&thinsp; model.Select<span class=SpecSymbol>(</span>&thinsp; Gene&thinsp; <span class=SpecSymbol>)</span>.Where<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>.<span class=Number>EQ</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>'name'</span>,&thinsp; <span class=String>'RAS'</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><span class=Comment># query and store the result into 'gene' object:
+<br /></span>hd.QueryOnce<span class=SpecSymbol>(</span>&thinsp; gene&thinsp; <span class=SpecSymbol>)</span>;</div>
+ 
+this module uses a series of method calls to contruct a SQL statement
+and then compile it. 
+The following two methods can be use to create a handler for
+thse two types of query,
+<div class="hlcode">
+DataModel.Select<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>DataModel.Update<span class=SpecSymbol>(</span>&thinsp; object,&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler</div>
+ 
+These two methods can take a class or a list of classes
+as parameters, which indicate which database tables to be queried.
+And after each of the class parameter, there can follow an integer,
+which indicates how many fields to be queried for that class/table.
+For example,
+<div class="hlcode">
+hd&thinsp; =&thinsp; model.Select<span class=SpecSymbol>(</span>&thinsp; Gene,&thinsp; <span class=Number>2</span>&thinsp; <span class=SpecSymbol>)</span>.Where<span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>.<span class=Number>EQ</span><span class=SpecSymbol>(</span>&thinsp; <span class=String>'name'</span>,&thinsp; <span class=String>'RAS'</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ 
+this will generate such SQL statement,
+<div class="hlcode">
+<span class=Comment># SELECT id,name FROM Gene WHERE name = 'RAS';</span></div>
+ <br/>
+Then the handler can call the following methods to prepare the SQL
+statement for a query,
+<div class="hlcode">
+<span class=Comment># WHERE
+<br /></span>Handler.Where<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># SET field=value, or, SET field=?
+<br /></span>Handler.Set<span class=SpecSymbol>(</span>&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># SET field=field+value, or, SET field=field+?
+<br /></span>Handler.Add<span class=SpecSymbol>(</span>&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># field=value, or, field=?
+<br /></span>Handler.<span class=Number>EQ</span><span class=SpecSymbol>(</span>&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># field!=value, or, field!=?
+<br /></span>Handler.<span class=Number>NE</span><span class=SpecSymbol>(</span>&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.<span class=Number>GT</span><span class=SpecSymbol>(</span>&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.<span class=Number>GE</span><span class=SpecSymbol>(</span>&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.<span class=Number>LT</span><span class=SpecSymbol>(</span>&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.<span class=Number>LE</span><span class=SpecSymbol>(</span>&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># SET table.field=value, or, SET table.field=?
+<br /></span>Handler.Set<span class=SpecSymbol>(</span>&thinsp; table,&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.Add<span class=SpecSymbol>(</span>&thinsp; table,&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.<span class=Number>EQ</span><span class=SpecSymbol>(</span>&thinsp; table,&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.<span class=Number>NE</span><span class=SpecSymbol>(</span>&thinsp; table,&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.<span class=Number>GT</span><span class=SpecSymbol>(</span>&thinsp; table,&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.<span class=Number>GE</span><span class=SpecSymbol>(</span>&thinsp; table,&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.<span class=Number>LT</span><span class=SpecSymbol>(</span>&thinsp; table,&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.<span class=Number>LE</span><span class=SpecSymbol>(</span>&thinsp; table,&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; <span class=Method>value</span>=nil&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># field IN ( values ), or, field IN ?
+<br /></span>Handler.In<span class=SpecSymbol>(</span>&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; values=<span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.In<span class=SpecSymbol>(</span>&thinsp; table,&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; values=<span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># OR
+<br /></span>Handler.Or<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.And<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/>Handler.Not<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># (
+<br /></span>Handler.LBrace<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># )
+<br /></span>Handler.RBrace<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># table1.field1=table2.field2
+<br /></span>Handler.Match<span class=SpecSymbol>(</span>&thinsp; table1,&thinsp; table2,&thinsp; field1=<span class=String>''</span>,&thinsp; field2=<span class=String>''</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># ORDER BY field ASC/DESC
+<br /></span>Handler.Sort<span class=SpecSymbol>(</span>&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; desc=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># ORDER BY table.field ASC/DESC
+<br /></span>Handler.Sort<span class=SpecSymbol>(</span>&thinsp; table,&thinsp; field&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; desc=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler<br/><span class=Comment># LIMIT limit, or, LIMIT limit OFFSET offset
+<br /></span>Handler.Range<span class=SpecSymbol>(</span>&thinsp; limit&thinsp; :&thinsp; <span class=DataType>int</span>,&thinsp; offset=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler</div>
+ 
+For the methods that take an optional parameter <span class=text_italic> value</span> ,
+if it is omitted, a place holder variable will be used,
+then data can be bind to these variables by,
+<div class="hlcode">
+Handler.Bind<span class=SpecSymbol>(</span>&thinsp; <span class=Method>value</span>,&thinsp; index=<span class=Number>0</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; Handler</div>
+ 
+A index can be given in the parameter list to indicate which to bind,
+if there is multiple place-holder variables. 
+If no index parameter is given, the binds will be done sequentially.<br/><br/>
+At last these two methods can be called to perform the query,
+<div class="hlcode">
+Handler.Query<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span><br/>Handler.QueryOnce<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+These two method will take class instance(s) as parameter,
+and store the resulting data in the members of the class instances,
+if the query is successful. These method will return 1 when query
+is successful, otherwise return 0.
+If the query hits multiple records, Handler.Query() can be called
+repeatedly to get the result.
+After calling Handler.Query(), it is necessary to call Handler.Done()
+to reset the model. If Handler.QueryOnce() is called, there will be no
+such necessary.<br/>
+<table class="topsection"><tr><td><a name="5"><H3>5  Other Methods</H3>
+</td><td align="right"><a href="&section=5"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+DataModel.Query<span class=SpecSymbol>(</span>&thinsp; sql&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+Perform a arbitrary query, return the status of the query.<br/>
+<div class="hlcode">
+Handler.sqlstring<span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>string</span></div>
+ 
+Return the SQL statemenet as a string.<br/>
+<div class="hlcode">
+Handler.Insert<span class=SpecSymbol>(</span>&thinsp; object&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; <span class=DataType>int</span></div>
+ 
+Use the handler created by <span class=text_italic> DataModel.Insert()</span> 
+to insert more records.<br clear=all />
+</div></body></html>

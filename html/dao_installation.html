@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+
+<h2>Installation of Dao Virtual Machine (DVM)</h2>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#1">Compiling&nbsp;and&nbsp;Installation</a></li>
+<li style="margin-top: 5px"><a href="#2">Configuring&nbsp;Paths</a></li>
+<li style="margin-top: 5px"><a href="#3">Extra&nbsp;Configuration</a></li>
+</ol></td></tr></table><table class="topsection"><tr><td><a name="1"><H3>1  Compiling and Installation</H3>
+</td><td align="right"><a href="&section=1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Under Linux with GCC compiler, simply type:
+<div class="hlcode">
+shell:&thinsp; make<br/>shell:&thinsp; make&thinsp; install</div>
+ 
+This will compile the DVM with most features enabled and install it at <span class=text_bold> /usr/local/dao</span> . <br/><br/>
+One may modify the Makefile to change the compiler, 
+or disable some Dao language features, or change the installation location.<br/><br/>
+Under Windows, it can be compiled with MinGW Developer studio and Microsoft Visual Studio Express.
+One just has to create a project and add the source files (excluding daoMaindl.h) 
+into the project, and then add additional preprocess definitions such as,
+<div class="hlcode">
+-<span class=Number>DDAO_WITH_AFC</span>,<br/>-<span class=Number>DDAO_WITH_JIT</span>,<br/>-<span class=Number>DDAO_WITH_MPI</span>,<br/>-<span class=Number>DDAO_WITH_MACRO</span>,<br/>-<span class=Number>DDAO_WITH_THREAD</span>,<br/>-<span class=Number>DDAO_WITH_NETWORK</span>,<br/>-<span class=Number>DDAO_WITH_NUMARRAY</span></div>
+ 
+and add additional linking libraries: <span class=text_italic> msvcp60</span>  for MinGW, 
+and <span class=text_italic> ws2_32</span> , <span class=text_italic> winmm</span> , <span class=text_italic> msvcprt</span>  for MS visual studio.
+Now the DVM should be built without problem.<br/><br/>
+A makefile for compiling using MinGW under Windows is also included in the release.<br/><br/>
+Compiling the DVM under OS X is also possible.<br/>
+<table class="topsection"><tr><td><a name="2"><H3>2  Configuring Paths</H3>
+</td><td align="right"><a href="&section=2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+The paths should be properly configured for Dao to load modules.
+To have an idea how the paths work for this purpose, one should
+refer to the <span class=text_italic> Path Management</span>  section in the quick guide documentaion.
+Basically, one need create one file named <span class=text_italic> addpath.dao</span>  with the following line:
+<div class="hlcode">
+@@<span class=Number>PATH</span><span class=SpecSymbol>(</span>&thinsp; +&thinsp; <span class=String>"YOUR_INSTALLATION_FOLD"</span>&thinsp; <span class=SpecSymbol>)</span></div>
+ 
+and put it at one of the following 3 locations:
+<ol>
+<li> /usr/lib/dao for linux, or C:\dao for windows;</li>
+
+<li> your_home_dir/dao</li>
+
+<li> path defined by environment variable DAO_DIR</li>
+
+</ol>
+ 
+If you want to use the binaries coming with the distribution package, you may simple put
+the fold of the unzipped package as the <span class=text_italic> YOUR_INSTALLATION_FOLD</span>  
+in that <span class=text_bold> addpath.dao</span>  file.<br/>
+<table class="topsection"><tr><td><a name="3"><H3>3  Extra Configuration</H3>
+</td><td align="right"><a href="&section=3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Extra configuration can be set by creating file(s) named <span class=text_italic> dao.conf</span> .
+When the Dao interpreter is started, it will search in the following
+folds for a file with such name,
+if found, the current configuration of the interpreter
+will be overrided by what is specified in the file.
+<ol>
+<li> /usr/local/dao for Linux (or C:\dao for Windows);</li>
+
+<li> directory specified by the environment variable <span class=text_italic> DAO_DIR</span> ;</li>
+
+<li> the current directory where the interpreter is invoked.</li>
+
+</ol>
+ 
+All the found files with such name in these folds are used to change
+the configuration, so that, the first found <span class=text_italic> dao.conf</span>  file
+can override the internal configuration;
+and the following <span class=text_italic> dao.conf</span>  files can override the configurations
+set by the previous files.<br/><br/>
+An example configuration file looks like,
+<div class="hlcode">
+<span class=Comment># number of CPUs
+<br /></span>cpu&thinsp; =&thinsp; <span class=Number>2</span><br/><br/><span class=Comment># just in time compiling
+<br /></span>jit&thinsp; =&thinsp; yes<br/><br/><span class=Comment># typed virtual machine code
+<br /></span>typedcode&thinsp; =&thinsp; yes<br/><br/><span class=Comment># incremental compiling
+<br /></span>incompile&thinsp; =&thinsp; yes<br/><br/><span class=Comment># safe running mode
+<br /></span>safe&thinsp; =&thinsp; no</div>
+<br clear=all />
+</div></body></html>

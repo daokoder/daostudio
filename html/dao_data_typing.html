@@ -1,0 +1,307 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+
+<h2>Dao Typing System</h2>
+<div align=center><p><b>Limin Fu (phoolimin<img src="/images/at.png"/>gmail<img src="/images/dot.png"/>com)</b></p></div>
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#1">Introduction</a></li>
+<li style="margin-top: 5px"><a href="#2">Implicit&nbsp;Typing</a></li>
+<li style="margin-top: 5px"><a href="#3">Explicit&nbsp;Typing</a></li>
+</ol></td></tr></table> <br/>
+<table class="topsection"><tr><td><a name="1"><H3>1  Introduction</H3>
+</td><td align="right"><a href="&section=1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ 
+The Dao typing system is a kind of blending between implicit and explicit,
+and static and dynamic typing, in that, the type of a variable can be defined
+explicitly or inferred implicitly, and it can be static for compiling time
+checking or dynamic for running time checking at the user's option.
+Language offering this feature is also called optionally typed.
+This kind of typing offers both the flexibility of dynamic-typed languages,
+and the safety of static-typed languages.<br/><br/>
+The Dao typing system can infer correctly the type of a variable
+in most cases (in other cases, the type is infered as <span class=text_bold> any</span>  which can hold
+any type of data),
+and check the type consistence of the operations before running the codes.
+Therefore, in Dao, one does not have to declare typed variables explicitly,
+nor need to worry about if it is safe not to do so.
+Moreover, it can exploit the typing information to generate some more specific
+and efficient virtual machine instructions for certain operations on numeric types.
+Sometimes, it may even create a new routine with some specialized instructions
+for a function call according to the parameter types of the call
+	(resembling specialization of template functions in C++,
+	or generic function in other languages)!<br/>
+<table class="topsection"><tr><td><a name="2"><H3>2  Implicit Typing</H3>
+</td><td align="right"><a href="&section=2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#2.1">Basic&nbsp;Types</a></li>
+<li style="margin-top: 5px"><a href="#2.2">List/Map/Tuple/Numeric&nbsp;Array</a></li>
+<li style="margin-top: 5px"><a href="#2.3">Routine</a></li>
+</ol></td></tr></table> <br/>
+<table><tr><td><a name="2.1"><H4>2.1  Basic Types</H4>
+</td><td align="right"><a href="&section=2.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+The simplest implicit typing happens when a variable is initialized with
+a constant value,
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=String>"a string"</span><br/>b&thinsp; =&thinsp; <span class=Number>123</span><br/>c&thinsp; =&thinsp; <span class=Number>456</span>$<br/>d&thinsp; =&thinsp; a&thinsp; +&thinsp; a<br/>e&thinsp; =&thinsp; b&thinsp; +&thinsp; b<br/>f&thinsp; =&thinsp; c&thinsp; +&thinsp; c<br/><br/><span class=Method>stdlib.debug</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;</div>
+ 
+Standard method <span class=text_bold> stdlib.debug()</span>  will prompt to the user a debugging console
+where one can exame the compiled virtual machine codes
+(using <span class=text_bold> list</span>  or <span class=text_bold> l</span>  command),
+the data types and values of virtual registgers (<span class=text_bold> about</span>  or <span class=text_bold> a</span> )
+and the calling trace (<span class=text_bold> trace</span>  or <span class=text_bold> t</span> ) etc.
+One may observe from the debugging console that, <span class=text_italic> a</span>  is infered as
+<span class=text_italic> string</span> , <span class=text_italic> b</span>  as <span class=text_italic> int</span>  and <span class=text_italic> c</span>  as <span class=text_italic> complex</span> ;
+and respectively, the 3 addition operations are compiled as
+<span class=text_italic> ADD</span> , <span class=text_italic> ADDF</span>  and <span class=text_italic> ADDC</span> .<br/>
+<table><tr><td><a name="2.2"><H4>2.2  List/Map/Tuple/Numeric Array</H4>
+</td><td align="right"><a href="&section=2.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+The type of a list/map/array is infered by the types of its elements at its creation point.
+In subindexing, the type of the result is infered according to the list/map/tuple/array type
+and the subindex type.<br/>
+<table><tr><td><a name="2.2.1"><H5>2.2.1  List</H5>
+</td><td align="right"><a href="&section=2.2.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># list&lt;int&gt;
+<br /></span>b&thinsp; =&thinsp; a<span class=SpecSymbol>[</span><span class=Number>1</span><span class=SpecSymbol>]</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Comment># int, single element
+<br /></span>e&thinsp; =&thinsp; a<span class=SpecSymbol>[</span><span class=Number>1</span>:<span class=Number>1</span><span class=SpecSymbol>]</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Comment># list&lt;int&gt;, slicing, sublist
+<br /></span><br/>c&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=String>"A"</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; &thinsp; <span class=Comment># list&lt;any&gt;
+<br /></span>d&thinsp; =&thinsp; c<span class=SpecSymbol>[</span><span class=Number>1</span><span class=SpecSymbol>]</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Comment># any</span></div>
+ <br/>
+<table><tr><td><a name="2.2.2"><H5>2.2.2  Map</H5>
+</td><td align="right"><a href="&section=2.2.2"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=String>"B"</span><span class=SpecSymbol>=></span><span class=Number>1</span>,&thinsp; <span class=String>"A"</span><span class=SpecSymbol>=></span><span class=Number>2</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># map&lt;string, int&gt;
+<br /></span>b&thinsp; =&thinsp; a<span class=SpecSymbol>[</span><span class=String>"A"</span><span class=SpecSymbol>]</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Comment># int
+<br /></span>b&thinsp; =&thinsp; a<span class=SpecSymbol>[</span><span class=String>"A"</span>:<span class=String>"B"</span><span class=SpecSymbol>]</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Comment># map&lt;string, int&gt;, slicing, sub-map
+<br /></span><br/>c&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=String>"B"</span><span class=SpecSymbol>=></span><span class=Number>1</span>,&thinsp; <span class=String>"A"</span><span class=SpecSymbol>=></span><span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># map&lt;string,any&gt;
+<br /></span>d&thinsp; =&thinsp; c<span class=SpecSymbol>[</span><span class=String>"A"</span><span class=SpecSymbol>]</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Comment># any
+<br /></span><br/>e&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=String>"B"</span><span class=SpecSymbol>=></span><span class=Number>1</span>,&thinsp; <span class=String>"A"</span><span class=SpecSymbol>=></span><span class=Number>2</span>&thinsp; <span class=SpecSymbol>}</span>,&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=String>"BB"</span><span class=SpecSymbol>=></span><span class=Number>1</span>,&thinsp; <span class=String>"AA"</span><span class=SpecSymbol>=></span><span class=Number>2</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=Comment># list&lt;map&lt;string,int&gt;&gt;</span></div>
+ <br/>
+<table><tr><td><a name="2.2.3"><H5>2.2.3  Tuple</H5>
+</td><td align="right"><a href="&section=2.2.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>(</span>&thinsp; <span class=String>"abc"</span>,&thinsp; <span class=Number>123</span>,&thinsp; <span class=Number>10.55</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=Comment># tuple&lt;string,int,float&gt;
+<br /></span>a&thinsp; =&thinsp; <span class=SpecSymbol>(</span>&thinsp; name<span class=SpecSymbol>=></span><span class=String>"abc"</span>,&thinsp; index<span class=SpecSymbol>=></span><span class=Number>123</span>,&thinsp; <span class=Method>value</span><span class=SpecSymbol>=></span><span class=Number>10.55</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=Comment># tuple&lt;name:string,index:int,value:float&gt;</span></div>
+ <br/>
+<table><tr><td><a name="2.2.4"><H5>2.2.4  Numeric Array</H5>
+</td><td align="right"><a href="&section=2.2.4"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>[</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>;&thinsp; <span class=Number>4</span>,&thinsp; <span class=Number>5</span>,&thinsp; <span class=Number>6</span>&thinsp; <span class=SpecSymbol>]</span>&thinsp; <span class=Comment># array&lt;int&gt;
+<br /></span>b&thinsp; =&thinsp; a<span class=SpecSymbol>[</span><span class=Number>0</span>,<span class=Number>2</span><span class=SpecSymbol>]</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Comment># int
+<br /></span>c&thinsp; =&thinsp; a<span class=SpecSymbol>[</span><span class=Number>1</span><span class=SpecSymbol>]</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Comment># int, treat "a" as a vector
+<br /></span>d&thinsp; =&thinsp; a<span class=SpecSymbol>[</span><span class=Number>1</span>,<span class=SpecSymbol>]</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Comment># array&lt;int&gt;, slicing, second row
+<br /></span>d&thinsp; =&thinsp; a<span class=SpecSymbol>[</span>:,<span class=Number>1</span>:<span class=SpecSymbol>]</span>&thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; &thinsp; <span class=Comment># array&lt;int&gt;, slicing, sub-matrix</span></div>
+ <br/>
+Empty list/map/array are infered as the corresponding types with an attribute
+indicating they are empty. Types with such attribute can be adapted to more
+specific types when necessary. For example,
+<div class="hlcode">
+a&thinsp; =&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=SpecSymbol>{</span>&thinsp; <span class=Number>1</span>,&thinsp; <span class=Number>2</span>,&thinsp; <span class=Number>3</span>&thinsp; <span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>}</span><br/>a.<span class=Method>append</span><span class=SpecSymbol>(</span>&thinsp; <span class=SpecSymbol>{</span><span class=SpecSymbol>}</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; a<span class=SpecSymbol>[</span><span class=Number>1</span><span class=SpecSymbol>]</span>,&thinsp; <span class=Method>stdlib.about</span><span class=SpecSymbol>(</span>&thinsp; a<span class=SpecSymbol>[</span><span class=Number>1</span><span class=SpecSymbol>]</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ 
+Where <span class=text_italic> a</span>  is infered as <span class=text_italic> list&lt;list&lt;int&gt;&gt;</span> , so the empty list
+appended to <span class=text_italic> a</span>  will assume type <span class=text_italic> list&lt;int&gt;</span> .<br/>
+<table><tr><td><a name="2.3"><H4>2.3  Routine</H4>
+</td><td align="right"><a href="&section=2.3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; foo<span class=SpecSymbol>(</span>&thinsp; a&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=Comment># routine&lt;a:?=&gt;?&gt;
+<br /></span><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; b&thinsp; =&thinsp; a&thinsp; +&thinsp; a;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=Method>stdlib.debug</span><span class=SpecSymbol>(</span><span class=SpecSymbol>)</span>;<br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; a;<br/><span class=SpecSymbol>}</span><br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; &thinsp; <span class=Method>stdlib.about</span><span class=SpecSymbol>(</span>foo<span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;<br/><br/>foo<span class=SpecSymbol>(</span>&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=Comment># routine&lt;a:int=&gt;int&gt;
+<br /></span>foo<span class=SpecSymbol>(</span>&thinsp; <span class=String>"ABC"</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=Comment># routine&lt;a:string=&gt;string&gt;</span></div>
+ 
+Three copies of routines will be generated for <span class=text_italic> foo()</span> , with
+infered types: <span class=text_italic> routine&lt;a:?=&gt;?&gt;</span> , the original, <span class=text_bold> ?</span>  stands for undefined type;
+<span class=text_italic> routine&lt;a:int=&gt;int&gt;</span> , specialized for call <span class=text_italic> foo( 1 )</span> ;
+<span class=text_italic> routine&lt;a:string=&gt;string&gt;</span> , specialized for call <span class=text_italic> foo( "ABC" )</span> .
+In routine types, each parameter typing has the form of:
+<span class=text_bold> type</span>  (parameter of type <span class=text_bold> type</span>  without name),
+<span class=text_bold> name:type</span>  (parameter of type <span class=text_bold> type</span>  with name <span class=text_bold> name</span> )
+or <span class=text_bold> name=type</span>  (parameter of type <span class=text_bold> type</span>  with a default value and named <span class=text_bold> name</span> ).
+The returned type is indicated by <span class=text_bold> =&gt;type</span> .<br/><br/>
+The addition instruction in the second copy
+is also specialized to take the advantage of infered typing information.
+Parameter names are also incorporated into routine types for parameter checking
+in function calls with named parameters.<br/>
+<table class="topsection"><tr><td><a name="3"><H3>3  Explicit Typing</H3>
+</td><td align="right"><a href="&section=3"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+
+<table class=toc><tr><td><ol><li style="margin-top: 5px"><a href="#3.1">Routine/Function&nbsp;Types</a></li>
+</ol></td></tr></table> <br/>
+The type of a variable can be declared explicitly in the following form,
+<div class="hlcode">
+variable&thinsp; :&thinsp; type<br/>variable&thinsp; :&thinsp; type&thinsp; =&thinsp; <span class=Method>value</span></div>
+ 
+The same form can also be used in parameter list.<br/><br/>
+<span class=text_bold> type</span>  can be one of the following keywords for built-in types:
+<span class=text_bold> int</span> , <span class=text_bold> float</span> , <span class=text_bold> double</span> ,  <span class=text_bold> long</span> ,
+<span class=text_bold> string</span> , <span class=text_bold> complex</span> , <span class=text_bold> list</span> ,
+<span class=text_bold> map</span> , <span class=text_bold> tuple</span> , <span class=text_bold> pair</span> , <span class=text_bold> array</span> , <span class=text_bold> buffer</span> , 
+<span class=text_bold> routine</span> , and composition of them.
+<span class=text_bold> type</span>  can also be a Dao class name or the name of a user-defined C type.
+Special keywords/symbols for typing include: <span class=text_bold> any</span>  for any types,
+<span class=text_bold> ?</span>  for undefined types and <span class=text_bold> @X</span>  for type holder that can be initialized
+to certain type in parameter list.<br/>
+<div class="hlcode">
+a&thinsp; :&thinsp; <span class=DataType>int</span><br/>b&thinsp; :&thinsp; <span class=DataType>string</span>&thinsp; =&thinsp; <span class=String>"ABC"</span></div>
+ <br/>
+<table><tr><td><a name="3.1"><H4>3.1  Routine/Function Types</H4>
+</td><td align="right"><a href="&section=3.1"></a>&nbsp;<a href="#start">top</a></td></tr></table>
+ <br/>
+Function types are composed of <span class=text_bold> routine</span>  with other types,
+they are usually infered for functions from their declarations.
+But they can also be declared in the same way as other types,
+for example,
+<div class="hlcode">
+myfunc&thinsp; :&thinsp; <span class=CodeStruct>routine</span>&lt;p1:<span class=DataType>string</span>,p2=<span class=DataType>int</span><span class=SpecSymbol>=></span><span class=DataType>int</span>&gt;</div>
+ 
+this will declare <span class=text_italic> myfunc</span>  as a function that takes a string as the first parameter,
+a integer as the second with default value, and return a integer as result.
+See above for the typing of the parameters.
+In addtion, <span class=text_bold> ...</span>  may also appear in the parameter list of a function type,
+it means variable number of parameters.<br/><br/>
+Example,
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; foo<span class=SpecSymbol>(</span>&thinsp; a,&thinsp; b&thinsp; :&thinsp; <span class=DataType>string</span>,&thinsp; c&thinsp; =&thinsp; <span class=Number>1</span>&thinsp; <span class=SpecSymbol>)</span><br/><span class=SpecSymbol>{</span><br/>&nbsp;&nbsp;&nbsp;&nbsp; <span class=StmtKey>return</span>&thinsp; c;<br/><span class=SpecSymbol>}</span><br/><span class=Method>stdio.println</span><span class=SpecSymbol>(</span>&thinsp; <span class=Method>stdlib.about</span><span class=SpecSymbol>(</span>&thinsp; foo&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ <br/>
+It must be noted that the type matching of function types is different from
+other types. When a function type is assigned to another function type,
+or passed to a function call with another function type as parameter,
+a "narrower" function type can not be matched to a "wider" function type.<br/><br/>
+Consider the following situation,
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; foo<span class=SpecSymbol>(</span>&thinsp; a&thinsp; :&thinsp; <span class=DataType>int</span>&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; <span class=SpecSymbol>...</span>&thinsp; <span class=SpecSymbol>}</span><br/><br/><span class=CodeStruct>routine</span>&thinsp; bar<span class=SpecSymbol>(</span>&thinsp; callback&thinsp; :&thinsp; <span class=CodeStruct>routine</span>&lt;any<span class=SpecSymbol>=></span>any&gt;&thinsp; <span class=SpecSymbol>)</span><span class=SpecSymbol>{</span>&thinsp; callback<span class=SpecSymbol>(</span>&thinsp; <span class=String>"ABC"</span>&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>}</span><br/><br/>bar<span class=SpecSymbol>(</span>&thinsp; foo&thinsp; <span class=SpecSymbol>)</span>;<br/><br/>myfunc&thinsp; :&thinsp; <span class=CodeStruct>routine</span>&lt;any<span class=SpecSymbol>=></span>any&gt;&thinsp; =&thinsp; foo;<br/>myfunc<span class=SpecSymbol>(</span>&thinsp; <span class=String>"ABC"</span>&thinsp; <span class=SpecSymbol>)</span>;</div>
+ 
+If the "narrower" function type of <span class=text_italic> foo</span>  may match to the "wider" function type
+<span class=text_italic> routine&lt;any=&gt;any&gt;</span> , there will be a problem when <span class=text_italic> bar</span>  is called
+with <span class=text_italic> foo</span>  as the callback. Because <span class=text_italic> bar</span>  expects that
+the callback can take any type as parameters, so it may invoke the callback
+with a string, while <span class=text_italic> foo</span>  can only accept a integer!
+The problem for <span class=text_italic> myfunc</span>  is similar.
+So for type matching between function types, it is always that
+a "wider" function type can be matched to a "narrower" function type!<br/><br/>
+How about if one wants a function to accept a parameter of certain type and another
+parameter of the same or a related type, or it returns a such type?
+It can be done by using a type holder in the form of <span class=text_bold> @X</span> .
+For example, <span class=text_italic> foo</span>  in the following example will take a list
+as its first parameter, and need the second parameter and returned value to be
+the type of the items of the list, one can do as,
+<div class="hlcode">
+<span class=CodeStruct>routine</span>&thinsp; foo<span class=SpecSymbol>(</span>&thinsp; mylist&thinsp; :&thinsp; <span class=DataType>list</span>&lt;@A&gt;,&thinsp; it&thinsp; :&thinsp; @A&thinsp; <span class=SpecSymbol>)</span>&thinsp; <span class=SpecSymbol>=></span>&thinsp; @A<br/><span class=SpecSymbol>{</span><br/>&thinsp; &thinsp; &thinsp; <span class=Comment>#do something
+<br /></span><span class=SpecSymbol>}</span></div>
+ 
+Then the typing system will ensure that only consistent types can be passed to
+<span class=text_italic> foo</span> .<br clear=all />
+</div></body></html>

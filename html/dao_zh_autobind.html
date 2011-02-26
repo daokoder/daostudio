@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta charset="utf-8" /></head>
+
+<style type="text/css">
+html, body {
+padding: 0;
+max-width: 900px;
+height: 100%;
+border: none;
+background-color: #F4F8FD;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+}
+div.body{
+	border: 1px solid #E0E4EC;
+	background-color: #F4F8FD;
+}
+h1{
+	text-align: center;
+}
+h3{
+	text-align: left;
+}
+div.leftcolum {
+float: left;
+}
+div.rightcolum {
+float: right;
+}
+span.vline {
+	border-left: thin solid #CDBFDC;
+	border-right: thin solid #CDBFDC;
+}
+span.hlred {
+	font-weight : bold;
+	color : #FF0000;
+}
+table {
+	width: 100%;
+}
+table.textwrap { 
+	width: 1px;
+	margin: 5px;
+}
+table.topsection{
+	border: 1px solid #CDB;
+	background-color: #DEC;
+}
+td.textleft { text-align: left; }
+td.textright { text-align: right; }
+
+SPAN.PermiPrefix { color: #008080 }
+SPAN.DataPrefix { color: #22EEAA }
+SPAN.CodeStruct { color: #CC00FF; font-weight: bold; }
+SPAN.DataType { color: #10CC20 }
+SPAN.StmtKey { color: #FF9900; font-weight: bold; }
+SPAN.Comment { color: #0066FF; font-style: italic; }
+SPAN.String { color: #FF0066 }
+SPAN.Number { color: #FF0044 }
+SPAN.Method { color: #448800 }
+SPAN.SpecSymbol { color: #999900 }
+.text_italic { font-style: italic; }
+.text_bold { font-weight: bold; }
+.text_delete { text-decoration: centerline; }
+.text_underline { text-decoration: underline; }
+.flushright{ text-align: right; }
+.bold{ font-weight: bold; }
+.vspace{ padding: 0.3em 0.3em; }
+span.codeback{
+	background-color: #cda;
+}
+
+TABLE.boardHeader {
+	padding: 8px 2px;
+	background-color: #D5EFDC;
+	width: 100%;
+}
+
+div.hlcode {
+	background-color: #E8F8F8;
+	margin: 5px;
+	padding : 5px;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 2px dashed #bdc;
+}
+TABLE.outputTable {
+	background-color: #D8FEFE;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+}
+.sdmltable {
+	background-color: #F8E8FB;
+	width: 90%;
+	margin-left	: 5%;
+	margin-right : 5%;
+	border: 1px solid #CCCCCC;
+}
+.docTableRow {
+	padding: 10px 10px;
+	background-color: #F4EEFB;
+}
+.docTableCell {
+	background-color: #F8EEFB;
+	padding-right  : 10px;
+	padding-top	: 2px;
+	padding-left   : 10px;
+	padding-bottom : 2px;
+	border: 1px solid #CCCCCC;
+}
+
+</style>
+<body><div class="body">
+<h2>自动封装C/C++库</h2>
+ <br/>
+这里介绍一个可以自动为道语言封装C/C++库的工具，
+此工具一般被包括在道语言发布的tools目录下，名为autobind.dao。<br/><br/>
+此工具为一个由道语言本身开发的脚本程序autobind.dao，
+它可带以下命令行参数：
+<ul>
+<li><span class=text_bold> inputfiles</span> :
+	输入文件，由逗号分割的头文件列表（不行空白字符）。
+	这些头文件将被此工具解析，并生成封装代码。如，
+<div class="hlcode text_italic"> 
+mgl_data.h,mgl_font.h,mgl.h,mgl_ab.h,mgl_zb.h
+</div> <br/>
+	如果这些头文件还依赖于其他不用封装的头文件，
+	那些头文件也可被放到inputfiles参数里，放在前部，
+	并用冒号和其他需要封装的头文件分开。
+<div class="hlcode text_italic"> 
+mgl_data.h:mgl_font.h,mgl.h,mgl_ab.h,mgl_zb.h
+</div> 
+	这种方式可用来将比较大的库分割成更小的模块封装。
+	如这里mgl_data.h被可以被独立封装并被编译为DaoMglData模块（含文件后缀so或dll），
+	其他文件以分开但依赖于mgl_data.h的方式被封装（并被编译为DaoMGL）。
+	那么当模块DaoMGL被载入时，它将需要用到DaoMglData模块：
+<div class="hlcode">
+<span class=StmtKey>load</span>&thinsp; DaoMglData;<br/><span class=StmtKey>load</span>&thinsp; DaoMGL&thinsp; <span class=StmtKey>require</span>&thinsp; DaoMglData;</div>
+</li>
+
+<li><span class=text_bold> wrap_name</span> ：模块封装名。
+	缺省时，它跟inputfiles参数里的第一个文件名一样，
+	如果想用其他名字，需要设定此参数，如在前面的例子里可用wrap_name=MGL。</li>
+
+<li><span class=text_bold> lang</span> : 头文件里源代码的语言。目前只支持c和cpp。</li>
+
+<li><span class=text_bold> fixing</span> : 一个包含字符串模式的文本文件，
+	被用了处理被封装库所特有的代码格式。<br/><br/>
+	在此文件里，每行可以包含一对字符串模式，
+	每个模式由单引号引起来，每对由制表符分割。
+	每对模式的第一个模式必须是道语言正则表达式，第二个是一个普通的字符串，
+	但可以包含到第一个模式里的模式组的向后引用。
+	对于每个头文件，此工具将使用第一个模式查找匹配的代码部分，
+	并将它们转换为第二模式里的字符串，并替换其中的向后引用。
+	如果要限定某对模式仅应用于某个头文件里，
+	可在此模式对的上一行写上该头文件的名称。<br/><br/>
+	这里是DaoVTK模块的fixing文件里摘取的几行：
+<div class="hlcode">
+<span class=String>'VTK_%w+_EXPORT'</span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=String>''</span><br/><span class=String>'VTK_BYTE_SWAP_DECL %s* %b() %s* ;'</span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=String>''</span><br/><span class=String>'([^\n]*) vtkSetMacro %s*%(%s*(%w+)%s*,%s*(%w+)%s*%)'</span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=String>'%1 virtual void Set%2(%3 _arg)'</span><br/><span class=String>'([^\n]*) vtkGetMacro %s*%(%s*(%w+)%s*,%s*(%w+)%s*%)'</span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=String>'%1 virtual %3 Get%2()'</span><br/><br/>vtkInstantiator.h<br/><span class=String>'static [^;]* CreateFunction [^;]*;'</span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=String>''</span><br/><br/>vtkOStreamWrapper.h<br/><span class=String>'static [^;]* UseEndl [^%{%}]* %b{}'</span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=String>''</span><br/><br/>vtkLightKit.h<br/><span class=String>'static [^;]* GetSubType [^%{%}]* %b()'</span>&nbsp;&nbsp;&nbsp;&nbsp; <span class=String>''</span></div>
+ 
+	在此例中，头两行表示将某些代码移除，
+	第三第四行告诉此工具如何将相应于那两个模式的宏展开！
+	其他模式则被限定到某些文件上。</li>
+
+<li><span class=text_bold> dir_input</span> : 输入头文件所在的目录；</li>
+
+<li><span class=text_bold> dir_output</span> : 封装代码的输出目录；</li>
+
+<li><span class=text_bold> dir_inc</span> : include目录；
+	在生成的封装代码里，它将是那些输入头文件的前缀目录。<br/><br/>
+	例如，
+<div class="hlcode">
+inputfiles=gl.h&thinsp; dir_input=/usr/include/<span class=Number>GL</span>&thinsp; dir_inc=<span class=Number>GL</span></div>
+ 
+那么，在生成的封装代码里gl.h头文件将以如下方式被包括：
+<div class="hlcode">
+<span class=SpecSymbol>#include</span>&lt;<span class=Number>GL</span>/gl.h&gt;</div>
+</li>
+
+<li><span class=text_bold> include</span> : 对于依赖于其他模块的封装，它是那些被依赖的模块封装名。<br/><br/>
+	例如在封装VTK5时，其公共部分被封装为 wrap_name=vtkCommon，
+	而跟filtering相关的部分则被封装为 wrap_name=vtkFiltering。
+	因为vtkFiltering依赖于vtkCommon，
+	那么在封装vtkFiltering时，命令行参数include应被设为include=vtkCommon。</li>
+
+</ul>
+<br clear=all />
+</div></body></html>
