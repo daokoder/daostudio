@@ -214,6 +214,7 @@ class DaoTextEdit : public QPlainTextEdit
         QString digits;
 
 		DArray  *tokens;
+        DString *mbs;
         DString *wcs;
 
         bool  showCursor;

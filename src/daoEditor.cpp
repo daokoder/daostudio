@@ -708,11 +708,13 @@ DaoTextEdit::DaoTextEdit( QWidget *parent, DaoWordList *wlist ) :
     connect( &timer, SIGNAL(timeout()), this, SLOT(slotBlink()));
     timer.start( 700 );
 
+    mbs = DString_New(1);
     wcs = DString_New(0);
 	tokens = DArray_New( D_TOKEN );
 }
 DaoTextEdit::~DaoTextEdit()
 {
+    DString_Delete( mbs );
     DString_Delete( wcs );
 	DArray_Delete( tokens );
 }
@@ -2006,6 +2008,43 @@ void DaoTextEdit::SetIndentData2( QTextBlock block )
         }
 	}
 }
+static QString DaoToken_MakeShortCodes( DArray *tokens )
+{
+	QString codes;
+	int i;
+	for(i=0; i<tokens->size; i++){
+		DaoToken *token = tokens->items.pToken[i];
+		switch( token->type ){
+		case DTOK_NONE :
+		case DTOK_CMT_OPEN :
+		case DTOK_COMMENT :
+			break;
+		case DTOK_MBS_OPEN :
+		case DTOK_WCS_OPEN :
+			codes += "'";
+			break;
+		case DTOK_DIGITS_HEX :
+		case DTOK_DIGITS_DEC :
+		case DTOK_NUMBER_HEX :
+		case DTOK_NUMBER_DEC :
+		case DTOK_DOUBLE_DEC :
+		case DTOK_NUMBER_SCI :
+			codes += '0';
+			break;
+		case DTOK_MBS :
+		case DTOK_WCS :
+			codes += "''";
+			break;
+		case DTOK_NEWLN :
+			codes += ' ';
+			break;
+		default:
+			codes += token->string->mbs;
+			break;
+		}
+	}
+	return codes;
+}
 void DaoTextEdit::IndentLine( QTextCursor cursor, bool indent )
 {
 #if 0
@@ -2031,6 +2070,7 @@ void DaoTextEdit::IndentLine( QTextCursor cursor, bool indent )
 	QTextBlock previous_start_block;
 	QString joint_lines = current_block.text();
 	QString previous_lines;
+	QString reference_line;
 	DaoCodeLineData *previous_data = NULL;
 	if( current_block.previous().isValid() ){
 		bk = current_block.previous();
@@ -2058,66 +2098,60 @@ void DaoTextEdit::IndentLine( QTextCursor cursor, bool indent )
 			previous_lines = previous_start_block.text() + '\n' + previous_lines;
 			ud = (DaoCodeLineData*) previous_start_block.userData();
 		}
+		bk = previous_block;
+		ud = (DaoCodeLineData*) bk.userData();
+		while( ud && ud->reference_line == false ){
+			bk = bk.previous();
+			ud = (DaoCodeLineData*) bk.userData();
+		}
+		if( ud && ud->reference_line == true ) reference_line = bk.text();
 	}
 	DaoBasicSyntax *language = codehl.language;
 	if( language == NULL ) language = DaoBasicSyntax::dao;
-	language->Tokenize( tokens, previous_lines.toUtf8().data() );
+	language->Tokenize( tokens, reference_line.toUtf8().data() );
 
-	QString previous_codes;
-	QString previous_indent;
-	int i, b=0, cb=0, sb = 0;
-	int open_brace =  0;
+	QString reference_indent;
 	bool begin = true;
+	int i;
 	for(i=0; i<tokens->size; i++){
 		DaoToken *token = tokens->items.pToken[i];
 		switch( token->type ){
-		case DTOK_NONE :
-		case DTOK_CMT_OPEN :
-		case DTOK_COMMENT :
-			begin = false;
-			break;
-		case DTOK_MBS_OPEN :
-		case DTOK_WCS_OPEN :
-			previous_codes += "'";
-			begin = false;
-			break;
-		case DTOK_DIGITS_HEX :
-		case DTOK_DIGITS_DEC :
-		case DTOK_NUMBER_HEX :
-		case DTOK_NUMBER_DEC :
-		case DTOK_DOUBLE_DEC :
-		case DTOK_NUMBER_SCI :
-			previous_codes += '0';
-			begin = false;
-			break;
-		case DTOK_MBS :
-		case DTOK_WCS :
-			previous_codes += "''";
-			begin = false;
-			break;
 		case DTOK_BLANK : 
 		case DTOK_TAB:
-			previous_codes += token->string->mbs;
-			if( begin ) previous_indent += token->string->mbs;
+			if( begin ) reference_indent += token->string->mbs;
 			break;
-		case DTOK_NEWLN :
-			previous_codes += ' ';
+		default :
 			begin = false;
 			break;
-		default:
-			previous_codes += token->string->mbs;
-			begin = false;
-			break;
-		}
-		switch( token->type ){
-		case DTOK_LB  : b  += 1; break;
-		case DTOK_RB  : b  -= 1; break;
-		case DTOK_LCB : cb += 1; if( cb > open_brace ) open_brace = cb; break;
-		case DTOK_RCB : cb -= 1; if( cb < 0 ) cb = 0; break;
-		case DTOK_LSB : sb += 1; break;
-		case DTOK_RSB : sb -= 1; break;
 		}
 	}
+
+	language->Tokenize( tokens, previous_lines.toUtf8().data() );
+	QString previous_indent;
+	begin = true;
+	for(i=0; i<tokens->size; i++){
+		DaoToken *token = tokens->items.pToken[i];
+		switch( token->type ){
+		case DTOK_BLANK : 
+		case DTOK_TAB:
+			if( begin ) previous_indent += token->string->mbs;
+			break;
+		default :
+			begin = false;
+			break;
+		}
+	}
+
+	int b=0, cb=0, sb = 0;
+	int open_brace =  0;
+	for(i=0; i<tokens->size; i++){
+		DaoToken *token = tokens->items.pToken[i];
+		switch( token->type ){
+		case DTOK_LCB : cb += 1; if( cb > open_brace ) open_brace = cb; break;
+		case DTOK_RCB : cb -= 1; if( cb < 0 ) cb = 0; break;
+		}
+	}
+	QString previous_codes = DaoToken_MakeShortCodes( tokens );
 
 	QString old_indent;
 	int close_brace = 0;
@@ -2144,30 +2178,53 @@ void DaoTextEdit::IndentLine( QTextCursor cursor, bool indent )
 			break;
 		}
 	}
+	QString current_codes = DaoToken_MakeShortCodes( tokens );
 	QString new_indent = old_indent;
-	QString current_codes = current_block.text().mid( old_indent.size(), -1 );
 
+#ifdef DEBUG
 	printf( "=======================\n%s\n\n%s\n\n", 
 			joint_lines.toUtf8().data(), previous_codes.toUtf8().data() );
 	if( previous_data ) printf( "%p %i %i\n", previous_data, previous_data->open_token, previous_data->incomplete );
+	if( previous_data && previous_data->open_token ){
+		printf( "manual indentation\n" );
+	}else if( incomplete_start_block.isValid() ){
+		printf( "incomplete line indentation\n" );
+	}else{
+		printf( "normal indentation:  %i %i\n", open_brace, close_brace );
+	}
+#endif
 
 	current_data->reference_line = true;
 	if( previous_data && previous_data->open_token ){
 		// manual indentation; namely do nothing here:
-		printf( "manual indentation\n" );
 		current_data->token_line = true;
 		current_data->extend_line = true;
 		current_data->reference_line = false;
 	}else if( incomplete_start_block.isValid() ){
 		// indent incomplete line:
-		printf( "incomplete line indentation\n" );
 		current_data->extend_line = true;
 		current_data->reference_line = false;
 		new_indent = previous_indent + '\t';
 	}else{
 		// indent normally:
-		printf( "normal indentation:  %i %i\n", open_brace, close_brace );
-		new_indent = previous_indent;
+		new_indent = reference_indent;
+		DString_SetMBS( mbs, previous_codes.toUtf8().data() );
+		if( language->IndentMore( previous_codes ) ){
+			new_indent = previous_indent;
+			open_brace += 1;
+			current_data->reference_line = false;
+		}else if( language->IndentMore2( previous_codes ) ){
+			new_indent = previous_indent;
+			open_brace += 1;
+		}
+		DString_SetMBS( mbs, current_codes.toUtf8().data() );
+		if( language->IndentNone( current_codes ) ){
+			new_indent = "";
+			open_brace = close_brace = 0;
+			current_data->reference_line = false;
+		}else if( language->IndentLess( current_codes ) ){
+			close_brace -= 1;
+		}
 		while( (open_brace--) > 0 ) new_indent += '\t';
 		while( (close_brace++) < 0 and new_indent.size() ){
 			if( new_indent[new_indent.size()-1] == '\t' ){
@@ -2179,9 +2236,11 @@ void DaoTextEdit::IndentLine( QTextCursor cursor, bool indent )
 			}
 		}
 	}
+#ifdef DEBUG
 	printf( "prev:%s;\n", previous_indent.toUtf8().data() );
 	printf( "old:%s;\n", old_indent.toUtf8().data() );
 	printf( "new:%s;\n", new_indent.toUtf8().data() );
+#endif
 	if( new_indent != old_indent ){
 		cursor = textCursor();
 		cursor.movePosition( QTextCursor::StartOfBlock );
@@ -2217,12 +2276,14 @@ void DaoTextEdit::IndentLine( QTextCursor cursor, bool indent )
 	}else{
 		current_data->token_line = false;
 	}
+#ifdef DEBUG
 	printf( "current line:::::::\n%s\n", current_block.text().toUtf8().data() );
 	printf( "reference line: %i\n", current_data->reference_line );
 	printf( "incoumplete: %i\n", current_data->incomplete );
 	printf( "extended line: %i\n", current_data->extend_line );
 	printf( "open token: %i\n", current_data->open_token );
 	printf( "token line: %i\n", current_data->token_line );
+#endif
 }
 void DaoTextEdit::IndentLine3( QTextCursor cursor, bool indent )
 {

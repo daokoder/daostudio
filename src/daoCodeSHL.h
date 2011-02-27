@@ -203,12 +203,22 @@ struct DaoBasicSyntax
 
     QList<DaoSyntaxPattern> patterns;
     QList<DaoIndentPattern> indents;
+
+	QList<DaoRegex*> noneIndents; // TODO delete
+	QList<DaoRegex*> lessIndents;
+	QList<DaoRegex*> moreIndents;
+	QList<DaoRegex*> moreIndents2;
     
     static DaoBasicSyntax *dao;
     static DaoBasicSyntax *python;
 
     DaoBasicSyntax( const QString & lang );
     ~DaoBasicSyntax();
+
+	bool IndentNone( const QString & codes );
+	bool IndentLess( const QString & codes );
+	bool IndentMore( const QString & codes );
+	bool IndentMore2( const QString & codes );
 
     void AddKeywordStruct( const char *keyword );
     void AddKeywordStorage( const char *keyword );
@@ -219,6 +229,11 @@ struct DaoBasicSyntax
     void AddMultiLineComment( const char *open, const char *close );
 
     void AddPattern( const char *pat, int group, int color );
+
+	void AddNoneIndentPattern( const char *pat );
+	void AddLessIndentPattern( const char *pat );
+	void AddMoreIndentPattern( const char *pat );
+	void AddMoreIndentPattern2( const char *pat );
 
     void AddZeroIndentThis( const char *pat );
     void AddBackIndentThis( const char *pat );

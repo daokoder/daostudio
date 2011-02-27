@@ -176,6 +176,66 @@ void DaoBasicSyntax::AddPattern( const char *pat, int group, int color )
     sp.pattern = DaoRegex_New( wcs );
     patterns.append( sp );
 }
+void DaoBasicSyntax::AddNoneIndentPattern( const char *pat )
+{
+	DString mbs = DString_WrapMBS( pat );
+	DaoRegex *noneIndent = DaoRegex_New( & mbs );
+	noneIndents.append( noneIndent );
+}
+void DaoBasicSyntax::AddLessIndentPattern( const char *pat )
+{
+	DString mbs = DString_WrapMBS( pat );
+	DaoRegex *lessIndent = DaoRegex_New( & mbs );
+	lessIndents.append( lessIndent );
+}
+void DaoBasicSyntax::AddMoreIndentPattern( const char *pat )
+{
+	DString mbs = DString_WrapMBS( pat );
+	DaoRegex *moreIndent = DaoRegex_New( & mbs );
+	moreIndents.append( moreIndent );
+}
+void DaoBasicSyntax::AddMoreIndentPattern2( const char *pat )
+{
+	DString mbs = DString_WrapMBS( pat );
+	DaoRegex *moreIndent = DaoRegex_New( & mbs );
+	moreIndents2.append( moreIndent );
+}
+bool DaoBasicSyntax::IndentNone( const QString & codes )
+{
+	int i;
+	DString mbs = DString_WrapMBS( codes.toUtf8().data() );
+	for(i=0; i<noneIndents.size(); i++){
+		if( DaoRegex_Match( noneIndents[i], & mbs, NULL, NULL ) ) return true;
+	}
+	return false;
+}
+bool DaoBasicSyntax::IndentLess( const QString & codes )
+{
+	int i;
+	DString mbs = DString_WrapMBS( codes.toUtf8().data() );
+	for(i=0; i<lessIndents.size(); i++){
+		if( DaoRegex_Match( lessIndents[i], & mbs, NULL, NULL ) ) return true;
+	}
+	return false;
+}
+bool DaoBasicSyntax::IndentMore( const QString & codes )
+{
+	int i;
+	DString mbs = DString_WrapMBS( codes.toUtf8().data() );
+	for(i=0; i<moreIndents.size(); i++){
+		if( DaoRegex_Match( moreIndents[i], & mbs, NULL, NULL ) ) return true;
+	}
+	return false;
+}
+bool DaoBasicSyntax::IndentMore2( const QString & codes )
+{
+	int i;
+	DString mbs = DString_WrapMBS( codes.toUtf8().data() );
+	for(i=0; i<moreIndents2.size(); i++){
+		if( DaoRegex_Match( moreIndents2[i], & mbs, NULL, NULL ) ) return true;
+	}
+	return false;
+}
 int DaoBasicSyntax::Tokenize( DArray *tokens, const char *source )
 {
     DArray *toks = this->tokens;
@@ -306,6 +366,19 @@ DaoLanguages::DaoLanguages()
     DaoBasicSyntax *dao = new DaoBasicSyntax( "dao" );
 	DaoBasicSyntax::dao = dao;
     DaoCodeSHL::languages[ "dao" ] = dao;
+	dao->hasDaoLineComment = true;
+    dao->hasDaoBlockComment = true;
+	dao->AddLessIndentPattern( "^ %s* (public | protected | private) %s* :? %s* $" );
+	dao->AddLessIndentPattern( "^ %s* case %s+ %S+ %s* (: | - | , | %. )" );
+	dao->AddLessIndentPattern( "^ %s* default %s* :" );
+	dao->AddMoreIndentPattern2( "^ %s* (public | protected | private) %s* :? %s* $" );
+	dao->AddMoreIndentPattern2( "^ %s* case %s+ %S+ %s* (: | - | , | %. )" );
+	dao->AddMoreIndentPattern2( "^ %s* default %s* :" );
+	dao->AddMoreIndentPattern( "(^ | %W) ( if | for | while | switch ) %s* %b() %s* $" );
+	dao->AddMoreIndentPattern( "(^ | %W) ( else %s+ if | rescue ) %s* %b() %s* $" );
+	dao->AddMoreIndentPattern( "(^ | %W) (|%}%s*) else %s* $" );
+	dao->AddMoreIndentPattern( "(^ | %W) ( try | raise | do ) %s* $" );
+
     dao->AddIndentPattern( "^ %s* (public | protected | private) %s* $", DS_IDT_THIS_ZERO, DS_IDT_NEXT_SAME );
     dao->AddIndentPattern( "^ %s* case %s+ %S+ %s* (: | - | , | %. )", DS_IDT_THIS_BACK, DS_IDT_NEXT_MORE );
     dao->AddIndentPattern( "^ %s* default %s* :", DS_IDT_THIS_ZERO, DS_IDT_NEXT_MORE );
