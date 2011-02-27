@@ -1,7 +1,7 @@
 //=============================================================================
 /*
    This file is a part of Dao Studio
-   Copyright (C) 2009,2010, Fu Limin
+   Copyright (C) 2009-2011, Fu Limin
 Email: limin.fu@yahoo.com, phoolimin@gmail.com
 
 Dao Studio is free software; you can redistribute it and/or modify it under the terms
@@ -115,6 +115,12 @@ class DaoCodeLineData : public QTextBlockUserData
             referIndent = 0;
             lastClose = 0;
             indentState = DS_IDT_SAME;
+			incomplete = false;
+			extend_line = false;
+			open_token = false;
+			reference_line = true;
+			token_line = false;
+			brace_count = 0;
         }
 
         unsigned short line;
@@ -138,6 +144,13 @@ class DaoCodeLineData : public QTextBlockUserData
         char openBrackets[3];
         char closeBrackets[3];
         char lastClose;
+
+		bool   incomplete; // incomplete line.
+		bool   extend_line; // follow up line of a incomplete line.
+		bool   open_token; // incomplete string or comment token
+		bool   reference_line; // line as indentation reference for following up lines.
+		bool   token_line; // line that is a part of an open token;
+		short  brace_count;
 };
 
 class DaoStudioSettings
@@ -216,6 +229,7 @@ struct DaoBasicSyntax
     
     void AddIndentPattern( const char *pat, int mthis, int mnext=DS_IDT_NEXT_SAME );
 
+	/* Note: the token field "name" will not be valid! */
     int Tokenize( DArray *tokens, const char *source );
 };
 struct DaoLanguages

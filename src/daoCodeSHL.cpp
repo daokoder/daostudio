@@ -1,7 +1,7 @@
 //=============================================================================
 /*
    This file is a part of Dao Studio
-   Copyright (C) 2009,2010, Fu Limin
+   Copyright (C) 2009-2011, Fu Limin
 Email: limin.fu@yahoo.com, phoolimin@gmail.com
 
 Dao Studio is free software; you can redistribute it and/or modify it under the terms
@@ -1203,7 +1203,6 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
             format = formatStorage;
             break;
         case DKEY_IF : case DKEY_ELSE :
-        case DKEY_ELIF : case DKEY_ELSEIF :
         case DKEY_WHILE : case DKEY_DO : case DKEY_UNTIL :
         case DKEY_FOR : case DKEY_IN :
         case DKEY_SKIP : case DKEY_BREAK : case DKEY_CONTINUE :

@@ -1,7 +1,7 @@
 //=============================================================================
 /*
    This file is a part of Dao Studio
-   Copyright (C) 2009,2010, Fu Limin
+   Copyright (C) 2009-2011, Fu Limin
 Email: limin.fu@yahoo.com, phoolimin@gmail.com
 
 Dao Studio is free software; you can redistribute it and/or modify it under the terms
@@ -20,7 +20,6 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #include"ui_daoStudio.h"
 #include"ui_daoAbout.h"
 #include"ui_daoHelpVIM.h"
-#include"ui_daoDataWidget.h"
 
 #include<QMainWindow>
 #include<QTime>

@@ -1,7 +1,7 @@
 //=============================================================================
 /*
 	This file is a part of Dao Studio
-	Copyright (C) 2009,2010, Fu Limin
+	Copyright (C) 2009-2011, Fu Limin
 	Email: limin.fu@yahoo.com, phoolimin@gmail.com
 
 	Dao Studio is free software; you can redistribute it and/or modify it under the terms

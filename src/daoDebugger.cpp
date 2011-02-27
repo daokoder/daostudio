@@ -1,7 +1,7 @@
 //=============================================================================
 /*
    This file is a part of Dao Studio
-   Copyright (C) 2009,2010, Fu Limin
+   Copyright (C) 2009-2011, Fu Limin
 Email: limin.fu@yahoo.com, phoolimin@gmail.com
 
 Dao Studio is free software; you can redistribute it and/or modify it under the terms
@@ -107,15 +107,17 @@ static short DaoVmCodeInfo[][5] =
     { 3, 3, 1, DVM_GETVO, DVM_GETVO } , 
     { 3, 3, 1, DVM_GETVK, DVM_GETVK } , 
     { 3, 3, 1, DVM_GETVG, DVM_GETVG } , 
-    { 1, 1, 1, DVM_GETI, DVM_GETI } ,  
-    { 1, 0, 1, DVM_GETF, DVM_GETF } ,  
+    { 1, 1, 1, DVM_GETI,  DVM_GETI } ,  
+    { 0, 2, 1, DVM_GETMI, DVM_GETMI } , 
+    { 1, 0, 1, DVM_GETF,  DVM_GETF } ,  
     { 1, 0, 1, DVM_GETMF, DVM_GETMF } ,  
     { 1, 3, 3, DVM_SETVL, DVM_SETVL } , 
     { 1, 3, 3, DVM_SETVO, DVM_SETVO } , 
     { 1, 3, 3, DVM_SETVK, DVM_SETVK } , 
     { 1, 3, 3, DVM_SETVG, DVM_SETVG } , 
-    { 1, 1, 1, DVM_SETI, DVM_SETI } , 
-    { 1, 0, 1, DVM_SETF, DVM_SETF } , 
+    { 1, 1, 1, DVM_SETI,  DVM_SETI } , 
+    { 1, 1, 1, DVM_SETMI, DVM_SETMI } ,  // TODO
+    { 1, 0, 1, DVM_SETF,  DVM_SETF } , 
     { 1, 0, 1, DVM_SETMF, DVM_SETMF } , 
     { 1, 0, 1, DVM_LOAD, DVM_LOAD } ,
     { 1, 0, 1, DVM_CAST, DVM_CAST } , 
@@ -147,6 +149,7 @@ static short DaoVmCodeInfo[][5] =
     { 0, 2, 1, DVM_TUPLE, DVM_TUPLE } , 
     { 0, 2, 1, DVM_LIST,  DVM_LIST } , 
     { 0, 2, 1, DVM_MAP,   DVM_MAP } , 
+    { 0, 2, 1, DVM_HASH,  DVM_HASH } , 
     { 0, 2, 1, DVM_ARRAY, DVM_ARRAY } , 
     { 0, 2, 1, DVM_MATRIX, DVM_MATRIX } , 
     { 0, 2, 1, DVM_CURRY,  DVM_CURRY } , 

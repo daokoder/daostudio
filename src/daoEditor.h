@@ -1,6 +1,6 @@
 /*=============================================================================
   This file is a part of Dao Studio
-  Copyright (C) 2009,2010, Fu Limin. Email: limin.fu@yahoo.com, phoolimin@gmail.com
+  Copyright (C) 2009-2011, Fu Limin. Email: limin.fu@yahoo.com, phoolimin@gmail.com
 
   Dao Studio is free software; you can redistribute it and/or modify it under the terms
   of the GNU General Public License as published by the Free Software Foundation;
@@ -213,6 +213,7 @@ class DaoTextEdit : public QPlainTextEdit
         QString keys;
         QString digits;
 
+		DArray  *tokens;
         DString *wcs;
 
         bool  showCursor;
@@ -280,8 +281,10 @@ class DaoTextEdit : public QPlainTextEdit
         void JoinNextLine( QTextCursor cursor );
         void IndentLine( QTextCursor cursor, bool indent=true );
         void IndentLine2( QTextCursor cursor, bool indent=true );
+        void IndentLine3( QTextCursor cursor, bool indent=true );
         void IndentLines( QTextCursor cursor, int n );
-        void SetIndentData( QTextBlock block );
+        DaoCodeLineData* SetIndentData( QTextBlock block );
+        void SetIndentData2( QTextBlock block );
         QTextBlock PairBracket( QTextBlock block, int type, int count );
         QTextBlock PairBracket2( QTextBlock block, int type, int count );
 
