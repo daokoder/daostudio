@@ -481,6 +481,7 @@ void DaoConsole::slotClearAll()
     if( rc ==2 ) slotSaveAll();
     block = document()->firstBlock();
     block = block.next();
+	while( block.isValid() and block.text().indexOf( "(dao)" ) <0 ) block = block.next();
     QTextCursor cursor( block );
     cursor.movePosition( QTextCursor::End, QTextCursor::KeepAnchor );
     cursor.removeSelectedText();
