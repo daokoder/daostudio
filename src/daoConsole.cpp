@@ -46,7 +46,9 @@ DaoConsole::DaoConsole( QWidget *parent ) : DaoTextEdit( parent, & wordList )
     count = 0;
     stdinCount = 0;
     prompt = "(dao)";
-    insertPlainText( "# Dao Language for Scripting and Computing" );
+	QString copy_notice = dao_copy_notice;
+	copy_notice.replace( "\n  ", "\n#  " );
+    insertPlainText( "#" + copy_notice );
     insertPlainText("\n");
     PrintPrompt();
     UpdateCursor( false );

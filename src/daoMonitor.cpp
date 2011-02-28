@@ -567,9 +567,9 @@ void DaoDataWidget::ViewClass( DaoClass *klass )
     labDataTable->setText( tr("Constants") );
     labExtraTable->setText( tr("Global Variables") );
     FillTable( wgtDataTable, & klass->cstData->data,
-            klass->cstData->size, NULL, klass->lookupTable );
-    FillTable( wgtExtraTable, & klass->glbData->data,
-            klass->glbData->size, klass->glbDataType, klass->lookupTable );
+            klass->cstData->size, NULL, klass->lookupTable, DAO_CLASS_CONSTANT );
+    FillTable( wgtExtraTable, & klass->glbData->data, klass->glbData->size, 
+			klass->glbDataType, klass->lookupTable, DAO_CLASS_VARIABLE );
     for(i=0; i<klass->cstData->size; i++){
         DValue val = klass->cstData->data[i];
         if( val.t != DAO_ROUTINE || val.v.routine->tidHost != DAO_CLASS ) continue;
@@ -611,8 +611,8 @@ void DaoDataWidget::ViewObject( DaoObject *object )
     rowlabs.clear();
 
     labDataTable->setText( tr("Instance Variables") );
-    FillTable( wgtDataTable, & object->objValues,
-            klass->objDataName->size, klass->objDataType, klass->lookupTable );
+    FillTable( wgtDataTable, & object->objValues, klass->objDataName->size,
+			klass->objDataType, klass->lookupTable, DAO_OBJECT_VARIABLE );
 }
 void DaoDataWidget::ViewFunction( DaoFunction *function )
 {
@@ -698,7 +698,7 @@ void DaoDataWidget::ViewRoutine( DaoRoutine *routine )
 
     labDataTable->setText( tr("Constants") );
     FillTable( wgtDataTable, & routine->routConsts->data,
-            routine->routConsts->size, NULL, map );
+            routine->routConsts->size, NULL, map, 0 );
     ViewVmCodes( wgtExtraTable, routine );
     DMap_Delete( map );
 }
@@ -756,7 +756,7 @@ void DaoDataWidget::ViewContext( DaoContext *context )
     DMap_Delete( map );
 }
 void DaoDataWidget::FillTable( QTableWidget *table, 
-        DValue **data, int size, DArray *type, DMap *names )
+        DValue **data, int size, DArray *type, DMap *names, int filter )
 {
     DNode *node;
     DaoType *itp = NULL;
@@ -773,6 +773,7 @@ void DaoDataWidget::FillTable( QTableWidget *table,
     table->setColumnWidth( 2, 300 );
     if( names ){
         for(node=DMap_First(names); node!=NULL; node=DMap_Next(names,node)){
+			if( filter && LOOKUP_ST( node->value.pInt ) != filter ) continue;
             // LOOKUP_ID: get the last 16 bits
             idnames[ LOOKUP_ID( node->value.pInt ) ] = node->key.pString->mbs;
         }
@@ -886,9 +887,9 @@ void DaoDataWidget::ViewNameSpace( DaoNameSpace *nspace )
     }
 
     FillTable( wgtDataTable, & nspace->cstData->data, nspace->cstData->size,
-            NULL, nspace->lookupTable );
+            NULL, nspace->lookupTable, DAO_GLOBAL_CONSTANT );
     FillTable( wgtExtraTable, & nspace->varData->data, nspace->varData->size,
-            nspace->varType, nspace->lookupTable );
+            nspace->varType, nspace->lookupTable, DAO_GLOBAL_VARIABLE );
     for(i=0; i<nspace->cstData->size; i++){
         DValue val = nspace->cstData->data[i];
         it = wgtDataTable->item(i,0);

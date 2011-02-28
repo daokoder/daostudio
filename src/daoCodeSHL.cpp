@@ -47,11 +47,11 @@ QFont DaoStudioSettings::codeFont;
 DaoBasicSyntax::DaoBasicSyntax( const QString & lang )
 {
     language = lang;
-    keyStruct = DMap_New(D_STRING,0);
-    keyStorage = DMap_New(D_STRING,0);
-    keyStatement = DMap_New(D_STRING,0);
-    keyConstant = DMap_New(D_STRING,0);
-    keyOthers = DMap_New(D_STRING,0);
+    keyStruct = DHash_New(D_STRING,0);
+    keyStorage = DHash_New(D_STRING,0);
+    keyStatement = DHash_New(D_STRING,0);
+    keyConstant = DHash_New(D_STRING,0);
+    keyOthers = DHash_New(D_STRING,0);
     mbs = DString_New(1);
     wcs = DString_New(0);
     cmtLine1 = NULL;
@@ -137,37 +137,6 @@ void DaoBasicSyntax::AddMultiLineComment( const char *open, const char *close )
         DString_SetMBS( mbs, close );
         cmtClose2 = DString_Copy( mbs );
     }
-}
-void DaoBasicSyntax::AddIndentPattern( const char *pat, int mthis, int mnext )
-{
-	DaoIndentPattern ip = { NULL, mthis, mnext };
-    DString_SetMBS( wcs, pat );
-    ip.pattern = DaoRegex_New( wcs );
-    indents.append( ip );
-}
-void DaoBasicSyntax::AddZeroIndentThis( const char *pat )
-{
-	AddIndentPattern( pat, DS_IDT_THIS_ZERO );
-}
-void DaoBasicSyntax::AddBackIndentThis( const char *pat )
-{
-	AddIndentPattern( pat, DS_IDT_THIS_BACK );
-}
-void DaoBasicSyntax::AddBackIndentAll( const char *pat )
-{
-	AddIndentPattern( pat, DS_IDT_ALL_BACK );
-}
-void DaoBasicSyntax::AddSameIndentNext( const char *pat )
-{
-	AddIndentPattern( pat, DS_IDT_NEXT_SAME );
-}
-void DaoBasicSyntax::AddMoreIndentNext( const char *pat )
-{
-	AddIndentPattern( pat, DS_IDT_NEXT_MORE );
-}
-void DaoBasicSyntax::AddMoreIndentNext1( const char *pat )
-{
-	AddIndentPattern( pat, DS_IDT_NEXT_MORE1 );
 }
 void DaoBasicSyntax::AddPattern( const char *pat, int group, int color )
 {
@@ -368,6 +337,8 @@ DaoLanguages::DaoLanguages()
     DaoCodeSHL::languages[ "dao" ] = dao;
 	dao->hasDaoLineComment = true;
     dao->hasDaoBlockComment = true;
+    dao->AddKeywordOthers( "std" );
+    dao->AddKeywordOthers( "io" );
 	dao->AddLessIndentPattern( "^ %s* (public | protected | private) %s* :? %s* $" );
 	dao->AddLessIndentPattern( "^ %s* case %s+ %S+ %s* (: | - | , | %. )" );
 	dao->AddLessIndentPattern( "^ %s* default %s* :" );
@@ -379,21 +350,7 @@ DaoLanguages::DaoLanguages()
 	dao->AddMoreIndentPattern( "(^ | %W) (|%}%s*) else %s* $" );
 	dao->AddMoreIndentPattern( "(^ | %W) ( try | raise | do ) %s* $" );
 
-    dao->AddIndentPattern( "^ %s* (public | protected | private) %s* $", DS_IDT_THIS_ZERO, DS_IDT_NEXT_SAME );
-    dao->AddIndentPattern( "^ %s* case %s+ %S+ %s* (: | - | , | %. )", DS_IDT_THIS_BACK, DS_IDT_NEXT_MORE );
-    dao->AddIndentPattern( "^ %s* default %s* :", DS_IDT_THIS_ZERO, DS_IDT_NEXT_MORE );
-    dao->AddIndentPattern( "(^ | %W) (|%}%s*) ( elif | rescue ) %s* %b() %s* %{ %s* $", DS_IDT_THIS_BACK, DS_IDT_NEXT_MORE );
-    dao->AddIndentPattern( "(^ | %W) ( if | for | while | switch ) %s* %b() %s* %{ %s* $",
-    DS_IDT_THIS_SAME, DS_IDT_NEXT_MORE );
-    dao->AddIndentPattern( "(^ | %W) (|%}%s*) else %s* %{ %s* $", DS_IDT_THIS_BACK, DS_IDT_NEXT_MORE );
-    dao->AddIndentPattern( "(^ | %W) ( try | raise | do ) %s* %{ %s* $", DS_IDT_THIS_SAME, DS_IDT_NEXT_MORE );
-    dao->AddIndentPattern( "(^ | %W) ( elif | rescue ) %s* %b() %s* $", DS_IDT_THIS_BACK, DS_IDT_NEXT_MORE1 );
-    dao->AddIndentPattern( "(^ | %W) ( if | for | while | switch ) %s* %b() %s* $", DS_IDT_THIS_SAME, DS_IDT_NEXT_MORE1 );
-    dao->AddIndentPattern( "(^ | %W) (|%}%s*) else %s* $", DS_IDT_THIS_BACK, DS_IDT_NEXT_MORE2 );
-    dao->AddIndentPattern( "(^ | %W) ( try | raise | do ) %s* $", DS_IDT_THIS_SAME, DS_IDT_NEXT_MORE1 );
-    dao->AddIndentPattern( "(^ | %W) ( %{ | %( | %[ ) %s* $", DS_IDT_THIS_SAME, DS_IDT_NEXT_MORE );
-    dao->AddIndentPattern( "^ %s* ( %} | %) | %] )", DS_IDT_THIS_BACK, DS_IDT_NEXT_SAME );
-    
+
     DaoBasicSyntax *cpp = new DaoBasicSyntax( "cpp" );
     DaoCodeSHL::languages[ "h" ] = cpp;
     DaoCodeSHL::languages[ "hpp" ] = cpp;
@@ -492,27 +449,19 @@ DaoLanguages::DaoLanguages()
     cpp->AddPattern( "# %s* include %s* (%b<>)", 1<<1, DAO_SHL_COLOR2 );
     cpp->AddPattern( "^ %s* %w+ %s*:", 1<<0, DAO_SHL_COLOR4 );
 
-    cpp->AddIndentPattern( "^ %s* # %s* pragma (%W|$)", DS_IDT_THIS_SAME, DS_IDT_NEXT_SAME );
-    cpp->AddIndentPattern( "^ %s* # %s* %w+", DS_IDT_THIS_ZERO, DS_IDT_NEXT_SAME );
-    cpp->AddIndentPattern( "^ %s* case %s+ %S+ %s* :", DS_IDT_THIS_BACK, DS_IDT_NEXT_MORE );
-    cpp->AddIndentPattern( "^ %s* default %s* :", DS_IDT_THIS_BACK, DS_IDT_NEXT_MORE );
-    cpp->AddIndentPattern( "^ %s* (|%}%s*) else %s* $", DS_IDT_THIS_BACK, DS_IDT_NEXT_MORE2 );
-    cpp->AddIndentPattern( "^ %s* (|%}%s*) else %s* %{ %s* $", DS_IDT_THIS_BACK, DS_IDT_NEXT_MORE );
-    cpp->AddIndentPattern( "^ %s* %w+ %s* :", DS_IDT_THIS_ZERO, DS_IDT_NEXT_SAME );
-    cpp->AddIndentPattern( "(^ | %W) (|%}%s*) (else %s+ if|catch) %s* %b() %s* %{ %s* $",
-    DS_IDT_THIS_BACK, DS_IDT_NEXT_MORE );
-    cpp->AddIndentPattern( "(^ | %W) (|%}%s*) (else %s+ if|catch) %s* %b() %s* $",
-    DS_IDT_THIS_BACK, DS_IDT_NEXT_MORE1 );
-    cpp->AddIndentPattern( "(^ | %W) (if|for|while|switch) %s* %b() %s* %{ %s* $",
-    DS_IDT_THIS_SAME, DS_IDT_NEXT_MORE );
-    cpp->AddIndentPattern( "(^ | %W) (try | throw | do) %s* %{ %s* $",
-    DS_IDT_THIS_SAME, DS_IDT_NEXT_MORE );
-    cpp->AddIndentPattern( "(^ | %W) ( if | for | while | switch ) %s* %b() %s* $",
-    DS_IDT_THIS_SAME, DS_IDT_NEXT_MORE1 );
-    cpp->AddIndentPattern( "(^ | %W) ( try | throw | do ) %s* $",
-    DS_IDT_THIS_SAME, DS_IDT_NEXT_MORE1 );
-    cpp->AddIndentPattern( "(^ | %W) ( %{ | %( | %[ ) %s* $", DS_IDT_THIS_SAME, DS_IDT_NEXT_MORE );
-    cpp->AddIndentPattern( "^ %s* ( %} | %) | %] )", DS_IDT_THIS_BACK, DS_IDT_NEXT_SAME );
+	cpp->AddNoneIndentPattern( "^ %s* # %s* %w+" );
+	cpp->AddNoneIndentPattern( "^ %s* %w+ %s* :" );
+	cpp->AddLessIndentPattern( "^ %s* (public | protected | private) %s* :? %s* $" );
+	cpp->AddLessIndentPattern( "^ %s* case %s+ %S+ %s* (: | - | , | %. )" );
+	cpp->AddLessIndentPattern( "^ %s* default %s* :" );
+	cpp->AddMoreIndentPattern2( "^ %s* (public | protected | private) %s* :? %s* $" );
+	cpp->AddMoreIndentPattern2( "^ %s* case %s+ %S+ %s* (: | - | , | %. )" );
+	cpp->AddMoreIndentPattern2( "^ %s* default %s* :" );
+	cpp->AddMoreIndentPattern( "(^ | %W) ( if | for | while | switch ) %s* %b() %s* $" );
+	cpp->AddMoreIndentPattern( "(^ | %W) ( else %s+ if | rescue ) %s* %b() %s* $" );
+	cpp->AddMoreIndentPattern( "(^ | %W) (|%}%s*) else %s* $" );
+	cpp->AddMoreIndentPattern( "(^ | %W) ( try | raise | do ) %s* $" );
+
     
     DaoBasicSyntax *lua = new DaoBasicSyntax( "lua" );
     DaoCodeSHL::languages[ "lua" ] = lua;
@@ -543,20 +492,16 @@ DaoLanguages::DaoLanguages()
     lua->AddKeywordOthers( "not" );
     lua->AddKeywordOthers( "or" );
     lua->AddKeywordOthers( "and" );
-    lua->AddIndentPattern( "(^ | %W) function %s+ %w+ %s* %b()%s* $", DS_IDT_THIS_SAME, DS_IDT_NEXT_MORE );
-    lua->AddIndentPattern( "(^ | %W) if %W+ .* %W+ then %s* $", DS_IDT_THIS_SAME, DS_IDT_NEXT_MORE );
-    lua->AddIndentPattern( "(^ | %W) for %W+ .* %W+ do %s* $", DS_IDT_THIS_SAME, DS_IDT_NEXT_MORE );
-    lua->AddIndentPattern( "(^ | %W) do %s* $", DS_IDT_THIS_SAME, DS_IDT_NEXT_MORE );
-    lua->AddIndentPattern( "^ %s* elseif %W+ .* %W+ then %s* $", DS_IDT_THIS_BACK, DS_IDT_NEXT_MORE );
-    lua->AddIndentPattern( "^ %s* else %s* $", DS_IDT_THIS_BACK, DS_IDT_NEXT_MORE );
-    lua->AddIndentPattern( "^ %s* end (%W | $)", DS_IDT_THIS_BACK, DS_IDT_NEXT_SAME );
-    
-    //lua->AddMoreIndentNext( "(^ | %W) function %s+ %w+ %s* %b()%s* $" );
-    //lua->AddMoreIndentNext( "(^ | %W) if %W+ .* %W+ then %s* $" );
-    //lua->AddMoreIndentNext( "(^ | %W) for %W+ .* %W+ do %s* $" );
-    //lua->AddMoreIndentNext( "(^ | %W) do %s* $" );
-    //lua->AddBackIndentThis( "^ %s* else %s* $" );
-    //lua->AddBackIndentAll( "^ %s* end (%W | $)" );
+
+	lua->AddMoreIndentPattern2( "(^ | %W) function %s+ %w+ %s* %b()%s* $" );
+	lua->AddMoreIndentPattern2( "(^ | %W) for %W+ .* %W+ do %s* $" );
+	lua->AddMoreIndentPattern2( "(^ | %W) do %s* $" );
+	lua->AddMoreIndentPattern2( "(^ | %W) if %W+ .* %W+ then %s* $" );
+	lua->AddMoreIndentPattern2( "^ %s* elseif %W+ .* %W+ then %s* $" );
+	lua->AddMoreIndentPattern2( "^ %s* else %s* $" );
+	lua->AddLessIndentPattern( "^ %s* elseif %W+ .* %W+ then %s* $" );
+	lua->AddLessIndentPattern( "^ %s* else %s* $" );
+	lua->AddLessIndentPattern( "^ %s* end (%W | $)" );
 
     DaoBasicSyntax *py = new DaoBasicSyntax( "python" );
     DaoBasicSyntax::python = py;
@@ -602,13 +547,13 @@ DaoLanguages::DaoLanguages()
     py->AddKeywordOthers( "and" );
 
     py->AddPattern( "__%w+__", 1<<0, DAO_SHL_COLOR3 );
-    py->AddIndentPattern( "(^ | %W) ( class | def | if | for | while | switch ) %s+ .* : %s* $",
-    DS_IDT_THIS_SAME, DS_IDT_NEXT_MORE );
-    py->AddIndentPattern( "^ %s* elif %W+ .* : %s* $", DS_IDT_THIS_BACK, DS_IDT_NEXT_MORE );
-    py->AddIndentPattern( "^ %s* ( else | rescue ) %s* : %s* $", DS_IDT_THIS_BACK, DS_IDT_NEXT_MORE );
+
+    py->AddMoreIndentPattern2( "(^ | %W) (class|def|if|for|while|switch) %s+ .* : %s* $" );
+	py->AddMoreIndentPattern2( "^ %s* elif %W+ .* : %s* $" );
+	py->AddMoreIndentPattern2( "^ %s* ( else | rescue ) %s* : %s* $" );
+	py->AddLessIndentPattern( "^ %s* elif %W+ .* : %s* $" );
+	py->AddLessIndentPattern( "^ %s* ( else | rescue ) %s* : %s* $" );
     
-    //py->AddMoreIndentNext( "(^ | %W) ( class | def | if | for | while | switch ) %s+ .* : %s* $" );
-    //py->AddBackIndentThis( "^ %s* ( elif | else | rescue ) %s+ .* : %s* $" );
 
     DaoBasicSyntax *tex = new DaoBasicSyntax( "tex" );
     DaoCodeSHL::languages[ "tex" ] = tex;
@@ -919,7 +864,7 @@ void DaoCodeSHL::SetIndentationData( DaoCodeLineData *ud, DArray *tokens )
 	int i, j;
 	bool leading = true;
 	ud->leadSpaces = ud->leadTabs = 0;
-	ud->firstToken = ud->lastToken = ud->lastNoComment = 0;
+	ud->firstToken = 0;
 	for(i=0; i<tokens->size; i++){
 		DaoToken *tk = tokens->items.pToken[i];
 		if( leading ){
@@ -932,94 +877,6 @@ void DaoCodeSHL::SetIndentationData( DaoCodeLineData *ud, DArray *tokens )
 			}
 		}
 	}
-	ud->expSpaces = ud->leadSpaces;
-	ud->expTabs = ud->leadTabs;
-	bool tailing = true;
-	for(i=tokens->size-1; i>=0; i--){
-		DaoToken *tk = tokens->items.pToken[i];
-		bool space = tk->type >= DTOK_BLANK and tk->type <= DTOK_NEWLN;
-		tailing = tailing and space;
-		if( tailing == false and ud->lastToken ==0 ) ud->lastToken = tk->type;
-		if( tk->type != DTOK_COMMENT and tk->type != DTOK_CMT_OPEN and not space ){
-			ud->lastNoComment = tk->type;
-			break;
-		}
-	}
-    ud->lastClose = 0;
-    ud->brackets[0] = ud->brackets[1] = ud->brackets[2] = 0;
-    ud->openBrackets[0] = ud->openBrackets[1] = ud->openBrackets[2] = 0;
-    ud->closeBrackets[0] = ud->closeBrackets[1] = ud->closeBrackets[2] = 0;
-	for(i=0; i<tokens->size; i++){
-		switch( tokens->items.pToken[i]->type ){
-			case DTOK_LB  : ud->brackets[0] += 1; break;
-			case DTOK_RB  : ud->brackets[0] -= 1; break;
-			case DTOK_LSB : ud->brackets[1] += 1; break;
-			case DTOK_RSB : ud->brackets[1] -= 1; break;
-			case DTOK_LCB : ud->brackets[2] += 1; break;
-			case DTOK_RCB : ud->brackets[2] -= 1; break;
-			default : break;
-		}
-        for(j=0; j<3; j++){
-            if( ud->brackets[j] < ud->closeBrackets[j] ){
-                ud->lastClose = tokens->items.pToken[i]->type;
-                ud->closeBrackets[j] = ud->brackets[j];
-            }
-        }
-	}
-    ud->brackets[0] = ud->brackets[1] = ud->brackets[2] = 0;
-	for(i=tokens->size-1; i>=0; i--){
-		switch( tokens->items.pToken[i]->type ){
-			case DTOK_LB  : ud->brackets[0] += 1; break;
-			case DTOK_RB  : ud->brackets[0] -= 1; break;
-			case DTOK_LSB : ud->brackets[1] += 1; break;
-			case DTOK_RSB : ud->brackets[1] -= 1; break;
-			case DTOK_LCB : ud->brackets[2] += 1; break;
-			case DTOK_RCB : ud->brackets[2] -= 1; break;
-			default : break;
-		}
-        for(j=0; j<3; j++){
-            if( ud->brackets[j] > ud->openBrackets[j] ) ud->openBrackets[j] = ud->brackets[j];
-        }
-	}
-#if 0
-    printf( "%p: %s\n", ud, currentBlock().text().toUtf8().data() );
-    printf( "close: %3i ; open: %3i\n", ud->closeBrackets[0], ud->openBrackets[0] );
-    printf( "close: %3i ; open: %3i\n", ud->closeBrackets[1], ud->openBrackets[1] );
-    printf( "close: %3i ; open: %3i\n", ud->closeBrackets[2], ud->openBrackets[2] );
-#endif
-    int opens = ud->openBrackets[0] + ud->openBrackets[1] + ud->openBrackets[2];
-    int closes = ud->closeBrackets[0] + ud->closeBrackets[1] + ud->closeBrackets[2];
-	ud->thisIndent = DS_IDT_THIS_SAME;
-	ud->nextIndent = DS_IDT_NEXT_SAME;
-	if( opens >0 ) ud->nextIndent = DS_IDT_NEXT_MORE;
-	if( closes >0 ) ud->thisIndent = DS_IDT_THIS_BACK;
-	if( language == NULL or language->indents.size() ==0 ) return;
-	DString_Clear( wcs );
-    unsigned char lastok = 0;
-	for(i=0; i<tokens->size; i++){
-		DaoToken *tk = tokens->items.pToken[i];
-		if( tk->type <= DTOK_COMMENT ) continue;
-		if( tk->type == DTOK_MBS or tk->type == DTOK_WCS ){
-			DString_AppendWCS( wcs, L"\"\"" );
-			continue;
-		}
-		DString_Append( wcs, tk->string );
-	}
-	if( wcs->size ==0 ) return;
-	for(i=0; i<language->indents.size(); i++){
-		DaoIndentPattern ip = language->indents[i];
-		size_t start = 0;
-		size_t end = wcs->size-1;
-		//printf( "%i a: %i %ls\n", i, ip.mode, wcs->wcs );
-		if( DaoRegex_Match( ip.pattern, wcs, &start, &end ) ){
-			//printf( "%i b: %i %i  %ls\n", i, ip.thisIndent, ip.nextIndent, wcs->wcs );
-			ud->thisIndent = ip.thisIndent;
-			ud->nextIndent = ip.nextIndent;
-			break;
-		}
-	}
-	if( opens >0 ) ud->nextIndent = DS_IDT_NEXT_MORE;
-	if( closes >0 ) ud->thisIndent = DS_IDT_THIS_BACK;
 }
 void DaoCodeSHL::HighlightNormal( const QString & text )
 {
@@ -1134,22 +991,8 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
     DaoCodeLineData *ud = (DaoCodeLineData*) currentBlockUserData();
     if( ud == NULL ) setCurrentBlockUserData( new DaoCodeLineData(false, CLS_COMMAND ) );
     ud = (DaoCodeLineData*) currentBlockUserData();
-    SetIndentationData( ud, tokens );
-#if 0
-    if( language->isLatex and language->pattern ){
-        DString_SetMBS( wcs, src.toLocal8Bit().data() );
-        size_t pos;
-        size_t start = 0;
-        size_t end = wcs->size-1;
-        while( DaoRegex_Match( language->pattern, wcs, &start, &end ) ){
-            pos = DString_FindWChar( wcs, L'{', start );
-            //printf( "pos = %3i,  %ls\n", pos, wcs->wcs );
-            setFormat( pos+1-offset, end-pos-1, formatStdobj );
-            start = end + 1;
-            end = wcs->size-1;
-        }
-    }
-#endif
+	SetIndentationData( ud, tokens );
+
     DString_SetMBS( wcs, src.toLocal8Bit().data() );
     for(i=0; i<language->patterns.size(); i++){
         DaoSyntaxPattern sp = language->patterns[i];
@@ -1233,12 +1076,14 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
     case DTOK_WCS_OPEN : setCurrentBlockState( DAO_HLSTATE_WCS ); break;
     default : setCurrentBlockState(0);
     }
+	DaoBasicSyntax *lang = language;
+	if( lang == NULL ) lang = DaoBasicSyntax::dao;
     for(size_t i=0; i<tokens->size; i++){
         DaoToken *tk = tokens->items.pToken[i];
         DaoTokenFormat format;
         format.setForeground( plainColor );
         DString_SetDataMBS( wcs, tk->string->mbs, tk->string->size );
-        //printf( "%4i:  %3i  %s\n", i, tk->name, tk->string->mbs->data );
+        //printf( "%4i:  %3i  %s\n", i, tk->name, tk->string->mbs );
         switch( tk->name ){
         case DTOK_BLANK : case DTOK_TAB :
             format.setObjectType( 0 );
@@ -1298,9 +1143,6 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
         case DKEY_SORT : case DKEY_APPLY :
             format = formatTypeStruct;
             break;
-            //			case DKEY_STDIO : case DKEY_STDLIB : case DKEY_MATH :
-            //			case DKEY_COROUTINE : case DKEY_REFLECT :
-            //			case DKEY_NETWORK : case DKEY_MPI : 
         case DKEY_SELF :
             format = formatStdobj;
             break;
@@ -1308,6 +1150,7 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
             format.setObjectType( TXT_CHAR_IDENTIFIER );
             if( tk->string->size == 3 && strcmp( tk->string->mbs, "dao" ) ==0 )
                 format = formatPrompt;
+			if( lang and DMap_Find( lang->keyOthers, tk->string ) ) format = formatPrompt;
             break;
         default:
             format.setObjectType( TXT_CHAR_SYMBOL );
@@ -1316,7 +1159,7 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
         setFormat( pos, wcs->size, format );
         pos += wcs->size;
     }
-    SetIndentationData( ud, tokens );
+	SetIndentationData( ud, tokens );
     //printf( "%3i%3i%3i%3i: %s\n", ud->leadSpaces, ud->leadTabs,
     //    ud->lastToken, ud->lastNoComment, src.toLocal8Bit().data() );
     HighlightSearch( text );

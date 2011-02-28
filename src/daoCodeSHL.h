@@ -102,19 +102,11 @@ class DaoCodeLineData : public QTextBlockUserData
 {
     public:
         DaoCodeLineData( bool b, enum CodeLineStates s=CLS_NORMAL, int l=0 ){
-            state = s; line = l; breaking = b;
+            state = s; 
+			line = l; 
+			breaking = b;
             leadTabs = leadSpaces = 0;
-            firstToken = lastToken = lastNoComment = 0;
-            brackets[0] = brackets[1] = brackets[2] = 0;
-            openBrackets[0] = openBrackets[1] = openBrackets[2] = 0;
-            closeBrackets[0] = closeBrackets[1] = closeBrackets[2] = 0;
-            expectIndent = 0;
-            thisIndent = DS_IDT_THIS_SAME;
-            nextIndent = DS_IDT_NEXT_SAME;
-            expSpaces = expTabs = 0;
-            referIndent = 0;
-            lastClose = 0;
-            indentState = DS_IDT_SAME;
+            firstToken = 0;
 			incomplete = false;
 			extend_line = false;
 			open_token = false;
@@ -124,27 +116,12 @@ class DaoCodeLineData : public QTextBlockUserData
         }
 
         unsigned short line;
-        unsigned short referIndent;
         unsigned char  leadTabs; /* count */
         unsigned char  leadSpaces; /* count */
         unsigned char  firstToken; /* token type */
-        unsigned char  lastToken; /* token type */
-        unsigned char  lastNoComment; /* token type, last no comment token */
-        unsigned char  expectIndent;
-        unsigned char  expSpaces;
-        unsigned char  expTabs;
+        unsigned char  state;
 
-        unsigned char  state : 4;
-        unsigned char  breaking : 1;
-        unsigned char  indentState : 2;
-        unsigned char  thisIndent : 4;
-        unsigned char  nextIndent : 4;
-        
-        char brackets[3];
-        char openBrackets[3];
-        char closeBrackets[3];
-        char lastClose;
-
+        bool   breaking;
 		bool   incomplete; // incomplete line.
 		bool   extend_line; // follow up line of a incomplete line.
 		bool   open_token; // incomplete string or comment token
@@ -166,13 +143,6 @@ struct DaoSyntaxPattern
     DaoRegex *pattern;
     short     groups;
     short     color;
-};
-
-struct DaoIndentPattern
-{
-    DaoRegex *pattern;
-    short     thisIndent;
-    short     nextIndent;
 };
 
 struct DaoBasicSyntax
@@ -202,7 +172,6 @@ struct DaoBasicSyntax
     DArray *tokens;
 
     QList<DaoSyntaxPattern> patterns;
-    QList<DaoIndentPattern> indents;
 
 	QList<DaoRegex*> noneIndents; // TODO delete
 	QList<DaoRegex*> lessIndents;
@@ -234,15 +203,6 @@ struct DaoBasicSyntax
 	void AddLessIndentPattern( const char *pat );
 	void AddMoreIndentPattern( const char *pat );
 	void AddMoreIndentPattern2( const char *pat );
-
-    void AddZeroIndentThis( const char *pat );
-    void AddBackIndentThis( const char *pat );
-    void AddBackIndentAll( const char *pat );
-    void AddSameIndentNext( const char *pat );
-    void AddMoreIndentNext( const char *pat );
-    void AddMoreIndentNext1( const char *pat );
-    
-    void AddIndentPattern( const char *pat, int mthis, int mnext=DS_IDT_NEXT_SAME );
 
 	/* Note: the token field "name" will not be valid! */
     int Tokenize( DArray *tokens, const char *source );
@@ -329,7 +289,7 @@ class DaoCodeSHL : public QSyntaxHighlighter
     static QMap<QString,DaoBasicSyntax*> languages;
 
     protected:
-    void SetIndentationData( DaoCodeLineData *ud, DArray *tokens );
+	void SetIndentationData( DaoCodeLineData *ud, DArray *tokens );
     void HighlightSearch( const QString & text );
     void HighlightNormal( const QString & text );
     void highlightBlock( const QString & text );

@@ -112,7 +112,7 @@ Q_OBJECT
 	QString itemName;
 
 	void RoutineInfo( DaoRoutine *routine, void *address );
-	void FillTable( QTableWidget *table, DValue **data, int size, DArray *type, DMap *names );
+	void FillTable( QTableWidget *table, DValue **data, int size, DArray *type, DMap *names, int fileter );
 	void FillTable2( QTableWidget *table, DValue **data, int size, DArray *type, DMap *names );
 	void ViewVmCodes( QTableWidget *table, DaoRoutine *routine );
 	void ResetExecutionPoint(int row, int col);

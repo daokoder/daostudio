@@ -281,13 +281,8 @@ class DaoTextEdit : public QPlainTextEdit
 
         void JoinNextLine( QTextCursor cursor );
         void IndentLine( QTextCursor cursor, bool indent=true );
-        void IndentLine2( QTextCursor cursor, bool indent=true );
-        void IndentLine3( QTextCursor cursor, bool indent=true );
         void IndentLines( QTextCursor cursor, int n );
         DaoCodeLineData* SetIndentData( QTextBlock block );
-        void SetIndentData2( QTextBlock block );
-        QTextBlock PairBracket( QTextBlock block, int type, int count );
-        QTextBlock PairBracket2( QTextBlock block, int type, int count );
 
         protected slots:
         void slotSearchOrReplace();
