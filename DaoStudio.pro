@@ -13,9 +13,9 @@ INCLUDEPATH += . src
 DESTDIR = .
 
 # Input
-HEADERS += src/daoConsole.h src/daoEditor.h src/daoCodeSHL.h src/daoStudio.h
-SOURCES += src/daoConsole.cpp src/daoEditor.cpp src/daoCodeSHL.cpp src/daoStudio.cpp
-FORMS += src/daoStudio.ui src/daoAbout.ui src/daoHelpVIM.ui
+HEADERS += src/daoConsole.h src/daoEditor.h src/daoCodeSHL.h src/daoDebugger.h src/daoMonitor.h src/daoStudio.h
+SOURCES += src/daoConsole.cpp src/daoEditor.cpp src/daoCodeSHL.cpp src/daoDebugger.cpp src/daoMonitor.cpp src/daoStudio.cpp src/daoStudioMain.cpp
+FORMS += src/daoStudio.ui src/daoMonitor.ui src/daoAbout.ui src/daoHelpVIM.ui
 #QMAKE_CXXFLAGS += -fPIC
 
 RESOURCES += daostudio.qrc

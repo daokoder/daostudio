@@ -291,7 +291,7 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
     //monitor->start( "echo \"r\" | gdb ./DaoMonitor" );
     //monitor->start( "./DaoMonitor", QIODevice::ReadWrite|QIODevice::Unbuffered );
     //monitor->start( "vi" );
-    monitor->start( "./DaoMonitor", QIODevice::ReadWrite | QIODevice::Unbuffered );
+    monitor->start( program + " --monitor", QIODevice::ReadWrite | QIODevice::Unbuffered );
     monitor->waitForStarted(100);
     wgtConsole->monitor = monitor;
     connect( monitor, SIGNAL(readyReadStandardOutput()),
@@ -473,7 +473,7 @@ void DaoStudio::RestartMonitor()
     text = QString::fromUtf8( output.data(), output.size() );
     wgtConsole->slotPrintOutput( text );
 
-    monitor->start( "./DaoMonitor", QIODevice::ReadWrite | QIODevice::Unbuffered );
+    monitor->start( program + " --monitor", QIODevice::ReadWrite | QIODevice::Unbuffered );
     monitor->waitForStarted();
     do{ socket.connectToServer( "/tmp/daostudio.socket.script" );
     }while( socket.state() != QLocalSocket::ConnectedState );
@@ -1102,31 +1102,5 @@ void DaoStudio::SaveSettings()
     }
     settings.setValue( "Editor/Cursors", lastCursor );
     settings.sync();
-}
-
-int main( int argc, char *argv[] )
-{
-    setlocale( LC_CTYPE, "" );
-    QApplication app( argc, argv );
-    QFileInfo finfo( argv[0] ); 
-    QTranslator translator;
-    QString locale = QLocale::system().name();
-    translator.load( finfo.absolutePath() + QString("/langs/daostudio_") + locale);
-    app.installTranslator(&translator);
-
-    DaoStudioSettings::codeFont.setWeight( 460 );
-    DaoStudioSettings::codeFont.setFamily( "Courier 10 Pitch" );
-    DaoStudioSettings::codeFont.setPointSize( 14 );
-    QFontInfo fi( DaoStudioSettings::codeFont );
-    if( fi.family() != "Courier 10 Pitch" )
-        DaoStudioSettings::codeFont.setFamily( "Courier New" );
-
-    DaoStudio studio( argv[0] );
-    //studio.resize( 800, 600 );
-    //DaoInitLibrary( argv[0] );
-    app.setActiveWindow( & studio );
-    studio.showMaximized();
-    studio.show();
-    return app.exec();
 }
 

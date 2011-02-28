@@ -1439,30 +1439,3 @@ void DaoMonitor::slotValueActivated( QListWidgetItem *item )
     ViewValue( dataWidget, (DaoValueItem*) item );
 }
 
-
-int main( int argc, char *argv[] )
-{
-    setlocale( LC_CTYPE, "" );
-    QApplication app( argc, argv );
-    QFileInfo finfo( argv[0] ); 
-    QTranslator translator;
-    QString locale = QLocale::system().name();
-    translator.load( finfo.absolutePath() + QString("/langs/daostudio_") + locale);
-    app.installTranslator(&translator);
-
-    DaoStudioSettings::codeFont.setWeight( 460 );
-    DaoStudioSettings::codeFont.setFamily( "Courier 10 Pitch" );
-    DaoStudioSettings::codeFont.setPointSize( 14 );
-    QFontInfo fi( DaoStudioSettings::codeFont );
-    if( fi.family() != "Courier 10 Pitch" )
-        DaoStudioSettings::codeFont.setFamily( "Courier New" );
-
-    DaoMonitor monitor( argv[0] );
-    QRect size = QApplication::desktop()->screenGeometry();
-    monitor.resize( 0.7*size.width(), 0.7*size.height() );
-    app.setActiveWindow( & monitor );
-    //monitor.showMaximized();
-    monitor.show();
-    return app.exec();
-}
-
