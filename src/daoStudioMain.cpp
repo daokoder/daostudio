@@ -18,8 +18,33 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #include<cmath>
 #include<QDir>
 
-#include<daoStudio.h>
 #include<daoMonitor.h>
+#include<daoStudio.h>
+#include<daoStudioMain.h>
+
+QFont DaoStudioSettings::codeFont;
+QString DaoStudioSettings::program_path;
+QString DaoStudioSettings::socket_script;
+QString DaoStudioSettings::socket_stdin;
+QString DaoStudioSettings::socket_debug;
+QString DaoStudioSettings::socket_breakpoints;
+
+void DaoStudioSettings::SetProgramPath( const QString & path0 )
+{
+	QFileInfo finfo( path0 ); 
+	QString path = finfo.absolutePath();
+
+	program_path = path;
+
+	path = QDir::tempPath ();
+	if( path.size() and path[ path.size()-1 ] != QDir::separator() )
+		path += QDir::separator();
+
+	socket_script = path + ".daostudio.socket.script";
+	socket_stdin = path + ".daostudio.socket.stdin";
+	socket_debug = path + ".daostudio.socket.debug";
+	socket_breakpoints = path + ".daostudio.socket.breakpoints";
+}
 
 int StudioMain( QApplication & app, int argc, char *argv[] )
 {

@@ -28,6 +28,7 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #include<QLocalSocket>
 
 #include<daoCodeSHL.h>
+#include<daoStudioMain.h>
 
 enum
 {
@@ -42,7 +43,6 @@ enum
     DAO_SHL_COLOR9
 };
 
-QFont DaoStudioSettings::codeFont;
 
 DaoBasicSyntax::DaoBasicSyntax( const QString & lang )
 {

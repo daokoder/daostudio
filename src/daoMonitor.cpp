@@ -1058,7 +1058,7 @@ static void DaoResetExecution( DaoContext *context, int line, int offset=0 )
 static void DaoStdioRead( DaoEventHandler *self, DString *buf, int count )
 {
     fflush( stdout );
-    self->socket.connectToServer( "/tmp/daostudio.socket.stdin" );
+    self->socket.connectToServer( DaoStudioSettings::socket_stdin );
     self->socket.write( QByteArray::number( count ) );
     self->socket.flush();
     QObject::connect( & self->socket, SIGNAL(disconnected()),
@@ -1093,7 +1093,7 @@ static void DaoConsDebug( DaoEventHandler *self, DaoContext *ctx )
     info += " ...";
     printf( "%s\n", info.toUtf8().data() );
     fflush( stdout );
-    self->socket.connectToServer( "/tmp/daostudio.socket.debug" );
+    self->socket.connectToServer( DaoStudioSettings::socket_debug );
     self->socket.write( send );
     self->socket.flush();
     QObject::connect( & self->socket, SIGNAL(disconnected()),
@@ -1152,6 +1152,8 @@ DaoMonitor::DaoMonitor( const char *cmd ) : QMainWindow()
     programPath = finfo.absolutePath();
     locale = QLocale::system().name();
 
+	DaoStudioSettings::SetProgramPath( programPath );
+
     QCommonStyle style;
     QIcon book( QPixmap( ":/images/book.png" ) );
     QIcon dao( QPixmap( ":/images/dao.png" ) );
@@ -1204,8 +1206,9 @@ DaoMonitor::DaoMonitor( const char *cmd ) : QMainWindow()
     SetPathWorking( "." );
     DaoVmSpace_AddPath( vmSpace, programPath.toLocal8Bit().data() );
 
-    system( "rm /tmp/daostudio.socket.script" );
-    server.listen( "/tmp/daostudio.socket.script" );
+	if( QFile::exists( DaoStudioSettings::socket_script ) )
+		QFile::remove( DaoStudioSettings::socket_script );
+    server.listen( DaoStudioSettings::socket_script );
     connect( &server, SIGNAL(newConnection()), this, SLOT(slotStartExecution()));
 
     time = 0;
@@ -1236,7 +1239,10 @@ void DaoMonitor::closeEvent ( QCloseEvent *e )
 {
     int ret = QMessageBox::warning( this, tr("DaoMonitor - quit"),
             tr("Are you sure to quit?\n" ), QMessageBox::Yes | QMessageBox::No );
-    if( ret == QMessageBox::Yes ) return;
+    if( ret == QMessageBox::Yes ){
+		handler.timer.terminate();
+		return;
+	}
     e->ignore();
 }
 void DaoMonitor::slotReadStdOut()

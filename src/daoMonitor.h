@@ -39,6 +39,7 @@
 
 #include<daoCodeSHL.h>
 #include<daoDebugger.h>
+#include<daoStudioMain.h>
 
 class DaoMonitor;
 class DaoTimer : public QThread

@@ -47,16 +47,6 @@ extern "C"{
 #include<daoRegex.h>
 }
 
-#define TIME_YIELD 20
-#define TIME_EVENT 5
-
-enum
-{
-    DAO_RUN_SCRIPT ,
-    DAO_DEBUG_SCRIPT ,
-    DAO_SET_PATH
-};
-
 enum DaoCodeSHLState
 {
     DAO_HLSTATE_NONE ,
@@ -129,14 +119,6 @@ class DaoCodeLineData : public QTextBlockUserData
 		bool   token_line; // line that is a part of an open token;
 		short  brace_count;
 };
-
-class DaoStudioSettings
-{
-    public:
-
-        static QFont codeFont;
-};
-
 
 struct DaoSyntaxPattern
 {

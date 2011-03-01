@@ -20,6 +20,7 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #include<daoConsole.h>
 #include<daoEditor.h>
 #include<daoStudio.h>
+#include<daoStudioMain.h>
 
 QStringList DaoConsole::oldComdHist;
 bool DaoConsole::appendToFile = 0;
@@ -77,12 +78,14 @@ DaoConsole::DaoConsole( QWidget *parent ) : DaoTextEdit( parent, & wordList )
 
     SetVmSpace( DaoInit() );
 
-    system( "rm /tmp/daostudio.socket.debug" );
-    debugServer.listen( "/tmp/daostudio.socket.debug" );
+	if( QFile::exists( DaoStudioSettings::socket_debug ) )
+		QFile::remove( DaoStudioSettings::socket_debug );
+    debugServer.listen( DaoStudioSettings::socket_debug );
     connect( & debugServer, SIGNAL(newConnection()), this, SLOT(slotSocketDebug()));
 
-    system( "rm /tmp/daostudio.socket.stdin" );
-    stdinServer.listen( "/tmp/daostudio.socket.stdin" );
+	if( QFile::exists( DaoStudioSettings::socket_stdin ) )
+		QFile::remove( DaoStudioSettings::socket_stdin );
+    stdinServer.listen( DaoStudioSettings::socket_stdin );
     connect( & stdinServer, SIGNAL(newConnection()), this, SLOT(slotSocketStdin()));
 }
 DaoConsole::~DaoConsole()
@@ -563,7 +566,7 @@ void DaoConsole::RunScript( const QString & src, bool debug )
     stdinSocket = NULL;
     state = DAOCON_RUN;
     studio->SetState( DAOCON_RUN );
-    scriptSocket.connectToServer( "/tmp/daostudio.socket.script" );
+    scriptSocket.connectToServer( DaoStudioSettings::socket_script );
     //printf( "socket: %i  %s\n", socket.isValid(), src.toUtf8().data() );
     scriptSocket.putChar( debug ? DAO_DEBUG_SCRIPT : DAO_RUN_SCRIPT );
     scriptSocket.write( src.toUtf8().data() );

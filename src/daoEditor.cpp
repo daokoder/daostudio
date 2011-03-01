@@ -30,6 +30,7 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 #include<daoEditor.h>
 #include<daoStudio.h>
+#include<daoStudioMain.h>
 
 void DaoTabEditor::focusInEvent ( QFocusEvent * event )
 {
@@ -2483,7 +2484,7 @@ void DaoEditor::MarkLine( int y )
             breakPoints.erase( it );
         }
         QLocalSocket socket;
-        socket.connectToServer( "/tmp/daostudio.socket.breakpoints" );
+        socket.connectToServer( DaoStudioSettings::socket_breakpoints );
         QByteArray data;
         data.append( fullName );
         data += '\0' + QByteArray::number( ud->breaking );

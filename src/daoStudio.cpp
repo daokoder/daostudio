@@ -19,6 +19,7 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #include<QDir>
 
 #include<daoStudio.h>
+#include<daoStudioMain.h>
 
 
 DaoStudioAbout::DaoStudioAbout( QWidget *parent ) : QDialog( parent )
@@ -106,6 +107,8 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
     QFileInfo finfo( program ); 
     programPath = finfo.absolutePath();
     locale = QLocale::system().name();
+
+	DaoStudioSettings::SetProgramPath( programPath );
 
     QCommonStyle style;
     QIcon book( QPixmap( ":/images/book.png" ) );
@@ -291,8 +294,22 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
     //monitor->start( "echo \"r\" | gdb ./DaoMonitor" );
     //monitor->start( "./DaoMonitor", QIODevice::ReadWrite|QIODevice::Unbuffered );
     //monitor->start( "vi" );
-    monitor->start( program + " --monitor", QIODevice::ReadWrite | QIODevice::Unbuffered );
-    monitor->waitForStarted(100);
+    socket.connectToServer( DaoStudioSettings::socket_script );
+	bool newStart = true;
+	if( socket.waitForConnected( 100 ) ){
+        int ret = QMessageBox::warning(this, tr("DaoStudio"),
+                tr("DaoMonitor is running. Use it?\n\n"
+				"Warning: if you use the running DaoMonitor, "
+				"its standard output will not be available in DaoStudio!"),
+                QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+        newStart = (ret == QMessageBox::No);
+	}
+	if( newStart ){
+		monitor->start( program + " --monitor", QIODevice::ReadWrite | QIODevice::Unbuffered );
+		monitor->waitForStarted(100);
+	}else{
+		slotWriteLog( tr("connected to running") + " DaoMonitor" );
+	}
     wgtConsole->monitor = monitor;
     connect( monitor, SIGNAL(readyReadStandardOutput()),
             wgtConsole, SLOT(slotReadStdOut()));
@@ -352,7 +369,7 @@ void DaoStudio::LoadPath( QListWidget *wgtList, const QString & path, const QStr
 }
 void DaoStudio::SendPathWorking()
 {
-    socket.connectToServer( "/tmp/daostudio.socket.script" );
+    socket.connectToServer( DaoStudioSettings::socket_script );
     socket.putChar( DAO_SET_PATH );
     socket.write( pathWorking.toUtf8().data() );
     socket.flush();
@@ -417,7 +434,7 @@ void DaoStudio::slotPathList(int id)
 void DaoStudio::showEvent ( QShowEvent * event )
 {
     QMainWindow::showEvent( event );
-    do{ socket.connectToServer( "/tmp/daostudio.socket.script" );
+    do{ socket.connectToServer( DaoStudioSettings::socket_script );
     }while( socket.state() != QLocalSocket::ConnectedState );
     socket.disconnectFromServer();
     SendPathWorking();
@@ -427,8 +444,7 @@ void DaoStudio::closeEvent ( QCloseEvent *e )
 {
     if( vmState != DAOCON_READY ){
         int ret = QMessageBox::warning(this, tr("DaoStudio"),
-                tr("The execution is not done yet.\n"
-                    "Quit anyway?"),
+                tr("The execution is not done yet.\nQuit anyway?"),
                 QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
         if( ret == QMessageBox::No ){
             e->ignore();
@@ -475,7 +491,7 @@ void DaoStudio::RestartMonitor()
 
     monitor->start( program + " --monitor", QIODevice::ReadWrite | QIODevice::Unbuffered );
     monitor->waitForStarted();
-    do{ socket.connectToServer( "/tmp/daostudio.socket.script" );
+    do{ socket.connectToServer( DaoStudioSettings::socket_script );
     }while( socket.state() != QLocalSocket::ConnectedState );
     socket.disconnectFromServer();
     connect( monitor, SIGNAL(readyReadStandardOutput()),

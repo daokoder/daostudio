@@ -19,11 +19,13 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #include<QtNetwork>
 
 #include"daoDebugger.h"
+#include<daoStudioMain.h>
 
 DaoDebugger::DaoDebugger()
 {
-    system( "rm /tmp/daostudio.socket.breakpoints" );
-    server.listen( "/tmp/daostudio.socket.breakpoints" );
+	if( QFile::exists( DaoStudioSettings::socket_breakpoints ) )
+		QFile::remove( DaoStudioSettings::socket_breakpoints );
+    server.listen( DaoStudioSettings::socket_breakpoints );
     connect( & server, SIGNAL(newConnection()), this, SLOT(slotSetBreakPoint()));
 }
 void DaoDebugger::slotSetBreakPoint()
