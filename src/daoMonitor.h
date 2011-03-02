@@ -198,6 +198,7 @@ class DaoMonitor : public QMainWindow, private Ui::DaoMonitor
 Q_OBJECT
 
   QLocalServer   server;
+  QLocalServer   server2;
 	DaoDataWidget *dataWidget;
 
 	QString  locale;

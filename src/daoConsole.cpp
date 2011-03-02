@@ -564,6 +564,11 @@ void DaoConsole::RunScript( const QString & src, bool debug )
     setUndoRedoEnabled( false );
     setUndoRedoEnabled( true );
     stdinSocket = NULL;
+	if( DaoStudioSettings::monitor_socket.state() == QLocalSocket::UnconnectedState ){
+		insertPlainText( tr( "ERROR: DaoMonitor is not running!" ) );
+		PrintPrompt();
+		return;
+	}
     state = DAOCON_RUN;
     studio->SetState( DAOCON_RUN );
     scriptSocket.connectToServer( DaoStudioSettings::socket_script );

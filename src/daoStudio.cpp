@@ -328,6 +328,9 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
     connect( &timer, SIGNAL(timeout()), this, SLOT(slotTimeOut()));
     timer.start( 97 );
 
+    DaoStudioSettings::monitor_socket.connectToServer( DaoStudioSettings::socket_monitor );
+	connect( & DaoStudioSettings::monitor_socket, SIGNAL( disconnected() ),
+			this, SLOT( slotRestartMonitor2() ) );
 }
 
 DaoStudio::~DaoStudio()
@@ -494,6 +497,9 @@ void DaoStudio::RestartMonitor()
     do{ socket.connectToServer( DaoStudioSettings::socket_script );
     }while( socket.state() != QLocalSocket::ConnectedState );
     socket.disconnectFromServer();
+    DaoStudioSettings::monitor_socket.connectToServer( DaoStudioSettings::socket_monitor );
+	disconnect( & DaoStudioSettings::monitor_socket, SIGNAL( disconnected() ),
+			this, SLOT( slotRestartMonitor2() ) );
     connect( monitor, SIGNAL(readyReadStandardOutput()),
             wgtConsole, SLOT(slotReadStdOut()));
     //connect( monitor, SIGNAL(readyReadStandardError()),
@@ -505,6 +511,11 @@ void DaoStudio::RestartMonitor()
     SendPathWorking();
     slotWriteLog( tr("restart Dao Program Monitor") );
     wgtConsole->SetState( DAOCON_READY );
+}
+void DaoStudio::slotRestartMonitor2()
+{
+	slotWriteLog( tr("Dao Program Monitor exited for unknown reason") );
+	RestartMonitor();
 }
 void DaoStudio::slotRestartMonitor( int code, QProcess::ExitStatus status )
 {

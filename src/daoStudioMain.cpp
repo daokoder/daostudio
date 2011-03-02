@@ -24,10 +24,12 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 QFont DaoStudioSettings::codeFont;
 QString DaoStudioSettings::program_path;
+QString DaoStudioSettings::socket_monitor;
 QString DaoStudioSettings::socket_script;
 QString DaoStudioSettings::socket_stdin;
 QString DaoStudioSettings::socket_debug;
 QString DaoStudioSettings::socket_breakpoints;
+QLocalSocket DaoStudioSettings::monitor_socket;
 
 void DaoStudioSettings::SetProgramPath( const QString & path0 )
 {
@@ -40,6 +42,7 @@ void DaoStudioSettings::SetProgramPath( const QString & path0 )
 	if( path.size() and path[ path.size()-1 ] != QDir::separator() )
 		path += QDir::separator();
 
+	socket_monitor = path + ".daostudio.socket.monitor";
 	socket_script = path + ".daostudio.socket.script";
 	socket_stdin = path + ".daostudio.socket.stdin";
 	socket_debug = path + ".daostudio.socket.debug";

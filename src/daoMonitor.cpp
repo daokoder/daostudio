@@ -1206,8 +1206,11 @@ DaoMonitor::DaoMonitor( const char *cmd ) : QMainWindow()
     SetPathWorking( "." );
     DaoVmSpace_AddPath( vmSpace, programPath.toLocal8Bit().data() );
 
+	if( QFile::exists( DaoStudioSettings::socket_monitor ) )
+		QFile::remove( DaoStudioSettings::socket_monitor );
 	if( QFile::exists( DaoStudioSettings::socket_script ) )
 		QFile::remove( DaoStudioSettings::socket_script );
+    server2.listen( DaoStudioSettings::socket_monitor );
     server.listen( DaoStudioSettings::socket_script );
     connect( &server, SIGNAL(newConnection()), this, SLOT(slotStartExecution()));
 

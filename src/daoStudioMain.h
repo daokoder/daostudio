@@ -34,10 +34,13 @@ public:
 
 	static QFont   codeFont;
 	static QString program_path;
+	static QString socket_monitor;
 	static QString socket_script;
 	static QString socket_stdin;
 	static QString socket_debug;
 	static QString socket_breakpoints;
+
+    static QLocalSocket  monitor_socket;
 
 	static void SetProgramPath( const QString & path );
 };

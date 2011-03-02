@@ -147,6 +147,7 @@ class DaoStudio : public QMainWindow, private Ui::DaoStudio
     void slotSave();
     void slotSaveAs();
     protected slots:
+        void slotRestartMonitor2();
         void slotRestartMonitor( int exitCode, QProcess::ExitStatus exitStatus );
     void slotLoadURL( const QString & );
     void slotFileActivated(QListWidgetItem*);
