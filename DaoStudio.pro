@@ -18,10 +18,11 @@ SOURCES += src/daoConsole.cpp src/daoEditor.cpp src/daoCodeSHL.cpp src/daoDebugg
 FORMS += src/daoStudio.ui src/daoMonitor.ui src/daoAbout.ui src/daoHelpVIM.ui
 #QMAKE_CXXFLAGS += -fPIC
 
-RESOURCES += daostudio.qrc
+RESOURCES += DaoStudio.qrc
 TRANSLATIONS = langs/daostudio_zh_cn.ts
 
 win32 {
+	RC_FILE = DaoStudio.rc
 	INCLUDEPATH += ..\dao\kernel
 	DEFINES += WIN32
 	LIBS += ..\dao\dao.a -lwinmm -lwsock32 -lmsvcp60
@@ -34,6 +35,7 @@ unix {
   #QMAKE_LFLAGS += -Xlinker -rpath -Xlinker .
 }
 mac {
+	ICON = icons/daostudio.icns
 	QMAKESPEC = macx-g++
 	INCLUDEPATH += ../dao/kernel
 	DEFINES += UNIX MAC_OSX

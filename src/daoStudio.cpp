@@ -113,6 +113,8 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
     QCommonStyle style;
     QIcon book( QPixmap( ":/images/book.png" ) );
     QIcon dao( QPixmap( ":/images/dao.png" ) );
+    QIcon daostudio( QPixmap( ":/images/daostudio.png" ) );
+	QApplication::setWindowIcon( daostudio );
 
     vmState = DAOCON_READY;
 

@@ -1157,6 +1157,8 @@ DaoMonitor::DaoMonitor( const char *cmd ) : QMainWindow()
     QCommonStyle style;
     QIcon book( QPixmap( ":/images/book.png" ) );
     QIcon dao( QPixmap( ":/images/dao.png" ) );
+    QIcon daomonitor( QPixmap( ":/images/daomonitor.png" ) );
+	QApplication::setWindowIcon( daomonitor );
 
     index = 0;
     vmState = DAOCON_READY;
