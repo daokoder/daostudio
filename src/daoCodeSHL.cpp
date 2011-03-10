@@ -630,7 +630,6 @@ DaoLanguages::DaoLanguages()
 }
 
 QMap<QString,DaoBasicSyntax*> DaoCodeSHL::languages;
-DaoLanguages languages;
 
 DaoTokenFormat::DaoTokenFormat()
 {

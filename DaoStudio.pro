@@ -15,7 +15,7 @@ DESTDIR = .
 # Input
 HEADERS += src/daoConsole.h src/daoEditor.h src/daoCodeSHL.h src/daoDebugger.h src/daoMonitor.h src/daoStudio.h src/daoStudioMain.h
 SOURCES += src/daoConsole.cpp src/daoEditor.cpp src/daoCodeSHL.cpp src/daoDebugger.cpp src/daoMonitor.cpp src/daoStudio.cpp src/daoStudioMain.cpp
-FORMS += src/daoStudio.ui src/daoMonitor.ui src/daoAbout.ui src/daoHelpVIM.ui
+FORMS += src/daoStudio.ui src/daoMonitor.ui src/daoDataWidget.ui src/daoAbout.ui src/daoHelpVIM.ui
 #QMAKE_CXXFLAGS += -fPIC
 
 RESOURCES += DaoStudio.qrc

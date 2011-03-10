@@ -75,6 +75,8 @@ int main( int argc, char *argv[] )
 {
     setlocale( LC_CTYPE, "" );
     QApplication app( argc, argv );
+	DaoLanguages languages;
+
     QFileInfo finfo( argv[0] ); 
     QTranslator translator;
     QString locale = QLocale::system().name();
