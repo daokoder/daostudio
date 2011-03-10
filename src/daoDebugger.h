@@ -43,30 +43,30 @@ extern "C"{
 
 class DaoDebugger : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 
-        QList<int> align1;
-    QList<int> align2;
-    QMap<int,int> regmap;
-    QVector<QVector<int> > codesim;
+		QList<int> align1;
+	QList<int> align2;
+	QMap<int,int> regmap;
+	QVector<QVector<int> > codesim;
 
-    QMap<QString,QMap<int,int> > breakPoints;
+	QMap<QString,QMap<int,int> > breakPoints;
 
-    QLocalServer server;
+	QLocalServer server;
 
-    public:
-    DaoDebugger();
+	public:
+	DaoDebugger();
 
-    void SetBreakPoints( DaoRoutine *routine );
-    void ResetExecution( DaoContext *context, int line, int offset );
-    void Similarity( QList<DaoVmCode> & x, QList<DaoVmCode> & y );
-    void Matching( QList<DaoVmCode> & x, QList<DaoVmCode> & y );
-    void Matching( int i, int j );
-    bool EditContinue( DaoContext*, int, QList<int>&, QStringList&, QStringList& );
+	void SetBreakPoints( DaoRoutine *routine );
+	void ResetExecution( DaoContext *context, int line, int offset );
+	void Similarity( QList<DaoVmCode> & x, QList<DaoVmCode> & y );
+	void Matching( QList<DaoVmCode> & x, QList<DaoVmCode> & y );
+	void Matching( int i, int j );
+	bool EditContinue( DaoContext*, int, QList<int>&, QStringList&, QStringList& );
 
-    protected slots:
+	protected slots:
 
-        void slotSetBreakPoint();
+		void slotSetBreakPoint();
 };
 
 #endif

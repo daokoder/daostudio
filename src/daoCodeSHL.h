@@ -49,24 +49,24 @@ extern "C"{
 
 enum DaoCodeSHLState
 {
-    DAO_HLSTATE_NONE ,
-    DAO_HLSTATE_PROMPT ,
-    DAO_HLSTATE_NORMAL ,
-    DAO_HLSTATE_MBS ,
-    DAO_HLSTATE_WCS ,
-    DAO_HLSTATE_COMMENT ,
-    DAO_HLSTATE_CMT_OPEN1 ,
-    DAO_HLSTATE_CMT_OPEN2 ,
-    DAO_HLSTATE_REDO
+	DAO_HLSTATE_NONE ,
+	DAO_HLSTATE_PROMPT ,
+	DAO_HLSTATE_NORMAL ,
+	DAO_HLSTATE_MBS ,
+	DAO_HLSTATE_WCS ,
+	DAO_HLSTATE_COMMENT ,
+	DAO_HLSTATE_CMT_OPEN1 ,
+	DAO_HLSTATE_CMT_OPEN2 ,
+	DAO_HLSTATE_REDO
 };
 
 enum CodeLineStates
 {
-    CLS_NORMAL ,
-    CLS_CHANGED ,
-    CLS_READONLY ,
-    CLS_COMMAND ,
-    CLS_OUTPUT
+	CLS_NORMAL ,
+	CLS_CHANGED ,
+	CLS_READONLY ,
+	CLS_COMMAND ,
+	CLS_OUTPUT
 };
 enum DaoSyntaxIndentMode1
 {
@@ -82,36 +82,36 @@ enum DaoSyntaxIndentMode1
 };
 enum DaoSyntaxIndentState
 {
-    DS_IDT_SAME ,
-    DS_IDT_ZERO ,
-    DS_IDT_BACK ,
-    DS_IDT_MORE
+	DS_IDT_SAME ,
+	DS_IDT_ZERO ,
+	DS_IDT_BACK ,
+	DS_IDT_MORE
 };
 
 class DaoCodeLineData : public QTextBlockUserData
 {
-    public:
-        DaoCodeLineData( bool b, enum CodeLineStates s=CLS_NORMAL, int l=0 ){
-            state = s; 
+	public:
+		DaoCodeLineData( bool b, enum CodeLineStates s=CLS_NORMAL, int l=0 ){
+			state = s; 
 			line = l; 
 			breaking = b;
-            leadTabs = leadSpaces = 0;
-            firstToken = 0;
+			leadTabs = leadSpaces = 0;
+			firstToken = 0;
 			incomplete = false;
 			extend_line = false;
 			open_token = false;
 			reference_line = true;
 			token_line = false;
 			brace_count = 0;
-        }
+		}
 
-        unsigned short line;
-        unsigned char  leadTabs; /* count */
-        unsigned char  leadSpaces; /* count */
-        unsigned char  firstToken; /* token type */
-        unsigned char  state;
+		unsigned short line;
+		unsigned char  leadTabs; /* count */
+		unsigned char  leadSpaces; /* count */
+		unsigned char  firstToken; /* token type */
+		unsigned char  state;
 
-        bool   breaking;
+		bool   breaking;
 		bool   incomplete; // incomplete line.
 		bool   extend_line; // follow up line of a incomplete line.
 		bool   open_token; // incomplete string or comment token
@@ -122,64 +122,64 @@ class DaoCodeLineData : public QTextBlockUserData
 
 struct DaoSyntaxPattern
 {
-    DaoRegex *pattern;
-    short     groups;
-    short     color;
+	DaoRegex *pattern;
+	short	 groups;
+	short	 color;
 };
 
 struct DaoBasicSyntax
 {
-    QString  language;
+	QString  language;
 
-    DMap    *keyStruct;
-    DMap    *keyStorage;
-    DMap    *keyStatement;
-    DMap    *keyConstant;
-    DMap    *keyOthers;
-    DString *cmtLine1;
-    DString *cmtLine2;
-    DString *cmtOpen1;
-    DString *cmtOpen2;
-    DString *cmtClose1;
-    DString *cmtClose2;
-    DString *mbs;
-    DString *wcs;
-    bool hasDaoLineComment;
-    bool hasDaoBlockComment;
-    bool singleQuotation;
-    bool doubleQuotation;
-    bool caseInsensitive;
-    bool isLatex;
+	DMap	*keyStruct;
+	DMap	*keyStorage;
+	DMap	*keyStatement;
+	DMap	*keyConstant;
+	DMap	*keyOthers;
+	DString *cmtLine1;
+	DString *cmtLine2;
+	DString *cmtOpen1;
+	DString *cmtOpen2;
+	DString *cmtClose1;
+	DString *cmtClose2;
+	DString *mbs;
+	DString *wcs;
+	bool hasDaoLineComment;
+	bool hasDaoBlockComment;
+	bool singleQuotation;
+	bool doubleQuotation;
+	bool caseInsensitive;
+	bool isLatex;
 
-    DArray *tokens;
+	DArray *tokens;
 
-    QList<DaoSyntaxPattern> patterns;
+	QList<DaoSyntaxPattern> patterns;
 
 	QList<DaoRegex*> noneIndents; // TODO delete
 	QList<DaoRegex*> lessIndents;
 	QList<DaoRegex*> moreIndents;
 	QList<DaoRegex*> moreIndents2;
-    
-    static DaoBasicSyntax *dao;
-    static DaoBasicSyntax *python;
+	
+	static DaoBasicSyntax *dao;
+	static DaoBasicSyntax *python;
 
-    DaoBasicSyntax( const QString & lang );
-    ~DaoBasicSyntax();
+	DaoBasicSyntax( const QString & lang );
+	~DaoBasicSyntax();
 
 	bool IndentNone( const QString & codes );
 	bool IndentLess( const QString & codes );
 	bool IndentMore( const QString & codes );
 	bool IndentMore2( const QString & codes );
 
-    void AddKeywordStruct( const char *keyword );
-    void AddKeywordStorage( const char *keyword );
-    void AddKeywordStatement( const char *keyword );
-    void AddKeywordConstant( const char *keyword );
-    void AddKeywordOthers( const char *keyword );
-    void AddSingleLineComment( const char *tok );
-    void AddMultiLineComment( const char *open, const char *close );
+	void AddKeywordStruct( const char *keyword );
+	void AddKeywordStorage( const char *keyword );
+	void AddKeywordStatement( const char *keyword );
+	void AddKeywordConstant( const char *keyword );
+	void AddKeywordOthers( const char *keyword );
+	void AddSingleLineComment( const char *tok );
+	void AddMultiLineComment( const char *open, const char *close );
 
-    void AddPattern( const char *pat, int group, int color );
+	void AddPattern( const char *pat, int group, int color );
 
 	void AddNoneIndentPattern( const char *pat );
 	void AddLessIndentPattern( const char *pat );
@@ -187,95 +187,95 @@ struct DaoBasicSyntax
 	void AddMoreIndentPattern2( const char *pat );
 
 	/* Note: the token field "name" will not be valid! */
-    int Tokenize( DArray *tokens, const char *source );
+	int Tokenize( DArray *tokens, const char *source );
 };
 struct DaoLanguages
 {
-    DaoLanguages();
+	DaoLanguages();
 };
 
 class DaoTokenFormat : public QTextCharFormat
 {
-    public:
-        DaoTokenFormat();
+	public:
+		DaoTokenFormat();
 };
 
 enum DaoTextCharType
 {
-    TXT_CHAR_OUTPUT = 0x1000 , // required by Qt
-    TXT_CHAR_PROMPT ,
-    TXT_CHAR_COMMENT ,
-    TXT_CHAR_CONSTANT ,
-    TXT_CHAR_IDENTIFIER ,
-    TXT_CHAR_SYMBOL 
+	TXT_CHAR_OUTPUT = 0x1000 , // required by Qt
+	TXT_CHAR_PROMPT ,
+	TXT_CHAR_COMMENT ,
+	TXT_CHAR_CONSTANT ,
+	TXT_CHAR_IDENTIFIER ,
+	TXT_CHAR_SYMBOL 
 };
 
 class DaoCodeSHL : public QSyntaxHighlighter
 {
-    friend class DaoConsole;
-    friend class DaoTextEdit;
+	friend class DaoConsole;
+	friend class DaoTextEdit;
 
-    DaoTokenFormat formatOutput;
-    DaoTokenFormat formatPrompt;
-    DaoTokenFormat formatComment;
-    DaoTokenFormat formatStorage;
-    DaoTokenFormat formatConstant;
-    DaoTokenFormat formatTypeStruct;
-    DaoTokenFormat formatStmtKey;
-    DaoTokenFormat formatStdobj;
-    DaoTokenFormat formatBracket;
-    DaoTokenFormat formatSBracket;
-    DaoTokenFormat formatCBracket;
+	DaoTokenFormat formatOutput;
+	DaoTokenFormat formatPrompt;
+	DaoTokenFormat formatComment;
+	DaoTokenFormat formatStorage;
+	DaoTokenFormat formatConstant;
+	DaoTokenFormat formatTypeStruct;
+	DaoTokenFormat formatStmtKey;
+	DaoTokenFormat formatStdobj;
+	DaoTokenFormat formatBracket;
+	DaoTokenFormat formatSBracket;
+	DaoTokenFormat formatCBracket;
 
-    QColor plainColor;
-    QColor tabColor[2];
-    QColor searchColor;
+	QColor plainColor;
+	QColor tabColor[2];
+	QColor searchColor;
 
-    QString oldBlock;
-    int oldBlockStart;
-    short toktype;
-    short entered;
-    short hlstate;
-    short scheme;
-    short tabVisibility;
-    int textSkip;
-    DArray  *tokens;
-    DArray  *toks;
-    DString *mbs;
-    DString *wcs;
-    QString cmt;
+	QString oldBlock;
+	int oldBlockStart;
+	short toktype;
+	short entered;
+	short hlstate;
+	short scheme;
+	short tabVisibility;
+	int textSkip;
+	DArray  *tokens;
+	DArray  *toks;
+	DString *mbs;
+	DString *wcs;
+	QString cmt;
 
-    QHash<QString,bool> words;
+	QHash<QString,bool> words;
 
-    DaoRegex *pattern;
-    DaoBasicSyntax *language;
+	DaoRegex *pattern;
+	DaoBasicSyntax *language;
 
-    public:
-    DaoCodeSHL( QTextDocument * parent );
-    ~DaoCodeSHL();
+	public:
+	DaoCodeSHL( QTextDocument * parent );
+	~DaoCodeSHL();
 
-    void SetSkip( int skip ){ textSkip = skip; }
-    void SetState( int state = -1 );
-    void SetFontSize( int size );
-    void SetFontFamily( const QString & family );
-    void SetColorScheme( int scheme );
-    void SetTabVisibility( int vid );
+	void SetSkip( int skip ){ textSkip = skip; }
+	void SetState( int state = -1 );
+	void SetFontSize( int size );
+	void SetFontFamily( const QString & family );
+	void SetColorScheme( int scheme );
+	void SetTabVisibility( int vid );
 
-    DaoTokenFormat ColorGroup( int group );
+	DaoTokenFormat ColorGroup( int group );
 
-    QString SetLanguage( const QString &lang );
-    DaoRegex* SetPattern( DaoRegex *pat );
+	QString SetLanguage( const QString &lang );
+	DaoRegex* SetPattern( DaoRegex *pat );
 
-    QList<QString> GetWords(){ return words.keys(); }
+	QList<QString> GetWords(){ return words.keys(); }
 
-    static QMap<QString,DaoBasicSyntax*> languages;
+	static QMap<QString,DaoBasicSyntax*> languages;
 
-    protected:
+	protected:
 	void SetIndentationData( DaoCodeLineData *ud, DArray *tokens );
-    void HighlightSearch( const QString & text );
-    void HighlightNormal( const QString & text );
-    void highlightBlock( const QString & text );
-    //void SetCharType( int pos, int count, int type );
+	void HighlightSearch( const QString & text );
+	void HighlightNormal( const QString & text );
+	void highlightBlock( const QString & text );
+	//void SetCharType( int pos, int count, int type );
 };
 
 #endif

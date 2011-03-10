@@ -22,9 +22,9 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 enum
 {
-    DAO_RUN_SCRIPT ,
-    DAO_DEBUG_SCRIPT ,
-    DAO_SET_PATH
+	DAO_RUN_SCRIPT ,
+	DAO_DEBUG_SCRIPT ,
+	DAO_SET_PATH
 };
 
 
@@ -40,7 +40,7 @@ public:
 	static QString socket_debug;
 	static QString socket_breakpoints;
 
-    static QLocalSocket  monitor_socket;
+	static QLocalSocket  monitor_socket;
 
 	static void SetProgramPath( const QString & path );
 };

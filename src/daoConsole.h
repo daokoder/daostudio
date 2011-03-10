@@ -34,26 +34,26 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 enum
 {
-    DVM_STATE_SUCCESSFUL ,
-    DVM_STATE_CANCELLED ,
-    DVM_STATE_ERROR
+	DVM_STATE_SUCCESSFUL ,
+	DVM_STATE_CANCELLED ,
+	DVM_STATE_ERROR
 };
 
 enum
 {
-    ID_LOGVIEW ,
-    ID_DOCVIEW ,
-    ID_EDITOR
+	ID_LOGVIEW ,
+	ID_DOCVIEW ,
+	ID_EDITOR
 };
 
 
 enum DaoConsoleState
 {
-    DAOCON_READY ,
-    DAOCON_RUN ,
-    DAOCON_STDIN ,
-    DAOCON_DEBUG ,
-    DAOCON_SHELL
+	DAOCON_READY ,
+	DAOCON_RUN ,
+	DAOCON_STDIN ,
+	DAOCON_DEBUG ,
+	DAOCON_SHELL
 };
 
 class DaoWordList;
@@ -61,52 +61,52 @@ class DaoWordPopup;
 
 class DaoConsole : public DaoTextEdit
 {
-    Q_OBJECT
+	Q_OBJECT
 
-        DaoWordList wordList;
+		DaoWordList wordList;
 
-    QRegExp  rgxDaoFile;
-    QRegExp  rgxShellCmd;
-    QRegExp  rgxPrintRes;
-    QRegExp  rgxHttpURL;
-    QString  prompt;
-    QString  script;
-    QProcess shellProcess;
-    int cursorBound;
-    int outputBound;
-    int clearScreenBound;
-    int state;
-    int count;
-    int stdinCount;
-    bool shellTop;
-    bool shell;
+	QRegExp  rgxDaoFile;
+	QRegExp  rgxShellCmd;
+	QRegExp  rgxPrintRes;
+	QRegExp  rgxHttpURL;
+	QString  prompt;
+	QString  script;
+	QProcess shellProcess;
+	int cursorBound;
+	int outputBound;
+	int clearScreenBound;
+	int state;
+	int count;
+	int stdinCount;
+	bool shellTop;
+	bool shell;
 
-    int idCommand;
-    QStringList  commandHistory;
+	int idCommand;
+	QStringList  commandHistory;
 
-    QLocalServer  debugServer;
-    QLocalServer  stdinServer;
+	QLocalServer  debugServer;
+	QLocalServer  stdinServer;
 
-    DArray  *tokens;
+	DArray  *tokens;
 
-    QList<int> promptBlocks;
+	QList<int> promptBlocks;
 
-    static bool appendToFile;
-    static QStringList oldComdHist;
+	static bool appendToFile;
+	static QStringList oldComdHist;
 
-    void LoadCmdHistory();
-    void SaveCmdHistory();
-    void AppendCmdHistory( const QString &comd );
-    void ClearCommand();
+	void LoadCmdHistory();
+	void SaveCmdHistory();
+	void AppendCmdHistory( const QString &comd );
+	void ClearCommand();
 
-    public:
+	public:
 	DaoConsole( QWidget *parent=NULL );
 	~DaoConsole();
 
 	void SetColorScheme( int scheme );
 	void PrintPrompt();
 	void SetVmSpace( DaoVmSpace *vms );
-    void SetState( int state ){ this->state = state; }
+	void SetState( int state ){ this->state = state; }
 	void RunScript( const QString & src, bool debug=false );
 	void LoadScript( const QString & file, bool debug=false );
 	void Resume();
@@ -114,20 +114,20 @@ class DaoConsole : public DaoTextEdit
 	void Quit();
 
 	DaoVmSpace   *vmSpace;
-	DaoEditor    *editor;
+	DaoEditor	*editor;
 	DaoContext   *context;
 	DaoTabEditor *tabWidget;
-    QLocalSocket *debugSocket;
-    QLocalSocket *stdinSocket;
-    QLocalSocket  scriptSocket;
-    QProcess     *monitor;
+	QLocalSocket *debugSocket;
+	QLocalSocket *stdinSocket;
+	QLocalSocket  scriptSocket;
+	QProcess	 *monitor;
 
 protected:
-  void AdjustCursor( QTextCursor *cursor, QTextCursor::MoveMode m );
+	void AdjustCursor( QTextCursor *cursor, QTextCursor::MoveMode m );
 	void keyPressEvent ( QKeyEvent * e );
 	void focusInEvent ( QFocusEvent * event );
 	void mousePressEvent ( QMouseEvent * event );
-    int ShowClearActionMessage( bool extra=false );
+	int ShowClearActionMessage( bool extra=false );
 
 public slots:
 	void slotPrintOutput( const QString & );
@@ -137,18 +137,18 @@ protected slots:
 	void slotBoundCursor();
 	void slotScriptFinished();
 	void slotProcessFinished( int,QProcess::ExitStatus );
-    void slotSocketDebug();
-    void slotSocketStdin();
-    void slotReadStdOut();
-    void slotReadStdError();
-    void slotFoldUnfoldOutput();
-    void slotSaveAll();
-    void slotClearAll();
-    void slotClearPart();
+	void slotSocketDebug();
+	void slotSocketStdin();
+	void slotReadStdOut();
+	void slotReadStdError();
+	void slotFoldUnfoldOutput();
+	void slotSaveAll();
+	void slotClearAll();
+	void slotClearPart();
 
 signals:
-    void signalFocusIn();
-    void signalLoadURL( const QString & );
+	void signalFocusIn();
+	void signalLoadURL( const QString & );
 };
 
 #endif

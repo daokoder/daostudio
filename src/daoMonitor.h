@@ -44,18 +44,18 @@
 class DaoMonitor;
 class DaoTimer : public QThread
 {
-  public:
-  DaoTimer(){ time = 0; }
+	public:
+	DaoTimer(){ time = 0; }
 
-  unsigned int time;
+	unsigned int time;
 
-  protected:
-  void run(){
-    while(1){
-      msleep( TIME_YIELD );
-      time += 1;
-    }
-  }
+	protected:
+	void run(){
+		while(1){
+			msleep( TIME_YIELD );
+			time += 1;
+		}
+	}
 };
 
 extern "C"{
@@ -70,12 +70,12 @@ struct DaoEventHandler
 	void (*Called)( DaoEventHandler *self, DaoRoutine *caller, DaoRoutine *callee );
 	void (*Returned)( DaoEventHandler *self, DaoRoutine *caller, DaoRoutine *callee );
 	void (*InvokeHost)( DaoEventHandler *self, DaoContext *context );
-	DaoMonitor   *monitor;
-  DaoVmProcess *process;
-  QLocalSocket  socket;
-  DaoDebugger   debugger;
-  DaoTimer      timer;
-  unsigned int  time;
+	DaoMonitor	 *monitor;
+	DaoVmProcess *process;
+	QLocalSocket	socket;
+	DaoDebugger	 debugger;
+	DaoTimer			timer;
+	unsigned int	time;
 };
 
 }
@@ -92,11 +92,11 @@ Q_OBJECT
 	DaoNameSpace *nameSpace;
 
 	DaoBase *currentObject;
-	DValue  *currentValue;
+	DValue	*currentValue;
 
-	DArray  *tokens;
+	DArray	*tokens;
 	DString *daoString;
-	DLong   *daoLong;
+	DLong	 *daoLong;
 
 	int vmcEntry;
 	int vmcNewEntry;
@@ -154,16 +154,16 @@ signals:
 
 union DValueRef
 {
-	DValue       *value; // = 0
-	DaoBase      *base;
-	DaoArray     *array; // = DAO_ARRAY
-	DaoList      *list; // = DAO_LIST
-	DaoMap       *map;  // = DAO_MAP
-	DaoTuple     *tuple; // = DAO_TUPLE
-	DaoClass     *klass; // = DAO_CLASS
-	DaoObject    *object; // = DAO_OBJECT
-	DaoRoutine   *routine;
-	DaoContext   *context;
+	DValue			 *value; // = 0
+	DaoBase			*base;
+	DaoArray		 *array; // = DAO_ARRAY
+	DaoList			*list; // = DAO_LIST
+	DaoMap			 *map;	// = DAO_MAP
+	DaoTuple		 *tuple; // = DAO_TUPLE
+	DaoClass		 *klass; // = DAO_CLASS
+	DaoObject		*object; // = DAO_OBJECT
+	DaoRoutine	 *routine;
+	DaoContext	 *context;
 	DaoNameSpace *nspace;
 	DaoVmProcess *process;
 };
@@ -175,21 +175,21 @@ class DaoValueItem : public QListWidgetItem
 
 	short type;
 	union {
-		DValue       *value; // = 0
-		DaoBase      *base;
-		DaoArray     *array; // = DAO_ARRAY
-		DaoList      *list; // = DAO_LIST
-		DaoMap       *map;  // = DAO_MAP
-		DaoTuple     *tuple; // = DAO_TUPLE
-		DaoClass     *klass; // = DAO_CLASS
-		DaoObject    *object; // = DAO_OBJECT
-		DaoRoutine   *routine;
-		DaoContext   *context;
+		DValue			 *value; // = 0
+		DaoBase			*base;
+		DaoArray		 *array; // = DAO_ARRAY
+		DaoList			*list; // = DAO_LIST
+		DaoMap			 *map;	// = DAO_MAP
+		DaoTuple		 *tuple; // = DAO_TUPLE
+		DaoClass		 *klass; // = DAO_CLASS
+		DaoObject		*object; // = DAO_OBJECT
+		DaoRoutine	 *routine;
+		DaoContext	 *context;
 		DaoNameSpace *nspace;
 		DaoVmProcess *process;
 	};
 
-	DaoValueItem  *parent;
+	DaoValueItem	*parent;
 	DaoDataWidget *dataWidget;
 };
 
@@ -197,38 +197,37 @@ class DaoMonitor : public QMainWindow, private Ui::DaoMonitor
 {
 Q_OBJECT
 
-  QLocalServer   server;
-  QLocalServer   server2;
+	QLocalServer	 server;
 	DaoDataWidget *dataWidget;
 
-	QString  locale;
-	QString  program;
-	QString  programPath;
+	QString	locale;
+	QString	program;
+	QString	programPath;
 
-  QProcess *shell;
+	QProcess *shell;
 
-	QLineEdit  *wgtFind;
-	QLineEdit  *wgtReplace;
-	QCheckBox  *chkReplaceAll;
-	QCheckBox  *chkCaseSensitive;
-	QComboBox  *wgtFontSize;
-	QComboBox  *wgtEditorColor;
+	QLineEdit	*wgtFind;
+	QLineEdit	*wgtReplace;
+	QCheckBox	*chkReplaceAll;
+	QCheckBox	*chkCaseSensitive;
+	QComboBox	*wgtFontSize;
+	QComboBox	*wgtEditorColor;
 
-	QString     script;
-	QString     pathWorking;
-	QString     pathImage;
+	QString		 script;
+	QString		 pathWorking;
+	QString		 pathImage;
 	DaoVmProcess *debugProcess;
 
-	DaoEventHandler  handler;
-  QLocalSocket  *scriptSocket;
-  QTimer timer;
+	DaoEventHandler	handler;
+	QLocalSocket	*scriptSocket;
+	QTimer timer;
 
 	QStack<DValue*> viewValues;
 	QVector<DValue*> itemValues2;
 	DString *daoString;
-	DLong   *daoLong;
-	DValue  *itemValues;
-	DArray  *tokens;
+	DLong	 *daoLong;
+	DValue	*itemValues;
+	DArray	*tokens;
 	int itemCount;
 	int vmcEntry;
 	int vmcNewEntry;
@@ -239,29 +238,29 @@ public:
 	DaoMonitor( const char *program=NULL );
 	~DaoMonitor();
 
-  bool          waiting;
-  unsigned int  time;
-	DaoContext   *viewContext;
-	DaoVmSpace   *vmSpace;
+	bool					waiting;
+	unsigned int	time;
+	DaoContext	 *viewContext;
+	DaoVmSpace	 *vmSpace;
 
 	void SetPathWorking( const QString & path );
 
 	void ViewValue( DaoDataWidget *dataView, DaoValueItem *it );
 	void ReduceValueItems( QListWidgetItem *item );
 	void EraseDebuggingProcess();
-  void InitDataBrowser();
+	void InitDataBrowser();
 
 protected:
 	void closeEvent ( QCloseEvent *e );
 
 public slots:
-  void slotExitWaiting();
-  void slotFlushStdout();
-  void slotReadStdOut();
-  void slotShellFinished(int, QProcess::ExitStatus);
+	void slotExitWaiting();
+	void slotFlushStdout();
+	void slotReadStdOut();
+	void slotShellFinished(int, QProcess::ExitStatus);
 protected slots:
-  void slotStartExecution();
-  void slotStopExecution();
+	void slotStartExecution();
+	void slotStopExecution();
 	void slotValueActivated(QListWidgetItem*);
 
 signals:

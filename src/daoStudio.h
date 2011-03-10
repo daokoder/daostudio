@@ -38,150 +38,150 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 class DaoTextBrowser : public QTextBrowser
 {
-    Q_OBJECT
+	Q_OBJECT
 
-        QString docPath;
+		QString docPath;
 
-    public:
-    DaoTextBrowser( QWidget *parent ) : QTextBrowser( parent ){
-        setOpenExternalLinks( true );
-    }
+	public:
+	DaoTextBrowser( QWidget *parent ) : QTextBrowser( parent ){
+		setOpenExternalLinks( true );
+	}
 
-    void SetPath( const QString & path ){ docPath = path; }
-    QVariant loadResource ( int type, const QUrl & name );
+	void SetPath( const QString & path ){ docPath = path; }
+	QVariant loadResource ( int type, const QUrl & name );
 
-    DaoStudio *studio;
-    QTabWidget *tabWidget;
+	DaoStudio *studio;
+	QTabWidget *tabWidget;
 
-    protected:
-    void mousePressEvent( QMouseEvent * event );
-    void keyPressEvent( QKeyEvent * e );
+	protected:
+	void mousePressEvent( QMouseEvent * event );
+	void keyPressEvent( QKeyEvent * e );
 signals:
-    void signalFocusIn();
+	void signalFocusIn();
 };
 
 class DaoLogBrowser : public DaoTextBrowser
 {
-    public:
-        DaoLogBrowser( QWidget *parent ) : DaoTextBrowser( parent ){}
+	public:
+		DaoLogBrowser( QWidget *parent ) : DaoTextBrowser( parent ){}
 };
 
 class DaoDocViewer : public DaoTextBrowser
 {
-    public:
-        DaoDocViewer( QWidget *parent, const QString & path="" );
+	public:
+		DaoDocViewer( QWidget *parent, const QString & path="" );
 };
 
 class DaoStudio : public QMainWindow, private Ui::DaoStudio
 {
-    Q_OBJECT
+	Q_OBJECT
 
-        QLocalSocket   socket;
-    QProcess      *monitor;
+		QLocalSocket   socket;
+	QProcess	  *monitor;
 
-    QTime  time;
-    QTimer timer;
-    QLabel *labTimer;
+	QTime  time;
+	QTimer timer;
+	QLabel *labTimer;
 
-    DaoDocViewer  *docViewer;
+	DaoDocViewer  *docViewer;
 
-    DaoWordList wordList;
+	DaoWordList wordList;
 
-    QHash<QString,int> pathUsage;
-    QHash<QString,QVariant> lastCursor;
+	QHash<QString,int> pathUsage;
+	QHash<QString,QVariant> lastCursor;
 
-    QString  locale;
-    QString  program;
-    QString  programPath;
+	QString  locale;
+	QString  program;
+	QString  programPath;
 
-    QLineEdit  *wgtFind;
-    QLineEdit  *wgtReplace;
-    QCheckBox  *chkReplaceAll;
-    QCheckBox  *chkCaseSensitive;
+	QLineEdit  *wgtFind;
+	QLineEdit  *wgtReplace;
+	QCheckBox  *chkReplaceAll;
+	QCheckBox  *chkCaseSensitive;
 
-    QString     pathWorking;
-    QString     pathBrowsing;
-    DaoVmSpace *vmSpace;
+	QString	 pathWorking;
+	QString	 pathBrowsing;
+	DaoVmSpace *vmSpace;
 
-    int vmState;
+	int vmState;
 
-    QFileSystemWatcher watcher;
+	QFileSystemWatcher watcher;
 
-    void LoadPath( QListWidget *wgt, const QString &path, const QString &suffix );
+	void LoadPath( QListWidget *wgt, const QString &path, const QString &suffix );
 
-    /*
-       void UpdateCombobox();
-       void UpdateTable();
-       void ShowWarning( const QString & message );
-     */
-    public:
-    DaoStudio( const char *program=NULL );
-    ~DaoStudio();
+	/*
+	   void UpdateCombobox();
+	   void UpdateTable();
+	   void ShowWarning( const QString & message );
+	 */
+	public:
+	DaoStudio( const char *program=NULL );
+	~DaoStudio();
 
-    void SetPathWorking( const QString & path );
-    void SendPathWorking();
-    DaoEditor* NewEditor( const QString & name, const QString & tip="" );
+	void SetPathWorking( const QString & path );
+	void SendPathWorking();
+	DaoEditor* NewEditor( const QString & name, const QString & tip="" );
 
-    void SetState( int state );
-    void ResetTimer(){ time.restart(); }
-    void RestartMonitor();
+	void SetState( int state );
+	void ResetTimer(){ time.restart(); }
+	void RestartMonitor();
 
-    DaoConsole* Console(){ return wgtConsole; }
-    QString GetWorkingPath(){ return pathWorking; }
-    QString GetBrowsingPath(){ return pathBrowsing; }
+	DaoConsole* Console(){ return wgtConsole; }
+	QString GetWorkingPath(){ return pathWorking; }
+	QString GetBrowsingPath(){ return pathBrowsing; }
 
-    void LoadSettings();
-    void SaveSettings();
+	void LoadSettings();
+	void SaveSettings();
 
-    protected:
-    void closeEvent ( QCloseEvent *e );
-    void showEvent ( QShowEvent * event );
+	protected:
+	void closeEvent ( QCloseEvent *e );
+	void showEvent ( QShowEvent * event );
 
-    public slots:
-    void SetPathBrowsing( const QString & path );
-        void slotWriteLog( const QString & );
-    void slotSetPathWorking();
-    void slotSetPathBrowsing();
-    void slotMaxConsole();
-    void slotMaxEditor( int id = 0 );
-    void slotSave();
-    void slotSaveAs();
-    protected slots:
-        void slotRestartMonitor2();
-        void slotRestartMonitor( int exitCode, QProcess::ExitStatus exitStatus );
-    void slotLoadURL( const QString & );
-    void slotFileActivated(QListWidgetItem*);
-    void slotViewFrame(QListWidgetItem*);
-    void slotViewDocument(QListWidgetItem*);
-    void slotCloseEditor(int);
-    void slotTextChanged(bool);
-    void slotPathList(int);
-    void slotTips();
-    void slotDocs();
-    void slotAbout();
-    void slotNew();
-    void slotOpen();
-    void slotPrint();
-    void slotUndo();
-    void slotRedo();
-    void slotCopy();
-    void slotCut();
-    void slotPaste();
-    void slotFind();
-    void slotReplace();
-    void slotRestartMonitor();
-    void slotStart();
-    void slotDebug();
-    void slotStop();
-    void slotMSplit(bool);
-    void slotFontSize(int);
-    void slotFileSuffix(int);
-    void slotFontFamily(const QFont&);
-    void slotEditorColor(int);
-    void slotConsoleColor(int);
-    void slotTabVisibility(int);
-    void slotTimeOut();
-    void slotHelpVIM();
+	public slots:
+	void SetPathBrowsing( const QString & path );
+		void slotWriteLog( const QString & );
+	void slotSetPathWorking();
+	void slotSetPathBrowsing();
+	void slotMaxConsole();
+	void slotMaxEditor( int id = 0 );
+	void slotSave();
+	void slotSaveAs();
+	protected slots:
+		void slotRestartMonitor2();
+		void slotRestartMonitor( int exitCode, QProcess::ExitStatus exitStatus );
+	void slotLoadURL( const QString & );
+	void slotFileActivated(QListWidgetItem*);
+	void slotViewFrame(QListWidgetItem*);
+	void slotViewDocument(QListWidgetItem*);
+	void slotCloseEditor(int);
+	void slotTextChanged(bool);
+	void slotPathList(int);
+	void slotTips();
+	void slotDocs();
+	void slotAbout();
+	void slotNew();
+	void slotOpen();
+	void slotPrint();
+	void slotUndo();
+	void slotRedo();
+	void slotCopy();
+	void slotCut();
+	void slotPaste();
+	void slotFind();
+	void slotReplace();
+	void slotRestartMonitor();
+	void slotStart();
+	void slotDebug();
+	void slotStop();
+	void slotMSplit(bool);
+	void slotFontSize(int);
+	void slotFileSuffix(int);
+	void slotFontFamily(const QFont&);
+	void slotEditorColor(int);
+	void slotConsoleColor(int);
+	void slotTabVisibility(int);
+	void slotTimeOut();
+	void slotHelpVIM();
 
 signals:
 
@@ -189,16 +189,16 @@ signals:
 
 class DaoStudioAbout : public QDialog, private Ui::DaoStudioAbout
 {
-    Q_OBJECT
+	Q_OBJECT
 
-    public:
-        DaoStudioAbout( QWidget *parent=NULL );
+	public:
+		DaoStudioAbout( QWidget *parent=NULL );
 };
 class DaoHelpVIM : public QDialog, private Ui::DaoHelpVIM
 {
-    Q_OBJECT
+	Q_OBJECT
 
-    public:
-        DaoHelpVIM( QWidget *parent=NULL );
+	public:
+		DaoHelpVIM( QWidget *parent=NULL );
 };
 #endif

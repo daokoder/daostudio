@@ -329,10 +329,6 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 
     connect( &timer, SIGNAL(timeout()), this, SLOT(slotTimeOut()));
     timer.start( 97 );
-
-    DaoStudioSettings::monitor_socket.connectToServer( DaoStudioSettings::socket_monitor );
-	connect( & DaoStudioSettings::monitor_socket, SIGNAL( disconnected() ),
-			this, SLOT( slotRestartMonitor2() ) );
 }
 
 DaoStudio::~DaoStudio()
@@ -439,9 +435,11 @@ void DaoStudio::slotPathList(int id)
 void DaoStudio::showEvent ( QShowEvent * event )
 {
     QMainWindow::showEvent( event );
+#if 0
     do{ socket.connectToServer( DaoStudioSettings::socket_script );
     }while( socket.state() != QLocalSocket::ConnectedState );
     socket.disconnectFromServer();
+#endif
     SendPathWorking();
     LoadSettings();
 }
@@ -499,9 +497,6 @@ void DaoStudio::RestartMonitor()
     do{ socket.connectToServer( DaoStudioSettings::socket_script );
     }while( socket.state() != QLocalSocket::ConnectedState );
     socket.disconnectFromServer();
-    DaoStudioSettings::monitor_socket.connectToServer( DaoStudioSettings::socket_monitor );
-	disconnect( & DaoStudioSettings::monitor_socket, SIGNAL( disconnected() ),
-			this, SLOT( slotRestartMonitor2() ) );
     connect( monitor, SIGNAL(readyReadStandardOutput()),
             wgtConsole, SLOT(slotReadStdOut()));
     //connect( monitor, SIGNAL(readyReadStandardError()),

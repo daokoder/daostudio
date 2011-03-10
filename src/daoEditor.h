@@ -52,34 +52,34 @@ class DaoTextEdit;
 
 class DaoTabEditor : public QTabWidget
 {
-    Q_OBJECT
-    public:
-        DaoTabEditor( QWidget *parent ) : QTabWidget( parent ){};
+	Q_OBJECT
+	public:
+		DaoTabEditor( QWidget *parent ) : QTabWidget( parent ){};
 
-    protected:
-        void focusInEvent ( QFocusEvent * event );
-        void mousePressEvent ( QMouseEvent * event );
+	protected:
+		void focusInEvent ( QFocusEvent * event );
+		void mousePressEvent ( QMouseEvent * event );
 signals:
-        void signalFocusIn();
+		void signalFocusIn();
 };
 
 struct DaoWordNode
 {
 #if 0
-    unsigned char  data;
-    unsigned short count;
-    DaoWordNode*   nexts[256];
+	unsigned char  data;
+	unsigned short count;
+	DaoWordNode*   nexts[256];
 #else
-    QChar                   data;
-    unsigned short          count;
-    QHash<QChar,DaoWordNode> nexts;
+	QChar				   data;
+	unsigned short		  count;
+	QHash<QChar,DaoWordNode> nexts;
 #endif
 
-    DaoWordNode( const QString & word = "" );
-    DaoWordNode( const QChar *chars, int n );
-    ~DaoWordNode();
+	DaoWordNode( const QString & word = "" );
+	DaoWordNode( const QChar *chars, int n );
+	~DaoWordNode();
 
-    //void SetWord( const QString & word = "" );
+	//void SetWord( const QString & word = "" );
 };
 struct DaoWordTree
 {
@@ -87,46 +87,46 @@ struct DaoWordTree
 
 class DaoWordList
 {
-    DArray  *tokens;
-    DaoWordNode wordTree;
-    QMap<QString,int>  wordList;
-    int numComplete;
-    int minLength;
+	DArray  *tokens;
+	DaoWordNode wordTree;
+	QMap<QString,int>  wordList;
+	int numComplete;
+	int minLength;
 
-    public:
-    DaoWordList( int n=3, int m=4 );
-    ~DaoWordList(){ DArray_Delete( tokens ); }
+	public:
+	DaoWordList( int n=3, int m=4 );
+	~DaoWordList(){ DArray_Delete( tokens ); }
 
-    void Extract( const QString & source );
-    void AddWord( const QString & word );
-    void AddWords( const QList<QString> & words );
-    QStringList GetWords( const QString & word );
+	void Extract( const QString & source );
+	void AddWord( const QString & word );
+	void AddWords( const QList<QString> & words );
+	QStringList GetWords( const QString & word );
 };
 
 class DaoWordPopup : public QWidget
 {
-    public:
-        DaoWordPopup( DaoTextEdit *parent=NULL, DaoWordList *wl=NULL );
+	public:
+		DaoWordPopup( DaoTextEdit *parent=NULL, DaoWordList *wl=NULL );
 
-        DaoWordList    *wordList;
-        DaoTextEdit    *editor;
-        QList<QLabel*> labWords;
-        bool isTip;
+		DaoWordList	*wordList;
+		DaoTextEdit	*editor;
+		QList<QLabel*> labWords;
+		bool isTip;
 
-        bool IsTip()const{ return isTip; }
-        void SetTip( const QString & tip );
-        void SetWords( const QStringList & words );
-        QString GetWord( int i );
+		bool IsTip()const{ return isTip; }
+		void SetTip( const QString & tip );
+		void SetWords( const QStringList & words );
+		QString GetWord( int i );
 
-        void TryCompleteWord( QKeyEvent *event, int xoffset );
-        void EnsureVisible( int offset, bool exactpos=false );
+		void TryCompleteWord( QKeyEvent *event, int xoffset );
+		void EnsureVisible( int offset, bool exactpos=false );
 };
 
 enum KeyMode
 {
-    KEY_MODE_EDIT ,
-    KEY_MODE_VIM ,
-    KEY_MODE_UNKNOWN
+	KEY_MODE_EDIT ,
+	KEY_MODE_VIM ,
+	KEY_MODE_UNKNOWN
 };
 
 class DaoEditWidget;
@@ -134,55 +134,55 @@ class DaoEditWidget;
 class DaoCommandEdit : public QLineEdit
 { Q_OBJECT
 
-    DaoEditWidget *wgtParent;
-    bool search;
+	DaoEditWidget *wgtParent;
+	bool search;
 
-    static void FilterHistory( QStringList & history, const QString prefix="" );
+	static void FilterHistory( QStringList & history, const QString prefix="" );
 
 public:
-    DaoCommandEdit( DaoEditWidget *parent = NULL );
+	DaoCommandEdit( DaoEditWidget *parent = NULL );
 
-    void SetMode( bool search=false ){ this->search = search; }
+	void SetMode( bool search=false ){ this->search = search; }
 
-    static void FilterSearchHistory( const QString prefix="" );
-    static void FilterCommandHistory( const QString prefix="" );
+	static void FilterSearchHistory( const QString prefix="" );
+	static void FilterCommandHistory( const QString prefix="" );
 
-    static QStringList searchHistory;
-    static QStringList commandHistory;
-    static QStringList historyBrowsing;
-    static int indexBrowsing;
+	static QStringList searchHistory;
+	static QStringList commandHistory;
+	static QStringList historyBrowsing;
+	static int indexBrowsing;
 
 protected:
-    void keyPressEvent( QKeyEvent *event );
+	void keyPressEvent( QKeyEvent *event );
 
 protected slots:
-    void slotTextChanged(const QString &);
+	void slotTextChanged(const QString &);
 };
 
 class DaoEditWidget : public QWidget
 {
-    // Q_OBJECT: if present, stylesheet will not work
+	// Q_OBJECT: if present, stylesheet will not work
 
-    QLabel         *labMessage;
-    QLabel         *labPrompt;
-    DaoCommandEdit *cmdEdit;
-    DaoTextEdit    *editor;
+	QLabel		 *labMessage;
+	QLabel		 *labPrompt;
+	DaoCommandEdit *cmdEdit;
+	DaoTextEdit	*editor;
 
-    public:
-    DaoEditWidget( DaoTextEdit *parent=NULL );
+	public:
+	DaoEditWidget( DaoTextEdit *parent=NULL );
 
-    void StartSearch();
-    void StartCommand();
-    void EnsureVisible( bool select=true );
-    void SetText( const QString & txt ){ cmdEdit->setText( txt ); }
-    void HideMessage();
-    void ShowMessage( const QString & txt );
-    void AddMessage( const QString & txt );
-    void SetPrompt( const QString & txt ){ labPrompt->setText( txt ); }
-    QString GetPrompt()const{ return labPrompt->text(); }
-    QString GetCommand()const{ return cmdEdit->text(); }
-    static void AppendSearchHistory( const QString text="" );
-    static void AppendCommandHistory( const QString text="" );
+	void StartSearch();
+	void StartCommand();
+	void EnsureVisible( bool select=true );
+	void SetText( const QString & txt ){ cmdEdit->setText( txt ); }
+	void HideMessage();
+	void ShowMessage( const QString & txt );
+	void AddMessage( const QString & txt );
+	void SetPrompt( const QString & txt ){ labPrompt->setText( txt ); }
+	QString GetPrompt()const{ return labPrompt->text(); }
+	QString GetCommand()const{ return cmdEdit->text(); }
+	static void AppendSearchHistory( const QString text="" );
+	static void AppendCommandHistory( const QString text="" );
 
 };
 enum { BUF_EMPTY, BUF_BLOCKS, BUF_WORDS };
@@ -190,104 +190,104 @@ enum { BUF_EMPTY, BUF_BLOCKS, BUF_WORDS };
 class DaoTextEdit : public QPlainTextEdit
 { Q_OBJECT
 
-    protected:
-        friend class DaoCursor;
-        friend class DaoEditWidget;
+	protected:
+		friend class DaoCursor;
+		friend class DaoEditWidget;
 
-        DaoCodeSHL  codehl;
-        DaoWordList *wordList;
-        DaoWordPopup *wgtWords;
-        QComboBox *wgtEditMode;
-        QLabel *labPopup;
+		DaoCodeSHL  codehl;
+		DaoWordList *wordList;
+		DaoWordPopup *wgtWords;
+		QComboBox *wgtEditMode;
+		QLabel *labPopup;
 
-        DaoEditWidget *cmdPrompt;
-        QWidget *myCursor;
-        QLabel  *labCursor;
+		DaoEditWidget *cmdPrompt;
+		QWidget *myCursor;
+		QLabel  *labCursor;
 
-        QTimer timer;
+		QTimer timer;
 
-        QTextBlock blockEntry;
-        QColor lineColor;
-        int     editMode; /* sepcified in wgtEditMode */
-        KeyMode keyMode; /* key mode in use */
-        QString keys;
-        QString digits;
+		QTextBlock blockEntry;
+		QColor lineColor;
+		int	 editMode; /* sepcified in wgtEditMode */
+		KeyMode keyMode; /* key mode in use */
+		QString keys;
+		QString digits;
 
 		DArray  *tokens;
-        DString *mbs;
-        DString *wcs;
+		DString *mbs;
+		DString *wcs;
 
-        bool  showCursor;
-        short tabWidth;
+		bool  showCursor;
+		short tabWidth;
 
-        QPoint menuPosition;
-        QList<QAction*> extraMenuActions;
+		QPoint menuPosition;
+		QList<QAction*> extraMenuActions;
 
-        void VimModeMove( int dir, int m );
-        void VimModeCopyDelete( int dir, int m, bool copy=false );
-        void VimModeMoveByWord( int dir, int m, bool token=false );
-        void VimModeCopyDeleteByWord( int dir, int m, bool token=false, bool copy=false );
-        void VimModeCommenting( int dir, int n, bool remove=false );
+		void VimModeMove( int dir, int m );
+		void VimModeCopyDelete( int dir, int m, bool copy=false );
+		void VimModeMoveByWord( int dir, int m, bool token=false );
+		void VimModeCopyDeleteByWord( int dir, int m, bool token=false, bool copy=false );
+		void VimModeCommenting( int dir, int n, bool remove=false );
 
-        static int buftype;
-        static QString buffer;
-        static QHash<QString,DaoRegex*> patterns;
+		static int buftype;
+		static QString buffer;
+		static QHash<QString,DaoRegex*> patterns;
 
-    public:
-        DaoTextEdit( QWidget *parent, DaoWordList *wlist );
-        ~DaoTextEdit();
+	public:
+		DaoTextEdit( QWidget *parent, DaoWordList *wlist );
+		~DaoTextEdit();
 
-        void Undo();
-        void Redo();
+		void Undo();
+		void Redo();
 
-        void RedoHighlight();
-        void SetFontSize( int size );
-        void SetFontFamily( const QString & family );
-        void SetColorScheme( int scheme );
-        void SetTabVisibility( int vid );
-        void SetModeSelector( QComboBox *combo ){ wgtEditMode = combo; }
-        void PreparePrinting( const QString &name );
+		void RedoHighlight();
+		void SetFontSize( int size );
+		void SetFontFamily( const QString & family );
+		void SetColorScheme( int scheme );
+		void SetTabVisibility( int vid );
+		void SetModeSelector( QComboBox *combo ){ wgtEditMode = combo; }
+		void PreparePrinting( const QString &name );
 
-        void ExtractWords();
+		void ExtractWords();
 
-        void UpdateCursor( bool show );
-        void HighlightFullLine( QTextCursor cursor );
+		void UpdateCursor( bool show );
+		void HighlightFullLine( QTextCursor cursor );
 
-        void HideMessage(){ labPopup->hide(); }
-        void ShowMessage( const QString & msg );
-        virtual int LeftMargin(){ return 0; }
-        virtual void BeforeRedoHighlight(){}
-        virtual void AfterRedoHighlight(){}
+		void HideMessage(){ labPopup->hide(); }
+		void ShowMessage( const QString & msg );
+		virtual int LeftMargin(){ return 0; }
+		virtual void BeforeRedoHighlight(){}
+		virtual void AfterRedoHighlight(){}
 
-        DaoStudio    *studio;
+		DaoStudio	*studio;
 
-    protected:
-        void AdjustMove( QTextCursor *cursor, int key, QTextCursor::MoveMode m=QTextCursor::MoveAnchor );
-        virtual void AdjustCursor( QTextCursor *cursor, QTextCursor::MoveMode m=QTextCursor::MoveAnchor ){};
-        bool EditModeVIM( QKeyEvent * e );
-        void keyPressEvent( QKeyEvent * e );
-        void contextMenuEvent(QContextMenuEvent *event);
+	protected:
+		void AdjustMove( QTextCursor *cursor, int key, QTextCursor::MoveMode m=QTextCursor::MoveAnchor );
+		virtual void AdjustCursor( QTextCursor *cursor, QTextCursor::MoveMode m=QTextCursor::MoveAnchor ){};
+		bool EditModeVIM( QKeyEvent * e );
+		void keyPressEvent( QKeyEvent * e );
+		void contextMenuEvent(QContextMenuEvent *event);
 
-        int FindRangeIndex( const QTextBlock & block, int pos );
-        int ForwardTokenEnd( int pos, int step );
-        int BackwardTokenStart( int pos, int step );
+		int FindRangeIndex( const QTextBlock & block, int pos );
+		int ForwardTokenEnd( int pos, int step );
+		int BackwardTokenStart( int pos, int step );
 
-        bool MoveSearchingCursor( QTextBlock block, int start=0 );
-        void MoveSearchingCursor( int start=0 );
+		bool MoveSearchingCursor( QTextBlock block, int start=0 );
+		void MoveSearchingCursor( int start=0 );
 
-        void focusInEvent( QFocusEvent * event );
-        void focusOutEvent( QFocusEvent * event );
-        void scrollContentsBy( int dx, int dy );
+		void focusInEvent( QFocusEvent * event );
+		void focusOutEvent( QFocusEvent * event );
+		void scrollContentsBy( int dx, int dy );
 
-        void JoinNextLine( QTextCursor cursor );
-        void IndentLine( QTextCursor cursor, bool indent=true );
-        void IndentLines( QTextCursor cursor, int n );
-        DaoCodeLineData* SetIndentData( QTextBlock block );
+		void JoinNextLine( QTextCursor cursor );
+		void IndentLine( QTextCursor cursor, bool indent=true );
+		void IndentLines( QTextCursor cursor, int n );
+		DaoCodeLineData* SetIndentData( QTextBlock block );
 
-        protected slots:
-        void slotSearchOrReplace();
-        void HighlightCurrentLine();
-        void slotBlink();
+		protected slots:
+		void slotSearchOrReplace();
+		void HighlightCurrentLine();
+		void slotBlink();
 };
 
 class DaoNumbering;
@@ -296,86 +296,86 @@ class DaoScriptEngine;
 class DaoEditor : public DaoTextEdit
 { Q_OBJECT
 
-    friend class DaoConsole;
+	friend class DaoConsole;
 
-    QFileSystemWatcher watcher;
-    DaoTabEditor *tabWidget;
-    DaoNumbering *wgtNumbering;
+	QFileSystemWatcher watcher;
+	DaoTabEditor *tabWidget;
+	DaoNumbering *wgtNumbering;
 
-    QString name;
-    QString fullName;
-    QString textOnDisk;
+	QString name;
+	QString fullName;
+	QString textOnDisk;
 
-    QStringList routCodes;
-    QStringList newCodes;
-    QList<int> lineMap;
+	QStringList routCodes;
+	QStringList newCodes;
+	QList<int> lineMap;
 
-    QMap<int,int> breakPoints;
-    bool state;
-    bool ready;
+	QMap<int,int> breakPoints;
+	bool state;
+	bool ready;
 
-    int newEntryLine;
+	int newEntryLine;
 
-    public:
-    DaoEditor( DaoTabEditor *parent, DaoWordList *wlist );
+	public:
+	DaoEditor( DaoTabEditor *parent, DaoWordList *wlist );
 
-    void LoadFile( const QString & file );
-    void Save( const QString & file = "" );
-    bool TextChanged()const{ return state; }
-    void SetExePoint( int entry );
-    void SetState( bool state );
-    void ResetBlockState();
-    void SetEditLines( int start, int end );
+	void LoadFile( const QString & file );
+	void Save( const QString & file = "" );
+	bool TextChanged()const{ return state; }
+	void SetExePoint( int entry );
+	void SetState( bool state );
+	void ResetBlockState();
+	void SetEditLines( int start, int end );
 
-    QList<int> BreakPoints(){ return breakPoints.keys(); }
+	QList<int> BreakPoints(){ return breakPoints.keys(); }
 
-    void BeforeRedoHighlight();
-    void AfterRedoHighlight();
+	void BeforeRedoHighlight();
+	void AfterRedoHighlight();
 
-    bool EditContinue2();
+	bool EditContinue2();
 
-    void SetFontSize( int size );
-    void SetFontFamily( const QString & family );
-    void SetColorScheme( int scheme );
-    QString FileName(){ return name; }
-    QString FilePath(){ return fullName; }
-    void ChangeMark( int y );
-    void MarkLine( int y );
-    void PaintNumbering ( QPaintEvent * event );
-    int NumberingWidth();
+	void SetFontSize( int size );
+	void SetFontFamily( const QString & family );
+	void SetColorScheme( int scheme );
+	QString FileName(){ return name; }
+	QString FilePath(){ return fullName; }
+	void ChangeMark( int y );
+	void MarkLine( int y );
+	void PaintNumbering ( QPaintEvent * event );
+	int NumberingWidth();
 
-    QString GuessFileType( const QString & source );
+	QString GuessFileType( const QString & source );
 
-    protected:
-    void focusInEvent ( QFocusEvent * event );
-    void keyPressEvent( QKeyEvent * e );
-    void mousePressEvent ( QMouseEvent * event );
-    void resizeEvent ( QResizeEvent * event );
-    void scrollContentsBy( int dx, int dy );
-    protected slots:
-        void slotBoundEditor();
-    void slotTextChanged();
-    void UpdateNumberingWidth(int newBlockCount);
-    void HighlightCurrentLine();
-    void UpdateNumbering(const QRect &, int);
-    void slotFileChanged( const QString & );
-    void slotContentsChange( int, int, int );
-    int LeftMargin(){ return NumberingWidth(); }
+	protected:
+	void focusInEvent ( QFocusEvent * event );
+	void keyPressEvent( QKeyEvent * e );
+	void mousePressEvent ( QMouseEvent * event );
+	void resizeEvent ( QResizeEvent * event );
+	void scrollContentsBy( int dx, int dy );
+	protected slots:
+		void slotBoundEditor();
+	void slotTextChanged();
+	void UpdateNumberingWidth(int newBlockCount);
+	void HighlightCurrentLine();
+	void UpdateNumbering(const QRect &, int);
+	void slotFileChanged( const QString & );
+	void slotContentsChange( int, int, int );
+	int LeftMargin(){ return NumberingWidth(); }
 signals:
-    void signalFocusIn();
-    void signalTextChanged( bool );
+	void signalFocusIn();
+	void signalTextChanged( bool );
 };
 
 class DaoNumbering : public QWidget
 {
-    DaoEditor *editor;
+	DaoEditor *editor;
 
-    public:
-    DaoNumbering( DaoEditor *editor ) : QWidget( editor ){ this->editor = editor; }
-    protected:
-    void paintEvent ( QPaintEvent * event );
-    void mouseDoubleClickEvent( QMouseEvent * event );
-    void mousePressEvent ( QMouseEvent * event );
+	public:
+	DaoNumbering( DaoEditor *editor ) : QWidget( editor ){ this->editor = editor; }
+	protected:
+	void paintEvent ( QPaintEvent * event );
+	void mouseDoubleClickEvent( QMouseEvent * event );
+	void mousePressEvent ( QMouseEvent * event );
 };
 
 #endif
