@@ -2070,6 +2070,7 @@ void DaoTextEdit::IndentLine( QTextCursor cursor, bool indent )
 	QString old_indent;
 	int close_brace = 0;
 	language->Tokenize( tokens, current_block.text().toUtf8().data() );
+	cb = 0;
 	begin = true;
 	for(i=0; i<tokens->size; i++){
 		DaoToken *token = tokens->items.pToken[i];
