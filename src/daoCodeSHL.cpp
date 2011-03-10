@@ -654,7 +654,6 @@ DaoTokenFormat::DaoTokenFormat()
 
 DaoCodeSHL::DaoCodeSHL( QTextDocument * parent ) : QSyntaxHighlighter( parent )
 {
-    DaoInit();
     plainColor = Qt::black;
     tabColor[0] = QColor( 240, 255, 240 );
     tabColor[1] = QColor( 240, 255, 240 );

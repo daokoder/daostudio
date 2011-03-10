@@ -73,6 +73,7 @@ int MonitorMain( QApplication & app, int argc, char *argv[] )
 
 int main( int argc, char *argv[] )
 {
+    DaoInit();
     setlocale( LC_CTYPE, "" );
     QApplication app( argc, argv );
 	DaoLanguages languages;
