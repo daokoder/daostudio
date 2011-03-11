@@ -602,13 +602,14 @@ void DaoConsole::PrintPrompt()
 	insertPlainText( " " );
 	setUndoRedoEnabled( false );
 	setUndoRedoEnabled( true );
+	cursorBound = outputBound = textCursor().position();
+	codehl.SetSkip( cursorBound );
+	codehl.SetState( DAO_HLSTATE_NORMAL );
+
 	QScrollBar *bar = verticalScrollBar();
 	bar->setSliderPosition( bar->maximum() );
 	bar = horizontalScrollBar();
 	bar->setSliderPosition( 0 );
-	cursorBound = outputBound = textCursor().position();
-	codehl.SetSkip( cursorBound );
-	codehl.SetState( DAO_HLSTATE_NORMAL );
 	insertPlainText( script );
 }
 void DaoConsole::slotPrintOutput( const QString & output )
