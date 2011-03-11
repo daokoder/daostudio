@@ -330,7 +330,7 @@ void DaoConsole::keyPressEvent ( QKeyEvent * event )
 					AppendCmdHistory( raw.trimmed() );
 					codehl.SetState(0);
 					script = "";
-					outputBound = textCursor().position();
+					cursorBound = outputBound = textCursor().position();
 					RunScript( src );
 				}else{
 					PrintPrompt();
