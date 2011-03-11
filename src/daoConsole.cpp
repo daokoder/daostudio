@@ -326,6 +326,7 @@ void DaoConsole::keyPressEvent ( QKeyEvent * event )
 			}else{
 				appendPlainText( "" );
 				moveCursor( QTextCursor::End );
+				UpdateCursor( true );
 				if( src.trimmed().size() ){
 					AppendCmdHistory( raw.trimmed() );
 					codehl.SetState(0);
