@@ -600,17 +600,17 @@ void DaoConsole::PrintPrompt()
 	cursorBound = textCursor().position();
 	codehl.SetSkip( cursorBound + 1 );
 	insertPlainText( " " );
+	cursorBound = outputBound = textCursor().position();
 	setUndoRedoEnabled( false );
 	setUndoRedoEnabled( true );
-	cursorBound = outputBound = textCursor().position();
 	codehl.SetSkip( cursorBound );
 	codehl.SetState( DAO_HLSTATE_NORMAL );
+	insertPlainText( script );
 
 	QScrollBar *bar = verticalScrollBar();
 	bar->setSliderPosition( bar->maximum() );
 	bar = horizontalScrollBar();
 	bar->setSliderPosition( 0 );
-	insertPlainText( script );
 }
 void DaoConsole::slotPrintOutput( const QString & output )
 {
