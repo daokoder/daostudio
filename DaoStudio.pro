@@ -25,7 +25,7 @@ win32 {
 	RC_FILE = DaoStudio.rc
 	INCLUDEPATH += ..\dao\kernel
 	DEFINES += WIN32
-	LIBS += ..\dao\dao.a -lwinmm -lwsock32 -lmsvcp60
+	LIBS += ..\dao\dao.a -lwinmm -lwsock32
 }
 unix {
 	INCLUDEPATH += ../dao/kernel
