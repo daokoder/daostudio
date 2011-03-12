@@ -1357,6 +1357,7 @@ void DaoMonitor::slotStartExecution()
 	QString status = QString::number( res ) + '\1';
 	status += QString::fromUtf8( buf, strlen( buf ) );
 	scriptSocket->write( status.toUtf8() );
+	scriptSocket->flush();
 	fflush( stdout );
 	ReduceValueItems( wgtDataList->item( wgtDataList->count()-1 ) );
 	EraseDebuggingProcess();
