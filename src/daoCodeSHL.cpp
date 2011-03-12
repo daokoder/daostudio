@@ -1050,11 +1050,11 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 		setFormat( 0, text.size(), formatOutput );
 		return;
 	}
-	if( ud && ud->state == CLS_OUTPUT ){
+	if( ud && ud->state == CLS_OUTPUT && language == NULL ){
 		setFormat( 0, text.size(), formatOutput );
 		return;
 	}
-	if( hlstate ==0 ){
+	if( hlstate ==0 && language == NULL ){
 		setCurrentBlockUserData( NULL );
 		setFormat( 0, text.size(), formatOutput );
 		return;

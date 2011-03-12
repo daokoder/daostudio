@@ -289,6 +289,7 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
             this, SLOT(SetPathBrowsing(const QString &)) );
 
     monitor = new QProcess();
+	monitor->setProcessChannelMode(QProcess::MergedChannels);
     //monitor->setProcessChannelMode(QProcess::MergedChannels);
     //monitor->start( "valgrind --tool=memcheck --leak-check=full --dsymutil=yes ./DaoMonitor" );
     //monitor->start( "echo \"r\" | gdb ./DaoMonitor" );
@@ -323,6 +324,9 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 			}
 			command += " --socket-suffix " + DaoStudioSettings::socket_suffix;
 		}
+		if( add_suffix == false and DaoStudioSettings::socket_suffix != "" )
+			command += " --socket-suffix " + DaoStudioSettings::socket_suffix;
+
 		monitor->start( command, QIODevice::ReadWrite | QIODevice::Unbuffered );
 		monitor->waitForStarted(100);
 	}else{

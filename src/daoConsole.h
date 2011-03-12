@@ -86,6 +86,7 @@ class DaoConsole : public DaoTextEdit
 
 	QLocalServer  debugServer;
 	QLocalServer  stdinServer;
+	QLocalServer  stdoutServer;
 
 	DArray  *tokens;
 
@@ -119,6 +120,7 @@ class DaoConsole : public DaoTextEdit
 	DaoTabEditor *tabWidget;
 	QLocalSocket *debugSocket;
 	QLocalSocket *stdinSocket;
+	QLocalSocket *stdoutSocket;
 	QLocalSocket  scriptSocket;
 	QProcess	 *monitor;
 
@@ -139,8 +141,10 @@ protected slots:
 	void slotProcessFinished( int,QProcess::ExitStatus );
 	void slotSocketDebug();
 	void slotSocketStdin();
+	void slotSocketStdout();
 	void slotReadStdOut();
 	void slotReadStdError();
+	void slotStdoutFromSocket();
 	void slotFoldUnfoldOutput();
 	void slotSaveAll();
 	void slotClearAll();

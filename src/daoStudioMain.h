@@ -40,6 +40,7 @@ public:
 	static QString socket_monitor;
 	static QString socket_script;
 	static QString socket_stdin;
+	static QString socket_stdout;
 	static QString socket_debug;
 	static QString socket_breakpoints;
 

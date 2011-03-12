@@ -1018,7 +1018,7 @@ void DaoDataWidget::slotElementChanged(int row, int col)
 		break;
 	}
 }
-static int DaoEditContinueData ( QByteArray &data, QList<int> & lineMap, QStringList & newCodes, QStringList & routCodes )
+static int DaoEditContinueData( QByteArray &data, QList<int> & lineMap, QStringList & newCodes, QStringList & routCodes )
 {
 	QList<QByteArray> lines = data.split( '\n' );
 	if( lines.size() <= 2 ) return lines[0].toInt();
@@ -1057,6 +1057,7 @@ static void DaoResetExecution( DaoContext *context, int line, int offset=0 )
 static void DaoStdioRead( DaoEventHandler *self, DString *buf, int count )
 {
 	fflush( stdout );
+	self->socket2.flush();
 	self->socket.connectToServer( DaoStudioSettings::socket_stdin );
 	self->socket.write( QByteArray::number( count ) );
 	self->socket.flush();
@@ -1073,6 +1074,16 @@ static void DaoStdioRead( DaoEventHandler *self, DString *buf, int count )
 	data += self->socket.readAll();
 	//QString s = QString::fromUtf8( data.data(), data.size() );
 	DString_SetDataMBS( buf, data.data(), data.size() );
+}
+static void DaoStdioWrite( DaoEventHandler *self, DString *buf )
+{
+#if 0
+	FILE *fout = fopen( "output.txt", "a+" );
+	fprintf( fout, "%s\n", DString_GetMBS( buf ) );
+	fclose( fout );
+#endif
+	self->socket2.write( DString_GetMBS( buf ), DString_Size( buf ) );
+	self->socket2.flush();
 }
 static void DaoConsDebug( DaoEventHandler *self, DaoContext *ctx )
 {
@@ -1174,7 +1185,7 @@ DaoMonitor::DaoMonitor( const char *cmd ) : QMainWindow()
 	handler.time = 0;
 	handler.monitor = this;
 	handler.stdRead = DaoStdioRead;
-	handler.stdWrite = NULL;
+	handler.stdWrite = DaoStdioWrite;
 	handler.stdFlush = NULL;
 	handler.debug = DaoConsDebug;
 	handler.breaks = DaoSetBreaks;
@@ -1279,6 +1290,7 @@ void DaoMonitor::slotStartExecution()
 		fflush( stdout );
 		return;
 	}
+
 	scriptSocket = server.nextPendingConnection();
 	scriptSocket->waitForReadyRead(1000);
 	QByteArray script = scriptSocket->readAll();
@@ -1286,12 +1298,14 @@ void DaoMonitor::slotStartExecution()
 		scriptSocket->disconnectFromServer();
 		return;
 	}
+	handler.socket2.connectToServer( DaoStudioSettings::socket_stdout );
 	char info = script[0];
 	script.remove(0,1);
 	if( info == DAO_SET_PATH ){
 		DaoVmSpace_SetPath( vmSpace, script.data() );
 		QDir::setCurrent( QString::fromUtf8( script.data(), script.size() ) );
 		scriptSocket->disconnectFromServer();
+		handler.socket2.disconnectFromServer();
 		return;
 	}
 
@@ -1344,6 +1358,9 @@ void DaoMonitor::slotStartExecution()
 		res = (int) DaoVmProcess_Eval( vmp, ns, mbs, 1 );
 		DString_Delete( mbs );
 	}
+	fflush( stdout );
+	handler.socket2.flush();
+	handler.socket2.disconnectFromServer();
 	int ms = time.elapsed();
 	int sec = ms / 1000;
 	int min = sec / 60;
@@ -1358,13 +1375,18 @@ void DaoMonitor::slotStartExecution()
 	status += QString::fromUtf8( buf, strlen( buf ) );
 	scriptSocket->write( status.toUtf8() );
 	scriptSocket->flush();
-	fflush( stdout );
 	ReduceValueItems( wgtDataList->item( wgtDataList->count()-1 ) );
 	EraseDebuggingProcess();
 	ViewValue( dataWidget, (DaoValueItem*) wgtDataList->item( 0 ) );
 	scriptSocket->disconnectFromServer();
 	//connect( &server, SIGNAL(newConnection()), this, SLOT(slotStartExecution()));
 	vmState = DAOCON_READY;
+
+#if 0
+	FILE *fout = fopen( "debug.txt", "a+" );
+	fprintf( fout, "%s\n", buf );
+	fclose( fout );
+#endif
 }
 void DaoMonitor::slotStopExecution()
 {

@@ -35,6 +35,7 @@ DaoConsole::DaoConsole( QWidget *parent ) : DaoTextEdit( parent, & wordList )
 
 	debugSocket = NULL;
 	stdinSocket = NULL;
+	stdoutSocket = NULL;
 	editor = NULL;
 	shellTop = false;
 	shell = false;
@@ -71,8 +72,11 @@ DaoConsole::DaoConsole( QWidget *parent ) : DaoTextEdit( parent, & wordList )
 	connect(save, SIGNAL(triggered()),this,SLOT(slotSaveAll()));
 
 	connect( this, SIGNAL( cursorPositionChanged() ), this, SLOT( slotBoundCursor() ) );
-	connect( &scriptSocket, SIGNAL( disconnected() ), this, SLOT( slotScriptFinished() ) );
+	//connect( &scriptSocket, SIGNAL( disconnected() ), this, SLOT( slotScriptFinished() ) );
+#ifdef Q_WS_WIN
+	// needed for windows vista
 	connect( &scriptSocket, SIGNAL( readyRead() ), this, SLOT( slotScriptFinished() ) );
+#endif
 	connect( &shellProcess, SIGNAL(finished(int,QProcess::ExitStatus)),
 			this, SLOT(slotProcessFinished(int,QProcess::ExitStatus)));
 	LoadCmdHistory();
@@ -88,6 +92,11 @@ DaoConsole::DaoConsole( QWidget *parent ) : DaoTextEdit( parent, & wordList )
 		QFile::remove( DaoStudioSettings::socket_stdin );
 	stdinServer.listen( DaoStudioSettings::socket_stdin );
 	connect( & stdinServer, SIGNAL(newConnection()), this, SLOT(slotSocketStdin()));
+
+	if( QFile::exists( DaoStudioSettings::socket_stdout ) )
+		QFile::remove( DaoStudioSettings::socket_stdout );
+	stdoutServer.listen( DaoStudioSettings::socket_stdout );
+	connect( & stdoutServer, SIGNAL(newConnection()), this, SLOT(slotSocketStdout()));
 }
 DaoConsole::~DaoConsole()
 {
@@ -608,6 +617,8 @@ void DaoConsole::PrintPrompt()
 	codehl.SetSkip( cursorBound );
 	codehl.SetState( DAO_HLSTATE_NORMAL );
 	insertPlainText( script );
+	stdoutSocket = NULL;
+	codehl.language = NULL;
 
 	QScrollBar *bar = verticalScrollBar();
 	bar->setSliderPosition( bar->maximum() );
@@ -617,7 +628,7 @@ void DaoConsole::PrintPrompt()
 void DaoConsole::slotPrintOutput( const QString & output )
 {
 	QScrollBar *bar = verticalScrollBar();
-	int sp = bar->sliderPosition();
+	int i, k, sp = bar->sliderPosition();
 	bool scroll = sp+1 == bar->maximum();
 	//printf( "%i %s\n\n\n", output.size(), output.toLocal8Bit().data() );
 	//printf( "======= %i %i\n\n\n", shellTop, output.indexOf( "Processes" ) );
@@ -631,8 +642,29 @@ void DaoConsole::slotPrintOutput( const QString & output )
 		cursor.insertText( output );
 		setTextCursor( cursor );
 	}else{
+		QStringList parts = output.split( '\1' );
 		moveCursor( QTextCursor::End );
+#if 1
+		for(i=0; i<parts.size(); i++){
+			QString part = parts[i];
+			k = part.indexOf( '\2' );
+			if( k >=0 && k < 16 ){
+				QString name = part.left( k );
+				if( codehl.languages.contains( name ) ){
+					codehl.language = codehl.languages[ name ];
+				}else{
+					codehl.language = NULL;
+					if( name.size() ) insertPlainText( '\1' + name + '\2' );
+				}
+				insertPlainText( part.mid( k + 1 ) );
+			}else{
+				if( i ) part = '\1' + part;
+				insertPlainText( part );
+			}
+		}
+#else
 		insertPlainText( output );
+#endif
 	}
 	setUndoRedoEnabled( false );
 	setUndoRedoEnabled( true );
@@ -645,7 +677,6 @@ void DaoConsole::slotPrintOutput( const QString & output )
 }
 void DaoConsole::slotReadStdOut()
 {
-	//printf( "hello\n" );
 	//QMessageBox::about( this, "test", "test" );
 
 #if 0
@@ -674,13 +705,13 @@ void DaoConsole::slotReadStdOut()
 		slotPrintOutput( text );
 	}
 #else
-	monitor->setReadChannel( QProcess::StandardOutput );
+	//monitor->setReadChannel( QProcess::StandardOutput );
 	while( not monitor->atEnd() ){
 		QByteArray output = monitor->readLine();
 		QString text = QString::fromUtf8( output.data(), output.size() );
 		slotPrintOutput( text );
 	}
-	monitor->setReadChannel( QProcess::StandardError );
+	//monitor->setReadChannel( QProcess::StandardError );
 	while( not monitor->atEnd() ){
 		QByteArray output = monitor->readLine();
 		QString text = QString::fromUtf8( output.data(), output.size() );
@@ -703,7 +734,7 @@ void DaoConsole::slotReadStdError()
 	QString text = QString::fromUtf8( output.data(), output.size() );
 	slotPrintOutput( text );
 #else
-	monitor->setReadChannel( QProcess::StandardError );
+	//monitor->setReadChannel( QProcess::StandardError );
 	while( not monitor->atEnd() ){
 		QByteArray output = monitor->readLine();
 		QString text = QString::fromUtf8( output.data(), output.size() );
@@ -716,8 +747,12 @@ void DaoConsole::slotReadStdError()
 }
 void DaoConsole::slotScriptFinished()
 {
+#ifdef Q_WS_WIN
+	// needed for windows vista
+#endif
 	if( state != DAOCON_RUN ) return;
 
+	slotStdoutFromSocket();
 	monitor->waitForReadyRead( TIME_YIELD + 20 );
 	slotReadStdOut();
 	slotReadStdError();
@@ -754,6 +789,22 @@ void DaoConsole::slotSocketStdin()
 	stdinSocket = stdinServer.nextPendingConnection();
 	stdinSocket->waitForReadyRead();
 	stdinCount = stdinSocket->readAll().toInt();
+}
+void DaoConsole::slotSocketStdout()
+{
+	//printf( "connect socket\n" );
+	stdoutSocket = stdoutServer.nextPendingConnection();
+	connect( stdoutSocket, SIGNAL(readyRead()), this, SLOT(slotStdoutFromSocket()) );
+	connect( stdoutSocket, SIGNAL(disconnected()), this, SLOT(slotScriptFinished()) );
+}
+void DaoConsole::slotStdoutFromSocket()
+{
+	//printf( "socket\n" );
+	if( stdoutSocket == NULL ) return;
+	QByteArray output = stdoutSocket->readAll();
+	QString text = QString::fromUtf8( output.data(), output.size() );
+	//printf( "socket %i %i\n", output.size(), text.size() );
+	slotPrintOutput( text );
 }
 void DaoConsole::slotSocketDebug()
 {

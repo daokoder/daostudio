@@ -72,10 +72,11 @@ struct DaoEventHandler
 	void (*InvokeHost)( DaoEventHandler *self, DaoContext *context );
 	DaoMonitor	 *monitor;
 	DaoVmProcess *process;
-	QLocalSocket	socket;
-	DaoDebugger	 debugger;
-	DaoTimer			timer;
-	unsigned int	time;
+	QLocalSocket  socket;
+	QLocalSocket  socket2;
+	DaoDebugger	  debugger;
+	DaoTimer      timer;
+	unsigned int  time;
 };
 
 }
