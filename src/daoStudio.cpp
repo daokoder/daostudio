@@ -307,7 +307,11 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 		add_suffix = true;
 	}
 	if( newStart ){
-		QString command = program + " --monitor";
+		QString command = program;
+#ifdef Q_WS_WIN
+		command = "\"" + program + "\"";
+#endif
+		command += " --monitor";
 		if( add_suffix ){
 			DaoStudioSettings::AppendSuffix( "@" );
 			socket.connectToServer( DaoStudioSettings::socket_script );
