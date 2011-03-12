@@ -72,6 +72,7 @@ DaoConsole::DaoConsole( QWidget *parent ) : DaoTextEdit( parent, & wordList )
 
 	connect( this, SIGNAL( cursorPositionChanged() ), this, SLOT( slotBoundCursor() ) );
 	connect( &scriptSocket, SIGNAL( disconnected() ), this, SLOT( slotScriptFinished() ) );
+	connect( &scriptSocket, SIGNAL( readReady() ), this, SLOT( slotScriptFinished() ) );
 	connect( &shellProcess, SIGNAL(finished(int,QProcess::ExitStatus)),
 			this, SLOT(slotProcessFinished(int,QProcess::ExitStatus)));
 	LoadCmdHistory();
@@ -715,6 +716,8 @@ void DaoConsole::slotReadStdError()
 }
 void DaoConsole::slotScriptFinished()
 {
+	if( state != DAOCON_RUN ) return;
+
 	monitor->waitForReadyRead( TIME_YIELD + 20 );
 	slotReadStdOut();
 	slotReadStdError();

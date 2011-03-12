@@ -23,18 +23,25 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #include<daoStudioMain.h>
 
 QFont DaoStudioSettings::codeFont;
+QString DaoStudioSettings::locale;
+QString DaoStudioSettings::program;
 QString DaoStudioSettings::program_path;
+QString DaoStudioSettings::socket_suffix;
 QString DaoStudioSettings::socket_script;
 QString DaoStudioSettings::socket_stdin;
 QString DaoStudioSettings::socket_debug;
 QString DaoStudioSettings::socket_breakpoints;
 
-void DaoStudioSettings::SetProgramPath( const QString & path0 )
+void DaoStudioSettings::SetProgramPath( const char *cmd, const char *suffix )
 {
-	QFileInfo finfo( path0 ); 
-	QString path = finfo.absolutePath();
+	program = cmd;
 
-	program_path = path;
+    QFileInfo finfo( program ); 
+
+    program_path = finfo.absolutePath();
+    locale = QLocale::system().name();
+
+	QString path = program_path;
 
 	path = QDir::tempPath ();
 	if( path.size() and path[ path.size()-1 ] != QDir::separator() )
@@ -44,10 +51,20 @@ void DaoStudioSettings::SetProgramPath( const QString & path0 )
 	path = "\\\\.\\pipe\\";
 #endif
 
-	socket_script = path + ".daostudio.socket.script";
-	socket_stdin = path + ".daostudio.socket.stdin";
-	socket_debug = path + ".daostudio.socket.debug";
-	socket_breakpoints = path + ".daostudio.socket.breakpoints";
+	if( suffix ) socket_suffix = suffix;
+
+	socket_script = path + ".daostudio.socket.script" + socket_suffix;
+	socket_stdin = path + ".daostudio.socket.stdin" + socket_suffix;
+	socket_debug = path + ".daostudio.socket.debug" + socket_suffix;
+	socket_breakpoints = path + ".daostudio.socket.breakpoints" + socket_suffix;
+}
+void DaoStudioSettings::AppendSuffix( const QString & suffix )
+{
+	socket_suffix += suffix;
+	socket_script += suffix;
+	socket_stdin += suffix;
+	socket_debug += suffix;
+	socket_breakpoints += suffix;
 }
 
 int StudioMain( QApplication & app, int argc, char *argv[] )
@@ -74,10 +91,22 @@ int MonitorMain( QApplication & app, int argc, char *argv[] )
 
 int main( int argc, char *argv[] )
 {
+	char *suffix = NULL;
+	bool monitor = false;
+	int i;
+	for(i=1; i<argc; i++){
+		if( strcmp( argv[i], "--monitor" ) ==0 ){
+			monitor = true;
+		}else if( strcmp( argv[i], "--socket-suffix" ) ==0 ){
+			i += 1;
+			if( i < argc ) suffix = argv[i];
+		}
+	}
 	DaoInit();
 	setlocale( LC_CTYPE, "" );
 	QApplication app( argc, argv );
 	DaoLanguages languages;
+	DaoStudioSettings::SetProgramPath( argv[0], suffix );
 
 	QFileInfo finfo( argv[0] ); 
 	QTranslator translator;
@@ -92,8 +121,6 @@ int main( int argc, char *argv[] )
 	if( fi.family() != "Courier 10 Pitch" )
 		DaoStudioSettings::codeFont.setFamily( "Courier New" );
 
-	if( argc >1 && strcmp( argv[1], "--monitor" ) ==0 )
-		return MonitorMain( app, argc, argv );
-
+	if( monitor ) return MonitorMain( app, argc, argv );
 	return StudioMain( app, argc, argv );
 }

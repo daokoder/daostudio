@@ -627,6 +627,27 @@ DaoLanguages::DaoLanguages()
 	mkfile->AddPattern( "^%w+%s*:", 1<<0, DAO_SHL_COLOR3 );
 	mkfile->AddPattern( "^%s*(%w+)%s*%+?=", 1<<1, DAO_SHL_COLOR5 );
 	mkfile->AddPattern( "%$%(%s*%w+%s*%)", 1<<0, DAO_SHL_COLOR6 );
+
+	DaoBasicSyntax *pld = new DaoBasicSyntax( "pld" );
+	DaoCodeSHL::languages[ "pld" ] = pld;
+	pld->caseInsensitive = true;
+	pld->singleQuotation = true;
+	pld->doubleQuotation = true;
+	pld->AddSingleLineComment( "#" );
+	pld->AddKeywordStruct( "pipeline" );
+	pld->AddKeywordStruct( "task" );
+	pld->AddKeywordStruct( "program" );
+	pld->AddKeywordStruct( "inputs" );
+	pld->AddKeywordStruct( "outputs" );
+	pld->AddKeywordStruct( "options" );
+	pld->AddKeywordStruct( "flags" );
+	pld->AddKeywordStruct( "tasks" );
+	pld->AddKeywordStatement( "as" );
+	pld->AddKeywordConstant( "on" );
+	pld->AddKeywordConstant( "off" );
+	pld->AddKeywordConstant( "default" );
+	pld->AddKeywordConstant( "stdout" );
+	pld->AddKeywordConstant( "stderr" );
 }
 
 QMap<QString,DaoBasicSyntax*> DaoCodeSHL::languages;

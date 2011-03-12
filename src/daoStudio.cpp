@@ -103,12 +103,10 @@ void DaoDocViewer::mousePressEvent ( QMouseEvent * event )
 DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 {
     int i;
-    if( cmd ) program = cmd;
-    QFileInfo finfo( program ); 
-    programPath = finfo.absolutePath();
-    locale = QLocale::system().name();
 
-	DaoStudioSettings::SetProgramPath( programPath );
+	locale = DaoStudioSettings::locale;
+	program = DaoStudioSettings::program;
+	programPath = DaoStudioSettings::program_path;
 
     QCommonStyle style;
     QIcon book( QPixmap( ":/images/book.png" ) );
@@ -298,6 +296,7 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
     //monitor->start( "vi" );
     socket.connectToServer( DaoStudioSettings::socket_script );
 	bool newStart = true;
+	bool add_suffix = false;
 	if( socket.waitForConnected( 100 ) ){
         int ret = QMessageBox::warning(this, tr("DaoStudio"),
                 tr("DaoMonitor is running. Use it?\n\n"
@@ -305,9 +304,22 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 				"its standard output will not be available in DaoStudio!"),
                 QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
         newStart = (ret == QMessageBox::No);
+		add_suffix = true;
 	}
 	if( newStart ){
-		monitor->start( program + " --monitor", QIODevice::ReadWrite | QIODevice::Unbuffered );
+		QString command = program + " --monitor";
+		if( add_suffix ){
+			DaoStudioSettings::AppendSuffix( "@" );
+			socket.connectToServer( DaoStudioSettings::socket_script );
+			// search for unused socket:
+			while( socket.waitForConnected( 100 ) ){
+				DaoStudioSettings::AppendSuffix( "@" );
+				socket.disconnectFromServer();
+				socket.connectToServer( DaoStudioSettings::socket_script );
+			}
+			command += " --socket-suffix " + DaoStudioSettings::socket_suffix;
+		}
+		monitor->start( command, QIODevice::ReadWrite | QIODevice::Unbuffered );
 		monitor->waitForStarted(100);
 	}else{
 		slotWriteLog( tr("connected to running") + " DaoMonitor" );

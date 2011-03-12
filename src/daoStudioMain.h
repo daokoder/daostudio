@@ -33,7 +33,10 @@ class DaoStudioSettings
 public:
 
 	static QFont   codeFont;
+	static QString locale;
+	static QString program;
 	static QString program_path;
+	static QString socket_suffix;
 	static QString socket_monitor;
 	static QString socket_script;
 	static QString socket_stdin;
@@ -42,7 +45,8 @@ public:
 
 	static QLocalSocket  monitor_socket;
 
-	static void SetProgramPath( const QString & path );
+	static void SetProgramPath( const char *cmd, const char *sock_suffix=NULL );
+	static void AppendSuffix( const QString & suffix );
 };
 
 

@@ -774,6 +774,7 @@ void DaoDataWidget::FillTable( QTableWidget *table,
 	if( names ){
 		for(node=DMap_First(names); node!=NULL; node=DMap_Next(names,node)){
 			if( filter && LOOKUP_ST( node->value.pInt ) != filter ) continue;
+			if( LOOKUP_UP( node->value.pInt ) ) continue;
 			// LOOKUP_ID: get the last 16 bits
 			idnames[ LOOKUP_ID( node->value.pInt ) ] = node->key.pString->mbs;
 		}
@@ -1145,12 +1146,10 @@ static void DaoProcessMonitor( DaoEventHandler *self, DaoContext *ctx )
 DaoMonitor::DaoMonitor( const char *cmd ) : QMainWindow()
 {
 	int i;
-	if( cmd ) program = cmd;
-	QFileInfo finfo( program ); 
-	programPath = finfo.absolutePath();
-	locale = QLocale::system().name();
 
-	DaoStudioSettings::SetProgramPath( programPath );
+	locale = DaoStudioSettings::locale;
+	program = DaoStudioSettings::program;
+	programPath = DaoStudioSettings::program_path;
 
 	QCommonStyle style;
 	QIcon book( QPixmap( ":/images/book.png" ) );
