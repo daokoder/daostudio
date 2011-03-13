@@ -30,6 +30,7 @@ QString DaoStudioSettings::socket_suffix;
 QString DaoStudioSettings::socket_script;
 QString DaoStudioSettings::socket_stdin;
 QString DaoStudioSettings::socket_stdout;
+QString DaoStudioSettings::socket_logger;
 QString DaoStudioSettings::socket_debug;
 QString DaoStudioSettings::socket_breakpoints;
 
@@ -57,6 +58,7 @@ void DaoStudioSettings::SetProgramPath( const char *cmd, const char *suffix )
 	socket_script = path + ".daostudio.socket.script" + socket_suffix;
 	socket_stdin = path + ".daostudio.socket.stdin" + socket_suffix;
 	socket_stdout = path + ".daostudio.socket.stdout" + socket_suffix;
+	socket_logger = path + ".daostudio.socket.logger" + socket_suffix;
 	socket_debug = path + ".daostudio.socket.debug" + socket_suffix;
 	socket_breakpoints = path + ".daostudio.socket.breakpoints" + socket_suffix;
 }
@@ -66,6 +68,7 @@ void DaoStudioSettings::AppendSuffix( const QString & suffix )
 	socket_script += suffix;
 	socket_stdin += suffix;
 	socket_stdout += suffix;
+	socket_logger += suffix;
 	socket_debug += suffix;
 	socket_breakpoints += suffix;
 }

@@ -122,6 +122,7 @@ class DaoStudio : public QMainWindow, private Ui::DaoStudio
 	void SendPathWorking();
 	DaoEditor* NewEditor( const QString & name, const QString & tip="" );
 
+	int  GetState()const{ return vmState; }
 	void SetState( int state );
 	void ResetTimer(){ time.restart(); }
 	void RestartMonitor();

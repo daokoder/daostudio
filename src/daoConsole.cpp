@@ -36,6 +36,8 @@ DaoConsole::DaoConsole( QWidget *parent ) : DaoTextEdit( parent, & wordList )
 	debugSocket = NULL;
 	stdinSocket = NULL;
 	stdoutSocket = NULL;
+	loggerSocket = NULL;
+
 	editor = NULL;
 	shellTop = false;
 	shell = false;
@@ -72,11 +74,8 @@ DaoConsole::DaoConsole( QWidget *parent ) : DaoTextEdit( parent, & wordList )
 	connect(save, SIGNAL(triggered()),this,SLOT(slotSaveAll()));
 
 	connect( this, SIGNAL( cursorPositionChanged() ), this, SLOT( slotBoundCursor() ) );
-	//connect( &scriptSocket, SIGNAL( disconnected() ), this, SLOT( slotScriptFinished() ) );
-#ifdef Q_WS_WIN
-	// needed for windows vista
-	connect( &scriptSocket, SIGNAL( readyRead() ), this, SLOT( slotScriptFinished() ) );
-#endif
+	//connect( &scriptSocket, SIGNAL( disconnected() ), this, SLOT( slotScriptFinished2() ) );
+
 	connect( &shellProcess, SIGNAL(finished(int,QProcess::ExitStatus)),
 			this, SLOT(slotProcessFinished(int,QProcess::ExitStatus)));
 	LoadCmdHistory();
@@ -97,10 +96,15 @@ DaoConsole::DaoConsole( QWidget *parent ) : DaoTextEdit( parent, & wordList )
 		QFile::remove( DaoStudioSettings::socket_stdout );
 	stdoutServer.listen( DaoStudioSettings::socket_stdout );
 	connect( & stdoutServer, SIGNAL(newConnection()), this, SLOT(slotSocketStdout()));
+
+	if( QFile::exists( DaoStudioSettings::socket_logger ) )
+		QFile::remove( DaoStudioSettings::socket_logger );
+	loggerServer.listen( DaoStudioSettings::socket_logger );
+	connect( & loggerServer, SIGNAL(newConnection()), this, SLOT(slotSocketLogger()));
 }
 DaoConsole::~DaoConsole()
 {
-	disconnect( &scriptSocket, SIGNAL( disconnected() ), this, SLOT( slotScriptFinished() ) );
+	//disconnect( &scriptSocket, SIGNAL( disconnected() ), this, SLOT( slotScriptFinished2() ) );
 	SaveCmdHistory();
 	DArray_Delete( tokens );
 }
@@ -210,6 +214,8 @@ void DaoConsole::keyPressEvent ( QKeyEvent * event )
 	QTextCursor cursor = textCursor();
 	Qt::KeyboardModifiers mdf = event->modifiers();
 	int key = event->key();
+	int st = studio->GetState();
+	if( st != DAOCON_READY && st != DAOCON_STDIN ) return;
 	if( cursor.position() < cursorBound && ! ( mdf & Qt::ControlModifier ) ){
 		cursor.setPosition( cursorBound );
 		setTextCursor( cursor );
@@ -587,6 +593,8 @@ void DaoConsole::RunScript( const QString & src, bool debug )
 	scriptSocket.putChar( debug ? DAO_DEBUG_SCRIPT : DAO_RUN_SCRIPT );
 	scriptSocket.write( src.toUtf8().data() );
 	scriptSocket.flush();
+	scriptSocket.disconnectFromServer();
+	scriptSocket.connectToServer( DaoStudioSettings::socket_script );
 	studio->ResetTimer();
 	clearScreenBound = textCursor().position();
 }
@@ -747,17 +755,56 @@ void DaoConsole::slotReadStdError()
 }
 void DaoConsole::slotScriptFinished()
 {
-#ifdef Q_WS_WIN
-	// needed for windows vista
-#endif
-	if( state != DAOCON_RUN ) return;
-
 	slotStdoutFromSocket();
 	monitor->waitForReadyRead( TIME_YIELD + 20 );
 	slotReadStdOut();
 	slotReadStdError();
 	shellTop = false;
-	QList<QByteArray> data = scriptSocket.readAll().split( '\1' );
+	PrintPrompt();
+	studio->SetState( DAOCON_READY );
+	state = DAOCON_READY;
+	shell = false;
+}
+void DaoConsole::slotSocketStdin()
+{
+	state = DAOCON_STDIN;
+	studio->SetState( DAOCON_STDIN );
+	stdinSocket = stdinServer.nextPendingConnection();
+	stdinSocket->waitForReadyRead();
+	stdinCount = stdinSocket->readAll().toInt();
+}
+void DaoConsole::slotSocketStdout()
+{
+	//slotPrintOutput( "connect socket\n" );
+	//printf( "connect socket\n" );
+	stdoutSocket = stdoutServer.nextPendingConnection();
+	connect( stdoutSocket, SIGNAL(readyRead()), this, SLOT(slotStdoutFromSocket()) );
+	connect( stdoutSocket, SIGNAL(disconnected()), this, SLOT(slotScriptFinished()) );
+}
+void DaoConsole::slotStdoutFromSocket()
+{
+	//slotPrintOutput( "read socket\n" );
+	//printf( "socket\n" );
+	if( stdoutSocket == NULL ) return;
+	QByteArray output = stdoutSocket->readAll();
+	QString text = QString::fromUtf8( output.data(), output.size() );
+	//printf( "socket %i %i\n", output.size(), text.size() );
+	slotPrintOutput( text );
+}
+void DaoConsole::slotSocketLogger()
+{
+	//slotPrintOutput( "connect socket\n" );
+	//printf( "connect socket\n" );
+	loggerSocket = loggerServer.nextPendingConnection();
+	connect( loggerSocket, SIGNAL(readyRead()), this, SLOT(slotLogFromSocket()) );
+}
+void DaoConsole::slotLogFromSocket()
+{
+	//slotPrintOutput( "read socket\n" );
+	//printf( "socket\n" );
+	if( loggerSocket == NULL ) return;
+	//printf( "socket %i %i\n", output.size(), text.size() );
+	QList<QByteArray> data = loggerSocket->readAll().split( '\1' );
 	if( data.size() != 2 ){ // cancelled
 		studio->SetState( DAOCON_READY );
 		PrintPrompt();
@@ -776,35 +823,7 @@ void DaoConsole::slotScriptFinished()
 	}else{
 		log += tr("execution failled");
 	}
-	PrintPrompt();
 	studio->slotWriteLog( log + " (" + time + ")" );
-	studio->SetState( DAOCON_READY );
-	state = DAOCON_READY;
-	shell = false;
-}
-void DaoConsole::slotSocketStdin()
-{
-	state = DAOCON_STDIN;
-	studio->SetState( DAOCON_STDIN );
-	stdinSocket = stdinServer.nextPendingConnection();
-	stdinSocket->waitForReadyRead();
-	stdinCount = stdinSocket->readAll().toInt();
-}
-void DaoConsole::slotSocketStdout()
-{
-	//printf( "connect socket\n" );
-	stdoutSocket = stdoutServer.nextPendingConnection();
-	connect( stdoutSocket, SIGNAL(readyRead()), this, SLOT(slotStdoutFromSocket()) );
-	connect( stdoutSocket, SIGNAL(disconnected()), this, SLOT(slotScriptFinished()) );
-}
-void DaoConsole::slotStdoutFromSocket()
-{
-	//printf( "socket\n" );
-	if( stdoutSocket == NULL ) return;
-	QByteArray output = stdoutSocket->readAll();
-	QString text = QString::fromUtf8( output.data(), output.size() );
-	//printf( "socket %i %i\n", output.size(), text.size() );
-	slotPrintOutput( text );
 }
 void DaoConsole::slotSocketDebug()
 {

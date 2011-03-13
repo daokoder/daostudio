@@ -1278,11 +1278,6 @@ void DaoMonitor::slotShellFinished(int, QProcess::ExitStatus)
 {
 	handler.process->stopit = 1;
 }
-class Sleeper : public QThread
-{
-	public:
-		static void Sleep( int us ){ QThread::usleep( us ); }
-};
 void DaoMonitor::slotStartExecution()
 {
 	if( vmState == DAOCON_RUN ){
@@ -1299,6 +1294,12 @@ void DaoMonitor::slotStartExecution()
 		return;
 	}
 	handler.socket2.connectToServer( DaoStudioSettings::socket_stdout );
+	if( handler.socket2.waitForConnected( 1000 ) ==0 ){
+		printf( "cannot connect to console stdout\n" );
+		fflush( stdout );
+		scriptSocket->disconnectFromServer();
+		return;
+	}
 	char info = script[0];
 	script.remove(0,1);
 	if( info == DAO_SET_PATH ){
@@ -1361,6 +1362,8 @@ void DaoMonitor::slotStartExecution()
 	fflush( stdout );
 	handler.socket2.flush();
 	handler.socket2.disconnectFromServer();
+	handler.socket2.connectToServer( DaoStudioSettings::socket_logger );
+	handler.socket2.waitForConnected( 1000 );
 	int ms = time.elapsed();
 	int sec = ms / 1000;
 	int min = sec / 60;
@@ -1373,12 +1376,12 @@ void DaoMonitor::slotStartExecution()
 			tr("execution time").toUtf8().data(), hr, min, sec, ms );
 	QString status = QString::number( res ) + '\1';
 	status += QString::fromUtf8( buf, strlen( buf ) );
-	scriptSocket->write( status.toUtf8() );
-	scriptSocket->flush();
+	handler.socket2.write( status.toUtf8() );
+	handler.socket2.flush();
 	ReduceValueItems( wgtDataList->item( wgtDataList->count()-1 ) );
 	EraseDebuggingProcess();
 	ViewValue( dataWidget, (DaoValueItem*) wgtDataList->item( 0 ) );
-	scriptSocket->disconnectFromServer();
+	handler.socket2.disconnectFromServer();
 	//connect( &server, SIGNAL(newConnection()), this, SLOT(slotStartExecution()));
 	vmState = DAOCON_READY;
 

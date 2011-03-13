@@ -31,6 +31,11 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 #include<daoEditor.h>
 
+class Sleeper : public QThread
+{
+	public:
+		static void Sleep( int us ){ QThread::usleep( us ); }
+};
 
 enum
 {
@@ -87,6 +92,7 @@ class DaoConsole : public DaoTextEdit
 	QLocalServer  debugServer;
 	QLocalServer  stdinServer;
 	QLocalServer  stdoutServer;
+	QLocalServer  loggerServer;
 
 	DArray  *tokens;
 
@@ -121,6 +127,7 @@ class DaoConsole : public DaoTextEdit
 	QLocalSocket *debugSocket;
 	QLocalSocket *stdinSocket;
 	QLocalSocket *stdoutSocket;
+	QLocalSocket *loggerSocket;
 	QLocalSocket  scriptSocket;
 	QProcess	 *monitor;
 
@@ -142,9 +149,11 @@ protected slots:
 	void slotSocketDebug();
 	void slotSocketStdin();
 	void slotSocketStdout();
+	void slotSocketLogger();
 	void slotReadStdOut();
 	void slotReadStdError();
 	void slotStdoutFromSocket();
+	void slotLogFromSocket();
 	void slotFoldUnfoldOutput();
 	void slotSaveAll();
 	void slotClearAll();
