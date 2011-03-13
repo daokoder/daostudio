@@ -290,6 +290,7 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 
     monitor = new QProcess();
 	monitor->setProcessChannelMode(QProcess::MergedChannels);
+    wgtConsole->monitor = monitor;
     //monitor->setProcessChannelMode(QProcess::MergedChannels);
     //monitor->start( "valgrind --tool=memcheck --leak-check=full --dsymutil=yes ./DaoMonitor" );
     //monitor->start( "echo \"r\" | gdb ./DaoMonitor" );
@@ -332,7 +333,6 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	}else{
 		slotWriteLog( tr("connected to running") + " DaoMonitor" );
 	}
-    wgtConsole->monitor = monitor;
     connect( monitor, SIGNAL(readyReadStandardOutput()),
             wgtConsole, SLOT(slotReadStdOut()));
     //connect( monitor, SIGNAL(readyReadStandardError()),
