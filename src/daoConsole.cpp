@@ -803,12 +803,10 @@ void DaoConsole::slotLogFromSocket()
 	//printf( "socket\n" );
 	if( loggerSocket == NULL ) return;
 	//printf( "socket %i %i\n", output.size(), text.size() );
-	QList<QByteArray> data = loggerSocket->readAll().split( '\1' );
-	if( data.size() != 2 ){ // cancelled
-		studio->SetState( DAOCON_READY );
-		PrintPrompt();
-		state = DAOCON_READY;
-		shell = false;
+	QByteArray output = loggerSocket->readAll();
+	QList<QByteArray> data = output.split( '\1' );
+	if( data.size() != 2 ){ 
+		studio->slotWriteLog( QString::fromUtf8( output.data(), output.size() ) );
 		return;
 	}
 	QString time = QString::fromUtf8( data[1].data(), data[1].size() );
