@@ -594,7 +594,6 @@ void DaoConsole::RunScript( const QString & src, bool debug )
 	scriptSocket.write( src.toUtf8().data() );
 	scriptSocket.flush();
 	scriptSocket.disconnectFromServer();
-	scriptSocket.connectToServer( DaoStudioSettings::socket_script );
 	studio->ResetTimer();
 	clearScreenBound = textCursor().position();
 }
