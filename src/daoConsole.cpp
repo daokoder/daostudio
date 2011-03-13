@@ -818,7 +818,7 @@ void DaoConsole::slotLogFromSocket()
 	}else if( shell or status ){
 		log += tr("execution terminated normally");
 	}else{
-		log += tr("execution failled");
+		log += tr("execution failed");
 	}
 	studio->slotWriteLog( log + " (" + time + ")" );
 }
