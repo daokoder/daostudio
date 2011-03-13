@@ -1319,10 +1319,9 @@ void DaoMonitor::slotStartExecution()
 	DaoVmProcess *vmp = DaoVmSpace_MainVmProcess( vmSpace );
 	DaoNameSpace *ns = DaoVmSpace_MainNameSpace( vmSpace );
 	ns->options |= DAO_EXEC_IDE | DAO_NS_AUTO_GLOBAL;
-	connect( scriptSocket, SIGNAL( disconnected() ), this, SLOT( slotStopExecution() ) );
-	//disconnect( &server, SIGNAL(newConnection()), this, SLOT(slotStartExecution()));
-	//QMessageBox::about( this, mbs->mbs, QString::number( mbs->size ) );
-	connect( scriptSocket, SIGNAL( readyRead() ), this, SLOT( slotStopExecution() ) );
+
+	connect( & handler.socket2, SIGNAL( disconnected() ), this, SLOT( slotStopExecution() ) );
+
 	vmp->stopit = 0;
 	handler.process = vmp;
 	QTime time;

@@ -881,12 +881,11 @@ void DaoConsole::Stop()
 {
 	if( state == DAOCON_READY ) return;
 	if( stdinSocket ) stdinSocket->disconnectFromServer();
+	if( stdoutSocket ) stdoutSocket->disconnectFromServer();
 	if( debugSocket ) debugSocket->disconnectFromServer();
 	stdinSocket = NULL;
+	stdoutSocket = NULL;
 	debugSocket = NULL;
-	//scriptSocket.disconnectFromServer();
-	scriptSocket.write( "X" );
-	scriptSocket.flush();
 	studio->slotWriteLog( tr("execution cancelled") );
 	studio->SetState( DAOCON_READY );
 	state = DAOCON_READY;
