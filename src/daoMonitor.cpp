@@ -1362,8 +1362,10 @@ void DaoMonitor::slotStartExecution()
 	fflush( stdout );
 	handler.socket2.flush();
 	handler.socket2.disconnectFromServer();
-	handler.socket2.connectToServer( DaoStudioSettings::socket_logger );
-	handler.socket2.waitForConnected( 1000 );
+
+	QLocalSocket socket;
+	socket.connectToServer( DaoStudioSettings::socket_logger );
+	socket.waitForConnected( 1000 );
 	int ms = time.elapsed();
 	int sec = ms / 1000;
 	int min = sec / 60;
@@ -1376,12 +1378,12 @@ void DaoMonitor::slotStartExecution()
 			tr("execution time").toUtf8().data(), hr, min, sec, ms );
 	QString status = QString::number( res ) + '\1';
 	status += QString::fromUtf8( buf, strlen( buf ) );
-	handler.socket2.write( status.toUtf8() );
-	handler.socket2.flush();
+	socket.write( status.toUtf8() );
+	socket.flush();
+	socket.disconnectFromServer();
 	ReduceValueItems( wgtDataList->item( wgtDataList->count()-1 ) );
 	EraseDebuggingProcess();
 	ViewValue( dataWidget, (DaoValueItem*) wgtDataList->item( 0 ) );
-	handler.socket2.disconnectFromServer();
 	//connect( &server, SIGNAL(newConnection()), this, SLOT(slotStartExecution()));
 	vmState = DAOCON_READY;
 
