@@ -64,6 +64,7 @@ DaoBasicSyntax::DaoBasicSyntax( const QString & lang )
 	hasDaoBlockComment = false;
 	singleQuotation = true;
 	doubleQuotation = true;
+	shortQuotation = false;
 	caseInsensitive = false;
 	isLatex = false;
 	tokens = DArray_New( D_TOKEN );
@@ -298,6 +299,17 @@ int DaoBasicSyntax::Tokenize( DArray *tokens, const char *source )
 			//DString_Clear( mbs );
 			mbs->size = 0;
 		}
+		if( shortQuotation && (*src == '\'' || *src == '\"') ){
+			one.type = DaoToken_Check( src, n, & k );
+			if( k < 16 && (one.type == DTOK_MBS || one.type == DTOK_WCS) ){
+				DString_SetDataMBS( mbs, src, k );
+				DArray_Append( tokens, & one );
+				src += k;
+				n -= k;
+				if( k == 0 ) break;
+				continue;
+			}
+		}
 		if( *src == '\'' and not singleQuotation ){
 			one.type = DTOK_MBS_OPEN;
 			DString_AppendChar( mbs, *src );
@@ -506,6 +518,7 @@ DaoLanguages::DaoLanguages()
 	DaoBasicSyntax *py = new DaoBasicSyntax( "python" );
 	DaoBasicSyntax::python = py;
 	DaoCodeSHL::languages[ "py" ] = py;
+	DaoCodeSHL::languages[ "python" ] = py;
 	py->AddSingleLineComment( "#" );
 	py->AddKeywordStruct( "class" );
 	py->AddKeywordStruct( "def" );
@@ -583,6 +596,13 @@ DaoLanguages::DaoLanguages()
 	DaoCodeSHL::languages[ "txt" ] = txt;
 	txt->singleQuotation = false;
 	txt->doubleQuotation = false;
+	txt->shortQuotation = true;
+
+	DaoBasicSyntax *bnf = new DaoBasicSyntax( "bnf" );
+	DaoCodeSHL::languages[ "bnf" ] = bnf;
+	bnf->AddPattern( "::=", 1<<0, DAO_SHL_COLOR3 );
+	bnf->AddPattern( "%.%.%.", 1<<0, DAO_SHL_COLOR4 );
+	bnf->AddPattern( "[%*%+%?]", 1<<0, DAO_SHL_COLOR4 );
 
 	DaoBasicSyntax *html = new DaoBasicSyntax( "html" );
 	DaoCodeSHL::languages[ "htm" ] = html;

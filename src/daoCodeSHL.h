@@ -148,6 +148,7 @@ struct DaoBasicSyntax
 	bool hasDaoBlockComment;
 	bool singleQuotation;
 	bool doubleQuotation;
+	bool shortQuotation;
 	bool caseInsensitive;
 	bool isLatex;
 
