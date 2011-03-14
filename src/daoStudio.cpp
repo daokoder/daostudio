@@ -114,7 +114,8 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
     QIcon daostudio( QPixmap( ":/images/daostudio.png" ) );
 	QApplication::setWindowIcon( daostudio );
 
-    vmState = DAOCON_READY;
+	vmState = DAOCON_READY;
+	configured = 0;
 
     setupUi(this);
 
@@ -391,10 +392,11 @@ void DaoStudio::LoadPath( QListWidget *wgtList, const QString & path, const QStr
 void DaoStudio::SendPathWorking()
 {
     socket.connectToServer( DaoStudioSettings::socket_script );
+    socket.waitForConnected( 500 );
     socket.putChar( DAO_SET_PATH );
     socket.write( pathWorking.toUtf8().data() );
     socket.flush();
-    socket.disconnectFromServer();
+    socket.waitForDisconnected();
 }
 void DaoStudio::SetPathWorking( const QString & path )
 {
@@ -455,13 +457,6 @@ void DaoStudio::slotPathList(int id)
 void DaoStudio::showEvent ( QShowEvent * event )
 {
     QMainWindow::showEvent( event );
-#if 0
-    do{ socket.connectToServer( DaoStudioSettings::socket_script );
-    }while( socket.state() != QLocalSocket::ConnectedState );
-    socket.disconnectFromServer();
-#endif
-    SendPathWorking();
-    LoadSettings();
 }
 void DaoStudio::closeEvent ( QCloseEvent *e )
 {
@@ -502,6 +497,14 @@ void DaoStudio::slotTimeOut()
     min -= hr * 60;
     sprintf( buf, "%02i:%02i:%02i.%03i", hr, min, sec, ms );
     if( vmState != DAOCON_READY ) labTimer->setText( buf );
+	if( configured ==0 ){
+		socket.connectToServer( DaoStudioSettings::socket_script );
+		if( socket.waitForConnected( 100 ) ){
+			socket.disconnectFromServer();
+			LoadSettings();
+			configured = 1;
+		}
+	}
 }
 void DaoStudio::RestartMonitor()
 {

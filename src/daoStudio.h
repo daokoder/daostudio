@@ -104,6 +104,7 @@ class DaoStudio : public QMainWindow, private Ui::DaoStudio
 	DaoVmSpace *vmSpace;
 
 	int vmState;
+	int configured;
 
 	QFileSystemWatcher watcher;
 

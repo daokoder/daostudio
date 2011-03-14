@@ -1293,20 +1293,19 @@ void DaoMonitor::slotStartExecution()
 		scriptSocket->disconnectFromServer();
 		return;
 	}
-	handler.socket2.connectToServer( DaoStudioSettings::socket_stdout );
-	if( handler.socket2.waitForConnected( 1000 ) ==0 ){
-		printf( "cannot connect to console stdout\n" );
-		fflush( stdout );
-		scriptSocket->disconnectFromServer();
-		return;
-	}
 	char info = script[0];
 	script.remove(0,1);
 	if( info == DAO_SET_PATH ){
 		DaoVmSpace_SetPath( vmSpace, script.data() );
 		QDir::setCurrent( QString::fromUtf8( script.data(), script.size() ) );
 		scriptSocket->disconnectFromServer();
-		handler.socket2.disconnectFromServer();
+		return;
+	}
+	handler.socket2.connectToServer( DaoStudioSettings::socket_stdout );
+	if( handler.socket2.waitForConnected( 1000 ) ==0 ){
+		printf( "cannot connect to console stdout\n" );
+		fflush( stdout );
+		scriptSocket->disconnectFromServer();
 		return;
 	}
 

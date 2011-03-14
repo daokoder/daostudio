@@ -2062,7 +2062,7 @@ void DaoTextEdit::IndentLine( QTextCursor cursor, bool indent )
 		DaoToken *token = tokens->items.pToken[i];
 		switch( token->type ){
 		case DTOK_LCB : cb += 1; if( cb > open_brace ) open_brace = cb; break;
-		case DTOK_RCB : cb -= 1; if( cb < 0 ) cb = 0; break;
+		case DTOK_RCB : cb -= 1; if( cb <= 0 ) open_brace = cb = 0; break;
 		}
 	}
 	QString previous_codes = DaoToken_MakeShortCodes( tokens );
