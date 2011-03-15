@@ -428,6 +428,7 @@ DaoLanguages::DaoLanguages()
 	cpp->AddKeywordStatement( "break" );
 	cpp->AddKeywordStatement( "continue" );
 	cpp->AddKeywordStatement( "return" );
+	cpp->AddKeywordStatement( "goto" );
 
 	cpp->AddKeywordConstant( "false" );
 	cpp->AddKeywordConstant( "true" );
@@ -459,10 +460,15 @@ DaoLanguages::DaoLanguages()
 
 	cpp->AddPattern( "# %s* %w+", 1<<0, DAO_SHL_COLOR1 );
 	cpp->AddPattern( "# %s* include %s* (%b<>)", 1<<1, DAO_SHL_COLOR2 );
-	cpp->AddPattern( "^ %s* %w+ %s*:", 1<<0, DAO_SHL_COLOR4 );
+	//cpp->AddPattern( "^ %s* %w+ %s*:", 1<<0, DAO_SHL_COLOR4 );
+	cpp->AddPattern( "^ %s* (%w{1,6} | %w{8,} | [^d]%w{6} | %w[^e]%w{5}"
+			"| %w{2}[^f]%w{4} | %w{3}[^a]%w{3} | %w{4}[^u]%w{2} "
+			"| %w{5}[^l]%w{1} | %w{6}[^t]) %s* :", 1<<0, DAO_SHL_COLOR4 );
 
 	cpp->AddNoneIndentPattern( "^ %s* # %s* %w+" );
-	cpp->AddNoneIndentPattern( "^ %s* %w+ %s* :" );
+	cpp->AddNoneIndentPattern( "^ %s* (%w{1,6} | %w{8,} | [^d]%w{6} | %w[^e]%w{5}"
+			"| %w{2}[^f]%w{4} | %w{3}[^a]%w{3} | %w{4}[^u]%w{2} "
+			"| %w{5}[^l]%w{1} | %w{6}[^t]) %s* :" );
 	cpp->AddLessIndentPattern( "^ %s* (public | protected | private) %s* :? %s* $" );
 	cpp->AddLessIndentPattern( "^ %s* case %s+ %S+ %s* (: | - | , | %. )" );
 	cpp->AddLessIndentPattern( "^ %s* default %s* :" );
