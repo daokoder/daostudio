@@ -186,7 +186,7 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
     wgtFileSuffix->addItem( tr("C/C++ Header Files") + " (*.h *.hpp *.hxx)" );
     wgtFileSuffix->addItem( tr("C Files") + " (*.c)" );
     wgtFileSuffix->addItem( tr("C++ Files") + " (*.cc *.cpp *.cxx *.c++)" );
-    wgtFileSuffix->addItem( tr("C/C++ Files") + " (*.h *hpp *hxx *.c *.cc *.cpp *.cxx *.c++)" );
+    wgtFileSuffix->addItem( tr("C/C++ Files") + " (*.h *.hpp *.hxx *.c *.cc *.cpp *.cxx *.c++)" );
     wgtFileSuffix->addItem( tr("Text Files") + " (*.txt)" );
     wgtFileSuffix->addItem( tr("HTML Files") + " (*.html *.htm)" );
     wgtFileSuffix->addItem( tr("TEX Files") + " (*.tex)" );
