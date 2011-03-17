@@ -1260,18 +1260,26 @@ void DaoMonitor::slotReadStdOut()
 	shell->setReadChannel( QProcess::StandardOutput );
 	while( not shell->atEnd() ){
 		QByteArray output = shell->readLine();
+#if 0
 		char *data = output.data();
 		int i, n = output.size();
 		for(i=0; i<n; i++) printf( "%c", data[i] );
 		fflush( stdout );
+#endif
+		handler.socket2.write( output.data(), output.size() );
+		handler.socket2.flush();
 	}
 	shell->setReadChannel( QProcess::StandardError );
 	while( not shell->atEnd() ){
 		QByteArray output = shell->readLine();
+#if 0
 		char *data = output.data();
 		int i, n = output.size();
 		for(i=0; i<n; i++) printf( "%c", data[i] );
 		fflush( stdout );
+#endif
+		handler.socket2.write( output.data(), output.size() );
+		handler.socket2.flush();
 	}
 }
 void DaoMonitor::slotShellFinished(int, QProcess::ExitStatus)
