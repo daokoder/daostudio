@@ -739,13 +739,8 @@ void DaoTextEdit::UpdateCursor( bool show )
 {
 	if( show ){
 		QFontMetrics fm( DaoStudioSettings::codeFont );
-		QTextCursor cursor = textCursor();
 		QRect rect = cursorRect();
-		cursor.movePosition( QTextCursor::Right, QTextCursor::MoveAnchor );
-		cursor.movePosition( QTextCursor::Left, QTextCursor::KeepAnchor );
-		QString txt = cursor.selectedText().trimmed();
-		if( txt.size() ==0 ) txt = "M";
-		if( txt.size() >2 ) txt = "II";
+		QString txt = "M";
 		myCursor->show();
 		myCursor->resize( fm.width( txt ), rect.height() );
 		myCursor->move( rect.x()+LeftMargin()+2, rect.y()+2 );
