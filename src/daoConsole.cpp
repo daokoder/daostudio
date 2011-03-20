@@ -119,7 +119,7 @@ void DaoConsole::LoadCmdHistory()
 {
 	if( oldComdHist.size()==0 ){
 		QString home = QDir::home().path();
-		QFile hist( home + "/.dao/daoio/command.history" );
+		QFile hist( home + "/.dao/daostudio/command.history" );
 		if( hist.open( QFile::ReadOnly )) {
 			QTextStream fin( &hist );
 			QString all = fin.readAll();
@@ -136,8 +136,8 @@ void DaoConsole::LoadCmdHistory()
 void DaoConsole::SaveCmdHistory()
 {
 	QString home = QDir::home().path();
-	QString fname = home + "/.dao/daoio/command.history";
-	if( ! QFile::exists( fname ) ) QDir().mkpath( home + "/.dao/daoio/" );
+	QString fname = home + "/.dao/daostudio/command.history";
+	if( ! QFile::exists( fname ) ) QDir().mkpath( home + "/.dao/daostudio/" );
 	QFile hist( fname );
 	if( appendToFile ){
 		if( hist.open( QFile::Append )) {

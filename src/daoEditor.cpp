@@ -836,7 +836,7 @@ void DaoTextEdit::SetColorScheme( int scheme )
 		break;
 	case 2 :
 		lineColor = QColor(80, 80, 0);
-		viewport()->setStyleSheet( "background-color: #444444" );
+		viewport()->setStyleSheet( "background-color: #222222" );
 		break;
 	default :
 		lineColor = QColor(80, 80, 40);

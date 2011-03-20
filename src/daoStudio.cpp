@@ -25,6 +25,8 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 DaoStudioAbout::DaoStudioAbout( QWidget *parent ) : QDialog( parent )
 {
     setupUi( this );
+	label->setPixmap( label->pixmap()->scaled( 100, 100,
+				Qt::IgnoreAspectRatio, Qt::SmoothTransformation ) );
     labAuthorChinese->setOpenExternalLinks( true );
     labAuthorEnglish->setOpenExternalLinks( true );
     QString locale = QLocale::system().name();
@@ -591,7 +593,7 @@ void DaoStudio::slotEditorColor( int scheme )
     switch( scheme ){
     case 0 : style1 += "color: black;"; style2 = "background-color: #FFF;"; break;
     case 1 : style1 += "color: black;"; style2 = "background-color: #DDD;"; break;
-    case 2 : style1 += "color: white;"; style2 = "background-color: #444;"; break;
+    case 2 : style1 += "color: white;"; style2 = "background-color: #222;"; break;
     default : style1 += "color: white;"; style2 = "background-color: #000;"; break;
     }
     wgtLogText->setStyleSheet( style1 );
