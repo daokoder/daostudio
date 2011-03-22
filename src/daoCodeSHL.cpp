@@ -463,12 +463,12 @@ DaoLanguages::DaoLanguages()
 	//cpp->AddPattern( "^ %s* %w+ %s*:", 1<<0, DAO_SHL_COLOR4 );
 	cpp->AddPattern( "^ %s* (%w{1,6} | %w{8,} | [^d]%w{6} | %w[^e]%w{5}"
 			"| %w{2}[^f]%w{4} | %w{3}[^a]%w{3} | %w{4}[^u]%w{2} "
-			"| %w{5}[^l]%w{1} | %w{6}[^t]) %s* :", 1<<0, DAO_SHL_COLOR4 );
+			"| %w{5}[^l]%w{1} | %w{6}[^t]) %s* : [^:]", 1<<0, DAO_SHL_COLOR4 );
 
 	cpp->AddNoneIndentPattern( "^ %s* # %s* %w+" );
 	cpp->AddNoneIndentPattern( "^ %s* (%w{1,6} | %w{8,} | [^d]%w{6} | %w[^e]%w{5}"
 			"| %w{2}[^f]%w{4} | %w{3}[^a]%w{3} | %w{4}[^u]%w{2} "
-			"| %w{5}[^l]%w{1} | %w{6}[^t]) %s* :" );
+			"| %w{5}[^l]%w{1} | %w{6}[^t]) %s* : [^:]" );
 	cpp->AddLessIndentPattern( "^ %s* (public | protected | private) %s* :? %s* $" );
 	cpp->AddLessIndentPattern( "^ %s* case %s+ %S+ %s* (: | - | , | %. )" );
 	cpp->AddLessIndentPattern( "^ %s* default %s* :" );
@@ -560,20 +560,55 @@ DaoLanguages::DaoLanguages()
 	py->AddKeywordStatement( "import" );
 	py->AddKeywordStatement( "try" );
 	py->AddKeywordStatement( "except" );
-
+	
 	py->AddKeywordOthers( "not" );
 	py->AddKeywordOthers( "or" );
 	py->AddKeywordOthers( "and" );
-
+	
 	py->AddPattern( "__%w+__", 1<<0, DAO_SHL_COLOR3 );
-
+	
 	py->AddMoreIndentPattern2( "(^ | %W) (class|def|if|for|while|switch) %s+ .* : %s* $" );
 	py->AddMoreIndentPattern2( "^ %s* elif %W+ .* : %s* $" );
 	py->AddMoreIndentPattern2( "^ %s* ( else | rescue ) %s* : %s* $" );
 	py->AddLessIndentPattern( "^ %s* elif %W+ .* : %s* $" );
 	py->AddLessIndentPattern( "^ %s* ( else | rescue ) %s* : %s* $" );
 	
-
+	DaoBasicSyntax *perl = new DaoBasicSyntax( "perl" );
+	DaoCodeSHL::languages[ "pl" ] = perl;
+	DaoCodeSHL::languages[ "pm" ] = perl;
+	DaoCodeSHL::languages[ "perl" ] = perl;
+	perl->AddSingleLineComment( "#" );
+	perl->AddKeywordStorage( "my" );
+	perl->AddKeywordStorage( "our" );
+	perl->AddKeywordStorage( "sub" );
+	perl->AddKeywordStorage( "use" );
+	perl->AddKeywordStorage( "require" );
+	perl->AddKeywordStatement( "for" );
+	perl->AddKeywordStatement( "foreach" );
+	perl->AddKeywordStatement( "while" );
+	perl->AddKeywordStatement( "until" );
+	perl->AddKeywordStatement( "continue" );
+	perl->AddKeywordStatement( "if" );
+	perl->AddKeywordStatement( "elsif" );
+	perl->AddKeywordStatement( "else" );
+	perl->AddKeywordStatement( "unless" );
+	perl->AddKeywordStatement( "do" );
+	perl->AddKeywordStatement( "goto" );
+	perl->AddKeywordStatement( "next" );
+	perl->AddKeywordStatement( "last" );
+	perl->AddKeywordStatement( "die" );
+	perl->AddKeywordStatement( "return" );
+	perl->AddKeywordStatement( "exit" );
+	perl->AddKeywordOthers( "and" );
+	perl->AddKeywordOthers( "or" );
+	perl->AddKeywordOthers( "not" );
+	perl->AddKeywordOthers( "eq" );
+	perl->AddKeywordOthers( "no" );
+	perl->AddKeywordOthers( "shift" );
+	perl->AddKeywordOthers( "strict" );
+	
+	perl->AddKeywordConstant( "fail" );
+	
 	DaoBasicSyntax *tex = new DaoBasicSyntax( "tex" );
 	DaoCodeSHL::languages[ "tex" ] = tex;
 	tex->AddPattern( "%\\ %s* (chapter|section|subsection) %s* %{ %s* ( %w+ ) %s*  %}", (1<<2), 0 );
@@ -706,7 +741,7 @@ DaoCodeSHL::DaoCodeSHL( QTextDocument * parent ) : QSyntaxHighlighter( parent )
 	tabColor[1] = QColor( 240, 255, 240 );
 	formatComment.setFontItalic( true );
 	formatOutput.setProperty( 10000, 1 );
-
+	
 	formatOutput.setObjectType( TXT_CHAR_OUTPUT );
 	formatPrompt.setObjectType( TXT_CHAR_PROMPT );
 	formatComment.setObjectType( TXT_CHAR_COMMENT );
@@ -715,10 +750,12 @@ DaoCodeSHL::DaoCodeSHL( QTextDocument * parent ) : QSyntaxHighlighter( parent )
 	formatTypeStruct.setObjectType( TXT_CHAR_IDENTIFIER );
 	formatStmtKey.setObjectType( TXT_CHAR_IDENTIFIER );
 	formatStdobj.setObjectType( TXT_CHAR_IDENTIFIER );
+	formatInitype.setObjectType( TXT_CHAR_IDENTIFIER );
+	formatSymbol.setObjectType( TXT_CHAR_IDENTIFIER );
 	formatBracket.setObjectType( TXT_CHAR_SYMBOL );
 	formatSBracket.setObjectType( TXT_CHAR_SYMBOL );
 	formatCBracket.setObjectType( TXT_CHAR_SYMBOL );
-
+	
 	tabVisibility = 1;
 	scheme = 0;
 	toktype = 0;
@@ -754,6 +791,8 @@ void DaoCodeSHL::SetFontSize( int size )
 	formatBracket.setFontPointSize( size );
 	formatSBracket.setFontPointSize( size );
 	formatCBracket.setFontPointSize( size );
+	formatInitype.setFontPointSize( size );
+	formatSymbol.setFontPointSize( size );
 }
 void DaoCodeSHL::SetFontFamily( const QString & family )
 {
@@ -769,6 +808,8 @@ void DaoCodeSHL::SetFontFamily( const QString & family )
 	formatBracket.setFontFamily( family );
 	formatSBracket.setFontFamily( family );
 	formatCBracket.setFontFamily( family );
+	formatInitype.setFontFamily( family );
+	formatSymbol.setFontFamily( family );
 }
 void DaoCodeSHL::SetColorScheme( int scheme )
 {
@@ -786,6 +827,8 @@ void DaoCodeSHL::SetColorScheme( int scheme )
 		formatBracket.setForeground( QColor(  0, 100, 150 ) );
 		formatSBracket.setForeground( QColor( 100, 150, 0 ) );
 		formatCBracket.setForeground( QColor( 150, 0, 100 ) );
+		formatInitype.setForeground( QColor( 40, 40, 0 ) );
+		formatSymbol.setForeground( QColor( 0, 40, 40 ) );
 	}else{
 		plainColor = QColor( 220, 220, 220 );;
 		plainColor = Qt::white;
@@ -800,6 +843,8 @@ void DaoCodeSHL::SetColorScheme( int scheme )
 		formatBracket.setForeground( QColor(  0, 130, 170 ) );
 		formatSBracket.setForeground( QColor( 130, 170, 0 ) );
 		formatCBracket.setForeground( QColor( 170, 0, 130 ) );
+		formatInitype.setForeground( QColor( 255, 255, 170 ) );
+		formatSymbol.setForeground( QColor( 180, 255, 255 ) );
 	}
 	formatOutput.setForeground( plainColor );
 	SetTabVisibility( tabVisibility );
@@ -953,6 +998,10 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 	case DTOK_WCS_OPEN : setCurrentBlockState( DAO_HLSTATE_WCS ); break;
 	default : setCurrentBlockState(0);
 	}
+	DaoTokenFormat format2;
+	format2.setForeground( plainColor );
+	setFormat( 0, text.size(), format2 );
+
 	int pos = 0;
 	for(i=0; i<tokens->size; i++){
 		DaoToken *tk = tokens->items.pToken[i];
@@ -992,6 +1041,12 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 			break;
 		case DTOK_AMAND :
 			format = formatTypeStruct;
+			break;
+		case DTOK_ID_INITYPE :
+			format = formatInitype;
+			break;
+		case DTOK_ID_SYMBOL :
+			format = formatSymbol;
 			break;
 		case DTOK_IDENTIFIER :
 			format.setObjectType( TXT_CHAR_IDENTIFIER );
@@ -1121,6 +1176,10 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 	case DTOK_WCS_OPEN : setCurrentBlockState( DAO_HLSTATE_WCS ); break;
 	default : setCurrentBlockState(0);
 	}
+	DaoTokenFormat format2;
+	format2.setForeground( plainColor );
+	setFormat( 0, text.size(), format2 );
+
 	DaoBasicSyntax *lang = language;
 	if( lang == NULL ) lang = DaoBasicSyntax::dao;
 	for(size_t i=0; i<tokens->size; i++){
@@ -1190,6 +1249,12 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 			break;
 		case DKEY_SELF :
 			format = formatStdobj;
+			break;
+		case DTOK_ID_INITYPE :
+			format = formatInitype;
+			break;
+		case DTOK_ID_SYMBOL :
+			format = formatSymbol;
 			break;
 		case DTOK_IDENTIFIER :
 			format.setObjectType( TXT_CHAR_IDENTIFIER );

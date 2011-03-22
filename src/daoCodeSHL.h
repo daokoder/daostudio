@@ -215,7 +215,7 @@ class DaoCodeSHL : public QSyntaxHighlighter
 {
 	friend class DaoConsole;
 	friend class DaoTextEdit;
-
+	
 	DaoTokenFormat formatOutput;
 	DaoTokenFormat formatPrompt;
 	DaoTokenFormat formatComment;
@@ -227,11 +227,13 @@ class DaoCodeSHL : public QSyntaxHighlighter
 	DaoTokenFormat formatBracket;
 	DaoTokenFormat formatSBracket;
 	DaoTokenFormat formatCBracket;
-
+	DaoTokenFormat formatInitype; // @T
+	DaoTokenFormat formatSymbol; // $E
+	
 	QColor plainColor;
 	QColor tabColor[2];
 	QColor searchColor;
-
+	
 	QString oldBlock;
 	int oldBlockStart;
 	short toktype;
