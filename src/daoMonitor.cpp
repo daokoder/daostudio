@@ -1225,7 +1225,11 @@ DaoMonitor::DaoMonitor( const char *cmd ) : QMainWindow()
 	//connect( &timer, SIGNAL(timeout()), this, SLOT(slotFlushStdout()));
 	//timer.start( 100 );
 
+	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+	env.insert( "daostudio", "yes" );
+
 	shell = new QProcess();
+	shell->setProcessEnvironment(env);
 	connect( shell, SIGNAL(readyReadStandardOutput()),
 			this, SLOT(slotReadStdOut()));
 	//connect( shell, SIGNAL(readyReadStandardError()),

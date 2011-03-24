@@ -612,6 +612,7 @@ void DaoConsole::PrintPrompt()
 	moveCursor( QTextCursor::End );
 	if( txt[ txt.size()-1 ] != '\n' ) insertPlainText( "\n" );
 	codehl.SetState(DAO_HLSTATE_PROMPT);
+	codehl.language = NULL;
 	insertPlainText( "(dao)" );
 	promptBlocks.append( textCursor().block().blockNumber() );
 	codehl.SetState( DAO_HLSTATE_NORMAL );
@@ -625,7 +626,6 @@ void DaoConsole::PrintPrompt()
 	codehl.SetState( DAO_HLSTATE_NORMAL );
 	insertPlainText( script );
 	stdoutSocket = NULL;
-	codehl.language = NULL;
 
 	QScrollBar *bar = verticalScrollBar();
 	bar->setSliderPosition( bar->maximum() );
