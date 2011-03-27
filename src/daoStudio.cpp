@@ -145,6 +145,7 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	wgtEditorTabs->addTab( docViewer, book, "" );
 	wgtEditorTabs->setTabsClosable(1);
 	wgtEditorTabs->setFixedHeight( 200 );
+	wgtEditorTabs->setUsesScrollButtons( true );
 	QString docs = "daostudio_docs";
 	if( locale.indexOf( "zh" ) ==0 ) docs += "_zh_cn";
 	docViewer->setSource( QUrl( docs + ".html" ) );
@@ -155,6 +156,7 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	wgtEditorTabs->setMaximumHeight( 5000 );
 	wgtConsole->setMinimumHeight( 100 );
 	wgtConsole->setMaximumHeight( 5000 );
+	mainSplitter->setStretchFactor( 1, 4 );
 	
 #if 0
 	wgtFontSize = new QComboBox( DConToolBar );
@@ -182,7 +184,7 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	wgtConsoleMode->addItem( tr("DS-VIM") );
 	//wgtConsoleMode->addItem( tr("Emacs") );
 	wgtTabVisibility->setCurrentIndex(1);
-	
+
 	fileFilters << ( tr("All Files") + " (*)" );
 	fileFilters << ( tr("Dao Files") + " (*.dao)" );
 	fileFilters << ( tr("C/C++ Header Files") + " (*.h *.hpp *.hxx)" );

@@ -703,6 +703,7 @@ DaoLanguages::DaoLanguages()
 	pld->AddKeywordStruct( "options" );
 	pld->AddKeywordStruct( "flags" );
 	pld->AddKeywordStruct( "tasks" );
+	pld->AddKeywordStatement( "include" );
 	pld->AddKeywordStatement( "as" );
 	pld->AddKeywordConstant( "on" );
 	pld->AddKeywordConstant( "off" );
