@@ -47,6 +47,10 @@ extern "C"{
 #include<daoRegex.h>
 }
 
+#include"daoStudioMain.h"
+
+#define ZOOM_FONT 2
+
 enum DaoCodeSHLState
 {
 	DAO_HLSTATE_NONE ,
@@ -103,6 +107,7 @@ class DaoCodeLineData : public QTextBlockUserData
 			reference_line = true;
 			token_line = false;
 			brace_count = 0;
+			font_size = DaoStudioSettings::codeFont.pointSize();
 		}
 
 		unsigned short line;
@@ -110,6 +115,7 @@ class DaoCodeLineData : public QTextBlockUserData
 		unsigned char  leadSpaces; /* count */
 		unsigned char  firstToken; /* token type */
 		unsigned char  state;
+		unsigned char  font_size;
 
 		bool   breaking;
 		bool   incomplete; // incomplete line.
@@ -154,6 +160,7 @@ struct DaoBasicSyntax
 
 	DArray *tokens;
 
+	DaoRegex *func_regex;
 	QList<DaoSyntaxPattern> patterns;
 
 	QList<DaoRegex*> noneIndents; // TODO delete
@@ -181,6 +188,7 @@ struct DaoBasicSyntax
 	void AddMultiLineComment( const char *open, const char *close );
 
 	void AddPattern( const char *pat, int group, int color );
+	void SetMethodPattern( const char *pat );
 
 	void AddNoneIndentPattern( const char *pat );
 	void AddLessIndentPattern( const char *pat );
@@ -241,6 +249,7 @@ class DaoCodeSHL : public QSyntaxHighlighter
 	short hlstate;
 	short scheme;
 	short tabVisibility;
+	short fontSize;
 	int textSkip;
 	DArray  *tokens;
 	DArray  *toks;
@@ -257,6 +266,7 @@ class DaoCodeSHL : public QSyntaxHighlighter
 	DaoCodeSHL( QTextDocument * parent );
 	~DaoCodeSHL();
 
+	QFont GetFont()const{ return formatOutput.font(); }
 	void SetSkip( int skip ){ textSkip = skip; }
 	void SetState( int state = -1 );
 	void SetFontSize( int size );
@@ -273,7 +283,7 @@ class DaoCodeSHL : public QSyntaxHighlighter
 
 	static QMap<QString,DaoBasicSyntax*> languages;
 
-	protected:
+	//protected:
 	void SetIndentationData( DaoCodeLineData *ud, DArray *tokens );
 	void HighlightSearch( const QString & text );
 	void HighlightNormal( const QString & text );

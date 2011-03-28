@@ -248,6 +248,7 @@ class DaoTextEdit : public QPlainTextEdit
 		void SetModeSelector( QComboBox *combo ){ wgtEditMode = combo; }
 		void PreparePrinting( const QString &name );
 
+		QFont GetFont()const{ return codehl.GetFont(); }
 		void ExtractWords();
 
 		void UpdateCursor( bool show );
@@ -291,6 +292,7 @@ class DaoTextEdit : public QPlainTextEdit
 };
 
 class DaoNumbering;
+class DaoLangLabels;
 class DaoScriptEngine;
 
 class DaoEditor : public DaoTextEdit
@@ -301,6 +303,7 @@ class DaoEditor : public DaoTextEdit
 	QFileSystemWatcher watcher;
 	DaoTabEditor *tabWidget;
 	DaoNumbering *wgtNumbering;
+	DaoLangLabels *wgtLangLabels;
 
 	QString name;
 	QString fullName;
@@ -341,7 +344,8 @@ class DaoEditor : public DaoTextEdit
 	QString FilePath(){ return fullName; }
 	void ChangeMark( int y );
 	void MarkLine( int y );
-	void PaintNumbering ( QPaintEvent * event );
+	void PaintNumbering( QPaintEvent * event );
+	void PaintQuickScroll( QPaintEvent * event );
 	int NumberingWidth();
 
 	QString GuessFileType( const QString & source );
@@ -377,5 +381,31 @@ class DaoNumbering : public QWidget
 	void mouseDoubleClickEvent( QMouseEvent * event );
 	void mousePressEvent ( QMouseEvent * event );
 };
+
+class DaoLangLabels : public QWidget
+{
+	public:
+	DaoEditor *editor;
+	bool entered;
+	int zoom;
+	int ymouse;
+	int top;
+	int bottom;
+
+	DaoLangLabels( DaoEditor *editor ) : QWidget( editor ){
+		entered = false;
+		zoom = 0;
+		top = bottom = 0;
+		this->editor = editor;
+	}
+	protected:
+	void paintEvent ( QPaintEvent * event );
+	void mouseDoubleClickEvent( QMouseEvent * event );
+	void mousePressEvent ( QMouseEvent * event );
+	void mouseMoveEvent ( QMouseEvent * event );
+	void enterEvent ( QEvent * event );
+	void leaveEvent ( QEvent * event );
+};
+
 
 #endif

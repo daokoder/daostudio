@@ -60,6 +60,7 @@ DaoBasicSyntax::DaoBasicSyntax( const QString & lang )
 	cmtOpen2 = NULL;
 	cmtClose1 = NULL;
 	cmtClose2 = NULL;
+	func_regex = NULL;
 	hasDaoLineComment = false;
 	hasDaoBlockComment = false;
 	singleQuotation = true;
@@ -87,6 +88,7 @@ DaoBasicSyntax::~DaoBasicSyntax()
 	if( cmtOpen2 ) DString_Delete( cmtOpen2 );
 	if( cmtClose1 ) DString_Delete( cmtClose1 );
 	if( cmtClose2 ) DString_Delete( cmtClose2 );
+	if( func_regex ) free( func_regex );
 }
 
 void DaoBasicSyntax::AddKeywordStruct( const char *keyword )
@@ -145,6 +147,12 @@ void DaoBasicSyntax::AddPattern( const char *pat, int group, int color )
 	DString_SetMBS( wcs, pat );
 	sp.pattern = DaoRegex_New( wcs );
 	patterns.append( sp );
+}
+void DaoBasicSyntax::SetMethodPattern( const char *pat )
+{
+	if( func_regex ) free( func_regex );
+	DString_SetMBS( wcs, pat );
+	func_regex = DaoRegex_New( wcs );
 }
 void DaoBasicSyntax::AddNoneIndentPattern( const char *pat )
 {
@@ -339,6 +347,10 @@ int DaoBasicSyntax::Tokenize( DArray *tokens, const char *source )
 	return 0;
 }
 
+const char *pat_funct = 
+"^( ((inline|static|virtual) %s+|) (%w+::|) ( [^\n:;%(%)%{%}]* (%b<>|) ) (%s*|) ([%*%&] %s*|) )"
+"( (%w+) :: | ) ((( %w+ | operator %W+ ))) %s* %b() %s* $";
+
 DaoBasicSyntax* DaoBasicSyntax::dao = NULL;
 DaoBasicSyntax* DaoBasicSyntax::python = NULL;
 
@@ -458,6 +470,7 @@ DaoLanguages::DaoLanguages()
 	//cpp->AddMultiLineComment( "#if 0", "#else" );
 	//cpp->AddMultiLineComment( "#if 0", "#endif" );
 
+	cpp->SetMethodPattern( pat_funct );
 	cpp->AddPattern( "# %s* %w+", 1<<0, DAO_SHL_COLOR1 );
 	cpp->AddPattern( "# %s* include %s* (%b<>)", 1<<1, DAO_SHL_COLOR2 );
 	//cpp->AddPattern( "^ %s* %w+ %s*:", 1<<0, DAO_SHL_COLOR4 );
@@ -757,6 +770,7 @@ DaoCodeSHL::DaoCodeSHL( QTextDocument * parent ) : QSyntaxHighlighter( parent )
 	formatSBracket.setObjectType( TXT_CHAR_SYMBOL );
 	formatCBracket.setObjectType( TXT_CHAR_SYMBOL );
 	
+	fontSize = 16;
 	tabVisibility = 1;
 	scheme = 0;
 	toktype = 0;
@@ -780,7 +794,7 @@ DaoCodeSHL::~DaoCodeSHL()
 }
 void DaoCodeSHL::SetFontSize( int size )
 {
-	DaoStudioSettings::codeFont.setPointSize( size );
+	fontSize = size;
 	formatOutput.setFontPointSize( size );
 	formatPrompt.setFontPointSize( size );
 	formatComment.setFontPointSize( size );
@@ -797,7 +811,6 @@ void DaoCodeSHL::SetFontSize( int size )
 }
 void DaoCodeSHL::SetFontFamily( const QString & family )
 {
-	DaoStudioSettings::codeFont.setFamily( family );
 	formatOutput.setFontFamily( family );
 	formatPrompt.setFontFamily( family );
 	formatComment.setFontFamily( family );
@@ -972,7 +985,11 @@ void DaoCodeSHL::SetIndentationData( DaoCodeLineData *ud, DArray *tokens )
 void DaoCodeSHL::HighlightNormal( const QString & text )
 {
 	QTextBlock block = currentBlock();
+	DaoTokenFormat format2;
 	int start = block.position();
+	format2.setFontPointSize( fontSize );
+	format2.setForeground( plainColor );
+	setFormat( 0, text.size(), format2 );
 	if( start + block.length() < textSkip ) return;
 	int cmt, offset = 0;
 	size_t i, j, k;
@@ -999,7 +1016,14 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 	case DTOK_WCS_OPEN : setCurrentBlockState( DAO_HLSTATE_WCS ); break;
 	default : setCurrentBlockState(0);
 	}
-	DaoTokenFormat format2;
+	int oldFontSize = fontSize;
+	if( fontSize <= 10 ){
+		DString_SetMBS( wcs, src.toLocal8Bit().data() );
+		if( language->func_regex && DaoRegex_Match( language->func_regex, wcs, NULL, NULL ) ){
+			SetFontSize( 12 );
+		}
+	}
+	format2.setFontPointSize( fontSize );
 	format2.setForeground( plainColor );
 	setFormat( 0, text.size(), format2 );
 
@@ -1008,6 +1032,7 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 		DaoToken *tk = tokens->items.pToken[i];
 		DaoTokenFormat format;
 		//printf( "%3i: %s\n", i, tk->string->mbs );
+		format.setFontPointSize( fontSize );
 		format.setForeground( plainColor );
 		DString_SetDataMBS( wcs, tk->string->mbs, tk->string->size );
 		//printf( "%4i:  %3i  %s\n", i, tk->type, tk->string->mbs );
@@ -1092,6 +1117,7 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 	DaoCodeLineData *ud = (DaoCodeLineData*) currentBlockUserData();
 	if( ud == NULL ) setCurrentBlockUserData( new DaoCodeLineData(false, CLS_COMMAND ) );
 	ud = (DaoCodeLineData*) currentBlockUserData();
+	ud->font_size = fontSize;
 	SetIndentationData( ud, tokens );
 
 	DString_SetMBS( wcs, src.toLocal8Bit().data() );
@@ -1119,6 +1145,7 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 			end = wcs->size-1;
 		}
 	}
+	SetFontSize( oldFontSize );
 }
 void DaoCodeSHL::highlightBlock ( const QString & text )
 {
@@ -1178,6 +1205,7 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 	default : setCurrentBlockState(0);
 	}
 	DaoTokenFormat format2;
+	format2.setFontPointSize( fontSize );
 	format2.setForeground( plainColor );
 	setFormat( 0, text.size(), format2 );
 
@@ -1186,6 +1214,7 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 	for(size_t i=0; i<tokens->size; i++){
 		DaoToken *tk = tokens->items.pToken[i];
 		DaoTokenFormat format;
+		format.setFontPointSize( fontSize );
 		format.setForeground( plainColor );
 		DString_SetDataMBS( wcs, tk->string->mbs, tk->string->size );
 		//printf( "%4i:  %3i  %s\n", i, tk->name, tk->string->mbs );

@@ -17,6 +17,8 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #ifndef _DAO_STUDIOMAIN_H_
 #define _DAO_STUDIOMAIN_H_
 
+#include<QLocalSocket>
+
 #define TIME_YIELD 20
 #define TIME_EVENT 5
 

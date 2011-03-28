@@ -167,7 +167,7 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	DConToolBar->insertWidget( actionMSplit, wgtConsoleColor );
 #endif
 	QStringList sizes, colors;
-	for(i=10; i<=20; i++) sizes<<QString::number(i);
+	for(i=12; i<=26; i++) sizes<<QString::number(i);
 	colors<<tr("White")<<tr("Light")<<tr("Dark")<<tr("Black");
 	wgtFontFamily->setFontFilters( QFontComboBox::MonospacedFonts );
 	wgtFontFamily->setCurrentFont( DaoStudioSettings::codeFont );
@@ -574,6 +574,7 @@ void DaoStudio::slotFileSuffix( int id )
 void DaoStudio::slotFontSize( int size )
 {
 	int i, n = wgtEditorTabs->count();
+	DaoStudioSettings::codeFont.setPointSize( size + 10 );
 	for(i=ID_EDITOR; i<n; i++){
 		DaoEditor *editor = (DaoEditor*) wgtEditorTabs->widget( i );
 		editor->SetFontSize( size + 10 );
@@ -584,6 +585,7 @@ void DaoStudio::slotFontFamily( const QFont & font )
 {
 	QString family = font.family();
 	int i, n = wgtEditorTabs->count();
+	DaoStudioSettings::codeFont.setFamily( family );
 	for(i=ID_EDITOR; i<n; i++){
 		DaoEditor *editor = (DaoEditor*) wgtEditorTabs->widget( i );
 		editor->SetFontFamily( family );
