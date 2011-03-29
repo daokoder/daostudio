@@ -61,6 +61,7 @@ DaoBasicSyntax::DaoBasicSyntax( const QString & lang )
 	cmtClose1 = NULL;
 	cmtClose2 = NULL;
 	func_regex = NULL;
+	class_regex = NULL;
 	hasDaoLineComment = false;
 	hasDaoBlockComment = false;
 	singleQuotation = true;
@@ -89,6 +90,7 @@ DaoBasicSyntax::~DaoBasicSyntax()
 	if( cmtClose1 ) DString_Delete( cmtClose1 );
 	if( cmtClose2 ) DString_Delete( cmtClose2 );
 	if( func_regex ) free( func_regex );
+	if( class_regex ) free( class_regex );
 }
 
 void DaoBasicSyntax::AddKeywordStruct( const char *keyword )
@@ -147,6 +149,12 @@ void DaoBasicSyntax::AddPattern( const char *pat, int group, int color )
 	DString_SetMBS( wcs, pat );
 	sp.pattern = DaoRegex_New( wcs );
 	patterns.append( sp );
+}
+void DaoBasicSyntax::SetClassPattern( const char *pat )
+{
+	if( class_regex ) free( class_regex );
+	DString_SetMBS( wcs, pat );
+	class_regex = DaoRegex_New( wcs );
 }
 void DaoBasicSyntax::SetMethodPattern( const char *pat )
 {
@@ -347,9 +355,21 @@ int DaoBasicSyntax::Tokenize( DArray *tokens, const char *source )
 	return 0;
 }
 
-const char *pat_funct = 
-"^( ((inline|static|virtual) %s+|) (%w+::|) ( [^\n:;%(%)%{%}]* (%b<>|) ) (%s*|) ([%*%&] %s*|) )"
-"( (%w+) :: | ) ((( %w+ | operator %W+ ))) %s* %b() %s* $";
+const char *pat_cxx_method = 
+"^( ((inline|static|virtual) %s+|) (%w+::|) ( %w [:%w]* (%b<>|) ) (%s*|) ([%*%&]+ %s*|) )"
+"( (%w+) :: | ) ((( %w+ | operator %W+ ))) %s* %b() %s* [^%S;]* $";
+
+const char *pat_dao_method =
+"^(routine|function|sub|operator) %s+ (%w+ %s* :: %s* |) %w+ %s* %b() %s* [^%S;]* $";
+
+const char *pat_python_method =
+"def %s+ %w+ %s* %b() %s* :";
+
+const char *pat_perl_method =
+"^sub %s+ %w+";
+
+const char *pat_lua_method =
+"^(local %s+|) function %s+ %w+ %s* %b()";
 
 DaoBasicSyntax* DaoBasicSyntax::dao = NULL;
 DaoBasicSyntax* DaoBasicSyntax::python = NULL;
@@ -363,6 +383,8 @@ DaoLanguages::DaoLanguages()
 	dao->hasDaoBlockComment = true;
 	dao->AddKeywordOthers( "std" );
 	dao->AddKeywordOthers( "io" );
+	dao->SetClassPattern( "^class %s* %w [%w:]* %s* (:|$)" );
+	dao->SetMethodPattern( pat_dao_method );
 	dao->AddLessIndentPattern( "^ %s* (public | protected | private) %s* :? %s* $" );
 	dao->AddLessIndentPattern( "^ %s* case %s+ %S+ %s* (: | - | , | %. )" );
 	dao->AddLessIndentPattern( "^ %s* default %s* :" );
@@ -470,7 +492,8 @@ DaoLanguages::DaoLanguages()
 	//cpp->AddMultiLineComment( "#if 0", "#else" );
 	//cpp->AddMultiLineComment( "#if 0", "#endif" );
 
-	cpp->SetMethodPattern( pat_funct );
+	cpp->SetClassPattern( "^(class|struct) %s* %w [%w:]* %s* (:|$)" );
+	cpp->SetMethodPattern( pat_cxx_method );
 	cpp->AddPattern( "# %s* %w+", 1<<0, DAO_SHL_COLOR1 );
 	cpp->AddPattern( "# %s* include %s* (%b<>)", 1<<1, DAO_SHL_COLOR2 );
 	//cpp->AddPattern( "^ %s* %w+ %s*:", 1<<0, DAO_SHL_COLOR4 );
@@ -496,6 +519,7 @@ DaoLanguages::DaoLanguages()
 	
 	DaoBasicSyntax *lua = new DaoBasicSyntax( "lua" );
 	DaoCodeSHL::languages[ "lua" ] = lua;
+	lua->SetMethodPattern( pat_lua_method );
 	lua->AddSingleLineComment( "--" );
 	lua->AddKeywordStruct( "function" );
 	lua->AddKeywordStorage( "local" );
@@ -538,6 +562,8 @@ DaoLanguages::DaoLanguages()
 	DaoBasicSyntax::python = py;
 	DaoCodeSHL::languages[ "py" ] = py;
 	DaoCodeSHL::languages[ "python" ] = py;
+	py->SetClassPattern( "^class %s* %w [%w:]* %s* (%b()|) %s* :" );
+	py->SetMethodPattern( pat_python_method );
 	py->AddSingleLineComment( "#" );
 	py->AddKeywordStruct( "class" );
 	py->AddKeywordStruct( "def" );
@@ -590,6 +616,7 @@ DaoLanguages::DaoLanguages()
 	DaoCodeSHL::languages[ "pl" ] = perl;
 	DaoCodeSHL::languages[ "pm" ] = perl;
 	DaoCodeSHL::languages[ "perl" ] = perl;
+	perl->SetMethodPattern( pat_perl_method );
 	perl->AddSingleLineComment( "#" );
 	perl->AddKeywordStorage( "my" );
 	perl->AddKeywordStorage( "our" );
@@ -716,6 +743,8 @@ DaoLanguages::DaoLanguages()
 	pld->AddKeywordStruct( "options" );
 	pld->AddKeywordStruct( "flags" );
 	pld->AddKeywordStruct( "tasks" );
+	pld->AddKeywordStruct( "extends" );
+	pld->AddKeywordStruct( "help" );
 	pld->AddKeywordStatement( "include" );
 	pld->AddKeywordStatement( "as" );
 	pld->AddKeywordConstant( "on" );
@@ -987,9 +1016,6 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 	QTextBlock block = currentBlock();
 	DaoTokenFormat format2;
 	int start = block.position();
-	format2.setFontPointSize( fontSize );
-	format2.setForeground( plainColor );
-	setFormat( 0, text.size(), format2 );
 	if( start + block.length() < textSkip ) return;
 	int cmt, offset = 0;
 	size_t i, j, k;
@@ -1016,16 +1042,23 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 	case DTOK_WCS_OPEN : setCurrentBlockState( DAO_HLSTATE_WCS ); break;
 	default : setCurrentBlockState(0);
 	}
+	DaoCodeLineData *ud = (DaoCodeLineData*) currentBlockUserData();
+	if( ud == NULL ) setCurrentBlockUserData( new DaoCodeLineData(false, CLS_COMMAND ) );
+	ud = (DaoCodeLineData*) currentBlockUserData();
+
+	DString_Resize( wcs, src.size() );
+	src.toWCharArray( wcs->wcs );
+	if( language->func_regex && DaoRegex_Match( language->func_regex, wcs, NULL, NULL ) )
+		ud->def_method = true;
+	if( language->class_regex && DaoRegex_Match( language->class_regex, wcs, NULL, NULL ) )
+		ud->def_class = true;
+
 	int oldFontSize = fontSize;
-	if( fontSize <= 10 ){
-		DString_SetMBS( wcs, src.toLocal8Bit().data() );
-		if( language->func_regex && DaoRegex_Match( language->func_regex, wcs, NULL, NULL ) ){
-			SetFontSize( 12 );
-		}
-	}
+	if( fontSize < 10 and (ud->def_class or ud->def_method) ) SetFontSize( 15 );
 	format2.setFontPointSize( fontSize );
 	format2.setForeground( plainColor );
 	setFormat( 0, text.size(), format2 );
+	ud->font_size = fontSize;
 
 	int pos = 0;
 	for(i=0; i<tokens->size; i++){
@@ -1114,10 +1147,6 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 		setFormat( pos, wcs->size, format );
 		pos += wcs->size;
 	}
-	DaoCodeLineData *ud = (DaoCodeLineData*) currentBlockUserData();
-	if( ud == NULL ) setCurrentBlockUserData( new DaoCodeLineData(false, CLS_COMMAND ) );
-	ud = (DaoCodeLineData*) currentBlockUserData();
-	ud->font_size = fontSize;
 	SetIndentationData( ud, tokens );
 
 	DString_SetMBS( wcs, src.toLocal8Bit().data() );
@@ -1149,6 +1178,11 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 }
 void DaoCodeSHL::highlightBlock ( const QString & text )
 {
+	DaoTokenFormat format2;
+	format2.setFontPointSize( fontSize );
+	format2.setForeground( plainColor );
+	setFormat( 0, text.size(), format2 );
+	
 	if( language and language != DaoBasicSyntax::dao ){
 		HighlightNormal( text );
 		HighlightSearch( text );
@@ -1170,6 +1204,7 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 	}
 	if( ud == NULL ) setCurrentBlockUserData( new DaoCodeLineData(false, CLS_COMMAND ) );
 	ud = (DaoCodeLineData*) currentBlockUserData();
+	ud->font_size = fontSize;
 	QTextBlock block = currentBlock();
 	int start = block.position();
 	if( start + block.length() < textSkip ) return;
@@ -1204,13 +1239,22 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 	case DTOK_WCS_OPEN : setCurrentBlockState( DAO_HLSTATE_WCS ); break;
 	default : setCurrentBlockState(0);
 	}
-	DaoTokenFormat format2;
+	DaoBasicSyntax *lang = language;
+	if( lang == NULL ) lang = DaoBasicSyntax::dao;
+	DString_Resize( wcs, src.size() );
+	src.toWCharArray( wcs->wcs );
+	if( lang->func_regex && DaoRegex_Match( lang->func_regex, wcs, NULL, NULL ) )
+		ud->def_method = true;
+	if( lang->class_regex && DaoRegex_Match( lang->class_regex, wcs, NULL, NULL ) )
+		ud->def_class = true;
+
+	int oldFontSize = fontSize;
+	if( fontSize < 10 and (ud->def_class or ud->def_method) ) SetFontSize( 15 );
 	format2.setFontPointSize( fontSize );
 	format2.setForeground( plainColor );
 	setFormat( 0, text.size(), format2 );
+	ud->font_size = fontSize;
 
-	DaoBasicSyntax *lang = language;
-	if( lang == NULL ) lang = DaoBasicSyntax::dao;
 	for(size_t i=0; i<tokens->size; i++){
 		DaoToken *tk = tokens->items.pToken[i];
 		DaoTokenFormat format;
@@ -1303,6 +1347,7 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 	//printf( "%3i%3i%3i%3i: %s\n", ud->leadSpaces, ud->leadTabs,
 	//	ud->lastToken, ud->lastNoComment, src.toLocal8Bit().data() );
 	HighlightSearch( text );
+	SetFontSize( oldFontSize );
 }
 
 

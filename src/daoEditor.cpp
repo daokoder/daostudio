@@ -459,51 +459,79 @@ void DaoLangLabels::paintEvent( QPaintEvent * event )
 void DaoLangLabels::mouseDoubleClickEvent( QMouseEvent * event )
 {
 }
-const int zoom_fonts[] = { 0, 11, 7, 3, 1 };
+const int zoom_fonts[] = { 0, 9, 4, 1 };
 void DaoLangLabels::mousePressEvent ( QMouseEvent * event )
 {
 	int x = event->x();
 	int y = event->y();
 	if( y < (top-5) or y > (bottom+5) ) return;
+	QTextCursor cursor = editor->textCursor();
+	int block = cursor.block().blockNumber();
 	if( x < 0 or x > width() ){
-		if( hasMouseTracking() ){
+		if( zoom ){
 			zoom -= 1;
 			if( zoom ==0 ){
 				releaseMouse();
-				setMouseTracking( not hasMouseTracking() );
 				editor->SetFontSize( DaoStudioSettings::codeFont.pointSize() );
 			}else{
 				editor->SetFontSize( zoom_fonts[zoom] );
 			}
 		}
-	}else if( hasMouseTracking() ){
-		if( zoom < 4 ) zoom += 1;
+	}else if( zoom ){
+		if( zoom < 3 ) zoom += 1;
 		editor->SetFontSize( zoom_fonts[zoom] );
 	}else{
 		zoom += 1;
 		grabMouse();
-		setMouseTracking( not hasMouseTracking() );
 		editor->SetFontSize( zoom_fonts[zoom] );
 	}
+	editor->ensureCursorVisible();
+	editor->UpdateCursor( true );
+	editor->setFocus();
 }
 
 void DaoLangLabels::mouseMoveEvent ( QMouseEvent * event )
 {
-	bool zoommed = editor->GetFont().pointSize() == ZOOM_FONT;
-	//if( not hasMouseTracking() ) return;
-	int y = event->y();
+	int x = event->x();
+	if( zoom == 0 ){
+		update();
+		return;
+	}
+	int i, y = event->y();
 	ymouse = y;
-	//if( zoommed == false and (y < (top-5) or y > (bottom+5)) ) return;
-	//if( zoommed == false and entered == true ) editor->SetFontSize( ZOOM_FONT );
 	int lines = editor->blockCount();
 	int line = (y * lines) / height();
 	QTextCursor cursor = editor->textCursor();
-	int block = cursor.block().blockNumber();
-	if( line > block ){
-		cursor.movePosition( QTextCursor::Down, QTextCursor::MoveAnchor, line-block );
+	int oldln = cursor.block().blockNumber();
+	QTextCursor cursor2;
+	bool found = false;
+	if( line > oldln ){
+		for(i=oldln; i<line; i++){
+			cursor.movePosition( QTextCursor::Down, QTextCursor::MoveAnchor );
+			if( i+5 >= line ){
+				QTextBlock block = cursor.block();
+				DaoCodeLineData *ud = (DaoCodeLineData*) block.userData();
+				if( ud and ud->font_size > 10 ){
+					cursor2 = cursor;
+					found = true;
+				}
+			}
+		}
 	}else{
-		cursor.movePosition( QTextCursor::Up, QTextCursor::MoveAnchor, block-line );
+		cursor.movePosition( QTextCursor::Up, QTextCursor::MoveAnchor, oldln-line );
+		for(i=oldln; i>line; i--){
+			cursor.movePosition( QTextCursor::Up, QTextCursor::MoveAnchor );
+			if( i-5 <= line ){
+				QTextBlock block = cursor.block();
+				DaoCodeLineData *ud = (DaoCodeLineData*) block.userData();
+				if( ud and ud->font_size > 10 ){
+					cursor2 = cursor;
+					found = true;
+				}
+			}
+		}
 	}
+	if( found ) cursor = cursor2;
 	editor->setTextCursor( cursor );
 	editor->ensureCursorVisible();
 }
@@ -808,12 +836,22 @@ void DaoTextEdit::slotBlink()
 void DaoTextEdit::UpdateCursor( bool show )
 {
 	if( show ){
-		QFontMetrics fm( GetFont() );
+		QFont font = GetFont();
+		QTextBlock block = textCursor().block();
+		DaoCodeLineData *ud = (DaoCodeLineData*) block.userData();
+		if( ud ) font.setPointSize( ud->font_size );
+		QFontMetrics fm( font );
 		QRect rect = cursorRect();
 		QString txt = "M";
+		int w = fm.width( txt );
+		int h = rect.height();
+		if( w < 5 ){
+			w += 2;
+			h += 2;
+		}
 		myCursor->show();
-		myCursor->resize( fm.width( txt ), rect.height() );
-		myCursor->move( rect.x()+LeftMargin()+2, rect.y()+2 );
+		myCursor->resize( w, h );
+		myCursor->move( rect.x()+LeftMargin()+1, rect.y()+2 );
 		showCursor = true;
 	}else{
 		showCursor = false;
@@ -2371,7 +2409,7 @@ DaoEditor::DaoEditor( DaoTabEditor *parent, DaoWordList *wlist )
 	ready = false;
 	setViewportMargins( 20, 0, MARK_WIDTH, 0 );
 	wgtLangLabels = new DaoLangLabels( this );
-	//wgtLangLabels->setMouseTracking( true );
+	wgtLangLabels->setMouseTracking( true );
 	wgtNumbering = new DaoNumbering( this );
 	wgtNumbering->setToolTip( tr("Right click to:") + "\n"
 			+ "(1) " + tr("set or unset break points;") + "\n"
@@ -2704,6 +2742,7 @@ void DaoEditor::PaintQuickScroll ( QPaintEvent * event )
 	QPainter painter(wgtLangLabels);
 	painter.fillRect(event->rect(), Qt::lightGray);
 	painter.fillRect( 0, 0, wgtLangLabels->width(), wgtLangLabels->height(), Qt::lightGray);
+	painter.setPen(Qt::black);
 	QTextBlock block = firstVisibleBlock();
 	int first = block.blockNumber();
 	int top = (int) blockBoundingGeometry(block).translated(contentOffset()).top();
@@ -2711,10 +2750,29 @@ void DaoEditor::PaintQuickScroll ( QPaintEvent * event )
 	int last = first;
 	int viewheight = viewport()->height();
 	int height = 0;
+	int B = blockCount();
+	int H = wgtLangLabels->height();
+	int W = wgtLangLabels->width();
 	while (block.isValid() && height < viewheight ) {
+#if 0
+		DaoCodeLineData *ud = (DaoCodeLineData*) block.userData();
+		if( ud && (ud->def_class or ud->def_method) ){
+			int y = (block.blockNumber() * H) / B;
+			painter.drawText(0, y, 2*W, fm.height(), Qt::AlignRight, "testtesttestest");
+		}
+#endif
 		height += (int) blockBoundingRect(block).height();
 		block = block.next();
 		last += 1;
+	}
+	block = document()->begin();
+	while (block.isValid() ) {
+		DaoCodeLineData *ud = (DaoCodeLineData*) block.userData();
+		if( ud && (ud->def_class or ud->def_method) ){
+			int y = (block.blockNumber() * H) / B;
+			painter.fillRect( 0, y, W, 2, ud->def_class ? Qt::green : Qt::yellow );
+		}
+		block = block.next();
 	}
 	top = (first * wgtLangLabels->height()) / blockCount();
 	bottom = (last * wgtLangLabels->height()) / blockCount();

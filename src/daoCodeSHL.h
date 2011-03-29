@@ -99,6 +99,7 @@ class DaoCodeLineData : public QTextBlockUserData
 			state = s; 
 			line = l; 
 			breaking = b;
+			def_class = def_method = false;
 			leadTabs = leadSpaces = 0;
 			firstToken = 0;
 			incomplete = false;
@@ -118,6 +119,8 @@ class DaoCodeLineData : public QTextBlockUserData
 		unsigned char  font_size;
 
 		bool   breaking;
+		bool   def_class;
+		bool   def_method;
 		bool   incomplete; // incomplete line.
 		bool   extend_line; // follow up line of a incomplete line.
 		bool   open_token; // incomplete string or comment token
@@ -161,6 +164,7 @@ struct DaoBasicSyntax
 	DArray *tokens;
 
 	DaoRegex *func_regex;
+	DaoRegex *class_regex;
 	QList<DaoSyntaxPattern> patterns;
 
 	QList<DaoRegex*> noneIndents; // TODO delete
@@ -188,6 +192,7 @@ struct DaoBasicSyntax
 	void AddMultiLineComment( const char *open, const char *close );
 
 	void AddPattern( const char *pat, int group, int color );
+	void SetClassPattern( const char *pat );
 	void SetMethodPattern( const char *pat );
 
 	void AddNoneIndentPattern( const char *pat );
