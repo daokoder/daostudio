@@ -651,7 +651,8 @@ DaoLanguages::DaoLanguages()
 	
 	DaoBasicSyntax *tex = new DaoBasicSyntax( "tex" );
 	DaoCodeSHL::languages[ "tex" ] = tex;
-	tex->AddPattern( "%\\ %s* (chapter|section|subsection) %s* %{ %s* ( %w+ ) %s*  %}", (1<<2), 0 );
+	tex->SetClassPattern( "^%\\ %s* (chapter|section|subsection) %s* %b{}" );
+	tex->AddPattern( "%\\ %s* (chapter|section|subsection) %s* %b{}", (1<<2), 0 );
 	tex->isLatex = true;
 	tex->singleQuotation = false;
 	tex->doubleQuotation = false;
@@ -703,6 +704,7 @@ DaoLanguages::DaoLanguages()
 
 	DaoBasicSyntax *sdml = new DaoBasicSyntax( "sdml" );
 	DaoCodeSHL::languages[ "sdml" ] = sdml;
+	sdml->SetClassPattern( "(%<(=+)%>).*(%<%/%2%>)" );
 	sdml->caseInsensitive = true;
 	sdml->singleQuotation = false;
 	sdml->doubleQuotation = false;
@@ -731,6 +733,7 @@ DaoLanguages::DaoLanguages()
 
 	DaoBasicSyntax *pld = new DaoBasicSyntax( "pld" );
 	DaoCodeSHL::languages[ "pld" ] = pld;
+	pld->SetClassPattern( "^(task | pipeline) %s* %w+" );
 	pld->caseInsensitive = true;
 	pld->singleQuotation = true;
 	pld->doubleQuotation = true;
@@ -1013,6 +1016,11 @@ void DaoCodeSHL::SetIndentationData( DaoCodeLineData *ud, DArray *tokens )
 }
 void DaoCodeSHL::HighlightNormal( const QString & text )
 {
+	DaoCodeLineData *ud = (DaoCodeLineData*) currentBlockUserData();
+	if( ud == NULL ) setCurrentBlockUserData( new DaoCodeLineData(false, CLS_COMMAND ) );
+	ud = (DaoCodeLineData*) currentBlockUserData();
+	//if( ud->rehighlight == false ) return;
+
 	QTextBlock block = currentBlock();
 	DaoTokenFormat format2;
 	int start = block.position();
@@ -1042,9 +1050,6 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 	case DTOK_WCS_OPEN : setCurrentBlockState( DAO_HLSTATE_WCS ); break;
 	default : setCurrentBlockState(0);
 	}
-	DaoCodeLineData *ud = (DaoCodeLineData*) currentBlockUserData();
-	if( ud == NULL ) setCurrentBlockUserData( new DaoCodeLineData(false, CLS_COMMAND ) );
-	ud = (DaoCodeLineData*) currentBlockUserData();
 
 	bool def_class = ud->def_class;
 	bool def_method = ud->def_method;
@@ -1176,7 +1181,9 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 					len -= 1;
 					type = format( pos ).objectType();
 				}
-				if( len ) setFormat( pos, len, ColorGroup( sp.color ) );
+				DaoTokenFormat format = ColorGroup( sp.color );
+				if( ud->font_size ) format.setFontPointSize( ud->font_size );
+				if( len ) setFormat( pos, len, format );
 			}
 			start = end + 1;
 			end = wcs->size-1;
@@ -1186,17 +1193,14 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 }
 void DaoCodeSHL::highlightBlock ( const QString & text )
 {
-	DaoTokenFormat format2;
-	format2.setFontPointSize( fontSize );
-	format2.setForeground( plainColor );
-	setFormat( 0, text.size(), format2 );
-	
+	DaoCodeLineData *ud = (DaoCodeLineData*) currentBlockUserData();
+	//if( ud and ud->rehighlight == false ) return;
+
 	if( language and language != DaoBasicSyntax::dao ){
 		HighlightNormal( text );
 		HighlightSearch( text );
 		return;
 	}
-	DaoCodeLineData *ud = (DaoCodeLineData*) currentBlockUserData();
 	if( ud == NULL && hlstate == DAO_HLSTATE_REDO ){
 		setFormat( 0, text.size(), formatOutput );
 		return;
@@ -1210,8 +1214,14 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 		setFormat( 0, text.size(), formatOutput );
 		return;
 	}
+	DaoTokenFormat format2;
+	format2.setFontPointSize( fontSize );
+	format2.setForeground( plainColor );
+	setFormat( 0, text.size(), format2 );
+	
 	if( ud == NULL ) setCurrentBlockUserData( new DaoCodeLineData(false, CLS_COMMAND ) );
 	ud = (DaoCodeLineData*) currentBlockUserData();
+
 	QTextBlock block = currentBlock();
 	int start = block.position();
 	if( start + block.length() < textSkip ) return;

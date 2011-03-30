@@ -2987,6 +2987,7 @@ void DaoEditor::slotUpdateOutline()
 		}
 		block = block.next();
 	}
+	codeThumb->lines.append( blockCount() );
 	codeThumb->horizontalScrollBar()->setSliderPosition(0);
 	codeThumb->UpdateOutline();
 }
@@ -3023,26 +3024,21 @@ void DaoCodeThumb::UpdateOutline()
 	QTextBlock block = document()->firstBlock();
 	DaoCodeLineData *last = NULL;
 	int prev = 0;
-	float ratio = 1.2;
-	if( lines.size() < 10 ){
-		ratio = 2.2;
-	}else if( lines.size() < 20 ){
-		ratio = 2.0;
-	}else if( lines.size() < 30 ){
-		ratio = 1.8;
-	}else if( lines.size() < 40 ){
-		ratio = 1.6;
-	}else if( lines.size() < 50 ){
-		ratio = 1.4;
-	}
+	float ratio = 1.5 + exp( 1 - lines.size() / 10.0 );
 	while( block.isValid() ){
 		DaoCodeLineData *ud = (DaoCodeLineData*) block.userData();
 		int cur = lines[ block.blockNumber()];
-		if( last ) last->font_size = ratio*(1 + log( cur - prev ));
+		int size = ratio*(2 + log( cur - prev ));
+		if( size > 12 ) size = 12;
+		if( last ) last->font_size = last->font_size2 = size;
 		block = block.next();
 		prev = cur;
 		last = ud;
 	}
+	int cur = lines[ lines.size() - 1];
+	int size = ratio*(1 + log( cur - prev ));
+	if( size > 12 ) size = 12;
+	if( last ) last->font_size = last->font_size2 = size;
 	codehl.rehighlight();
 }
 void DaoCodeThumb::mousePressEvent ( QMouseEvent * event )
@@ -3056,38 +3052,43 @@ void DaoCodeThumb::mousePressEvent ( QMouseEvent * event )
 }
 void DaoCodeThumb::mouseMoveEvent ( QMouseEvent * event )
 {
-	horizontalScrollBar()->setSliderPosition(0);
-	return;
-	QTextCursor cursor = cursorForPosition( event->pos() );
-	QTextBlock block = cursor.block();
-	DaoCodeLineData *ud = (DaoCodeLineData*) block.userData();
-	int mid = block.blockNumber();
-	block = document()->firstBlock();
-	while( block.isValid() ){
-		int dist = abs( block.blockNumber() - mid );
+	int last = -1;
+	for(int i=0; i<5; i++){
+		QTextCursor cursor = cursorForPosition( event->pos() );
+		QTextBlock block = cursor.block();
 		DaoCodeLineData *ud = (DaoCodeLineData*) block.userData();
-		if( ud ){
-			ud->font_size = 0;
-			switch( dist ){
-			case 1 : ud->font_size = 15; break;
-			case 2 : ud->font_size = 14; break;
-			case 3 : ud->font_size = 12; break;
-			case 4 : ud->font_size = 11; break;
-			case 5 : ud->font_size = 10; break;
+		int mid = block.blockNumber();
+		if( mid == last ) break;
+		block = document()->firstBlock();
+		while( block.isValid() ){
+			int dist = abs( block.blockNumber() - mid );
+			DaoCodeLineData *ud = (DaoCodeLineData*) block.userData();
+			if( ud ){
+				int font_size = ud->font_size2;
+				switch( dist ){
+				case 0 : font_size = 16; break;
+				case 1 : font_size = 15; break;
+				case 2 : font_size = 14; break;
+				case 3 : font_size = 12; break;
+				case 4 : font_size = 11; break;
+				case 5 : font_size = 10; break;
+				}
+				ud->rehighlight = font_size != ud->font_size;
+				ud->font_size = font_size;
 			}
+			block = block.next();
 		}
-		block = block.next();
+		codehl.SetState( DAO_HLSTATE_REDO );
+		codehl.rehighlight();
+		codehl.SetState(DAO_HLSTATE_NORMAL);
+		repaint();
 	}
-	ud->font_size = 16;
-	codehl.SetState( DAO_HLSTATE_REDO );
-	codehl.rehighlight();
-	codehl.SetState(DAO_HLSTATE_NORMAL);
-	repaint();
 	horizontalScrollBar()->setSliderPosition(0);
 }
 void DaoCodeThumb::leaveEvent( QEvent * event )
 {
 	if( isVisible() ) hide();
+	editor->setFocus();
 }
 /*
 void DaoCodeThumb::resizeEvent ( QResizeEvent * event )

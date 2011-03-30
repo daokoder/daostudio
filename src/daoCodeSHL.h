@@ -99,6 +99,7 @@ class DaoCodeLineData : public QTextBlockUserData
 			state = s; 
 			line = l; 
 			breaking = b;
+			rehighlight = true;
 			def_class = def_method = false;
 			leadTabs = leadSpaces = 0;
 			firstToken = 0;
@@ -109,6 +110,7 @@ class DaoCodeLineData : public QTextBlockUserData
 			token_line = false;
 			brace_count = 0;
 			font_size = 0;
+			font_size2 = 0;
 		}
 
 		unsigned short line;
@@ -117,7 +119,9 @@ class DaoCodeLineData : public QTextBlockUserData
 		unsigned char  firstToken; /* token type */
 		unsigned char  state;
 		unsigned char  font_size;
+		unsigned char  font_size2;
 
+		bool   rehighlight;
 		bool   breaking;
 		bool   def_class;
 		bool   def_method;
