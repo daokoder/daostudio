@@ -1046,19 +1046,26 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 	if( ud == NULL ) setCurrentBlockUserData( new DaoCodeLineData(false, CLS_COMMAND ) );
 	ud = (DaoCodeLineData*) currentBlockUserData();
 
+	bool def_class = ud->def_class;
+	bool def_method = ud->def_method;
 	DString_Resize( wcs, src.size() );
 	src.toWCharArray( wcs->wcs );
+	ud->def_class = ud->def_method = false;
 	if( language->func_regex && DaoRegex_Match( language->func_regex, wcs, NULL, NULL ) )
 		ud->def_method = true;
 	if( language->class_regex && DaoRegex_Match( language->class_regex, wcs, NULL, NULL ) )
 		ud->def_class = true;
 
+	if( def_class != ud->def_class or def_method != ud->def_method ) emit signalUpdateOutline();
+
 	int oldFontSize = fontSize;
-	if( fontSize < 10 and (ud->def_class or ud->def_method) ) SetFontSize( 15 );
+	if( fontSize < 10 and (ud->def_class or ud->def_method) ){
+		//ud->font_size = 15;
+		//SetFontSize( 15 );
+	}
 	format2.setFontPointSize( fontSize );
 	format2.setForeground( plainColor );
 	setFormat( 0, text.size(), format2 );
-	ud->font_size = fontSize;
 
 	int pos = 0;
 	for(i=0; i<tokens->size; i++){
@@ -1144,6 +1151,7 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 			format.setObjectType( TXT_CHAR_SYMBOL );
 			break;
 		}
+		if( ud->font_size ) format.setFontPointSize( ud->font_size );
 		setFormat( pos, wcs->size, format );
 		pos += wcs->size;
 	}
@@ -1204,7 +1212,6 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 	}
 	if( ud == NULL ) setCurrentBlockUserData( new DaoCodeLineData(false, CLS_COMMAND ) );
 	ud = (DaoCodeLineData*) currentBlockUserData();
-	ud->font_size = fontSize;
 	QTextBlock block = currentBlock();
 	int start = block.position();
 	if( start + block.length() < textSkip ) return;
@@ -1239,21 +1246,28 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 	case DTOK_WCS_OPEN : setCurrentBlockState( DAO_HLSTATE_WCS ); break;
 	default : setCurrentBlockState(0);
 	}
+	bool def_class = ud->def_class;
+	bool def_method = ud->def_method;
 	DaoBasicSyntax *lang = language;
 	if( lang == NULL ) lang = DaoBasicSyntax::dao;
 	DString_Resize( wcs, src.size() );
 	src.toWCharArray( wcs->wcs );
+	ud->def_class = ud->def_method = false;
 	if( lang->func_regex && DaoRegex_Match( lang->func_regex, wcs, NULL, NULL ) )
 		ud->def_method = true;
 	if( lang->class_regex && DaoRegex_Match( lang->class_regex, wcs, NULL, NULL ) )
 		ud->def_class = true;
 
+	if( def_class != ud->def_class or def_method != ud->def_method ) emit signalUpdateOutline();
+
 	int oldFontSize = fontSize;
-	if( fontSize < 10 and (ud->def_class or ud->def_method) ) SetFontSize( 15 );
+	if( fontSize < 10 and (ud->def_class or ud->def_method) ){
+		//ud->font_size = 15;
+		//SetFontSize( 15 );
+	}
 	format2.setFontPointSize( fontSize );
 	format2.setForeground( plainColor );
 	setFormat( 0, text.size(), format2 );
-	ud->font_size = fontSize;
 
 	for(size_t i=0; i<tokens->size; i++){
 		DaoToken *tk = tokens->items.pToken[i];
@@ -1340,6 +1354,7 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 			format.setObjectType( TXT_CHAR_SYMBOL );
 			break;
 		}
+		if( ud->font_size ) format.setFontPointSize( ud->font_size );
 		setFormat( pos, wcs->size, format );
 		pos += wcs->size;
 	}

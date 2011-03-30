@@ -193,6 +193,8 @@ class DaoTextEdit : public QPlainTextEdit
 	protected:
 		friend class DaoCursor;
 		friend class DaoEditWidget;
+		friend class DaoThumbCode;
+		friend class DaoCodeThumb;
 
 		DaoCodeSHL  codehl;
 		DaoWordList *wordList;
@@ -294,16 +296,19 @@ class DaoTextEdit : public QPlainTextEdit
 class DaoNumbering;
 class DaoLangLabels;
 class DaoScriptEngine;
+class DaoCodeThumb;
 
 class DaoEditor : public DaoTextEdit
 { Q_OBJECT
 
+	friend class DaoLangLabels;
 	friend class DaoConsole;
 
 	QFileSystemWatcher watcher;
 	DaoTabEditor *tabWidget;
 	DaoNumbering *wgtNumbering;
 	DaoLangLabels *wgtLangLabels;
+	DaoCodeThumb *codeThumb;
 
 	QString name;
 	QString fullName;
@@ -316,6 +321,7 @@ class DaoEditor : public DaoTextEdit
 	QMap<int,int> breakPoints;
 	bool state;
 	bool ready;
+	bool updateOutline;
 
 	int newEntryLine;
 
@@ -365,6 +371,7 @@ class DaoEditor : public DaoTextEdit
 	void slotFileChanged( const QString & );
 	void slotContentsChange( int, int, int );
 	int LeftMargin(){ return NumberingWidth(); }
+	void slotUpdateOutline();
 signals:
 	void signalFocusIn();
 	void signalTextChanged( bool );
@@ -405,6 +412,40 @@ class DaoLangLabels : public QWidget
 	void mouseMoveEvent ( QMouseEvent * event );
 	void enterEvent ( QEvent * event );
 	void leaveEvent ( QEvent * event );
+};
+
+class DaoThumbCode : public DaoTextEdit
+{ Q_OBJECT
+
+	DaoCodeThumb *codeThumb;
+
+	public:
+	DaoThumbCode( DaoCodeThumb *ct, DaoEditor *parent );
+};
+
+class DaoCodeThumb : public QPlainTextEdit
+{ Q_OBJECT
+
+	friend class DaoEditor;
+
+	QList<int> lines;
+	DaoCodeSHL codehl;
+	DaoEditor *editor;
+	DaoThumbCode *tcodes;
+	int font_size;
+
+	public:
+	DaoCodeThumb( DaoEditor *parent );
+
+	void UpdateOutline();
+
+	protected:
+	void mousePressEvent ( QMouseEvent * event );
+	void mouseMoveEvent ( QMouseEvent * event );
+	void leaveEvent ( QEvent * event );
+#if 0
+	void resizeEvent ( QResizeEvent * event );
+#endif
 };
 
 

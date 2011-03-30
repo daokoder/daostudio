@@ -32,6 +32,8 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #include<daoStudio.h>
 #include<daoStudioMain.h>
 
+#include<math.h>
+
 void DaoTabEditor::focusInEvent ( QFocusEvent * event )
 {
 	//emit signalFocusIn();
@@ -511,7 +513,7 @@ void DaoLangLabels::mouseMoveEvent ( QMouseEvent * event )
 			if( i+5 >= line ){
 				QTextBlock block = cursor.block();
 				DaoCodeLineData *ud = (DaoCodeLineData*) block.userData();
-				if( ud and ud->font_size > 10 ){
+				if( ud and (ud->def_class or ud->def_method) ){
 					cursor2 = cursor;
 					found = true;
 				}
@@ -524,7 +526,7 @@ void DaoLangLabels::mouseMoveEvent ( QMouseEvent * event )
 			if( i-5 <= line ){
 				QTextBlock block = cursor.block();
 				DaoCodeLineData *ud = (DaoCodeLineData*) block.userData();
-				if( ud and ud->font_size > 10 ){
+				if( ud and (ud->def_class or ud->def_method) ){
 					cursor2 = cursor;
 					found = true;
 				}
@@ -537,6 +539,10 @@ void DaoLangLabels::mouseMoveEvent ( QMouseEvent * event )
 }
 void DaoLangLabels::enterEvent ( QEvent * event )
 {
+	if( not editor->codeThumb->isVisible() ){
+		editor->codeThumb->show();
+		editor->codeThumb->update();
+	}
 	return;
 	if( not hasMouseTracking() ) return;
 	entered = true;
@@ -839,7 +845,7 @@ void DaoTextEdit::UpdateCursor( bool show )
 		QFont font = GetFont();
 		QTextBlock block = textCursor().block();
 		DaoCodeLineData *ud = (DaoCodeLineData*) block.userData();
-		if( ud ) font.setPointSize( ud->font_size );
+		if( ud and ud->font_size ) font.setPointSize( ud->font_size );
 		QFontMetrics fm( font );
 		QRect rect = cursorRect();
 		QString txt = "M";
@@ -2407,6 +2413,7 @@ DaoEditor::DaoEditor( DaoTabEditor *parent, DaoWordList *wlist )
 	tabWidget = parent;
 	state = false;
 	ready = false;
+	updateOutline = true;
 	setViewportMargins( 20, 0, MARK_WIDTH, 0 );
 	wgtLangLabels = new DaoLangLabels( this );
 	wgtLangLabels->setMouseTracking( true );
@@ -2414,6 +2421,11 @@ DaoEditor::DaoEditor( DaoTabEditor *parent, DaoWordList *wlist )
 	wgtNumbering->setToolTip( tr("Right click to:") + "\n"
 			+ "(1) " + tr("set or unset break points;") + "\n"
 			+ "(2) " + tr("change execution point.") );
+
+	codeThumb = new DaoCodeThumb( this );
+	codeThumb->hide();
+
+	connect( & codehl, SIGNAL(signalUpdateOutline()), this, SLOT(slotUpdateOutline()));
 	connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(UpdateNumberingWidth(int)));
 	connect(this, SIGNAL(updateRequest(const QRect &, int)), this, SLOT(UpdateNumbering(const QRect &, int)));
 	connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(HighlightCurrentLine()));
@@ -2451,13 +2463,18 @@ void DaoEditor::LoadFile( const QString & name )
 		disconnect( this, SIGNAL(textChanged()), this, SLOT(slotTextChanged()) );
 		QString ftype = info.suffix();
 		codehl.SetLanguage( ftype );
+		codeThumb->codehl.SetLanguage( ftype );
 		textOnDisk = fin.readAll();
 		if( ftype == "" ){
 			ftype = GuessFileType( textOnDisk );
 			//printf( "%s\n", ftype.toUtf8().data() );
 			codehl.SetLanguage( ftype );
+			codeThumb->codehl.SetLanguage( ftype );
 		}
+		updateOutline = false;
 		setPlainText( textOnDisk );
+		updateOutline = true;
+		slotUpdateOutline();
 		emit signalTextChanged( false );
 		connect( this, SIGNAL(textChanged()), this, SLOT(slotTextChanged()) );
 	}
@@ -2510,6 +2527,7 @@ void DaoEditor::Save( const QString & fname )
 	}
 	if( ftype.size() ){
 		codehl.SetLanguage( ftype );
+		codeThumb->codehl.SetLanguage( ftype );
 		RedoHighlight();
 	}
 	state = false;
@@ -2535,6 +2553,8 @@ void DaoEditor::resizeEvent ( QResizeEvent * event )
 	cr = viewport()->geometry();
 	wgtLangLabels->setGeometry(QRect(cr.right(), cr.top(), MARK_WIDTH, cr.height()));
 	wgtLangLabels->update();
+	int twidth = cr.width() / 2.5;
+	codeThumb->setGeometry(QRect(cr.right()-twidth, cr.top(), twidth, cr.height()));
 }
 void DaoEditor::keyPressEvent ( QKeyEvent * event )
 {
@@ -2625,6 +2645,7 @@ void DaoEditor::SetFontFamily( const QString & family )
 }
 void DaoEditor::BeforeRedoHighlight()
 {
+	updateOutline = false;
 	disconnect( document(), SIGNAL(contentsChange(int,int,int)),
 			this, SLOT(slotContentsChange(int,int,int)) );
 	disconnect( this, SIGNAL(textChanged()), this, SLOT(slotTextChanged()) );
@@ -2634,6 +2655,8 @@ void DaoEditor::AfterRedoHighlight()
 	connect( this, SIGNAL(textChanged()), this, SLOT(slotTextChanged()) );
 	connect( document(), SIGNAL(contentsChange(int,int,int)),
 			this, SLOT(slotContentsChange(int,int,int)) );
+	updateOutline = true;
+	slotUpdateOutline();
 }
 void DaoEditor::SetColorScheme( int scheme )
 {
@@ -2711,7 +2734,7 @@ void DaoEditor::PaintNumbering ( QPaintEvent * event )
 			QString number = QString::number(blockNumber + 1);
 			DaoCodeLineData *ud = (DaoCodeLineData*) block.userData();
 			QFont font2 = font;
-			if( ud ) font2.setPointSize( ud->font_size );
+			if( ud && ud->font_size ) font2.setPointSize( ud->font_size );
 			QFontMetrics fm( font2 );
 			painter.setFont( font2 );
 			if( block == blockEntry )
@@ -2948,3 +2971,127 @@ bool DaoEditor::EditContinue2()
 	Save();
 	return true;
 }
+void DaoEditor::slotUpdateOutline()
+{
+	if( updateOutline == false ) return;
+	codeThumb->clear();
+	codeThumb->lines.clear();
+	QTextBlock block = document()->firstBlock();
+	while( block.isValid() ){
+		DaoCodeLineData *ud = (DaoCodeLineData*) block.userData();
+		if( ud and (ud->def_class or ud->def_method) ){
+			QString text = block.text();
+			if( text.indexOf( "static " ) ==0 ) text = text.mid( 7 );
+			codeThumb->appendPlainText( text );
+			codeThumb->lines.append( block.blockNumber() );
+		}
+		block = block.next();
+	}
+	codeThumb->horizontalScrollBar()->setSliderPosition(0);
+	codeThumb->UpdateOutline();
+}
+
+DaoThumbCode::DaoThumbCode( DaoCodeThumb *ct, DaoEditor *parent )
+: DaoTextEdit( parent, parent->wordList )
+{
+}
+DaoCodeThumb::DaoCodeThumb( DaoEditor *parent ) 
+: QPlainTextEdit( parent ), codehl( this->document() )
+//: QWidget( parent )
+{
+	font_size = 10;
+	editor = parent;
+	viewport()->setCursor( Qt::CrossCursor );
+	setMouseTracking( true );
+	setViewportMargins( 8, 16, 8, 16 );
+	setLineWrapMode( QPlainTextEdit::NoWrap );
+	setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+
+	QString style = "background-color: rgb(200, 250, 200, 200);"
+		"border-style: outset; border-width: 1px;"
+		"border-radius: 8px; border-color: rgb(0, 250, 0, 120);";
+	setReadOnly( true );
+	setStyleSheet( style );
+	codehl.SetState(DAO_HLSTATE_NORMAL);
+	codehl.SetColorScheme( 0 );
+	codehl.SetFontSize( font_size );
+//	tcodes = new DaoThumbCode( this, parent );
+//	tcodes->hide();
+}
+void DaoCodeThumb::UpdateOutline()
+{
+	QTextBlock block = document()->firstBlock();
+	DaoCodeLineData *last = NULL;
+	int prev = 0;
+	float ratio = 1.2;
+	if( lines.size() < 10 ){
+		ratio = 2.2;
+	}else if( lines.size() < 20 ){
+		ratio = 2.0;
+	}else if( lines.size() < 30 ){
+		ratio = 1.8;
+	}else if( lines.size() < 40 ){
+		ratio = 1.6;
+	}else if( lines.size() < 50 ){
+		ratio = 1.4;
+	}
+	while( block.isValid() ){
+		DaoCodeLineData *ud = (DaoCodeLineData*) block.userData();
+		int cur = lines[ block.blockNumber()];
+		if( last ) last->font_size = ratio*(1 + log( cur - prev ));
+		block = block.next();
+		prev = cur;
+		last = ud;
+	}
+	codehl.rehighlight();
+}
+void DaoCodeThumb::mousePressEvent ( QMouseEvent * event )
+{
+	QTextCursor cursor = cursorForPosition( event->pos() );
+	QTextBlock block = cursor.block();
+	int line = lines[block.blockNumber()];
+	block = editor->document()->findBlockByLineNumber( line );
+	cursor = QTextCursor( block );
+	editor->setTextCursor( cursor );
+}
+void DaoCodeThumb::mouseMoveEvent ( QMouseEvent * event )
+{
+	horizontalScrollBar()->setSliderPosition(0);
+	return;
+	QTextCursor cursor = cursorForPosition( event->pos() );
+	QTextBlock block = cursor.block();
+	DaoCodeLineData *ud = (DaoCodeLineData*) block.userData();
+	int mid = block.blockNumber();
+	block = document()->firstBlock();
+	while( block.isValid() ){
+		int dist = abs( block.blockNumber() - mid );
+		DaoCodeLineData *ud = (DaoCodeLineData*) block.userData();
+		if( ud ){
+			ud->font_size = 0;
+			switch( dist ){
+			case 1 : ud->font_size = 15; break;
+			case 2 : ud->font_size = 14; break;
+			case 3 : ud->font_size = 12; break;
+			case 4 : ud->font_size = 11; break;
+			case 5 : ud->font_size = 10; break;
+			}
+		}
+		block = block.next();
+	}
+	ud->font_size = 16;
+	codehl.SetState( DAO_HLSTATE_REDO );
+	codehl.rehighlight();
+	codehl.SetState(DAO_HLSTATE_NORMAL);
+	repaint();
+	horizontalScrollBar()->setSliderPosition(0);
+}
+void DaoCodeThumb::leaveEvent( QEvent * event )
+{
+	if( isVisible() ) hide();
+}
+/*
+void DaoCodeThumb::resizeEvent ( QResizeEvent * event )
+{
+//	tcodes->setGeometry( geometry() );
+}
+*/

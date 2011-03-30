@@ -108,7 +108,7 @@ class DaoCodeLineData : public QTextBlockUserData
 			reference_line = true;
 			token_line = false;
 			brace_count = 0;
-			font_size = DaoStudioSettings::codeFont.pointSize();
+			font_size = 0;
 		}
 
 		unsigned short line;
@@ -225,7 +225,7 @@ enum DaoTextCharType
 };
 
 class DaoCodeSHL : public QSyntaxHighlighter
-{
+{ Q_OBJECT
 	friend class DaoConsole;
 	friend class DaoTextEdit;
 	
@@ -294,6 +294,9 @@ class DaoCodeSHL : public QSyntaxHighlighter
 	void HighlightNormal( const QString & text );
 	void highlightBlock( const QString & text );
 	//void SetCharType( int pos, int count, int type );
+
+signals:
+	void signalUpdateOutline();
 };
 
 #endif
