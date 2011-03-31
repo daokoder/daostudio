@@ -542,6 +542,7 @@ void DaoLangLabels::enterEvent ( QEvent * event )
 	if( not editor->codeThumb->isVisible() ){
 		editor->codeThumb->show();
 		editor->codeThumb->update();
+		editor->codeThumb->horizontalScrollBar()->setSliderPosition(0);
 	}
 	return;
 	if( not hasMouseTracking() ) return;
@@ -2793,7 +2794,7 @@ void DaoEditor::PaintQuickScroll ( QPaintEvent * event )
 		DaoCodeLineData *ud = (DaoCodeLineData*) block.userData();
 		if( ud && (ud->def_class or ud->def_method) ){
 			int y = (block.blockNumber() * H) / B;
-			painter.fillRect( 0, y, W, 2, ud->def_class ? Qt::green : Qt::yellow );
+			painter.fillRect( 0, y, W, 1, ud->def_class ? Qt::green : Qt::yellow );
 		}
 		block = block.next();
 	}
@@ -2988,23 +2989,19 @@ void DaoEditor::slotUpdateOutline()
 		block = block.next();
 	}
 	codeThumb->lines.append( blockCount() );
-	codeThumb->horizontalScrollBar()->setSliderPosition(0);
 	codeThumb->UpdateOutline();
+	codeThumb->horizontalScrollBar()->setSliderPosition(0);
 }
 
-DaoThumbCode::DaoThumbCode( DaoCodeThumb *ct, DaoEditor *parent )
-: DaoTextEdit( parent, parent->wordList )
-{
-}
+
 DaoCodeThumb::DaoCodeThumb( DaoEditor *parent ) 
 : QPlainTextEdit( parent ), codehl( this->document() )
-//: QWidget( parent )
 {
 	font_size = 10;
 	editor = parent;
 	viewport()->setCursor( Qt::CrossCursor );
 	setMouseTracking( true );
-	setViewportMargins( 5, 20, 5, 20 );
+	setViewportMargins( 5, 10, 5, 10 );
 	setLineWrapMode( QPlainTextEdit::NoWrap );
 	setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
@@ -3017,8 +3014,6 @@ DaoCodeThumb::DaoCodeThumb( DaoEditor *parent )
 	codehl.SetState(DAO_HLSTATE_NORMAL);
 	codehl.SetColorScheme( 0 );
 	codehl.SetFontSize( font_size );
-//	tcodes = new DaoThumbCode( this, parent );
-//	tcodes->hide();
 }
 void DaoCodeThumb::UpdateOutline()
 {
@@ -3059,14 +3054,16 @@ void DaoCodeThumb::mouseMoveEvent ( QMouseEvent * event )
 	int y = event->y();
 	int max = editor->GetFont().pointSize();
 	if( max < 15 ) max = 15;
-#if 0
-	if( y < 20 or y > viewport()->height()+20 ){
+	if( y <= 10 or y > viewport()->height()-10 ){
 		QPoint pos = event->pos();
-		if( y < 20 ) pos.setY( 20 );
-		if( y > (viewport()->height()+20) ) pos.setY( viewport()->height()+20 );
-		pos = mapToGlobal( pos );
+		if( y <= 10 ) pos.setY( 11 );
+		if( y > (viewport()->height()-10) ) pos.setY( viewport()->height()-11 );
+		pos = viewport()->mapToGlobal( pos );
+		setMouseTracking( false );
 		QCursor::setPos( event->globalX(), pos.y() );
+		setMouseTracking( true );
 	}
+#if 0
 #endif
 	for(i=0; i<5; i++){
 		QTextBlock block = firstVisibleBlock();
@@ -3125,9 +3122,3 @@ void DaoCodeThumb::leaveEvent( QEvent * event )
 	if( isVisible() ) hide();
 	editor->setFocus();
 }
-/*
-void DaoCodeThumb::resizeEvent ( QResizeEvent * event )
-{
-//	tcodes->setGeometry( geometry() );
-}
-*/

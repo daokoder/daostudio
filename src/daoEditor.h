@@ -414,15 +414,6 @@ class DaoLangLabels : public QWidget
 	void leaveEvent ( QEvent * event );
 };
 
-class DaoThumbCode : public DaoTextEdit
-{ Q_OBJECT
-
-	DaoCodeThumb *codeThumb;
-
-	public:
-	DaoThumbCode( DaoCodeThumb *ct, DaoEditor *parent );
-};
-
 class DaoCodeThumb : public QPlainTextEdit
 { Q_OBJECT
 
@@ -431,7 +422,6 @@ class DaoCodeThumb : public QPlainTextEdit
 	QList<int> lines;
 	DaoCodeSHL codehl;
 	DaoEditor *editor;
-	DaoThumbCode *tcodes;
 	int font_size;
 
 	public:
@@ -443,9 +433,6 @@ class DaoCodeThumb : public QPlainTextEdit
 	void mousePressEvent ( QMouseEvent * event );
 	void mouseMoveEvent ( QMouseEvent * event );
 	void leaveEvent ( QEvent * event );
-#if 0
-	void resizeEvent ( QResizeEvent * event );
-#endif
 };
 
 
