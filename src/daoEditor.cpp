@@ -1738,7 +1738,7 @@ bool DaoTextEdit::EditModeVIM( QKeyEvent * event )
 	if( keyMode == KEY_MODE_VIM ){
 		Qt::KeyboardModifier ctrl = Qt::ControlModifier;
 #ifdef Q_WS_MAC
-		ctrl = Qt::MetaModifier;
+//		ctrl = Qt::MetaModifier;
 #endif
 		if( event->modifiers() & ctrl ){
 			int newkey = 0;
@@ -3006,9 +3006,9 @@ DaoCodeThumb::DaoCodeThumb( DaoEditor *parent )
 	setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 
-	QString style = "background-color: rgb(200, 250, 200, 200);"
+	QString style = "background-color: rgb(200, 250, 200, 255);"
 		"border-style: outset; border-width: 1px;"
-		"border-radius: 8px; border-color: rgb(0, 250, 0, 120);";
+		"border-radius: 8px; border-color: rgb(0, 250, 0, 150);";
 	setReadOnly( true );
 	setStyleSheet( style );
 	codehl.SetState(DAO_HLSTATE_NORMAL);
