@@ -141,15 +141,18 @@ win32 {
 	RC_FILE = DaoStudio.rc
 	DEFINES += WIN32
 	LIBS += -lwinmm -lwsock32
+	INCLUDEPATH += libssh2/win32
 }
 unix {
 	DEFINES += UNIX
 	LIBS += -lz -lssl -lcrypto
 	#QMAKE_LFLAGS += -Xlinker -rpath -Xlinker .
+	INCLUDEPATH += libssh2/unix
 }
 mac {
 	ICON = icons/daostudio.icns
 	QMAKESPEC = macx-g++
 	DEFINES += UNIX MAC_OSX
 	LIBS += -lz -lssl -lcrypto
+	INCLUDEPATH += libssh2/unix
 }
