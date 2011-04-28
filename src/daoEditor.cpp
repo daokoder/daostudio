@@ -2414,7 +2414,7 @@ DaoEditor::DaoEditor( DaoTabEditor *parent, DaoWordList *wlist )
 	tabWidget = parent;
 	state = false;
 	ready = false;
-	updateOutline = true;
+	outlineChanged = true;
 	setViewportMargins( 20, 0, MARK_WIDTH, 0 );
 	wgtLangLabels = new DaoLangLabels( this );
 	wgtLangLabels->setMouseTracking( true );
@@ -2426,7 +2426,7 @@ DaoEditor::DaoEditor( DaoTabEditor *parent, DaoWordList *wlist )
 	codeThumb = new DaoCodeThumb( this );
 	codeThumb->hide();
 
-	connect( & codehl, SIGNAL(signalUpdateOutline()), this, SLOT(slotUpdateOutline()));
+	connect( & codehl, SIGNAL(signalOutlineChanged()), this, SLOT(slotOutlineChanged()));
 	connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(UpdateNumberingWidth(int)));
 	connect(this, SIGNAL(updateRequest(const QRect &, int)), this, SLOT(UpdateNumbering(const QRect &, int)));
 	connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(HighlightCurrentLine()));
@@ -2472,10 +2472,8 @@ void DaoEditor::LoadFile( const QString & name )
 			codehl.SetLanguage( ftype );
 			codeThumb->codehl.SetLanguage( ftype );
 		}
-		updateOutline = false;
 		setPlainText( textOnDisk );
-		updateOutline = true;
-		slotUpdateOutline();
+		UpdateOutline();
 		emit signalTextChanged( false );
 		connect( this, SIGNAL(textChanged()), this, SLOT(slotTextChanged()) );
 	}
@@ -2578,6 +2576,7 @@ void DaoEditor::keyPressEvent ( QKeyEvent * event )
 	QTextCursor cursor = textCursor();
 	slotBoundEditor();
 	DaoTextEdit::keyPressEvent( event );
+	if( outlineChanged ) UpdateOutline();
 	if( isReadOnly() ){
 		wgtWords->SetTip( tr("Read only area") );
 		wgtWords->EnsureVisible( LeftMargin(), true );
@@ -2646,7 +2645,6 @@ void DaoEditor::SetFontFamily( const QString & family )
 }
 void DaoEditor::BeforeRedoHighlight()
 {
-	updateOutline = false;
 	disconnect( document(), SIGNAL(contentsChange(int,int,int)),
 			this, SLOT(slotContentsChange(int,int,int)) );
 	disconnect( this, SIGNAL(textChanged()), this, SLOT(slotTextChanged()) );
@@ -2656,8 +2654,7 @@ void DaoEditor::AfterRedoHighlight()
 	connect( this, SIGNAL(textChanged()), this, SLOT(slotTextChanged()) );
 	connect( document(), SIGNAL(contentsChange(int,int,int)),
 			this, SLOT(slotContentsChange(int,int,int)) );
-	updateOutline = true;
-	slotUpdateOutline();
+	UpdateOutline();
 }
 void DaoEditor::SetColorScheme( int scheme )
 {
@@ -2972,9 +2969,13 @@ bool DaoEditor::EditContinue2()
 	Save();
 	return true;
 }
-void DaoEditor::slotUpdateOutline()
+void DaoEditor::slotOutlineChanged()
 {
-	if( updateOutline == false ) return;
+	outlineChanged = true;
+}
+void DaoEditor::UpdateOutline()
+{
+	outlineChanged = false;
 	codeThumb->clear();
 	codeThumb->lines.clear();
 	QTextBlock block = document()->firstBlock();

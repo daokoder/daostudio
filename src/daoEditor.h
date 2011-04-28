@@ -321,7 +321,7 @@ class DaoEditor : public DaoTextEdit
 	QMap<int,int> breakPoints;
 	bool state;
 	bool ready;
-	bool updateOutline;
+	bool outlineChanged;
 
 	int newEntryLine;
 
@@ -354,6 +354,7 @@ class DaoEditor : public DaoTextEdit
 	void PaintQuickScroll( QPaintEvent * event );
 	int NumberingWidth();
 
+	void UpdateOutline();
 	QString GuessFileType( const QString & source );
 
 	protected:
@@ -371,7 +372,7 @@ class DaoEditor : public DaoTextEdit
 	void slotFileChanged( const QString & );
 	void slotContentsChange( int, int, int );
 	int LeftMargin(){ return NumberingWidth(); }
-	void slotUpdateOutline();
+	void slotOutlineChanged();
 signals:
 	void signalFocusIn();
 	void signalTextChanged( bool );

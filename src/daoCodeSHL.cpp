@@ -1053,21 +1053,19 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 
 	bool def_class = ud->def_class;
 	bool def_method = ud->def_method;
-	DString_Resize( wcs, src.size() );
-	src.toWCharArray( wcs->wcs );
 	ud->def_class = ud->def_method = false;
-	if( language->func_regex && DaoRegex_Match( language->func_regex, wcs, NULL, NULL ) )
-		ud->def_method = true;
-	if( language->class_regex && DaoRegex_Match( language->class_regex, wcs, NULL, NULL ) )
-		ud->def_class = true;
+	if( tokens->size and tokens->items.pToken[0]->type == DTOK_IDENTIFIER ){
+		DString_Resize( wcs, src.size() );
+		src.toWCharArray( wcs->wcs );
+		if( language->func_regex && DaoRegex_Match( language->func_regex, wcs, NULL, NULL ) )
+			ud->def_method = true;
+		if( language->class_regex && DaoRegex_Match( language->class_regex, wcs, NULL, NULL ) )
+			ud->def_class = true;
+	}
 
-	if( def_class != ud->def_class or def_method != ud->def_method ) emit signalUpdateOutline();
+	if( def_class != ud->def_class or def_method != ud->def_method ) emit signalOutlineChanged();
 
 	int oldFontSize = fontSize;
-	if( fontSize < 10 and (ud->def_class or ud->def_method) ){
-		//ud->font_size = 15;
-		//SetFontSize( 15 );
-	}
 	format2.setFontPointSize( fontSize );
 	format2.setForeground( plainColor );
 	setFormat( 0, text.size(), format2 );
@@ -1256,25 +1254,23 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 	case DTOK_WCS_OPEN : setCurrentBlockState( DAO_HLSTATE_WCS ); break;
 	default : setCurrentBlockState(0);
 	}
-	bool def_class = ud->def_class;
-	bool def_method = ud->def_method;
 	DaoBasicSyntax *lang = language;
 	if( lang == NULL ) lang = DaoBasicSyntax::dao;
-	DString_Resize( wcs, src.size() );
-	src.toWCharArray( wcs->wcs );
+	bool def_class = ud->def_class;
+	bool def_method = ud->def_method;
 	ud->def_class = ud->def_method = false;
-	if( lang->func_regex && DaoRegex_Match( lang->func_regex, wcs, NULL, NULL ) )
-		ud->def_method = true;
-	if( lang->class_regex && DaoRegex_Match( lang->class_regex, wcs, NULL, NULL ) )
-		ud->def_class = true;
+	if( tokens->size and tokens->items.pToken[0]->type == DTOK_IDENTIFIER ){
+		DString_Resize( wcs, src.size() );
+		src.toWCharArray( wcs->wcs );
+		if( lang->func_regex && DaoRegex_Match( lang->func_regex, wcs, NULL, NULL ) )
+			ud->def_method = true;
+		if( lang->class_regex && DaoRegex_Match( lang->class_regex, wcs, NULL, NULL ) )
+			ud->def_class = true;
+	}
 
-	if( def_class != ud->def_class or def_method != ud->def_method ) emit signalUpdateOutline();
+	if( def_class != ud->def_class or def_method != ud->def_method ) emit signalOutlineChanged();
 
 	int oldFontSize = fontSize;
-	if( fontSize < 10 and (ud->def_class or ud->def_method) ){
-		//ud->font_size = 15;
-		//SetFontSize( 15 );
-	}
 	format2.setFontPointSize( fontSize );
 	format2.setForeground( plainColor );
 	setFormat( 0, text.size(), format2 );

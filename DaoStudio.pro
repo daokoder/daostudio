@@ -56,7 +56,6 @@ HEADERS += src/daoConsole.h \
 		   libssh2/include/libssh2.h \
 		   libssh2/include/libssh2_publickey.h \
 		   libssh2/include/libssh2_sftp.h \
-		   libssh2/src/libssh2_config.h\
 		   libssh2/src/channel.h \
 		   libssh2/src/comp.h \
 		   libssh2/src/crypto.h \

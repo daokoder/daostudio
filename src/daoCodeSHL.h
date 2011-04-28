@@ -300,7 +300,7 @@ class DaoCodeSHL : public QSyntaxHighlighter
 	//void SetCharType( int pos, int count, int type );
 
 signals:
-	void signalUpdateOutline();
+	void signalOutlineChanged();
 };
 
 #endif
