@@ -91,8 +91,8 @@ static const char *const cmd_help =
 "   -d, --debug:          run in debug mode;\n"
 "   -i, --ineractive:     run in interactive mode;\n"
 "   -l, --list-bc:        print compiled bytecodes;\n"
+"   -j, --jit:            enable just-in-time compiling;\n"
 "   -T, --no-typed-code:  no typed VM codes;\n"
-"   -J, --no-jit:         no just-in-time compiling;\n"
 "   -n, --incr-comp:      incremental compiling;\n"
 ;
 /*
@@ -119,6 +119,7 @@ extern DaoTypeBase  nsTyper;
 extern DaoTypeBase  cmodTyper;
 extern DaoTypeBase  tupleTyper;
 extern DaoTypeBase  namevaTyper;
+extern DaoTypeBase  mroutineTyper;
 
 extern DaoTypeBase  numarTyper;
 extern DaoTypeBase  comTyper;
@@ -158,9 +159,9 @@ DaoTypeBase* DaoVmSpace_GetTyper( short type )
 #else
 	case DAO_ARRAY  :  return & baseTyper;
 #endif
-					   /*     case DAO_REGEX    :  return & regexTyper; // XXX */
 	case DAO_FUNCURRY : return & curryTyper;
 	case DAO_CDATA   :  return & cdataTyper;
+	case DAO_METAROUTINE : return & mroutineTyper;
 	case DAO_ROUTINE   :  return & routTyper;
 	case DAO_FUNCTION  :  return & funcTyper;
 	case DAO_INTERFACE :  return & interTyper;
@@ -521,6 +522,7 @@ static void ParseScriptParameters( DString *str, DArray *tokens )
 	DString_Delete( tok );
 }
 
+int DaoJIT_TryInit( DaoVmSpace *vms );
 int DaoVmSpace_ParseOptions( DaoVmSpace *self, DString *options )
 {
 	DString *str = DString_New(1);
@@ -562,9 +564,9 @@ int DaoVmSpace_ParseOptions( DaoVmSpace *self, DString *options )
 			}else if( strcmp( token->mbs, "--no-typed-code" ) ==0 ){
 				self->options |= DAO_EXEC_NO_TC;
 				daoConfig.typedcode = 0;
-			}else if( strcmp( token->mbs, "--no-typedcode" ) ==0 ){
-				self->options |= DAO_EXEC_NO_JIT;
-				daoConfig.jit = 0;
+			}else if( strcmp( token->mbs, "--jit" ) ==0 ){
+				self->options |= DAO_EXEC_JIT;
+				daoConfig.jit = 1;
 			}else if( token->size ){
 				DaoStream_WriteMBS( self->stdStream, "Unknown option: " );
 				DaoStream_WriteMBS( self->stdStream, token->mbs );
@@ -590,11 +592,11 @@ int DaoVmSpace_ParseOptions( DaoVmSpace *self, DString *options )
 				case 'n' : self->options |= DAO_EXEC_INCR_COMP;
 						   daoConfig.incompile = 0;
 						   break;
+				case 'j' : self->options |= DAO_EXEC_JIT;
+						   daoConfig.jit = 1;
+						   break;
 				case 'T' : self->options |= DAO_EXEC_NO_TC;
 						   daoConfig.typedcode = 0;
-						   break;
-				case 'J' : self->options |= DAO_EXEC_NO_JIT;
-						   daoConfig.jit = 0;
 						   break;
 				case 'e' : self->evalCmdline = 1;
 						   DString_Clear( self->source );
@@ -617,6 +619,9 @@ int DaoVmSpace_ParseOptions( DaoVmSpace *self, DString *options )
 	}
 	DString_Delete( str );
 	DArray_Delete( array );
+	if( daoConfig.jit && dao_jit.Compile == NULL && DaoJIT_TryInit( self ) == 0 ){
+		DaoStream_WriteMBS( self->stdStream, "Failed to enable Just-In-Time compiling!\n" );
+	}
 	return 1;
 }
 
@@ -671,7 +676,7 @@ static void DaoVmSpace_ParseArguments( DaoVmSpace *self, DaoNameSpace *ns,
 	DValue nkey = daoZeroInteger;
 	DValue skey = daoNullString;
 	DValue sval = daoNullString;
-	size_t i, pk;
+	size_t i;
 	int tk, offset=0, eq=0;
 
 	skey.v.s = key;
@@ -772,7 +777,7 @@ static void DaoVmSpace_ConvertArguments( DaoNameSpace *ns, DArray *argNames, DAr
 	if( i >=0 ){
 		DValue nkey = DaoNameSpace_GetConst( ns, i );
 		/* It may has not been compiled if it is not called explicitly. */
-		if( nkey.t == DAO_ROUTINE ){
+		if( nkey.t == DAO_ROUTINE ){ // TODO: better handling
 			DaoRoutine_Compile( nkey.v.routine );
 			rout = nkey.v.routine;
 			abtp = rout->routType;
@@ -941,12 +946,8 @@ static void DaoVmSpace_ExeCmdArgs( DaoVmSpace *self )
 		for( i=ns->cstUser; i<ns->cstData->size; i++){
 			DValue p = ns->cstData->data[i];
 			if( p.t == DAO_ROUTINE && p.v.routine != ns->mainRoutine ){
-				n = p.v.routine->routTable->size;
-				for(j=0; j<n; j++){
-					rout = (DaoRoutine*) p.v.routine->routTable->items.pBase[j];
-					DaoRoutine_Compile( rout );
-					DaoRoutine_PrintCode( rout, self->stdStream );
-				}
+				DaoRoutine_Compile( p.v.routine );
+				DaoRoutine_PrintCode( p.v.routine, self->stdStream );
 			}else if( p.t == DAO_CLASS ){
 				DaoClass_PrintCode( p.v.klass, self->stdStream );
 			}
@@ -972,7 +973,7 @@ int DaoVmSpace_RunMain( DaoVmSpace *self, DString *file )
 	DValue *ps;
 	ullong_t tm = 0;
 	size_t N;
-	int i, j, ch, res;
+	int i, j, res;
 
 	if( file == NULL || file->size ==0 || self->evalCmdline ){
 		DArray_PushFront( self->nameLoading, self->pathWorking );
@@ -1022,22 +1023,25 @@ int DaoVmSpace_RunMain( DaoVmSpace *self, DString *file )
 	DArray_Resize( array, N, NULL );
 	for(j=0; j<N; j++) array->items.pValue[j] = ps + j;
 	if( i >=0 ){
+		DRoutine *unirout = NULL;
 		value = DaoNameSpace_GetConst( ns, i );
-		if( value.t == DAO_ROUTINE ){
-			mainRoutine = value.v.routine;
-			ctx = DaoVmProcess_MakeContext( vmp, mainRoutine );
-			ctx->vmSpace = self;
-			DaoContext_Init( ctx, mainRoutine );
-			if( DaoContext_InitWithParams( ctx, vmp, array->items.pValue, N ) == 0 ){
-				DaoStream_WriteMBS( self->stdStream, "ERROR: invalid command line arguments.\n" );
-				if( mainRoutine->routHelp )
-					DaoStream_WriteString( self->stdStream, mainRoutine->routHelp );
-				DArray_Delete( array );
-				return 0;
-			}
-			DaoVmProcess_PushContext( vmp, ctx );
+		if( value.t == DAO_METAROUTINE ){
+			DaoMetaRoutine *routine = (DaoMetaRoutine*) value.v.routine;
+			unirout = DaoMetaRoutine_Lookup( routine, NULL, array->items.pValue, N, DVM_CALL );
+		}else if( value.t == DAO_ROUTINE ){
+			unirout = (DRoutine*) value.v.routine;
 		}
-		mainRoutine = ns->mainRoutine;
+		if( unirout == NULL || unirout->type != DAO_ROUTINE ){
+			DaoStream_WriteMBS( self->stdStream, "ERROR: invalid command line arguments.\n" );
+			if( unirout && unirout->routHelp )
+				DaoStream_WriteString( self->stdStream, unirout->routHelp );
+			DArray_Delete( array );
+			return 0;
+		}
+		ctx = DaoVmProcess_MakeContext( vmp, (DaoRoutine*) unirout );
+		ctx->vmSpace = self;
+		DaoContext_Init( ctx, (DaoRoutine*) unirout );
+		DaoVmProcess_PushContext( vmp, ctx );
 	}
 	DaoVmSpace_ExeCmdArgs( self );
 	/* always execute default ::main() routine first for initialization: */
@@ -1046,19 +1050,16 @@ int DaoVmSpace_RunMain( DaoVmSpace *self, DString *file )
 		DaoVmProcess_Execute( vmp );
 	}
 	/* check and execute explicitly defined main() routine  */
-	if( i >=0 ){
-		value = DaoNameSpace_GetConst( ns, i );
-		if( value.t == DAO_ROUTINE ){
-			if( ! DRoutine_PassParams( (DRoutine*)ctx->routine, NULL, ctx->regValues,
-						array->items.pValue, NULL, N, 0 ) ){
-				DaoStream_WriteMBS( self->stdStream, "ERROR: invalid command line arguments.\n" );
+	if( ctx != NULL ){
+		if( ! DRoutine_PassParams( (DRoutine*)ctx->routine, NULL, ctx->regValues,
+					array->items.pValue, N, 0 ) ){
+			DaoStream_WriteMBS( self->stdStream, "ERROR: invalid command line arguments.\n" );
+			if( ctx->routine->routHelp )
 				DaoStream_WriteString( self->stdStream, ctx->routine->routHelp );
-				DaoVmProcess_CacheContext( vmp, ctx );
-				DArray_Delete( array );
-				return 0;
-			}
-			DaoVmProcess_Execute( vmp );
+			DArray_Delete( array );
+			return 0;
 		}
+		DaoVmProcess_Execute( vmp );
 	}
 	DArray_Delete( array );
 	if( ( self->options & DAO_EXEC_INTERUN ) && self->userHandler == NULL )
@@ -1070,7 +1071,7 @@ static int DaoVmSpace_CompleteModuleName( DaoVmSpace *self, DString *fname )
 {
 	int slen = strlen( DAO_DLL_SUFFIX );
 	int i, modtype = DAO_MODULE_NONE;
-	size_t k, k2, k3, size;
+	size_t size;
 	DString_ToMBS( fname );
 	size = fname->size;
 	if( size >6 && DString_FindMBS( fname, ".dao.o", 0 ) == size-6 ){
@@ -1344,16 +1345,17 @@ ExecuteModule :
 			DaoContext_Init( ctx, mainRoutine );
 			if( DaoContext_InitWithParams( ctx, vmp, array->items.pValue, N ) == 0 ){
 				DaoStream_WriteMBS( self->stdStream, "ERROR: invalid command line arguments.\n" );
-				DaoStream_WriteString( self->stdStream, mainRoutine->routHelp );
+				if( mainRoutine->routHelp )
+					DaoStream_WriteString( self->stdStream, mainRoutine->routHelp );
 				DArray_Delete( array );
 				return 0;
 			}
 			DaoVmProcess_PushContext( vmp, ctx );
 			if( ! DRoutine_PassParams( (DRoutine*)ctx->routine, NULL, ctx->regValues,
-						array->items.pValue, NULL, N, 0 ) ){
+						array->items.pValue, N, 0 ) ){
 				DaoStream_WriteMBS( self->stdStream, "ERROR: invalid command line arguments.\n" );
-				DaoStream_WriteString( self->stdStream, ctx->routine->routHelp );
-				DaoVmProcess_CacheContext( vmp, ctx );
+				if( mainRoutine->routHelp )
+					DaoStream_WriteString( self->stdStream, ctx->routine->routHelp );
 				DArray_Delete( array );
 				return 0;
 			}
@@ -1896,14 +1898,14 @@ void DaoInitAPI( DaoAPI *api )
 	api->DaoArray_SetBuffer = DaoArray_SetBuffer;
 #endif
 
+	api->DaoMethod_Resolve = DaoMethod_Resolve;
 	api->DaoObject_GetField = DaoObject_GetField;
+	api->DaoObject_GetMethod = DaoObject_GetMethod;
 	api->DaoObject_MapCData = DaoObject_MapCData;
 
 	api->DaoStream_New = DaoStream_New;
 	api->DaoStream_SetFile = DaoStream_SetFile;
 	api->DaoStream_GetFile = DaoStream_GetFile;
-
-	api->DaoFunction_Call = DaoFunction_Call;
 
 	api->DaoCData_New = DaoCData_New;
 	api->DaoCData_Wrap = DaoCData_Wrap;
@@ -2174,7 +2176,6 @@ static void dao_FakeList_GetType( DaoContext *_ctx, DValue *_p[], int _n )
 }
 #endif
 
-extern void DaoJitMapper_Init();
 extern void DaoType_Init();
 
 DaoType *dao_type_udf = NULL;
@@ -2206,11 +2207,29 @@ void print_trace();
 extern DMap *dao_cdata_bindings;
 extern DArray *dao_callback_data;
 
+int DaoJIT_TryInit( DaoVmSpace *vms )
+{
+	void (*init)( DaoVmSpace*, DaoJIT* );
+	char name[64];
+	void *jitHandle;
+	sprintf( name, "libDaoJIT%s", DAO_DLL_SUFFIX );
+	jitHandle = DaoLoadLibrary( name );
+	if( jitHandle == NULL ) return 0;
+	init = (DaoJIT_InitFPT) DaoFindSymbol( jitHandle, "DaoJIT_Init" );
+	if( init == NULL ) return 0;
+	(*init)( vms, & dao_jit );
+	dao_jit.Quit = (DaoJIT_QuitFPT) DaoFindSymbol( jitHandle, "DaoJIT_Quit" );
+	dao_jit.Free = (DaoJIT_FreeFPT) DaoFindSymbol( jitHandle, "DaoJIT_Free" );
+	dao_jit.Compile = (DaoJIT_CompileFPT) DaoFindSymbol( jitHandle, "DaoJIT_Compile" );
+	dao_jit.Execute = (DaoJIT_ExecuteFPT) DaoFindSymbol( jitHandle, "DaoJIT_Execute" );
+	if( dao_jit.Execute == NULL ) dao_jit.Compile = NULL;
+	return dao_jit.Compile != NULL;
+}
+
 DaoVmSpace* DaoInit()
 {
 	DaoVmSpace *vms;
 	DaoNameSpace *ns;
-	DaoFunction *func;
 	DaoType *type, *type1, *type2, *type3, *type4;
 	DString *mbs;
 	int i;
@@ -2245,10 +2264,6 @@ DaoVmSpace* DaoInit()
 
 #ifdef DAO_WITH_THREAD
 	DaoInitThread();
-#endif
-
-#ifdef DAO_WITH_JIT
-	DaoJitMapper_Init();
 #endif
 
 	DaoStartGC();
@@ -2370,7 +2385,6 @@ extern DaoType* DaoParser_ParseTypeName( const char *type, DaoNameSpace *ns, Dao
 extern DMap *dao_typing_cache;
 void DaoQuit()
 {
-	int i;
 	/* TypeTest(); */
 #if( defined DAO_WITH_THREAD && defined DAO_WITH_SYNCLASS )
 	DaoCallServer_Join( mainVmSpace );
@@ -2430,6 +2444,13 @@ void DaoQuit()
 	dao_callback_data = NULL;
 	mainVmSpace = NULL;
 	mainVmProcess = NULL; 
+	if( dao_jit.Quit ){
+		dao_jit.Quit();
+		dao_jit.Quit = NULL;
+		dao_jit.Free = NULL;
+		dao_jit.Compile = NULL;
+		dao_jit.Execute = NULL;
+	}
 }
 DaoNameSpace* DaoVmSpace_FindModule( DaoVmSpace *self, DString *fname )
 {

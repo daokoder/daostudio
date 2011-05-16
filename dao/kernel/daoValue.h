@@ -35,6 +35,7 @@ const extern DValue daoNullMap;
 const extern DValue daoNullTuple;
 const extern DValue daoNullClass;
 const extern DValue daoNullObject;
+const extern DValue daoNullMetaRoutine;
 const extern DValue daoNullRoutine;
 const extern DValue daoNullFunction;
 const extern DValue daoNullCData;
@@ -55,6 +56,8 @@ int DValue_Move2( DValue from, DValue *to, DaoType *totype );
 void DValue_SimpleMove( DValue from, DValue *to );
 
 void DValue_MarkConst( DValue *self );
+
+int DValue_IsZero( DValue *self );
 
 llong_t DValue_GetLongLong( DValue val );
 llong_t DValue_GetInteger( DValue val );

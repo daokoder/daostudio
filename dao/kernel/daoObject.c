@@ -27,20 +27,23 @@
 int DaoObject_InvokeMethod( DaoObject *self, DaoObject *thisObject,
 		DaoVmProcess *vmp, DString *name, DaoContext *ctx, DValue *ps[], int N, int ret )
 {
+	DRoutine *meth;
 	DValue value = daoNullValue;
 	DValue selfpar = daoNullObject;
-	int i, errcode = DaoObject_GetData( self, name, & value, thisObject, NULL );
+	int errcode = DaoObject_GetData( self, name, & value, thisObject, NULL );
 	if( errcode ) return errcode;
+	if( value.t < DAO_METAROUTINE || value.t > DAO_FUNCTION ) return DAO_ERROR_TYPE;
 	selfpar.v.object = self;
-	if( value.t == DAO_ROUTINE ){
-		DaoRoutine *rout = value.v.routine;
+	meth = DRoutine_Resolve( value.v.p, &selfpar, ps, N, DVM_CALL );
+	if( meth == NULL ) goto InvalidParam;
+	if( meth->type == DAO_ROUTINE ){
+		DaoRoutine *rout = (DaoRoutine*) meth;
 		DaoContext *ctxNew = DaoVmProcess_MakeContext( vmp, rout );
 		GC_ShiftRC( self, ctxNew->object );
 		ctxNew->object = self;
 		DaoContext_Init( ctxNew, rout );
-		DaoContext_InitWithParams( ctxNew, vmp, ps, N );
 		if( DRoutine_PassParams( (DRoutine*) ctxNew->routine, &selfpar, 
-					ctxNew->regValues, ps, NULL, N, DVM_CALL ) ){
+					ctxNew->regValues, ps, N, DVM_CALL ) ){
 			if( STRCMP( name, "_PRINT" ) ==0 ){
 				DaoVmProcess_PushContext( ctx->process, ctxNew );
 				DaoVmProcess_Execute( ctx->process );
@@ -50,19 +53,19 @@ int DaoObject_InvokeMethod( DaoObject *self, DaoObject *thisObject,
 			}
 			return 0;
 		}
-		DaoVmProcess_CacheContext( vmp, ctxNew );
-		return DAO_ERROR_PARAM;
-	}else if( value.t == DAO_FUNCTION ){
-		DaoFunction *func = value.v.func;
-		DValue *ps2[ DAO_MAX_PARAM+1 ];
+		goto InvalidParam;
+	}else if( meth->type == DAO_FUNCTION ){
+		DaoFunction *func = (DaoFunction*) meth;
 		DValue self0 = daoNullObject;
-		memcpy( ps2+1, ps, N*sizeof(DValue*) );
-		ps2[0] = & self0;
 		self0.v.object = (DaoObject*) DaoObject_MapThisObject( self, func->routHost );
 		self0.t = self0.v.object ? self0.v.object->type : 0;
-		func = (DaoFunction*)DRoutine_GetOverLoad( (DRoutine*) func, &selfpar, ps2, N+1, DVM_MCALL );
-		DaoFunction_SimpleCall( func, ctx, ps2, N+1 );
+		DaoFunction_Call( func, ctx, &self0, ps, N );
+	}else{
+		return DAO_ERROR_TYPE;
 	}
+	return 0;
+InvalidParam:
+	DaoContext_ShowCallError( ctx, (DRoutine*)value.v.p, & selfpar, ps, N, DVM_CALL );
 	return 0;
 }
 static void DaoObject_Print( DValue *self0, DaoContext *ctx, DaoStream *stream, DMap *cycData )
@@ -112,11 +115,11 @@ static void DaoObject_Core_SetField( DValue *self0, DaoContext *ctx, DString *na
 	int ec = DaoObject_SetData( self, name, value, ctx->object );
 	int ec2 = ec;
 	if( ec ){
-		DString_SetMBS( ctx->process->mbstring, "." );
-		DString_Append( ctx->process->mbstring, name );
-		DString_AppendMBS( ctx->process->mbstring, "=" );
-		ec = DaoObject_InvokeMethod( self, ctx->object, ctx->process,
-				ctx->process->mbstring, ctx, & par, 1, -1 );
+		DString *mbs = ctx->process->mbstring;
+		DString_SetMBS( mbs, "." );
+		DString_Append( mbs, name );
+		DString_AppendMBS( mbs, "=" );
+		ec = DaoObject_InvokeMethod( self, ctx->object, ctx->process, mbs, ctx, & par, 1, -1 );
 		if( ec == DAO_ERROR_FIELD_NOTEXIST ) ec = ec2;
 	}
 	if( ec ) DaoContext_RaiseException( ctx, ec, DString_GetMBS( name ) );
@@ -316,30 +319,34 @@ DaoBase* DaoObject_MapThisObject( DaoObject *self, DaoType *host )
 	}
 	return NULL;
 }
-DaoBase* DaoObject_MapChildObject( DaoObject *self, DaoType *parent )
+DaoObject* DaoObject_SetParentCData( DaoObject *self, DaoCData *parent )
 {
 	int i;
+	DaoObject *child = NULL;
 	if( parent == NULL ) return NULL;
-	if( self->myClass->objType == parent ) return NULL;
 	if( self->superObject ==NULL ) return NULL;
 	for( i=0; i<self->superObject->size; i++ ){
+		DaoObject *obj = self->superObject->items.pObject[i];
 		DaoBase *sup = self->myClass->superClass->items.pBase[i];
 		if( sup == NULL ) continue;
-		if( sup->type == DAO_CLASS ){
-			if( ((DaoClass*)sup)->objType == parent ) return (DaoBase*) self;
-		}else if( sup->type == DAO_CDATA ){
-			DaoCData *cdata = (DaoCData*)sup;
-			if( DaoCData_ChildOf( cdata->typer, parent->typer ) ) return (DaoBase*) self;
+		if( obj ){
+			if( sup->type == DAO_CLASS ){
+				DaoObject *o = DaoObject_SetParentCData( obj, parent );
+				/* TODO: map to first common child for multiple inheritance: */
+				if( o ) child = o;
+			}
+			continue;
 		}
-		sup = self->superObject->items.pBase[i];
-		if( sup == NULL ) continue;
-		if( sup->type == DAO_OBJECT ){
-			DaoObject *obj = (DaoObject*)sup;
-			if( obj->myClass->objType == parent ) return (DaoBase*) self;
-			return DaoObject_MapChildObject( obj, parent );
+		if( sup->type == DAO_CTYPE ){
+			DaoCData *cdata = (DaoCData*)sup;
+			if( DaoCData_ChildOf( cdata->typer, parent->typer ) ){
+				GC_IncRC( parent );
+				self->superObject->items.pBase[i] = (DaoBase*)parent;
+				return self;
+			}
 		}
 	}
-	return NULL;
+	return child;
 }
 DaoCData* DaoObject_MapCData( DaoObject *self, DaoTypeBase *typer )
 {
@@ -430,4 +437,14 @@ DValue DaoObject_GetField( DaoObject *self, const char *name )
 	DString str = DString_WrapMBS( name );
 	DaoObject_GetData( self, & str, & res, self, NULL );
 	return res;
+}
+DaoMethod* DaoObject_GetMethod( DaoObject *self, const char *name )
+{
+	DValue value;
+	DString str = DString_WrapMBS( name );
+	int id = DaoClass_FindConst( self->myClass, & str );
+	if( id < 0 ) return NULL;
+	value = DaoClass_GetConst( self->myClass, id );
+	if( value.t < DAO_METAROUTINE || value.t > DAO_FUNCTION ) return NULL;
+	return (DaoMethod*) value.v.p;
 }

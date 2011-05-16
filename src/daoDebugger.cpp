@@ -389,8 +389,6 @@ static short DaoVmCodeInfo[][5] =
 	{ 1, 1, 1, DVM_GETI, DVM_GETI_AM } , 
 	{ 1, 1, 1, DVM_SETI, DVM_SETI_AM } , 
 
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_M } , 
-
 	{ 1, 0, 1, DVM_GETF, DVM_GETF_KC } , 
 	{ 1, 0, 1, DVM_GETF, DVM_GETF_KG } , 
 	{ 1, 0, 1, DVM_GETF, DVM_GETF_OC } , 
@@ -447,12 +445,6 @@ static short DaoVmCodeInfo[][5] =
 	{ 1, 0, 0, DVM_TEST, DVM_TEST_I } ,
 	{ 1, 0, 0, DVM_TEST, DVM_TEST_F } ,
 	{ 1, 0, 0, DVM_TEST, DVM_TEST_D } ,
-
-	{ 0, 2, 1, DVM_CALL, DVM_CALL_CF } , 
-	{ 0, 2, 1, DVM_CALL, DVM_CALL_CMF } , 
-
-	{ 0, 2, 1, DVM_CALL, DVM_CALL_TC } , 
-	{ 0, 2, 1, DVM_MCALL, DVM_MCALL_TC } , 
 
 	{ 1, 0, 0, DVM_GOTO, DVM_SAFE_GOTO }, 
 

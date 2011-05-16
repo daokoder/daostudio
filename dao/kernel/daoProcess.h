@@ -60,9 +60,6 @@ struct DaoVmProcess
 	DaoFuture *future;
 
 	DString *mbstring;
-	DVarray *parbuf;
-	DArray  *array;
-	DArray  *signature;
 	DMap    *mbsRegex; /* <DString*,DString*> */
 	DMap    *wcsRegex; /* <DString*,DString*> */
 };
@@ -76,10 +73,9 @@ void DaoVmProcess_PushRoutine( DaoVmProcess *self, DaoRoutine *routine );
 /* Push an initialized context into the calling stack of the VM process */
 void DaoVmProcess_PushContext( DaoVmProcess *self, DaoContext *context );
 DaoContext* DaoVmProcess_MakeContext( DaoVmProcess *self, DaoRoutine *routine );
-void DaoVmProcess_CacheContext( DaoVmProcess *self, DaoContext *ctx );
 void DaoVmProcess_PopContext( DaoVmProcess *self );
 
-int DaoVmProcess_Call( DaoVmProcess *self, DaoRoutine *r, DaoObject *o, DValue *p[], int n );
+int DaoVmProcess_Call( DaoVmProcess *self, DaoMethod *f, DValue *o, DValue *p[], int n );
 /* Execute from the top of the calling stack */
 int DaoVmProcess_Execute( DaoVmProcess *self );
 int DaoVmProcess_ExecuteSection( DaoVmProcess *self, int entry );
@@ -100,5 +96,23 @@ void DaoVmProcess_PrintException( DaoVmProcess *self, int clear );
 DValue DaoVmProcess_MakeConst( DaoVmProcess *self );
 DValue DaoVmProcess_MakeEnumConst( DaoVmProcess *self, DaoVmCode *vmCode, int n, DaoType *t );
 DValue DaoVmProcess_MakeArithConst( DaoVmProcess *self, ushort_t opc, DValue a, DValue b );
+
+
+typedef struct DaoJIT DaoJIT;
+typedef void (*DaoJIT_InitFPT)( DaoVmSpace*, DaoJIT* );
+typedef void (*DaoJIT_QuitFPT)();
+typedef void (*DaoJIT_FreeFPT)( DaoRoutine *routine );
+typedef void (*DaoJIT_CompileFPT)( DaoRoutine *routine );
+typedef void (*DaoJIT_ExecuteFPT)( DaoContext *context, int jitcode );
+
+struct DaoJIT
+{
+	void (*Quit)();
+	void (*Free)( DaoRoutine *routine );
+	void (*Compile)( DaoRoutine *routine );
+	void (*Execute)( DaoContext *context, int jitcode );
+};
+
+extern struct DaoJIT dao_jit;
 
 #endif

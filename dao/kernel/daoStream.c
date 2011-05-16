@@ -158,7 +158,7 @@ static void DaoIO_Read( DaoContext *ctx, DValue *p[], int N )
 	DaoStream *self = ctx->vmSpace->stdStream;
 	DaoVmSpace *vms = self->vmSpace;
 	DString *ds = DaoContext_PutMBString( ctx, "" );
-	int ch, count = 0;
+	int count = 0;
 	if( N >0 ) self = p[0]->v.stream;
 	if( N >1 ) count = p[1]->v.i;
 	if( (self->attribs & (DAO_IO_FILE | DAO_IO_PIPE)) && self->file == NULL ){
@@ -434,15 +434,15 @@ static void DaoIO_Mode( DaoContext *ctx, DValue *p[], int N )
 
 static DaoFuncItem streamMeths[] =
 {
-	{  DaoIO_Write,     "write( self :stream, ... )const" },
+	{  DaoIO_Write,     "write( self :stream, ... )" },
 	{  DaoIO_Write2,    "write( ... )" },
-	{  DaoIO_Writef,    "writef( self :stream, format : string, ... )const" },
+	{  DaoIO_Writef,    "writef( self :stream, format : string, ... )" },
 	{  DaoIO_Writef2,   "writef( format : string, ... )" },
-	{  DaoIO_Writeln,   "writeln( self :stream, ... )const" },
+	{  DaoIO_Writeln,   "writeln( self :stream, ... )" },
 	{  DaoIO_Writeln2,  "writeln( ... )" },
-	{  DaoIO_Flush,     "flush( self :stream )const" },
-	{  DaoIO_Read,      "read( self :stream, count=0 )const=>string" },
-	{  DaoIO_Read2,     "read( self :stream, quantity :enum<line, all> )const=>string" },
+	{  DaoIO_Flush,     "flush( self :stream )" },
+	{  DaoIO_Read,      "read( self :stream, count=0 )=>string" },
+	{  DaoIO_Read2,     "read( self :stream, quantity :enum<line, all> )=>string" },
 	{  DaoIO_Read,      "read( )=>string" },
 	{  DaoIO_ReadFile,  "read( file : string, silent=0 )=>string" },
 	{  DaoIO_Open,      "open( )=>stream" },
@@ -848,7 +848,7 @@ int DaoFile_ReadLine( FILE *fin, DString *line )
 
 #ifdef WIN32
 #include <windows.h>
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(_stat)
 #define _stat stat
 #endif
 #endif

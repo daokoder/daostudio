@@ -16,24 +16,20 @@
 
 #include"daoType.h"
 
-typedef unsigned int bits_t;
-
 #define \
 	DAO_ROUT_COMMON \
 uchar_t        attribs; \
-uchar_t        minimal; \
-uchar_t        minParam; \
 uchar_t        parCount; \
 ushort_t       defLine; \
-uchar_t        tidHost; \
 DaoType       *routHost; \
 DaoType       *routType; \
 DString       *routName; \
 DString       *routHelp; \
 DString       *parCodes; \
 DVarray       *routConsts; \
-DArray        *routTable; \
 DaoNameSpace  *nameSpace
+
+#define ROUT_HOST_TID( t ) ((t)->routHost ? (t)->routHost->tid : 0)
 
 struct DRoutine
 {
@@ -43,26 +39,17 @@ struct DRoutine
 
 DRoutine* DRoutine_New();
 void DRoutine_CopyFields( DRoutine *self, DRoutine *from );
-void DRoutine_AddOverLoad( DRoutine *self, DRoutine *rout );
 int  DRoutine_AddConst( DRoutine *self, DaoBase *data );
 int  DRoutine_AddConstValue( DRoutine *self, DValue value );
 
-DRoutine* DRoutine_GetOverLoadByType( DRoutine *self, DaoType *type );
-DRoutine* DRoutine_GetOverLoad( DRoutine *self, DValue *obj, DValue *p[], int n, int code );
-
 /* Return 0 if failed, otherwise return 1 plus number passed parameters: */
-int DRoutine_PassParams( DRoutine *rout, DValue *obj, DValue *recv[], DValue *p[], DValue *base, int np, int code );
-int DRoutine_FastPassParams( DRoutine *routine, DValue *obj, DValue *recv[], DValue *p[], DValue *base, int np, int code );
+int DRoutine_PassParams( DRoutine *rout, DValue *obj, DValue *recv[], DValue *p[], int np, int code );
 
 #define DaoRoutine_AddConst(f,d) DRoutine_AddConst((DRoutine*)(f),(DaoBase*)(d))
 #define DaoRoutine_AddConstValue(f,v) DRoutine_AddConstValue((DRoutine*)(f),v)
-#define DaoRoutine_GetOverLoad(f,o,p,n,c) (DaoRoutine*)DRoutine_GetOverLoad((DRoutine*)(f),o,p,n,c)
-#define DaoRoutine_PassParams(f,o,r,p,b,n,c) DRoutine_PassParam((DRoutine*)(f),o,r,p,b,n,c)
-#define DaoRoutine_FastPassParams(f,o,r,p,b,n,c) DRoutine_FastPassParam((DRoutine*)(f),o,r,p,b,n,c)
+#define DaoRoutine_PassParams(f,o,r,p,n,c) DRoutine_PassParam((DRoutine*)(f),o,r,p,n,c)
 
-#define DaoFunction_GetOverLoad(f,o,p,n,c) (DaoFunction*)DRoutine_GetOverLoad((DRoutine*)(f),o,p,n,c)
-#define DaoFunction_PassParams(f,o,r,p,b,n,c) DRoutine_PassParam((DRoutine*)(f),o,r,p,b,n,c)
-#define DaoFunction_FastPassParams(f,o,r,p,b,n,c) DRoutine_FastPassParam((DRoutine*)(f),o,r,p,b,n,c)
+#define DaoFunction_PassParams(f,o,r,p,n,c) DRoutine_PassParam((DRoutine*)(f),o,r,p,n,c)
 
 struct DaoRoutine
 {
@@ -71,6 +58,9 @@ struct DaoRoutine
 
 	/* virtual machine codes: */
 	DaoVmcArray *vmCodes;
+
+	/* modes of each virtual register */
+	DString *regMode;
 
 	/* data type for local registers: */
 	DArray *regType; /* <DaoType*> */
@@ -87,36 +77,28 @@ struct DaoRoutine
 	int mode;
 
 	ushort_t locRegCount;
-	ushort_t constParam;
-	int bodyStart;
-	int bodyEnd;
+	ushort_t bodyStart;
+	ushort_t bodyEnd;
 
 	DMap *abstypes;
 
-	DaoRoutine *original;
-	DArray     *specialized;
+	DaoRoutine     *original;
+	DaoMetaRoutine *specialized;
 
-	DaoRoutine *upRoutine;
-	DaoContext *upContext;
-	DaoParser  *parser;
-	DaoRoutine *revised; /* to support edit & continue */
+	DaoRoutine   *upRoutine;
+	DaoContext   *upContext;
+	DaoParser    *parser;
+	DaoRoutine   *revised; /* to support edit & continue */
 
-#ifdef DAO_WITH_JIT
-	DArray *binCodes; /* <DString*>: compiled machince codes */
-	DArray *jitFuncs; /* <void*>: executable machine codes as function pointers */
-	DaoVmcArray *preJit; /* original VM codes */
-	DaoJitMemory *jitMemory;
-#endif
+	void *jitData;
 };
 
 DaoRoutine* DaoRoutine_New();
-DaoRoutine* DaoRoutine_Copy( DaoRoutine *self, int overload );
+DaoRoutine* DaoRoutine_Copy( DaoRoutine *self );
 void DaoRoutine_Delete( DaoRoutine *self );
 
 void DaoRoutine_Compile( DaoRoutine *self );
-void DaoRoutine_AddOverLoad( DaoRoutine *self, DaoRoutine *rout );
 int DaoRoutine_SetVmCodes( DaoRoutine *self, DArray *vmCodes );
-
 void DaoRoutine_SetSource( DaoRoutine *self, DArray *tokens, DaoNameSpace *ns );
 
 void DaoRoutine_PrintCode( DaoRoutine *self, DaoStream *stream );
@@ -134,10 +116,7 @@ struct DaoFunction
 
 extern DaoFunction* DaoFunction_New();
 void DaoFunction_Delete( DaoFunction *self );
-DaoFunction* DaoFunction_Copy( DaoFunction *self, int overload );
-
-void DaoFunction_SimpleCall( DaoFunction *self, DaoContext *ctx, DValue *p[], int N );
-int DaoFunction_Call( DaoFunction *func, DaoCData *self, DValue *p[], int n );
+int DaoFunction_Call( DaoFunction *self, DaoContext *ctx, DValue *obj, DValue *p[], int n );
 
 struct DaoFunCurry
 {
@@ -148,5 +127,55 @@ struct DaoFunCurry
 	DVarray  *params;
 };
 DaoFunCurry* DaoFunCurry_New( DValue v, DValue o );
+
+typedef struct DMetaParam DMetaParam;
+
+struct DMetaParam
+{
+	DaoType  *type;
+	DArray   *nexts; /* <DMetaParam*> */
+	DMap     *names; /* <DaoType*,DMetaParam*> */
+	DRoutine *routine;
+};
+DMetaParam* DMetaParam_New();
+void DMetaParam_Delete( DMetaParam *self );
+
+/* DaoMetaRoutine is a structure to organize overloaded functions into trees,
+ * for fast function resolving based on parameter types. */
+
+/* In data structures for namespace and class,
+ * each individual function should have its own entry in these structures,
+ * and an additional entry of DaoMetaRoutine should be added for overloaded
+ * functions. This will simplify some operations such as deriving methods from
+ * parent type or instantiating template classes! */
+
+struct DaoMetaRoutine
+{
+	DAO_DATA_COMMON;
+
+	unsigned int   attribs;
+	DaoNameSpace  *space;
+	DaoType       *host;
+	DaoType       *unitype;
+	DString       *name;
+	DMetaParam    *tree;
+	DMetaParam    *mtree; /* for routines with self parameter */
+	DArray        *routines; /* list of overloaded routines on the trees */
+};
+
+DaoMetaRoutine* DaoMetaRoutine_New( DaoNameSpace *nameSpace, DString *name );
+void DaoMetaRoutine_Delete( DaoMetaRoutine *self );
+
+void DaoMetaRoutine_UpdateVtable( DaoMetaRoutine *self, DRoutine *routine, DMap *vtable );
+DRoutine* DaoMetaRoutine_Add( DaoMetaRoutine *self, DRoutine *routine );
+DRoutine* DaoMetaRoutine_Lookup( DaoMetaRoutine *self, DValue *obj, DValue *p[], int n, int code );
+DRoutine* DaoMetaRoutine_LookupByType( DaoMetaRoutine *self, DaoType *st, DaoType *t[], int n, int c );
+void DaoMetaRoutine_Import( DaoMetaRoutine *self, DaoMetaRoutine *other );
+void DaoMetaRoutine_Compile( DaoMetaRoutine *self );
+
+/* Resolve overloaded, virtual and specialized function: */
+/* "self" must be one of: DRoutine, DaoRoutine, DaoFunction, DaoMetaRoutine. */
+DRoutine* DRoutine_Resolve( DaoBase *self, DValue *obj, DValue *p[], int n, int code );
+DRoutine* DRoutine_ResolveByType( DaoBase *self, DaoType *st, DaoType *t[], int n, int code );
 
 #endif

@@ -41,8 +41,9 @@ enum DaoRTTI
 	DAO_ANY = END_CORE_TYPES, /* a : any */
 	DAO_INITYPE ,  /* a : @t */
 	DAO_VALTYPE ,
-	DAO_UNION , /* disjoint union */
+	DAO_VARIANT , /* variant or disjoint union */
 	DAO_MACRO ,
+	DAO_ABROUTINE , /* abstract routine in interface */
 	DAO_FUNCURRY ,
 	DAO_CMODULE ,
 	DAO_THDMASTER ,
@@ -60,7 +61,6 @@ enum DaoRTTI
 	DAO_PAR_VALIST , /* ... */
 	END_EXTRA_TYPES ,
 
-	DAO_NOCOPYING , /* not a type! */
 	END_NOT_TYPES
 };
 
@@ -76,6 +76,36 @@ enum DaoBasicStruct
 	D_MAP ,
 	D_VOID2 , /* a pair of pointer */
 	D_NULL
+};
+
+enum DaoValueMode
+{
+	DAO_VALUE_NORMAL ,
+	DAO_REFER_PARAM /* reference parameter */
+};
+
+enum DaoRegisterMode
+{
+	DAO_REG_VARIABLE = 1, /* explicit variables */
+	DAO_REG_INTERMED = 2, /* intermediate operands */
+	DAO_REG_INTERMED_SU = 3, /* single-use intermediate operands */
+	/* Mark a reference safe register, which should be an intermediate register
+	 * and is safe to hold a reference. It is considered safe if it used before
+	 * any operations that might invalidate the reference.
+	 *
+	 * Positive example: alist[i] + c
+	 * here the left operand register is safe to store a reference to "alist[i]",
+	 * because it is immediately used in the add operation and there is no other
+	 * operation before the add that can possibly cause reallocation of items of
+	 * "alist", hence invalidate the reference.
+	 *
+	 * Negative example: alist[i] + func()
+	 * here the left operand register is NOT safe to store the reference,
+	 * because func() may access "alist" and cause reallocation of the items.
+	 */
+	DAO_REG_REFER = 4
+	/* single-use and reference-safe intermediate operands can be used for
+	 * some basic optimizations (particularly for DaoJIT). */
 };
 
 /* It is for the typing system, to decide when to specialize a routine.
@@ -131,6 +161,7 @@ enum DaoCaseMode
 {
 	DAO_CASE_ORDERED ,
 	DAO_CASE_UNORDERED ,
+	DAO_CASE_INTS , /* ordered integer cases; TODO optimize, enums */
 	DAO_CASE_TABLE
 };
 
@@ -167,10 +198,9 @@ enum DaoRoutineAttrib
 	DAO_ROUT_PARSELF = 1, /* need self parameter */
 	DAO_ROUT_INITOR = (1<<1), /* class constructor */
 	DAO_ROUT_NEEDSELF = (1<<2), /* for routines use class instance variable(s) */
-	DAO_ROUT_ISCONST = (1<<3), /* constant routine  */
-	DAO_ROUT_EXTFUNC = (1<<4), /* external C function */
-	DAO_ROUT_VIRTUAL = (1<<5),
-	DAO_ROUT_STATIC = (1<<6),
+	DAO_ROUT_EXTFUNC = (1<<3), /* external C function */
+	DAO_ROUT_VIRTUAL = (1<<4),
+	DAO_ROUT_STATIC = (1<<5),
 	DAO_ROUT_MAIN = (1<<7)
 };
 

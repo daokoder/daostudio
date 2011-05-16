@@ -39,7 +39,7 @@ DMap *dao_typing_cache; /* HASH<void*[2],int> */
 DMutex dao_typing_mutex;
 #endif
 
-DaoFunction* DaoFindFunction( DaoTypeBase *typer, DString *name )
+DaoBase* DaoFindFunction( DaoTypeBase *typer, DString *name )
 {
 	DNode *node;
 	if( typer->priv->methods == NULL ){
@@ -47,21 +47,24 @@ DaoFunction* DaoFindFunction( DaoTypeBase *typer, DString *name )
 		if( typer->priv->methods == NULL ) return NULL;
 	}
 	node = DMap_Find( typer->priv->methods, name );
-	if( node ) return (DaoFunction*)node->value.pVoid;
+	if( node ) return node->value.pBase;
 	return NULL;
 }
-DaoFunction* DaoFindFunction2( DaoTypeBase *typer, const char *name )
+DaoBase* DaoFindFunction2( DaoTypeBase *typer, const char *name )
 {
 	DString mbs = DString_WrapMBS( name );
 	return DaoFindFunction( typer, & mbs );
 }
 DValue DaoFindValue( DaoTypeBase *typer, DString *name )
 {
-	DaoFunction *func = DaoFindFunction( typer, name );
-	DValue value = daoNullFunction;
+	DaoBase *func = DaoFindFunction( typer, name );
+	DValue value = daoNullValue;
 	DNode *node;
-	value.v.func = func;
-	if( func ) return value;
+	value.v.p = func;
+	if( func ){
+		value.t = func->type;
+		return value;
+	}
 	if( typer->priv->values == NULL ){
 		DaoNameSpace_SetupValues( typer->priv->nspace, typer );
 		if( typer->priv->values == NULL ) return daoNullValue;
@@ -353,7 +356,6 @@ void DEnum_MakeName( DEnum *self, DString *name )
 {
 	DMap *mapNames;
 	DNode *node;
-	int n;
 	DString_Clear( name );
 	mapNames = self->type->mapNames;
 	for(node=DMap_First(mapNames);node;node=DMap_Next(mapNames,node)){
@@ -664,38 +666,26 @@ void DaoBase_SafeSetField( DValue *dbase, DaoContext *ctx, DString *name, DValue
 }
 void DaoBase_GetItem( DValue *self0, DaoContext *ctx, DValue *pid[], int N )
 {
-	DaoTypeBase *typer = DValue_GetTyper( *self0 );
-	DaoFunction *func = NULL;
-	DValue *p[ DAO_MAX_PARAM ];
-	memcpy( p + 1, pid, N*sizeof(DValue*) );
-	p[0] = self0;
-	DString_SetMBS( ctx->process->mbstring, "[]" );
-	func = DaoFindFunction( typer, ctx->process->mbstring );
-	if( func )
-		func = (DaoFunction*)DRoutine_GetOverLoad( (DRoutine*)func, self0, p+1, N, 0 );
+	DaoBase *func = DaoFindFunction2( DValue_GetTyper( *self0 ), "[]" );
+	if( func ) func = (DaoBase*) DRoutine_Resolve( func, self0, pid, N, DVM_CALL );
 	if( func == NULL ){
 		DaoContext_RaiseException( ctx, DAO_ERROR_FIELD_NOTEXIST, "" );
 		return;
 	}
-	DaoFunction_SimpleCall( func, ctx, p, N+1 );
+	DaoFunction_Call( (DaoFunction*) func, ctx, self0, pid, N );
 }
 void DaoBase_SetItem( DValue *self0, DaoContext *ctx, DValue *pid[], int N, DValue value )
 {
-	DaoTypeBase *typer = DValue_GetTyper( *self0 );
-	DaoFunction *func = NULL;
+	DaoBase *func = DaoFindFunction2( DValue_GetTyper( *self0 ), "[]=" );
 	DValue *p[ DAO_MAX_PARAM ];
-	memcpy( p + 1, pid, N*sizeof(DValue*) );
-	p[0] = self0;
+	memcpy( p, pid, N*sizeof(DValue*) );
 	p[N+1] = & value;
-	DString_SetMBS( ctx->process->mbstring, "[]=" );
-	func = DaoFindFunction( typer, ctx->process->mbstring );
-	if( func )
-		func = (DaoFunction*)DRoutine_GetOverLoad( (DRoutine*)func, self0, p+1, N+1, 0 );
+	if( func ) func = (DaoBase*) DRoutine_Resolve( func, self0, p, N+1, DVM_CALL );
 	if( func == NULL ){
 		DaoContext_RaiseException( ctx, DAO_ERROR_FIELD_NOTEXIST, "" );
 		return;
 	}
-	DaoFunction_SimpleCall( func, ctx, p, N+2 );
+	DaoFunction_Call( (DaoFunction*) func, ctx, self0, p, N+1 );
 }
 
 /**/
@@ -1835,9 +1825,9 @@ static void DaoSTR_Reverse( DaoContext *ctx, DValue *p[], int N )
 
 static DaoFuncItem stringMeths[] =
 {
-	{ DaoSTR_Size,    "size( self :string )const=>int" },
+	{ DaoSTR_Size,    "size( self :string )=>int" },
 	{ DaoSTR_Resize,  "resize( self :string, size :int )" },
-	{ DaoSTR_Type,    "type( self :string )const =>enum<mbs, wcs>" },
+	{ DaoSTR_Type,    "type( self :string )=>enum<mbs, wcs>" },
 	{ DaoSTR_Convert, "convert( self :string, to :enum<mbs, wcs> ) =>string" },
 	{ DaoSTR_Insert,  "insert( self :string, str :string, index=0, remove=0, copy=0 )" },
 	{ DaoSTR_Clear,   "clear( self :string )" },
@@ -1845,24 +1835,24 @@ static DaoFuncItem stringMeths[] =
 	{ DaoSTR_Chop,    "chop( self :string ) =>string" },
 	{ DaoSTR_Trim,    "trim( self :string ) =>string" },
 	/* return -1, if not found. */
-	{ DaoSTR_Find,    "find( self :string, str :string, from=0, reverse=0 )const=>int" },
+	{ DaoSTR_Find,    "find( self :string, str :string, from=0, reverse=0 )=>int" },
 	/* replace index-th occurrence: =0: replace all; >0: from begin; <0: from end. */
 	/* return int of occurrence replaced. */
 	{ DaoSTR_Replace, "replace( self :string, str1 :string, str2 :string, index=0 )=>int" },
 	{ DaoSTR_Replace2, "replace( self :string, table : map<string,string>, max=0 )" },
-	{ DaoSTR_Expand,  "expand( self :string, keys :map<string,string>, spec='$', keep=1 )const=>string" },
-	{ DaoSTR_Expand,  "expand( self :string, keys : tuple, spec='$', keep=1 )const=>string" },
-	{ DaoSTR_Split, "split( self :string, sep='', quote='', rm=1 )const=>list<string>" },
-	{ DaoSTR_Tokenize, "tokenize( self :string, seps :string, quotes='', backslash=0, simplify=0 )const=>list<string>" },
-	{ DaoSTR_PFind, "pfind( self :string, pt :string, index=0, start=0, end=0 )const=>list<tuple<start:int,end:int>>" },
-	{ DaoSTR_Match, "match( self :string, pt :string, start=0, end=0, substring=1 )const=>tuple<start:int,end:int,substring:string>" },
-	{ DaoSTR_SubMatch, "submatch( self :string, pt :string, group:int, start=0, end=0 )const=>tuple<start:int,end:int,substring:string>" },
-	{ DaoSTR_Extract, "extract( self :string, pt :string, matched=1, mask='', rev=0 )const=>list<string>" },
-	{ DaoSTR_Capture, "capture( self :string, pt :string, start=0, end=0 )const=>list<string>" },
+	{ DaoSTR_Expand,  "expand( self :string, keys :map<string,string>, spec='$', keep=1 )=>string" },
+	{ DaoSTR_Expand,  "expand( self :string, keys : tuple, spec='$', keep=1 )=>string" },
+	{ DaoSTR_Split, "split( self :string, sep='', quote='', rm=1 )=>list<string>" },
+	{ DaoSTR_Tokenize, "tokenize( self :string, seps :string, quotes='', backslash=0, simplify=0 )=>list<string>" },
+	{ DaoSTR_PFind, "pfind( self :string, pt :string, index=0, start=0, end=0 )=>list<tuple<start:int,end:int>>" },
+	{ DaoSTR_Match, "match( self :string, pt :string, start=0, end=0, substring=1 )=>tuple<start:int,end:int,substring:string>" },
+	{ DaoSTR_SubMatch, "submatch( self :string, pt :string, group:int, start=0, end=0 )=>tuple<start:int,end:int,substring:string>" },
+	{ DaoSTR_Extract, "extract( self :string, pt :string, matched=1, mask='', rev=0 )=>list<string>" },
+	{ DaoSTR_Capture, "capture( self :string, pt :string, start=0, end=0 )=>list<string>" },
 	{ DaoSTR_Change,  "change( self :string, pt :string, s:string, index=0, start=0, end=0 )=>int" },
-	{ DaoSTR_Mpack,  "mpack( self :string, pt :string, s:string, index=0 )const=>string" },
-	{ DaoSTR_Mpack,  "mpack( self :string, pt :string, s:string, index : int, count : int )const=>list<string>" },
-	{ DaoSTR_Tonumber, "tonumber( self :string, base=10 )const=>double" },
+	{ DaoSTR_Mpack,  "mpack( self :string, pt :string, s:string, index=0 )=>string" },
+	{ DaoSTR_Mpack,  "mpack( self :string, pt :string, s:string, index : int, count : int )=>list<string>" },
+	{ DaoSTR_Tonumber, "tonumber( self :string, base=10 )=>double" },
 	{ DaoSTR_Tolower, "tolower( self :string ) =>string" },
 	{ DaoSTR_Toupper, "toupper( self :string ) =>string" },
 	{ DaoSTR_Reverse, "reverse( self :string ) =>string" },
@@ -2124,11 +2114,11 @@ static void DaoLIST_Erase2( DaoContext *ctx, DValue *p[], int N )
 		if( id < 0 || id >= self->items->size ) continue;
 		if( id < k ) k = id;
 		DValue_Clear( self->items->data + id );
-		self->items->data[id].sub = 1; /* mark as deleted */
+		self->items->data[id].temp = 1; /* mark as deleted */
 	}
 	for(i=k; i<self->items->size; i++){
 		DValue val = self->items->data[i];
-		if( val.t == 0 && val.sub == 1 ) continue;
+		if( val.t == 0 && val.temp == 1 ) continue;
 		self->items->data[k] = val;
 		k += 1;
 	}
@@ -2151,7 +2141,6 @@ static void DaoLIST_Resize( DaoContext *ctx, DValue *p[], int N )
 	DaoList *self = p[0]->v.list;
 	size_t size = (size_t)p[1]->v.i;
 	size_t oldSize = self->items->size;
-	size_t i;
 	if( ( ctx->vmSpace->options & DAO_EXEC_SAFE ) && size > 1000 ){
 		DaoContext_RaiseException( ctx, DAO_ERROR,
 				"not permitted to create large list in safe running mode" );
@@ -2558,7 +2547,7 @@ static void DaoLIST_Join( DaoContext *ctx, DValue *p[], int N )
 			case DAO_LONG:
 				digits = self->items->data[i].v.l->size;
 				digits = digits > 1 ? (LONG_BITS * (digits - 1) + 1) : 1; /* bits */
-				digits /= log( self->items->data[i].v.l->base ) / log(2); /* digits */
+				digits /= (int)(log( self->items->data[i].v.l->base ) / log(2)); /* digits */
 				size += digits + (data[i].v.l->sign < 0) ? 3 : 2; /* sign + suffix */
 				break;
 			case DAO_ENUM :
@@ -2602,18 +2591,18 @@ static DaoFuncItem listMeths[] =
 	{ DaoLIST_Erase,      "erase( self :list<any>, start=0, n=1 )" },
 	{ DaoLIST_Erase2,     "erase( self :list<any>, indices : list<int> )" },
 	{ DaoLIST_Clear,      "clear( self :list<any> )" },
-	{ DaoLIST_Size,       "size( self :list<any> )const=>int" },
+	{ DaoLIST_Size,       "size( self :list<any> )=>int" },
 	{ DaoLIST_Resize,     "resize( self :list<any>, size :int )" },
-	{ DaoLIST_Max,        "max( self :list<@T<int|long|float|double|complex|string|enum>> )const=>tuple<@T,int>" },
-	{ DaoLIST_Min,        "min( self :list<@T<int|long|float|double|complex|string|enum>> )const=>tuple<@T,int>" },
-	{ DaoLIST_Sum,        "sum( self :list<@T<int|long|float|double|complex|string|enum>> )const=>@T" },
-	{ DaoLIST_Join,       "join( self :list<int|float|double|long|complex|string|enum>, separator='' )const=>string" },
+	{ DaoLIST_Max,        "max( self :list<@T<int|long|float|double|complex|string|enum>> )=>tuple<@T,int>" },
+	{ DaoLIST_Min,        "min( self :list<@T<int|long|float|double|complex|string|enum>> )=>tuple<@T,int>" },
+	{ DaoLIST_Sum,        "sum( self :list<@T<int|long|float|double|complex|string|enum>> )=>@T" },
+	{ DaoLIST_Join,       "join( self :list<int|float|double|long|complex|string|enum>, separator='' )=>string" },
 	{ DaoLIST_PushBack,   "append( self :list<@T>, item :@T )" },
 	{ DaoLIST_Push,       "push( self :list<@T>, item :@T, to :enum<front, back> = $back )" },
 	{ DaoLIST_Pop,        "pop( self :list<any>, from :enum<front, back> = $back )" },
-	{ DaoLIST_Front,      "front( self :list<@T> )const=>@T" },
-	{ DaoLIST_Top,        "back( self :list<@T> )const=>@T" },
-	{ DaoLIST_Rank,       "rank( self :list<any>, order :enum<ascend, descend>=$ascend, k=0 )const=>list<int>" },
+	{ DaoLIST_Front,      "front( self :list<@T> )=>@T" },
+	{ DaoLIST_Top,        "back( self :list<@T> )=>@T" },
+	{ DaoLIST_Rank,       "rank( self :list<any>, order :enum<ascend, descend>=$ascend, k=0 )=>list<int>" },
 	{ DaoLIST_Sort,       "sort( self :list<@T>, order :enum<ascend, descend>=$ascend, k=0 )=>list<@T>" },
 	{ DaoLIST_Reverse,    "reverse( self :list<@T> )=>list<@T>" },
 	{ DaoLIST_Iter,       "__for_iterator__( self :list<any>, iter : for_iterator )" },
@@ -2934,7 +2923,7 @@ static void DaoMAP_Reset( DaoContext *ctx, DValue *p[], int N )
 static void DaoMAP_Erase( DaoContext *ctx, DValue *p[], int N )
 {
 	DMap *self = p[0]->v.map->items;
-	DNode *node, *ml, *mg;
+	DNode *ml, *mg;
 	DArray *keys;
 	N --;
 	switch( N ){
@@ -3080,15 +3069,15 @@ static DaoFuncItem mapMeths[] =
 	{ DaoMAP_Erase,  "erase( self :map<@K,@V>, from :@K, to :@K )" },
 	{ DaoMAP_Insert, "insert( self :map<@K,@V>, key :@K, value :@V )" },
 	/* 0:EQ; -1:MaxLess; 1:MinGreat */
-	{ DaoMAP_Find,   "find( self :map<@K,@V>, key :@K, type : enum<le,eq,ge>=$eq )const=>tuple<int,@K,@V>" },
-	{ DaoMAP_Key,    "keys( self :map<@K,any> )const=>list<@K>" },
-	{ DaoMAP_Key,    "keys( self :map<@K,any>, from :@K )const=>list<@K>" },
-	{ DaoMAP_Key,    "keys( self :map<@K,any>, from :@K, to :@K )const=>list<@K>" },
-	{ DaoMAP_Value,  "values( self :map<any,@V> )const=>list<@V>" },
-	{ DaoMAP_Value,  "values( self :map<@K,@V>, from :@K )const=>list<@V>" },
-	{ DaoMAP_Value,  "values( self :map<@K,@V>, from :@K, to :@K )const=>list<@V>" },
-	{ DaoMAP_Has,    "has( self :map<@K,any>, key :@K )const=>int" },
-	{ DaoMAP_Size,   "size( self :map<any,any> )const=>int" },
+	{ DaoMAP_Find,   "find( self :map<@K,@V>, key :@K, type : enum<le,eq,ge>=$eq )=>tuple<int,@K,@V>" },
+	{ DaoMAP_Key,    "keys( self :map<@K,any> )=>list<@K>" },
+	{ DaoMAP_Key,    "keys( self :map<@K,any>, from :@K )=>list<@K>" },
+	{ DaoMAP_Key,    "keys( self :map<@K,any>, from :@K, to :@K )=>list<@K>" },
+	{ DaoMAP_Value,  "values( self :map<any,@V> )=>list<@V>" },
+	{ DaoMAP_Value,  "values( self :map<@K,@V>, from :@K )=>list<@V>" },
+	{ DaoMAP_Value,  "values( self :map<@K,@V>, from :@K, to :@K )=>list<@V>" },
+	{ DaoMAP_Has,    "has( self :map<@K,any>, key :@K )=>int" },
+	{ DaoMAP_Size,   "size( self :map<any,any> )=>int" },
 	{ DaoMAP_Iter,   "__for_iterator__( self :map<any,any>, iter : for_iterator )" },
 	{ NULL, NULL }
 };
@@ -3454,17 +3443,16 @@ static void DaoCData_GetField( DValue *self, DaoContext *ctx, DString *name )
 		return;
 	}
 	if( p.t == 0 ){
-		DaoFunction *func = NULL;
+		DaoBase *func = NULL;
 		DString_SetMBS( ctx->process->mbstring, "." );
 		DString_Append( ctx->process->mbstring, name );
-		p = DaoFindValue( typer, ctx->process->mbstring );
-		if( p.t == DAO_FUNCTION )
-			func = (DaoFunction*)DRoutine_GetOverLoad( (DRoutine*)p.v.p, NULL, & self, 1, 0 );
+		func = DaoFindFunction( typer, ctx->process->mbstring );
+		func = (DaoBase*) DRoutine_Resolve( func, self, NULL, 0, DVM_CALL );
 		if( func == NULL ){
 			DaoContext_RaiseException( ctx, DAO_ERROR_FIELD_NOTEXIST, "not exist" );
 			return;
 		}
-		func->pFunc( ctx, & self, 1 );
+		((DaoFunction*)func)->pFunc( ctx, & self, 1 );
 	}else{
 		DaoContext_PutValue( ctx, p );
 	}
@@ -3472,11 +3460,9 @@ static void DaoCData_GetField( DValue *self, DaoContext *ctx, DString *name )
 static void DaoCData_SetField( DValue *self, DaoContext *ctx, DString *name, DValue value )
 {
 	DaoTypeBase *typer = DValue_GetTyper( *self );
-	DaoFunction *func = NULL;
+	DaoBase *func = NULL;
+	DValue *pval = & value;
 	DValue val;
-	DValue *p[2];
-	p[0] = self;
-	p[1] = & value;
 	DString_SetMBS( ctx->process->mbstring, "." );
 	DString_Append( ctx->process->mbstring, name );
 	DString_AppendMBS( ctx->process->mbstring, "=" );
@@ -3484,14 +3470,13 @@ static void DaoCData_SetField( DValue *self, DaoContext *ctx, DString *name, DVa
 		DaoContext_RaiseException( ctx, DAO_ERROR, "not permitted" );
 		return;
 	}
-	val = DaoFindValue( typer, ctx->process->mbstring );
-	if( val.t == DAO_FUNCTION )
-		func = (DaoFunction*)DRoutine_GetOverLoad( (DRoutine*)val.v.p, self, p+1, 1, 0 );
+	func = DaoFindFunction( typer, ctx->process->mbstring );
+	if( func ) func = (DaoBase*) DRoutine_Resolve( func, self, &pval, 1, DVM_CALL );
 	if( func == NULL ){
 		DaoContext_RaiseException( ctx, DAO_ERROR_FIELD_NOTEXIST, name->mbs );
 		return;
 	}
-	DaoFunction_SimpleCall( func, ctx, p, 2 );
+	DaoFunction_Call( (DaoFunction*) func, ctx, self, &pval, 1 );
 }
 static void DaoCData_GetItem1( DValue *self0, DaoContext *ctx, DValue pid )
 {
@@ -3516,26 +3501,22 @@ static void DaoCData_GetItem1( DValue *self0, DaoContext *ctx, DValue pid )
 		}
 		DaoContext_PutValue( ctx, *self0 );
 	}else{
-		DaoFunction *func = NULL;
-		DValue *p[ DAO_MAX_PARAM ];
-		p[0] = self0;
-		p[1] = & pid;
-		DString_SetMBS( ctx->process->mbstring, "[]" );
-		func = DaoFindFunction( typer, ctx->process->mbstring );
-		if( func )
-			func = (DaoFunction*)DRoutine_GetOverLoad( (DRoutine*)func, self0, p+1, 1, 0 );
+		DaoBase *func = NULL;
+		DValue *pval = & pid;
+		func = DaoFindFunction2( typer, "[]" );
+		if( func ) func = (DaoBase*) DRoutine_Resolve( func, self0, &pval, 1, DVM_CALL );
 		if( func == NULL ){
 			DaoContext_RaiseException( ctx, DAO_ERROR_FIELD_NOTEXIST, "" );
 			return;
 		}
-		DaoFunction_SimpleCall( func, ctx, p, 2 );
+		DaoFunction_Call( (DaoFunction*) func, ctx, self0, &pval, 1 );
 	}
 }
 static void DaoCData_SetItem1( DValue *self0, DaoContext *ctx, DValue pid, DValue value )
 {
 	DaoTypeBase *typer = DValue_GetTyper( *self0 );
-	DaoFunction *func = NULL;
-	DValue *p[ DAO_MAX_PARAM+2 ];
+	DaoBase *func = NULL;
+	DValue *p[2];
 
 	DString_SetMBS( ctx->process->mbstring, "[]=" );
 	if( ctx->vmSpace->options & DAO_EXEC_SAFE ){
@@ -3544,22 +3525,20 @@ static void DaoCData_SetItem1( DValue *self0, DaoContext *ctx, DValue pid, DValu
 	}
 	func = DaoFindFunction( typer, ctx->process->mbstring );
 	if( func ){
-		p[0] = self0;
-		p[1] = & pid;
-		p[2] = & value;
-		func = (DaoFunction*)DRoutine_GetOverLoad( (DRoutine*)func, self0, p+1, 2, 0 );
+		p[0] = & pid;
+		p[1] = & value;
+		func = (DaoBase*) DRoutine_Resolve( func, self0, p, 2, DVM_CALL );
 	}
 	if( func == NULL ){
 		DaoContext_RaiseException( ctx, DAO_ERROR_FIELD_NOTEXIST, "" );
 		return;
 	}
-	DaoFunction_SimpleCall( func, ctx, p, 3 );
+	DaoFunction_Call( (DaoFunction*) func, ctx, self0, p, 2 );
 }
 static void DaoCData_GetItem( DValue *self, DaoContext *ctx, DValue *ids[], int N )
 {
 	DaoTypeBase *typer = DValue_GetTyper( *self );
-	DaoFunction *func = NULL;
-	DValue *p[ DAO_MAX_PARAM ];
+	DaoBase *func = NULL;
 	if( ctx->vmSpace->options & DAO_EXEC_SAFE ){
 		DaoContext_RaiseException( ctx, DAO_ERROR, "not permitted" );
 		return;
@@ -3568,22 +3547,18 @@ static void DaoCData_GetItem( DValue *self, DaoContext *ctx, DValue *ids[], int 
 		DaoCData_GetItem1( self, ctx, *ids[0] );
 		return;
 	}
-	memcpy( p + 1, ids, N*sizeof(DValue*) );
-	p[0] = self;
-	DString_SetMBS( ctx->process->mbstring, "[]" );
-	func = DaoFindFunction( typer, ctx->process->mbstring );
-	if( func )
-		func = (DaoFunction*)DRoutine_GetOverLoad( (DRoutine*)func, self, p+1, N, 0 );
+	func = DaoFindFunction2( typer, "[]" );
+	if( func ) func = (DaoBase*) DRoutine_Resolve( func, self, ids, N, DVM_CALL );
 	if( func == NULL ){
 		DaoContext_RaiseException( ctx, DAO_ERROR_FIELD_NOTEXIST, "" );
 		return;
 	}
-	DaoFunction_SimpleCall( func, ctx, p, N + 1 );
+	DaoFunction_Call( (DaoFunction*) func, ctx, self, ids, N );
 }
 static void DaoCData_SetItem( DValue *self, DaoContext *ctx, DValue *ids[], int N, DValue value )
 {
 	DaoTypeBase *typer = DValue_GetTyper( *self );
-	DaoFunction *func = NULL;
+	DaoBase *func = NULL;
 	DValue *p[ DAO_MAX_PARAM ];
 	if( ctx->vmSpace->options & DAO_EXEC_SAFE ){
 		DaoContext_RaiseException( ctx, DAO_ERROR, "not permitted" );
@@ -3593,19 +3568,17 @@ static void DaoCData_SetItem( DValue *self, DaoContext *ctx, DValue *ids[], int 
 		DaoCData_SetItem1( self, ctx, *ids[0], value );
 		return;
 	}
-	DString_SetMBS( ctx->process->mbstring, "[]=" );
-	func = DaoFindFunction( typer, ctx->process->mbstring );
+	func = DaoFindFunction2( typer, "[]=" );
 	if( func ){
-		memcpy( p + 1, ids, N*sizeof(DValue*) );
-		p[0] = self;
-		p[N+1] = & value;
-		func = (DaoFunction*)DRoutine_GetOverLoad( (DRoutine*)func, self, p+1, N+1, 0 );
+		memcpy( p, ids, N*sizeof(DValue*) );
+		p[N] = & value;
+		func = (DaoBase*) DRoutine_Resolve( func, self, p, N+1, DVM_CALL );
 	}
 	if( func == NULL ){
 		DaoContext_RaiseException( ctx, DAO_ERROR_FIELD_NOTEXIST, "" );
 		return;
 	}
-	DaoFunction_SimpleCall( func, ctx, p, N+2 );
+	DaoFunction_Call( (DaoFunction*) func, ctx, self, p, N+1 );
 }
 
 DaoCDataCore* DaoCDataCore_New()
@@ -4093,7 +4066,7 @@ static DaoFuncItem dao_Exception_Meths[] =
 	{ Dao_Exception_New22, "Exception( data : any )=>Exception" },
 	/* for testing or demonstration */
 	{ Dao_Exception_Get_info, "serialize( self : Exception )=>string" },
-	{ Dao_Exception_Get_info, "cast( self : Exception, @T<string> )=>@T" },
+	//XXX { Dao_Exception_Get_info, "cast( self : Exception, @T<string> )=>@T" },
 	{ NULL, NULL }
 };
 
@@ -4416,7 +4389,6 @@ DaoType* DaoCData_WrapType( DaoNameSpace *ns, DaoTypeBase *typer )
 	DaoCDataCore *plgCore;
 	DaoCData *cdata;
 	DaoType *abtype;
-	DString name = DString_WrapMBS( "default" );
 
 	cdata = DaoCData_New( typer, NULL );
 	cdata->type = DAO_CTYPE;

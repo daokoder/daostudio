@@ -83,7 +83,7 @@ static void STD_Load( DaoContext *ctx, DValue *p[], int N )
 #if 0
 	if( ns ){ /* in the case that it is cancelled from console */
 		DArray_PushFront( vms->pathLoading, ns->path );
-		res = DaoVmProcess_Call( ctx->process, ns->mainRoutine, NULL, NULL, 0 );
+		res = DaoVmProcess_Call( ctx->process, (DaoMethod*)ns->mainRoutine, NULL, NULL, 0 );
 		if( ctx->process->stopit | vms->stopit )
 			DaoContext_RaiseException( ctx, DAO_ERROR, "loading cancelled" );
 		else if( res == 0 )
@@ -152,7 +152,7 @@ static void STD_Callable( DaoContext *ctx, DValue *p[], int N )
 		{
 			DaoCData *plugin = (DaoCData*) p[0]->v.p;
 			DaoTypeBase *tp = plugin->typer;
-			DaoFunction *func;
+			DaoBase *func;
 			if( plugin->data == NULL && (plugin->trait & DAO_DATA_CONST) ){
 				func = DaoFindFunction2( tp, tp->name );
 				*res = func != NULL;
@@ -221,8 +221,8 @@ void STD_Debug( DaoContext *ctx, DValue *p[], int N )
 	DString *input;
 	DArray *tokens;
 	DMap   *cycData;
-	char *chs, *cmd, buffer[100];
-	int i, j;
+	char *chs, *cmd;
+	int i;
 	if( ! (ctx->vmSpace->options & DAO_EXEC_DEBUG ) ) return;
 	input = DString_New(1);
 	if( N > 0 && p[0]->t == DAO_STREAM ){
@@ -872,7 +872,7 @@ DaoVmProcess* DaoVmProcess_Create( DaoContext *ctx, DValue *par[], int N )
 		DaoContext_RaiseException( ctx, DAO_ERROR_PARAM, "need more parameters." );
 		return NULL;
 	}
-	if( ! DRoutine_PassParams( (DRoutine*)coCtx->routine, NULL, coCtx->regValues, par+1, NULL, N-1, DVM_CALL ) ){
+	if( ! DRoutine_PassParams( (DRoutine*)coCtx->routine, NULL, coCtx->regValues, par+1, N-1, DVM_CALL ) ){
 		DaoContext_SetResult( ctx, NULL );
 		if( newed ) DaoContext_Delete( coCtx );
 		DaoContext_RaiseException( ctx, DAO_ERROR_PARAM, "not matched" );
@@ -892,6 +892,8 @@ static void REFL_NS( DaoContext *ctx, DValue *p[], int N )
 		res.v.ns = ctx->nameSpace;
 	}else if( p[0]->t == DAO_CLASS ){
 		res.v.ns = p[0]->v.klass->classRoutine->nameSpace;
+	}else if( p[0]->t == DAO_METAROUTINE ){
+		res.v.ns = p[0]->v.metaRoutine->space;
 	}else if( p[0]->t == DAO_ROUTINE || p[0]->t == DAO_FUNCTION ){
 		res.v.ns = p[0]->v.routine->nameSpace;
 	}else{
@@ -953,7 +955,7 @@ static void REFL_Cst1( DaoContext *ctx, DValue *p[], int N )
 	DaoNameSpace *ns, *here = ctx->nameSpace;
 	DMap *index = NULL, *lookup = NULL;
 	DVarray *data;
-	DNode *node, *node2;
+	DNode *node;
 	DValue value;
 	DValue name = daoNullString;
 	DValue vtup = daoNullTuple;
@@ -1175,15 +1177,15 @@ static void REFL_Routine( DaoContext *ctx, DValue *p[], int N )
 	DaoList *list;
 	DValue item = daoNullValue;
 	int i;
-	if( N ==1 ){
-		DRoutine *rout = (DRoutine*) p[0]->v.p;
+	if( N ==1 ){ // XXX
+		DaoMetaRoutine *rout = p[0]->v.metaRoutine;
 		list = DaoContext_PutList( ctx );
-		if( p[0]->t != DAO_ROUTINE && p[0]->t != DAO_FUNCTION ){
+		if( p[0]->t != DAO_METAROUTINE ){
 			DaoContext_RaiseException( ctx, DAO_ERROR, "invalid parameter" );
 			return;
 		}
-		for(i=0; i<rout->routTable->size; i++){
-			item.v.p = rout->routTable->items.pBase[i];
+		for(i=0; i<rout->routines->size; i++){
+			item.v.p = rout->routines->items.pBase[i];
 			item.t = item.v.p->type;
 			DaoList_Append( list, item );
 		}
@@ -1193,11 +1195,13 @@ static void REFL_Routine( DaoContext *ctx, DValue *p[], int N )
 }
 static void REFL_Class( DaoContext *ctx, DValue *p[], int N )
 {
+#if 0
 	if( p[0]->t == DAO_ROUTINE && p[0]->v.routine->tidHost == DAO_OBJECT ){
 		DaoContext_SetResult( ctx, (DaoBase*) p[0]->v.routine->routHost->aux.v.klass );
 	}else if( p[0]->t == DAO_OBJECT ){
 		DaoContext_SetResult( ctx, (DaoBase*) p[0]->v.object->myClass );
 	}
+#endif
 	DaoContext_PutValue( ctx, daoNullValue );
 }
 static void REFL_Isa( DaoContext *ctx, DValue *p[], int N )
@@ -1280,7 +1284,7 @@ static void REFL_Param( DaoContext *ctx, DValue *p[], int N )
 		vtp.v.p = (DaoBase*) nested[i];
 		if( nested[i] ) vtp.t = DAO_TYPE;
 		cst = routine->routConsts->data[i];
-		if( cst.t || cst.ndef == 0 ) num.v.i = 1;
+		if( nested[i]->tid == DAO_PAR_DEFAULT ) num.v.i = 1;
 		DValue_Copy( tuple->items->data, str );
 		DValue_Copy( tuple->items->data + 1, vtp );
 		DValue_Copy( tuple->items->data + 2, num );
@@ -1370,7 +1374,7 @@ static void REFL_Doc( DaoContext *ctx, DValue *p[], int N )
 	switch( p[0]->t ){
 	case DAO_CLASS : doc = p[0]->v.klass->classHelp; break;
 	case DAO_OBJECT : doc = p[0]->v.object->myClass->classHelp; break;
-	case DAO_ROUTINE : doc = p[0]->v.routine->routHelp; break;
+	//XXX case DAO_ROUTINE : doc = p[0]->v.routine->routHelp; break;
 	default : break;
 	}
 	if( doc == NULL ){

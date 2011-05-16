@@ -301,7 +301,7 @@ void DString_SetWCS( DString *self, const wchar_t *chs )
 }
 void DString_Reserve( DString *self, size_t size )
 {
-	size_t i, bsize;
+	size_t bsize;
 	DString_Detach( self );
 	if( size <= self->bufSize && 2*size >= self->bufSize ) return;
 	if( self->mbs ){
@@ -648,7 +648,6 @@ void DString_InsertWCS( DString *self, const wchar_t *chs, size_t at, size_t rm,
 }
 void DString_Append( DString *self, DString *chs )
 {
-	if( self == NULL ) return; /* in parsing, DaoInode.annot can be NULL */
 	DString_Detach( self );
 	if( self->mbs && chs->mbs ){
 		DMBString_Append( self, chs->mbs, chs->size );
@@ -662,7 +661,6 @@ void DString_Append( DString *self, DString *chs )
 }
 void DString_AppendChar( DString *self, const char ch )
 {
-	if( self == NULL ) return; /* in parsing, DaoInode.annot can be NULL */
 	DString_Detach( self );
 	if( self->mbs ){
 		DMBString_AppendChar( self, ch );
@@ -672,6 +670,10 @@ void DString_AppendChar( DString *self, const char ch )
 }
 void DString_AppendWChar( DString *self, const wchar_t ch )
 {
+	if( self->mbs && ch >=0 && ch <= 0xff ){
+		DString_AppendChar( self, (char)ch );
+		return;
+	}
 	DString_Detach( self );
 	if( self->mbs ){
 		DMBString_AppendWChar( self, ch );
@@ -681,7 +683,6 @@ void DString_AppendWChar( DString *self, const wchar_t ch )
 }
 void DString_AppendDataMBS( DString *self, const char *chs, size_t n )
 {
-	if( self == NULL ) return; /* in parsing, DaoInode.annot can be NULL */
 	DString_Detach( self );
 	if( self->mbs ){
 		DMBString_Append( self, chs, n );
@@ -892,7 +893,6 @@ void DString_Assign( DString *self, DString *chs )
 	size_t *data1, *data2;
 	int share1, share2;
 	int assigned = 0;
-	if( self == NULL ) return; /* in parsing, DaoInode.annot can be NULL */
 	if( self == chs ) return;
 	if( self->data == chs->data ) return;
 
@@ -1084,7 +1084,7 @@ void DString_Trim( DString *self )
 }
 size_t DString_CheckUTF8( DString *self )
 {
-	size_t i = 0, k, m, size = self->size;
+	size_t i = 0, m, size = self->size;
 	size_t total = 0;
 	size_t valid = 0;
 	unsigned char *mbs;
@@ -1342,7 +1342,7 @@ static int STR_Cipher( DString *self, DString *key, int hex, int flag )
 			}
 			DString_Resize( self, size );
 		}
-		btea( (int*)self->mbs, - (self->size / 4), (int*) ks );
+		btea( (int*)self->mbs, - (int)(self->size / 4), (int*) ks );
 		size = *(int*) self->mbs;
 		DString_Erase( self, 0, 4 );
 		self->size = size;

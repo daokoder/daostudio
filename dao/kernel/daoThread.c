@@ -865,8 +865,8 @@ static void DaoThdMaster_Lib_Create( DaoContext *ctx, DValue *par[], int N )
 		for(i=0; i<N; i++) buffer[i] = curry->params->data + i;
 		params = buffer;
 	}
-	if( rov.t != DAO_ROUTINE && rov.t != DAO_FUNCTION ) goto ErrorParam;
-	rout = DRoutine_GetOverLoad( (DRoutine*)rov.v.routine, & selfobj, params, N, DVM_CALL );
+	if( rov.t < DAO_METAROUTINE && rov.t > DAO_FUNCTION ) goto ErrorParam;
+	rout = DRoutine_Resolve( rov.v.p, & selfobj, params, N, DVM_CALL );
 	if( rout == NULL ) goto ErrorParam;
 	if( rout->type == DAO_ROUTINE ){
 		DaoRoutine *drout = (DaoRoutine*) rout;
@@ -892,7 +892,7 @@ static void DaoThdMaster_Lib_Create( DaoContext *ctx, DValue *par[], int N )
 	if( rout->type == DAO_ROUTINE ){
 		DaoVmProcess_PushContext( vmProc, thdCtx );
 		if( ! DRoutine_PassParams( (DRoutine*)rout, & selfobj, 
-					thdCtx->regValues, params, NULL, N, DVM_CALL ) ){
+					thdCtx->regValues, params, N, DVM_CALL ) ){
 			DaoVmProcess_Delete( vmProc );
 			goto ErrorParam;
 		}
@@ -905,7 +905,7 @@ static void DaoThdMaster_Lib_Create( DaoContext *ctx, DValue *par[], int N )
 		if( N > DAO_MAX_PARAM ) N = DAO_MAX_PARAM; /* XXX warning */
 		calldata->npar = N;
 		if( ! DRoutine_PassParams( (DRoutine*)rout, & selfobj, 
-					calldata->par2, params, NULL, N, DVM_CALL ) ){
+					calldata->par2, params, N, DVM_CALL ) ){
 			DValue_ClearAll( calldata->par, N );
 			DaoVmProcess_Delete( vmProc );
 			dao_free( calldata );
@@ -967,14 +967,14 @@ static void DaoThdMaster_Lib_Sema( DaoContext *ctx, DValue *par[], int N )
 
 static DaoFuncItem thdMasterMeths[] =
 {
-	{ DaoThdMaster_Lib_Create,      "thread( self : mtlib, object, ... )const=>thread" },
-	{ DaoThdMaster_Lib_Mutex,       "mutex( self : mtlib )const=>mutex" },
-	{ DaoThdMaster_Lib_CondVar,     "condition( self : mtlib )const=>condition" },
-	{ DaoThdMaster_Lib_Sema,        "semaphore( self : mtlib )const=>semaphore" },
-	{ DaoThdMaster_Lib_Exit,        "exit( self : mtlib )const" },
-	{ DaoThdMaster_Lib_TestCancel,  "testcancel( self : mtlib )const" },
-	{ DaoThdMaster_Lib_Self,        "self( self : mtlib )const=>thread" },
-	{ DaoThdMaster_Lib_MyData,      "mydata( self : mtlib )const=>map<string,any>" },
+	{ DaoThdMaster_Lib_Create,      "thread( self : mtlib, object, ... )=>thread" },
+	{ DaoThdMaster_Lib_Mutex,       "mutex( self : mtlib )=>mutex" },
+	{ DaoThdMaster_Lib_CondVar,     "condition( self : mtlib )=>condition" },
+	{ DaoThdMaster_Lib_Sema,        "semaphore( self : mtlib )=>semaphore" },
+	{ DaoThdMaster_Lib_Exit,        "exit( self : mtlib )" },
+	{ DaoThdMaster_Lib_TestCancel,  "testcancel( self : mtlib )" },
+	{ DaoThdMaster_Lib_Self,        "self( self : mtlib )=>thread" },
+	{ DaoThdMaster_Lib_MyData,      "mydata( self : mtlib )=>map<string,any>" },
 	{ NULL, NULL }
 };
 

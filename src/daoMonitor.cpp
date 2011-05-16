@@ -572,9 +572,9 @@ void DaoDataWidget::ViewClass( DaoClass *klass )
 			klass->glbDataType, klass->lookupTable, DAO_CLASS_VARIABLE );
 	for(i=0; i<klass->cstData->size; i++){
 		DValue val = klass->cstData->data[i];
-		if( val.t != DAO_ROUTINE || val.v.routine->tidHost != DAO_CLASS ) continue;
-		if( val.v.routine->routHost->aux.v.klass == klass )
-			wgtDataTable->item(i,0)->setBackground( QColor(200,250,200) );
+		//XXX if( val.t != DAO_ROUTINE || val.v.routine->tidHost != DAO_CLASS ) continue;
+		//XXX if( val.v.routine->routHost->aux.v.klass == klass )
+		//XXX	wgtDataTable->item(i,0)->setBackground( QColor(200,250,200) );
 	}
 }
 void DaoDataWidget::ViewObject( DaoObject *object )
@@ -681,7 +681,7 @@ void DaoDataWidget::ViewRoutine( DaoRoutine *routine )
 	RoutineInfo( routine, routine );
 
 	QStringList rowlabs;
-	wgtInfoTable->setRowCount( 1 + (routine->tidHost == DAO_CLASS) );
+	wgtInfoTable->setRowCount( 1 + (routine->routHost && routine->routHost->tid == DAO_OBJECT) );
 	wgtInfoTable->setColumnCount(1);
 	wgtInfoTable->setColumnWidth(0, 150);
 	rowlabs<<tr("NameSpace")<<tr("Class");
@@ -691,7 +691,7 @@ void DaoDataWidget::ViewRoutine( DaoRoutine *routine )
 
 	QString info = "NameSpace[" + StringAddress( routine->nameSpace ) + "]";
 	wgtInfoTable->setItem( 0, 0, new QTableWidgetItem( info ) );
-	if( routine->tidHost == DAO_CLASS ){
+	if( routine->routHost && routine->routHost->tid == DAO_OBJECT ){
 		info = "Class[" + StringAddress( routine->routHost->aux.v.klass ) + "]";
 		wgtInfoTable->setItem( 1, 0, new QTableWidgetItem( info ) );
 	}

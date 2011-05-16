@@ -2,12 +2,12 @@
   This file is a part of a virtual machine for the Dao programming language.
   Copyright (C) 2006-2011, Fu Limin. Email: fu@daovm.net, limin.fu@yahoo.com
 
-  This software is free software; you can redistribute it and/or modify it under the terms 
-  of the GNU Lesser General Public License as published by the Free Software Foundation; 
+  This software is free software; you can redistribute it and/or modify it under the terms
+  of the GNU Lesser General Public License as published by the Free Software Foundation;
   either version 2.1 of the License, or (at your option) any later version.
 
-  This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+  This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the GNU Lesser General Public License for more details.
   =========================================================================================*/
 
@@ -39,12 +39,12 @@ struct DaoContext
 	DVaTuple  *regArray; /* virtual registers for the call */
 	DValue   **regValues;
 	DaoType  **regTypes; /* = routine->regType->items.pType; */
+	uchar_t   *regModes; /* = routine->regMode->mbs */
 
 	ushort_t  entryCode;
 	ushort_t  idClearFE;
 	ushort_t  parCount;
-	uchar_t   ctxState;
-	uchar_t   constCall;
+	ushort_t  ctxState;
 
 	DaoRoutine   *routine; /* routine prototype */
 	DaoObject    *object; /* self object */
@@ -53,6 +53,7 @@ struct DaoContext
 
 	DaoContext   *caller;
 	DaoVmProcess *process;
+	DaoRoutine   *lastRoutine;
 
 	/* the currently called wrapped C function,
 	   for exception handling and DaoCLoader module. */
@@ -109,6 +110,7 @@ DaoCData*  DaoContext_CopyCData( DaoContext *self, void *data, int n, DaoTypeBas
 void DaoContext_RaiseException( DaoContext *self, int type, const char *value );
 void DaoContext_RaiseTypeError( DaoContext *self, DaoType *from, DaoType *to, const char *op );
 /**/
+void DaoContext_ShowCallError( DaoContext *self, DRoutine *rout, DValue *selfobj, DValue *ps[], int np, int code );
 void DaoContext_Print( DaoContext *self, const char *chs );
 void DaoContext_PrintInfo( DaoContext *self, const char *head, const char *info );
 void DaoContext_PrintVmCode( DaoContext *self );

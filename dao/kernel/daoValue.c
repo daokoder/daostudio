@@ -2,12 +2,12 @@
   This file is a part of a virtual machine for the Dao programming language.
   Copyright (C) 2006-2011, Fu Limin. Email: fu@daovm.net, limin.fu@yahoo.com
 
-  This software is free software; you can redistribute it and/or modify it under the terms 
-  of the GNU Lesser General Public License as published by the Free Software Foundation; 
+  This software is free software; you can redistribute it and/or modify it under the terms
+  of the GNU Lesser General Public License as published by the Free Software Foundation;
   either version 2.1 of the License, or (at your option) any later version.
 
-  This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+  This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the GNU Lesser General Public License for more details.
   =========================================================================================*/
 
@@ -43,6 +43,7 @@ const DValue daoNullMap = { DAO_MAP, 0, 0, 0, {0}};
 const DValue daoNullTuple = { DAO_TUPLE, 0, 0, 0, {0}};
 const DValue daoNullClass = { DAO_CLASS, 0, 0, 0, {0}};
 const DValue daoNullObject = { DAO_OBJECT, 0, 0, 0, {0}};
+const DValue daoNullMetaRoutine = { DAO_METAROUTINE, 0, 0, 0, {0}};
 const DValue daoNullRoutine = { DAO_ROUTINE, 0, 0, 0, {0}};
 const DValue daoNullFunction = { DAO_FUNCTION, 0, 0, 0, {0}};
 const DValue daoNullCData = { DAO_CDATA, 0, 0, 0, {0}};
@@ -169,6 +170,18 @@ int DValue_Compare( DValue left, DValue right )
 		return 1;
 	}else{
 		/* return (int)( (size_t)right.v.p - (size_t)left.v.p); */
+	}
+	return 0;
+}
+int DValue_IsZero( DValue *self )
+{
+	switch( self->t ){
+	case DAO_INTEGER : return self->v.i == 0;
+	case DAO_FLOAT  : return self->v.f == 0.0;
+	case DAO_DOUBLE : return self->v.d == 0.0;
+	case DAO_COMPLEX : return self->v.c->real == 0.0 && self->v.c->imag == 0.0;
+	case DAO_LONG : return self->v.l->size == 0 && self->v.l->data[0] ==0;
+	case DAO_ENUM : return self->v.e->value == 0;
 	}
 	return 0;
 }
@@ -376,17 +389,15 @@ void DValue_MarkConst( DValue *self )
 }
 void DValue_Clear( DValue *self )
 {
-	if( self->t >= DAO_COMPLEX ){
-		switch( self->t ){
-		case DAO_COMPLEX : dao_free( self->v.c ); break;
-		case DAO_LONG : DLong_Delete( self->v.l ); break;
-		case DAO_ENUM : DEnum_Delete( self->v.e ); break;
-		case DAO_STRING : DString_Delete( self->v.s ); break;
-		default : GC_DecRC( self->v.p ); break;
-		}
+	switch( self->t ){
+	case DAO_NIL : case DAO_INTEGER : case DAO_FLOAT : case DAO_DOUBLE : break;
+	case DAO_COMPLEX : dao_free( self->v.c ); break;
+	case DAO_LONG : DLong_Delete( self->v.l ); break;
+	case DAO_ENUM : DEnum_Delete( self->v.e ); break;
+	case DAO_STRING : DString_Delete( self->v.s ); break;
+	default : GC_DecRC( self->v.p ); break;
 	}
-	self->t = self->sub = self->cst = self->ndef = 0;
-	self->v.d = 0.0;
+	*self = daoNullValue;
 }
 void DValue_IncRCs( DValue *v, int n )
 {
@@ -460,8 +471,6 @@ void DValue_CopyExt( DValue *self, DValue from, int copy )
 		break;
 	}
 	self->t = from.t;
-	self->sub = from.sub;
-	self->ndef = from.ndef;
 	self->cst = 0;
 }
 void DValue_Copy( DValue *self, DValue from )
@@ -523,229 +532,59 @@ void DValue_SimpleMove( DValue from, DValue *to )
 {
 	DValue_CopyExt( to, from, 0 );
 }
-#if 0
-int DValue_Move2( DValue from, DValue *to, DaoType *tp );
-int DValue_Move( DValue from, DValue *to, DaoType *tp )
+static int DValue_MoveVariant( DValue from, DValue *to, DaoType *tp )
 {
-	//DaoBase *dA = NULL;
-	//int i = 1;
-	if( tp == NULL ){
-		DValue_Copy( to, from );
-		return 1;
-	}
-	/* binary or is OK here: */
-	if( (from.t < DAO_ARRAY) & (to->t < DAO_ARRAY) & (tp->tid < DAO_ARRAY) ){
-		to->sub = from.sub;
-		to->cst = to->ndef = 0;
-		if( from.t != to->t ){
-			switch( to->t ){
-			case DAO_COMPLEX : dao_free( to->v.c ); break;
-			case DAO_STRING : DString_Delete( to->v.s ); break;
-			case DAO_LONG : DLong_Delete( to->v.l ); break;
-			default : break;
-			}
+	DaoType *itp = NULL;
+	int j, k, mt = 0;
+	for(j=0; j<tp->nested->size; j++){
+		k = DaoType_MatchValue( tp->nested->items.pType[j], from, NULL );
+		if( k > mt ){
+			itp = tp->nested->items.pType[j];
+			mt = k;
 		}
-		switch( (from.t<<8) | tp->tid ){
-		case (DAO_COMPLEX<<8)|DAO_COMPLEX :
-			if( to->t != DAO_COMPLEX ) to->v.c = dao_malloc( sizeof(complex16) );
-			to->v.c[0] = from.v.c[0];
-			break;
-		case (DAO_STRING<<8)|DAO_STRING  :
-			if( to->t == DAO_STRING ){
-				DString_Assign( to->v.s, from.v.s );
-			}else{
-				to->v.s = DString_Copy( from.v.s );
-			}
-			break;
-		case (DAO_LONG)|DAO_LONG  :
-			if( to->t != DAO_LONG ) to->v.l = DLong_New();
-			DLong_Move( to->v.l, from.v.l );
-			break;
-		case (DAO_INTEGER<<8)|DAO_INTEGER : to->v.i = from.v.i; break;
-		case (DAO_INTEGER<<8)|DAO_FLOAT   : to->v.f = from.v.i; break;
-		case (DAO_INTEGER<<8)|DAO_DOUBLE  : to->v.d = from.v.i; break;
-		case (DAO_FLOAT  <<8)|DAO_INTEGER : to->v.i = from.v.f; break;
-		case (DAO_FLOAT  <<8)|DAO_FLOAT   : to->v.f = from.v.f; break;
-		case (DAO_FLOAT  <<8)|DAO_DOUBLE  : to->v.d = from.v.f; break;
-		case (DAO_DOUBLE <<8)|DAO_INTEGER : to->v.i = from.v.d; break;
-		case (DAO_DOUBLE <<8)|DAO_FLOAT   : to->v.f = from.v.d; break;
-		case (DAO_DOUBLE <<8)|DAO_DOUBLE  : to->v.d = from.v.d; break;
-		case 0: to->t = 0; return 1;
-		default : return 0;
-		}
-		to->t = from.t;
-		return 1;
 	}
-	/* binary or is OK here: */
-	if( (tp->tid ==DAO_NIL) | (tp->tid ==DAO_INITYPE) ){
-		DValue_Copy( to, from );
-		return 1;
-	}else if( tp->tid == DAO_ANY ){
-		DValue_Copy( to, from );
-		DValue_SetType( to, tp );
-		return 1;
-	}
-	return DValue_Move2( from, to, tp );
+	if( itp == NULL ) return 0;
+	return DValue_Move( from, to, itp );
 }
-#endif
-int DValue_Move( DValue from, DValue *to, DaoType *tp )
+int DValue_Move4( DValue from, DValue *to, DaoType *tp )
 {
-	DaoBase *dA = NULL;
-	DNode *node = NULL;
+	DaoBase *dA = from.v.p;
 	int tm = 1;
-	if( tp ==0 || tp->tid ==DAO_NIL || tp->tid ==DAO_INITYPE ){
-		DValue_Copy( to, from );
-		return 1;
-	}else if( tp->tid == DAO_ANY ){
-		DValue_Copy( to, from );
-		DValue_SetType( to, tp );
-		return 1;
-	}else if( tp->tid == DAO_VALTYPE ){
-		if( DValue_Compare( from, tp->aux ) !=0 ) return 0;
-		DValue_Copy( to, from );
-		return 1;
-	}else if( tp->tid == DAO_UNION ){
-		DaoType *itp = NULL;
-		int j, k, mt = 0;
-		for(j=0; j<tp->nested->size; j++){
-			k = DaoType_MatchValue( tp->nested->items.pType[j], from, NULL );
-			if( k > mt ){
-				itp = tp->nested->items.pType[j];
-				mt = k;
-			}
+	if( tp->tid == DAO_METAROUTINE && dA->type == DAO_METAROUTINE ){
+		/* XXX pair<objetp,routine<...>> */
+		if( tp != ((DaoMetaRoutine*)dA)->unitype ) goto MoveFailed;
+	}else if( (tp->tid == DAO_OBJECT || tp->tid == DAO_CDATA) && dA->type == DAO_OBJECT){
+		if( ((DaoObject*)dA)->myClass != tp->aux.v.klass ){
+			dA = DaoObject_MapThisObject( ((DaoObject*)dA)->that, tp );
+			tm = (dA != NULL);
 		}
-		if( itp == NULL ) return 0;
-		return DValue_Move( from, to, itp );
-	}else if( from.t == 0 ){
-		return 0;
-	}
-	to->sub = from.sub;
-	to->cst = to->ndef = 0;
-	if( from.t >= DAO_COMPLEX && from.t == to->t && from.v.p == to->v.p ) return 1;
-	if( from.t >= DAO_INTEGER && from.t <= DAO_DOUBLE ){
-		if( tp->tid < DAO_INTEGER || tp->tid > DAO_DOUBLE ) goto MoveFailed;;
-	}else if( from.t >= DAO_COMPLEX && from.t <= DAO_ENUM ){
-		if( tp->tid != from.t ) goto MoveFailed;;
-	}else if( from.v.p ==NULL && tp->tid == DAO_OBJECT ){
-		from.t = 0;
-	}else if( from.t ==0 ){
-		goto MoveFailed;;
+	}else if( from.t == DAO_CLASS && tp->tid == DAO_CLASS && from.v.klass->typeHolders ){
+		if( DMap_Find( from.v.klass->instanceClasses, tp->aux.v.klass->className ) ){
+			from.v.klass = tp->aux.v.klass;
+			dA = (DaoBase*) from.v.klass;
+			tm = DAO_MT_SUB;
+		}
 	}else{
-		dA = from.v.p;
-		if( tp->tid == DAO_ROUTINE && ( dA->type ==DAO_ROUTINE || dA->type ==DAO_FUNCTION ) ){
-			/* XXX pair<objetp,routine<...>> */
-			dA = (DaoBase*) DRoutine_GetOverLoadByType( (DRoutine*)dA, tp );
-			if( dA == NULL ) goto MoveFailed;;
-			/* printf( "dA = %p,  %i  %s  %s\n", dA, tm, tp->name->mbs, from.v.routine->routType->name->mbs ); */
-		}else if( (tp->tid == DAO_OBJECT || tp->tid == DAO_CDATA) && dA->type == DAO_OBJECT){
-			if( ((DaoObject*)dA)->myClass != tp->aux.v.klass ){
-				dA = DaoObject_MapThisObject( ((DaoObject*)dA)->that, tp );
-				tm = (dA != NULL);
-			}
-		}else if( from.t == DAO_CLASS && tp->tid == DAO_CLASS && from.v.klass->typeHolders ){
-			if( DMap_Find( from.v.klass->instanceClasses, tp->aux.v.klass->className ) ){
-				from.v.klass = tp->aux.v.klass;
-				dA = (DaoBase*) from.v.klass;
-				tm = DAO_MT_SUB;
-			}
-		}else{
-			tm = DaoType_MatchValue( tp, from, NULL );
-		}
-		/*
-		   if( i ==0 ){
-		   printf( "tp = %p; dA = %p, type = %i\n", tp, dA, from.t );
-		   printf( "tp: %s %i %i\n", tp->name->mbs, tp->tid, tm );
-		   if( from.t == DAO_TUPLE ) printf( "%p\n", from.v.tuple->unitype );
-		   }
-		   printf( "dA->type = %p\n", dA );
-		 */
-		if( tm == 0 ) goto MoveFailed;;
-		/* composite known types must match exactly. example,
-		 * where it will not work if composite types are allowed to match loosely.
-		 * d : list<list<int>> = {};
-		 * e : list<float> = { 1.0 };
-		 * d.append( e );
-		 * 
-		 * but if d is of type list<list<any>>, 
-		 * the matching do not necessary to be exact.
-		 */
+		tm = DaoType_MatchValue( tp, from, NULL );
 	}
-
-	if( to->t >= DAO_ARRAY ){
-		GC_DecRC( to->v.p );
-	}else if( to->t == DAO_COMPLEX ){
-		if( from.t != DAO_COMPLEX ) dao_free( to->v.c );
-	}else if( to->t == DAO_LONG ){
-		if( from.t != DAO_LONG ) DLong_Delete( to->v.l );
-	}else if( to->t == DAO_ENUM ){
-		if( from.t != DAO_ENUM ) DEnum_Delete( to->v.e );
-	}else if( to->t == DAO_STRING ){
-		if( from.t != DAO_STRING ) DString_Delete( to->v.s );
-	}
-	if( from.t >= DAO_INTEGER && from.t < DAO_ARRAY ){
-		switch( from.t ){
-		case DAO_INTEGER :
-			to->t = tp->tid;
-			switch( tp->tid ){
-			case DAO_INTEGER : to->v.i = from.v.i; break;
-			case DAO_FLOAT   : to->v.f = from.v.i; break;
-			case DAO_DOUBLE  : to->v.d = from.v.i; break;
-			default : break;
-			}
-			break;
-		case DAO_FLOAT   :
-			to->t = tp->tid;
-			switch( tp->tid ){
-			case DAO_INTEGER : to->v.i = from.v.f; break;
-			case DAO_FLOAT   : to->v.f = from.v.f; break;
-			case DAO_DOUBLE  : to->v.d = from.v.f; break;
-			default : break;
-			}
-			break;
-		case DAO_DOUBLE  :
-			to->t = tp->tid;
-			switch( tp->tid ){
-			case DAO_INTEGER : to->v.i = from.v.d; break;
-			case DAO_FLOAT   : to->v.f = from.v.d; break;
-			case DAO_DOUBLE  : to->v.d = from.v.d; break;
-			default : break;
-			}
-			break;
-		case DAO_COMPLEX :
-			if( to->t != DAO_COMPLEX ) to->v.c = dao_malloc( sizeof(complex16) );
-			to->t = from.t;
-			to->v.c[0] = DValue_GetComplex( from );
-			break;
-		case DAO_LONG  :
-			if( to->t != DAO_LONG ) to->v.l = DLong_New();
-			to->t = DAO_LONG;
-			DLong_Move( to->v.l, from.v.l );
-			break;
-		case DAO_ENUM :
-			if( to->t != DAO_ENUM ){
-				to->v.e = DEnum_New( NULL, 0 );
-				to->t = from.t;
-			}
 #if 0
-			printf( "%s %s %i %i\n", tp->name->mbs, from.v.e->type->name->mbs, to->v.e->value, from.v.e->value );
-			printf( "%i %i\n", tp->flagtype, from.v.e->type->flagtype );
-#endif
-			DEnum_SetType( to->v.e, tp );
-			DEnum_SetValue( to->v.e, from.v.e, NULL );
-			break;
-		case DAO_STRING  :
-			if( to->t == DAO_STRING ){
-				DString_Assign( to->v.s, from.v.s );
-			}else{
-				to->v.s = DString_Copy( from.v.s );
-			}
-			to->t = from.t;
-			break;
-		default : break;
-		}
-		return 1;
+	if( tm ==0 ){
+		printf( "tp = %p; dA = %p, type = %i\n", tp, dA, from.t );
+		printf( "tp: %s %i %i\n", tp->name->mbs, tp->tid, tm );
+		if( from.t == DAO_TUPLE ) printf( "%p\n", from.v.tuple->unitype );
 	}
-
+	printf( "dA->type = %p\n", dA );
+#endif
+	if( tm == 0 ) goto MoveFailed;;
+	/* composite known types must match exactly. example,
+	 * where it will not work if composite types are allowed to match loosely.
+	 * d : list<list<int>> = {};
+	 * e : list<float> = { 1.0 };
+	 * d.append( e );
+	 *
+	 * but if d is of type list<list<any>>,
+	 * the matching do not necessary to be exact.
+	 */
 	dA = DaoBase_Duplicate( dA, tp );
 	GC_IncRC( dA );
 	to->t = dA->type;
@@ -767,12 +606,18 @@ int DValue_Move( DValue from, DValue *to, DaoType *tp )
 			tm = DaoType_MatchValue( it, data[i], NULL );
 			if( tm < DAO_MT_SIM ) return 1;
 		}
+		/* casting is not necessary if the tuple's field names are a superset of the
+		 * field names of the target type: */
+		if( tp->mapNames == NULL || tp->mapNames->size ==0 ) return 1;
 		if( names ){
+			int count = 0;
 			for(node=DMap_First(names); node; node=DMap_Next(names,node)){
 				search = DMap_Find( tp->mapNames, node->key.pVoid );
-				if( search == NULL ) return 0;
-				if( node->value.pInt != search->value.pInt ) return 0;
+				if( search && node->value.pInt != search->value.pInt ) return 0;
+				count += search != NULL;
 			}
+			/* be superset of the field names of the target type: */
+			if( count == tp->mapNames->size ) return 1;
 		}
 		tuple = DaoTuple_New( T );
 		for(i=0; i<T; i++){
@@ -795,6 +640,110 @@ int DValue_Move( DValue from, DValue *to, DaoType *tp )
 MoveFailed:
 	DValue_Clear( to );
 	return 0;
+}
+int DValue_Move( DValue from, DValue *to, DaoType *tp )
+{
+	to->cst = to->mode = 0;
+	if( tp == NULL ){
+		DValue_Copy( to, from );
+		return 1;
+	}
+	switch( tp->tid ){
+	case DAO_NIL :
+	case DAO_INITYPE :
+		DValue_Copy( to, from );
+		return 1;
+	case DAO_ANY :
+		DValue_Copy( to, from );
+		DValue_SetType( to, tp );
+		return 1;
+	case DAO_VALTYPE :
+		if( DValue_Compare( from, tp->aux ) !=0 ) return 0;
+		DValue_Copy( to, from );
+		return 1;
+	case DAO_VARIANT :
+		return DValue_MoveVariant( from, to, tp );
+	default : break;
+	}
+	switch( from.t ){
+	case DAO_NIL : return 0;
+	case DAO_INTEGER :
+	case DAO_FLOAT :
+	case DAO_DOUBLE : break;
+	case DAO_COMPLEX :
+	case DAO_LONG :
+	case DAO_STRING :
+	case DAO_ENUM : if( to->t != tp->tid ) DValue_Clear( to ); break;
+	default : if( from.t == tp->tid && from.v.p == to->v.p ) return 1;
+	}
+	switch( (from.t<<8) | tp->tid ){
+	case (DAO_INTEGER<<8)|DAO_INTEGER :
+		to->v.i = from.v.i;
+		to->t = tp->tid;
+		return 1;
+	case (DAO_INTEGER<<8)|DAO_FLOAT   :
+		to->v.f = from.v.i;
+		to->t = tp->tid;
+		return 1;
+	case (DAO_INTEGER<<8)|DAO_DOUBLE  :
+		to->v.d = from.v.i;
+		to->t = tp->tid;
+		return 1;
+	case (DAO_FLOAT  <<8)|DAO_INTEGER :
+		to->v.i = from.v.f;
+		to->t = tp->tid;
+		return 1;
+	case (DAO_FLOAT  <<8)|DAO_FLOAT   :
+		to->v.f = from.v.f;
+		to->t = tp->tid;
+		return 1;
+	case (DAO_FLOAT  <<8)|DAO_DOUBLE  :
+		to->v.d = from.v.f;
+		to->t = tp->tid;
+		return 1;
+	case (DAO_DOUBLE <<8)|DAO_INTEGER :
+		to->v.i = from.v.d;
+		to->t = tp->tid;
+		return 1;
+	case (DAO_DOUBLE <<8)|DAO_FLOAT   :
+		to->v.f = from.v.d;
+		to->t = tp->tid;
+		return 1;
+	case (DAO_DOUBLE <<8)|DAO_DOUBLE  :
+		to->v.d = from.v.d;
+		to->t = tp->tid;
+		return 1;
+	case (DAO_COMPLEX<<8)|DAO_COMPLEX :
+		if( to->t != DAO_COMPLEX ) to->v.c = dao_malloc( sizeof(complex16) );
+		to->v.c[0] = from.v.c[0];
+		to->t = tp->tid;
+		return 1;
+	case (DAO_LONG<<8)|DAO_LONG  :
+		if( to->t != DAO_LONG ) to->v.l = DLong_New();
+		DLong_Move( to->v.l, from.v.l );
+		to->t = tp->tid;
+		return 1;
+	case (DAO_STRING<<8)|DAO_STRING  :
+		if( to->t == DAO_STRING ){
+			DString_Assign( to->v.s, from.v.s );
+		}else{
+			to->v.s = DString_Copy( from.v.s );
+			to->t = tp->tid;
+		}
+		return 1;
+	case (DAO_ENUM<<8)|DAO_ENUM :
+		if( to->t != DAO_ENUM ){
+			to->v.e = DEnum_New( NULL, 0 );
+			to->t = tp->tid;
+		}
+		DEnum_SetType( to->v.e, tp );
+		DEnum_SetValue( to->v.e, from.v.e, NULL );
+		return 1;
+	default :
+		if( to->t >= DAO_ARRAY ) GC_DecRC( to->v.p );
+		break;
+	}
+	return DValue_Move4( from, to, tp );
 }
 int DValue_Move2( DValue from, DValue *to, DaoType *totype )
 {
@@ -1256,7 +1205,7 @@ static int DValue_Serialize2( DValue*, DString*, DaoNameSpace*, DaoVmProcess*, D
 
 static void DString_Serialize( DString *self, DString *serial, DString *buf )
 {
-	int i, c;
+	int i;
 	unsigned char *mbs;
 
 	DString_Clear( buf );
@@ -1352,11 +1301,10 @@ static int DaoObject_Serialize( DaoObject *self, DString *serial, DaoNameSpace *
 	DString name = DString_WrapMBS( "serialize" );
 	DValue value = daoNullValue;
 	DValue selfpar = daoNullObject;
-	int i, errcode = DaoObject_GetData( self, & name, & value, NULL, NULL );
-	if( errcode || (value.t != DAO_ROUTINE && value.t != DAO_FUNCTION) ) return 0;
+	int errcode = DaoObject_GetData( self, & name, & value, NULL, NULL );
+	if( errcode || value.t < DAO_METAROUTINE || value.t > DAO_FUNCTION ) return 0;
 	selfpar.v.object = self;
-	rt = (DRoutine*) value.v.routine;
-	rt = DRoutine_GetOverLoad( rt, &selfpar, NULL, 0, DVM_CALL );
+	rt = DRoutine_Resolve( value.v.p, &selfpar, NULL, 0, DVM_CALL );
 	if( rt == NULL ) return 0;
 	if( rt->type == DAO_ROUTINE ){
 		DaoRoutine *rout = (DaoRoutine*) rt;
@@ -1364,13 +1312,12 @@ static int DaoObject_Serialize( DaoObject *self, DString *serial, DaoNameSpace *
 		GC_ShiftRC( self, ctx->object );
 		ctx->object = self;
 		DaoContext_Init( ctx, rout );
-		if( DRoutine_PassParams( rt, &selfpar, ctx->regValues, NULL, NULL, 0, DVM_CALL ) ){
+		if( DRoutine_PassParams( rt, &selfpar, ctx->regValues, NULL, 0, DVM_CALL ) ){
 			DaoVmProcess_PushContext( proc, ctx );
 			proc->topFrame->returning = -1;
 			DaoVmProcess_Execute( proc );
 		}
 	}else if( rt->type == DAO_FUNCTION ){
-		DValue *p = & selfpar;
 		DValue *res = & proc->returned;
 		DaoFunction *func = (DaoFunction*) rt;
 		DaoContext ctx = *proc->topFrame->context;
@@ -1381,7 +1328,7 @@ static int DaoObject_Serialize( DaoObject *self, DString *serial, DaoNameSpace *
 		ctx.regTypes = types;
 		ctx.vmc = & vmc;
 
-		DaoFunction_SimpleCall( func, & ctx, & p, 1 );
+		DaoFunction_Call( func, & ctx, & selfpar, NULL, 0 );
 	}else{
 		return 0;
 	}
@@ -1395,7 +1342,8 @@ static int DaoCData_Serialize( DaoCData *self, DString *serial, DaoNameSpace *ns
 	DValue selfpar = daoNullCData;
 	DValue *p = & selfpar;
 	DValue *res = & proc->returned;
-	DaoFunction *func = DaoFindFunction2( self->typer, "serialize" );
+	DaoBase *meth = DaoFindFunction2( self->typer, "serialize" );
+	DaoFunction *func = (DaoFunction*) meth;
 	DaoContext ctx = *proc->topFrame->context;
 	DaoVmCode vmc = { 0, 0, 0, 0 };
 	DaoType *types[] = { NULL, NULL, NULL };
@@ -1404,11 +1352,11 @@ static int DaoCData_Serialize( DaoCData *self, DString *serial, DaoNameSpace *ns
 	ctx.regTypes = types;
 	ctx.vmc = & vmc;
 
-	if( func == NULL ) return 0;
+	if( meth == NULL ) return 0;
 	selfpar.v.cdata = self;
-	func = (DaoFunction*)DRoutine_GetOverLoad( (DRoutine*)func, &selfpar, NULL, 0, DVM_CALL );
-	if( func == NULL ) return 0;
-	DaoFunction_SimpleCall( func, & ctx, & p, 1 );
+	func = (DaoFunction*) DRoutine_Resolve( meth, &selfpar, NULL, 0, DVM_CALL );
+	if( func == NULL || func->type != DAO_FUNCTION ) return 0;
+	DaoFunction_Call( func, & ctx, & selfpar, NULL, 0 );
 	type = DaoNameSpace_GetTypeV( ns, proc->returned );
 	DValue_Serialize2( & proc->returned, serial, ns, proc, type, buf );
 	return 1;
@@ -1488,13 +1436,12 @@ DaoType* DaoParser_ParseType( DaoParser *self, int start, int end, int *newpos, 
 static DaoObject* DaoClass_MakeObject( DaoClass *self, DValue param, DaoVmProcess *proc )
 {
 	DaoContext *ctx;
-	DRoutine *rt = (DRoutine*) self->classRoutine;
 	DValue *p = & param;
-	rt = DRoutine_GetOverLoad( rt, NULL, & p, 1, DVM_CALL );
+	DRoutine *rt = DRoutine_Resolve( (DaoBase*)self->classRoutines, NULL, & p, 1, DVM_CALL );
 	if( rt == NULL || rt->type != DAO_ROUTINE ) return NULL;
 	ctx = DaoVmProcess_MakeContext( proc, (DaoRoutine*) rt );
 	DaoContext_Init( ctx, ctx->routine );
-	if( DRoutine_PassParams( rt, NULL, ctx->regValues, & p, NULL, 1, DVM_CALL ) ){
+	if( DRoutine_PassParams( rt, NULL, ctx->regValues, & p, 1, DVM_CALL ) ){
 		DaoObject *object = DaoObject_New( self, NULL, 0 );
 		GC_ShiftRC( object, ctx->object );
 		ctx->object = object;
@@ -1508,21 +1455,21 @@ static DaoObject* DaoClass_MakeObject( DaoClass *self, DValue param, DaoVmProces
 }
 static DaoCData* DaoCData_MakeObject( DaoCData *self, DValue param, DaoVmProcess *proc )
 {
-	DaoFunction *func = DaoFindFunction2( self->typer, self->typer->name );
+	DaoBase *meth = DaoFindFunction2( self->typer, self->typer->name );
+	DaoFunction *func = (DaoFunction*) meth;
 	DaoContext ctx = *proc->topFrame->context;
 	DaoVmCode vmc = { 0, 0, 0, 0 };
 	DaoType *types[] = { self->typer->priv->abtype, NULL, NULL };
-	DRoutine *rt = (DRoutine*) func;
 	DValue *res = & proc->returned;
 	DValue *p = & param;
 
 	ctx.regValues = & res;
 	ctx.regTypes = types;
 	ctx.vmc = & vmc;
-	if( func == NULL ) return NULL;
-	rt = DRoutine_GetOverLoad( rt, NULL, & p, 1, DVM_CALL );
-	if( func == NULL ) return NULL;
-	DaoFunction_SimpleCall( func, & ctx, & p, 1 );
+	if( meth == NULL ) return NULL;
+	func = (DaoFunction*) DRoutine_Resolve( meth, NULL, & p, 1, DVM_CALL );
+	if( func == NULL || func->type != DAO_FUNCTION ) return NULL;
+	DaoFunction_Call( func, & ctx, NULL, & p, 1 );
 	if( proc->returned.t == DAO_CDATA ) return proc->returned.v.cdata;
 	return NULL;
 }
@@ -1665,7 +1612,7 @@ int DaoParser_Deserialize( DaoParser *self, int start, int end, DValue *value, D
 		}
 		n = array->dimAccum->size;
 		DaoArray_ResizeArray( array, array->dimAccum->items.pSize, n );
-		if( it1->tid == DAO_COMPLEX ) tmp.t == DAO_COMPLEX;
+		if( it1->tid == DAO_COMPLEX ) tmp.t = DAO_COMPLEX;
 		DArray_PushFront( types, it1 );
 		n = 0;
 		for(i=k+1; i<=end; i++){
