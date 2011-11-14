@@ -30,7 +30,7 @@ static DaoVmSpace *vmSpace = NULL;
 
 static char* DaoReadLine( const char *s )
 {
-	char *line;
+	char *line = NULL;
 	readingline = 1;
 #ifdef DAO_USE_READLINE
 	line = readline( s );
@@ -113,10 +113,10 @@ int main( int argc, char **argv )
 	}
 
 	/* Start execution. */
-	if( ! DaoVmSpace_RunMain( vmSpace, args ) ) return 1;
+	k = ! DaoVmSpace_RunMain( vmSpace, args );
 	DString_Delete( args );
 	DString_Delete( opts );
 	DaoQuit();
 	/* printf( "FINISHED %s\n", getenv( "PROC_NAME" ) ); */
-	return 0;
+	return k;
 }

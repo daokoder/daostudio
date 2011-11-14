@@ -15,6 +15,7 @@
 #include"stdio.h"
 #include"time.h"
 #include"daoType.h"
+#include"daoValue.h"
 #include"daoThread.h"
 #include"daoRoutine.h"
 #include"daoObject.h"
@@ -23,12 +24,12 @@
 #include"daoProcess.h"
 #include"daoGC.h"
 
-#if( defined DAO_WITH_THREAD && defined DAO_WITH_SYNCLASS )
+#if( defined DAO_WITH_THREAD && defined DAO_WITH_ASYNCLASS )
 
 typedef struct DaoCallThread   DaoCallThread;
 typedef struct DaoCallServer   DaoCallServer;
 
-extern DaoVmProcess *mainVmProcess;
+extern DaoVmSpace *mainVmSpace;
 
 struct DaoCallThread
 {
@@ -36,201 +37,404 @@ struct DaoCallThread
 	DThreadData  *thdData;
 };
 
-DaoCallThread* DaoCallThread_New();
-void DaoCallThread_Run( DaoCallThread *self );
+static DaoCallThread* DaoCallThread_New();
+static void DaoCallThread_Run( DaoCallThread *self );
 
 struct DaoCallServer
 {
+	DThread  timer;
 	DMutex   mutex;
 	DCondVar condv;
+	DCondVar condv2;
 
 	int finishing;
+	int timing;
 	int total;
 	int idle;
+	int stopped;
 
-	DArray  *pending; /* list of DaoFuture */
-	DMap    *active; /* map of DaoObject keys */
+	DArray  *threads;
+
+	DArray  *functions; /* list of DThreadTask function pointers */
+	DArray  *parameters; /* list of void* */
+	DArray  *futures; /* list of DaoFuture* */
+	DArray  *timeouts; /* list of timeout waitings */
+	DMap    *waitings; /* timed waiting: <DaoDouble,DaoFuture*> */
+	DMap    *active; /* map of DaoObject* or DaoProcess* keys */
+	DMap    *pending; /* map of pointers from ::parameters and ::futures */
+
+	DaoTuple    *tuple;
+	DaoVmSpace  *vmspace;
 };
-static DaoCallServer *daoCallServer;
+static DaoCallServer *daoCallServer = NULL;
 
-DaoCallThread* DaoCallThread_New()
+static DaoCallThread* DaoCallThread_New()
 {
 	DaoCallThread *self = (DaoCallThread*)dao_malloc( sizeof(DaoCallThread) );
 	self->thdData = NULL;
 	DThread_Init( & self->thread );
 	return self;
 }
-DaoCallServer* DaoCallServer_New( DaoVmSpace *vms, int count )
+static void DaoCallThread_Delete( DaoCallThread *self )
+{
+	// XXX self->thdData
+	DThread_Destroy( & self->thread );
+	dao_free( self );
+}
+static DaoCallServer* DaoCallServer_New( DaoVmSpace *vms )
 {
 	DaoCallServer *self = (DaoCallServer*)dao_malloc( sizeof(DaoCallServer) );
 	DMutex_Init( & self->mutex );
 	DCondVar_Init( & self->condv );
+	DCondVar_Init( & self->condv2 );
+	DThread_Init( & self->timer );
 	self->finishing = 0;
-	self->total = count;
+	self->timing = 0;
+	self->total = 0;
 	self->idle = 0;
-	self->pending = DArray_New(0);
-	self->active = DMap_New(0,0);
+	self->stopped = 0;
+	self->threads = DArray_New(0);
+	self->functions = DArray_New(0);
+	self->parameters = DArray_New(0);
+	self->futures = DArray_New(0);
+	self->timeouts = DArray_New(0);
+	self->waitings = DMap_New(D_VALUE,0);
+	self->pending = DHash_New(0,0);
+	self->active = DHash_New(0,0);
+	self->vmspace = vms;
+	self->tuple = DaoTuple_New(2);
+	self->tuple->items[0] = DaoValue_NewDouble(0);
+	self->tuple->items[1] = DaoValue_NewDouble(0);
+	DaoValue_MarkConst( (DaoValue*) self->tuple );
+	GC_IncRC( self->tuple );
 	return self;
 }
-int DaoCallServer_MapStop( DaoCallServer *self )
+static void DaoCallServer_Delete( DaoCallServer *self )
 {
-	if( self->finishing == 0 ) return 0; /* program not reach the end yet */
-	if( self->total > self->idle ) return 0; /* active thread may invoke new calls */
-	if( self->pending->size ) return 0; /* there are pending calls or joining */
-	return 1;
+	size_t i, n = self->threads->size;
+	for(i=0; i<n; i++) DaoCallThread_Delete( (DaoCallThread*)self->threads->items.pVoid[i] );
+	GC_DecRC( self->tuple );
+	DArray_Delete( self->functions );
+	DArray_Delete( self->parameters );
+	DArray_Delete( self->futures );
+	DArray_Delete( self->timeouts );
+	DMap_Delete( self->waitings );
+	DMap_Delete( self->pending );
+	DMap_Delete( self->active );
+	DMutex_Destroy( & self->mutex );
+	DCondVar_Destroy( & self->condv );
+	DCondVar_Destroy( & self->condv2 );
+	DThread_Destroy( & self->timer );
+	dao_free( self );
 }
-
-DaoFuture* DaoCallServer_Add( DaoContext *ctx, DaoVmProcess *proc, DaoFuture *pre )
+static void DaoCallServer_AddThread()
 {
-	DaoFuture *future = NULL;
-#if 0
-	printf( "DaoCallServer_Add( %12p, %12p, %12p )\n", ctx, proc, pre );
+	DaoCallThread *calth = DaoCallThread_New();
+	DMutex_Lock( & daoCallServer->mutex );
+	daoCallServer->total += 1;
+	DArray_Append( daoCallServer->threads, calth );
+	DMutex_Unlock( & daoCallServer->mutex );
+	DThread_Start( & calth->thread, (DThreadTask) DaoCallThread_Run, calth );
+}
+static double DaoGetCurrentTime()
+{
+#ifdef WIN32
+	return timeGetTime();
+#else
+	struct timeval tv;
+	gettimeofday( & tv, NULL);
+	return tv.tv_sec + (double)tv.tv_usec * 1.0E-9;
 #endif
-	if( ctx ){ /* new synchronous method call: */
-		future = DaoFuture_New();
-		future->context = ctx;
-		future->process = proc; /* could be null */
-		GC_IncRC( ctx );
-		GC_IncRC( proc );
-		future->state = DAO_CALL_QUEUED;
-	}else if( proc ){
-		/* joining the process with the future value's own process */
-		if( proc->future == NULL ){
-			proc->future = DaoFuture_New();
-			proc->future->process = proc;
-			GC_IncRC( proc );
-		}
-		future = proc->future;
-		GC_ShiftRC( pre, future->precondition );
-		future->precondition = pre;
-		future->state = DAO_CALL_PAUSED;
-	}
-	if( future ){
-		DMutex_Lock( & daoCallServer->mutex );
-		DArray_Append( daoCallServer->pending, future );
-		GC_IncRC( future );
-		DCondVar_Signal( & daoCallServer->condv );
-		DMutex_Unlock( & daoCallServer->mutex );
-	}
-	return future;
 }
-DaoFuture* DaoFutures_GetFirstExecutable( DArray *pending, DMap *active )
+static void DaoCallServer_Timer( void *p )
+{
+	DaoCallServer *server = daoCallServer;
+	double time = 0.0;
+	int i, timeout;
+
+	server->timing = 1;
+	while( server->finishing == 0 || server->stopped != server->total ){
+		DMutex_Lock( & server->mutex );
+		while( server->waitings->size == 0 && server->timeouts->size == 0 ){
+			if( server->finishing && server->stopped == server->total ) break;
+			DCondVar_TimedWait( & server->condv2, & server->mutex, 0.01 );
+		}
+		if( server->waitings->size ){
+			DNode *node = DMap_First( server->waitings );
+			time = node->key.pValue->xTuple.items[0]->xDouble.value;
+			time -= DaoGetCurrentTime();
+			/* wait the right amount of time for the closest arriving timeout: */
+			if( time > 0 ) DCondVar_TimedWait( & server->condv2, & server->mutex, time );
+		}else if( server->timeouts->size ){
+			/* there is at least one pending timeout to be handled,
+			 * wait for some time before creating a new thread to handle it: */
+			DCondVar_TimedWait( & server->condv2, & server->mutex, 0.1 );
+		}
+		DMutex_Unlock( & server->mutex );
+		if( server->finishing && server->stopped == server->total ) break;
+
+		/* create new thread for unhandled timeout: */
+		if( server->timeouts->size ) DaoCallServer_AddThread();
+
+		DMutex_Lock( & server->mutex );
+		if( server->waitings->size ){ /* a new wait timed out: */
+			DNode *node = DMap_First( server->waitings );
+			time = DaoGetCurrentTime();
+			if( node->key.pValue->xTuple.items[0]->xDouble.value < time ){
+				DArray_Append( server->timeouts, node->value.pVoid );
+				DMap_EraseNode( server->waitings, node );
+			}
+		}
+		DCondVar_Signal( & server->condv );
+		DMutex_Unlock( & server->mutex );
+	}
+	server->timing = 0;
+}
+static void DaoCallServer_Init( DaoVmSpace *vms )
 {
 	int i;
-	DaoFuture *future = (DaoFuture*) pending->items.pVoid[0];
-	DaoFuture *precond = future->precondition;
-	DaoFuture *first = future;
-	while( precond && (precond->state == DAO_CALL_QUEUED || precond->state == DAO_CALL_PAUSED) ){
-		DArray_PopFront( pending );
-		DArray_PushBack( pending, future );
-		future = (DaoFuture*) pending->items.pVoid[0];
+	DaoCGC_Start();
+	daoCallServer = DaoCallServer_New( vms );
+	DThread_Start( & daoCallServer->timer, (DThreadTask) DaoCallServer_Timer, NULL );
+	for(i=0; i<2; i++) DaoCallServer_AddThread(); // TODO: set minimumal number of threads
+}
+
+void DaoCallServer_AddTask( DThreadTask func, void *param )
+{
+	DaoCallServer *server;
+	if( daoCallServer == NULL ) DaoCallServer_Init( mainVmSpace );
+	server = daoCallServer;
+	DMutex_Lock( & server->mutex );
+	DArray_Append( server->functions, func );
+	DArray_Append( server->parameters, param );
+	DMap_Insert( server->pending, param, NULL );
+	DCondVar_Signal( & server->condv );
+	DMutex_Unlock( & server->mutex );
+	if( server->parameters->size ) DaoCallServer_AddThread();
+}
+static void DaoCallServer_Add( DaoFuture *future )
+{
+	DaoCallServer *server;
+	if( daoCallServer == NULL ) DaoCallServer_Init( mainVmSpace );
+	server = daoCallServer;
+	if( server->pending->size > server->total * server->total ) DaoCallServer_AddThread();
+	DMutex_Lock( & server->mutex );
+	DArray_Append( server->futures, future );
+	DMap_Insert( server->pending, future, NULL );
+	GC_IncRC( future );
+	DCondVar_Signal( & server->condv );
+	DMutex_Unlock( & server->mutex );
+}
+DaoFuture* DaoCallServer_AddCall( DaoProcess *call )
+{
+	DaoFuture *future = DaoFuture_New();
+	DaoValue **params = call->stackValues + call->topFrame->stackBase;
+	int i, count = call->topFrame->parCount;
+
+	for(i=0; i<count; i++) DaoValue_Copy( params[i], & future->params[i] );
+	future->parCount = count;
+	future->state = DAO_CALL_QUEUED;
+	future->object = call->topFrame->object;
+	future->routine = call->topFrame->routine;
+	GC_IncRC( future->routine );
+	GC_IncRC( future->object );
+	DaoCallServer_Add( future );
+	return future;
+}
+void DaoCallServer_AddWait( DaoProcess *wait, DaoFuture *pre, double timeout, short state )
+{
+	DaoFuture *future;
+	/* joining the process with the future value's own process */
+	if( wait->future == NULL ){
+		wait->future = DaoFuture_New();
+		wait->future->process = wait;
+		GC_IncRC( wait->future );
+		GC_IncRC( wait );
+	}
+	future = wait->future;
+	GC_ShiftRC( pre, future->precondition );
+	future->precondition = pre;
+	future->state = DAO_CALL_PAUSED;
+	future->state2 = state;
+	if( timeout >0 ){
+		DaoCallServer *server;
+		if( daoCallServer == NULL ) DaoCallServer_Init( mainVmSpace );
+		server = daoCallServer;
+
+		DMutex_Lock( & server->mutex );
+		server->tuple->items[0]->xDouble.value = timeout + DaoGetCurrentTime();
+		server->tuple->items[1]->xDouble.value += 1;
+		DMap_Insert( server->waitings, server->tuple, future );
+		DMap_Insert( server->pending, future, NULL );
+		GC_IncRC( future );
+		DCondVar_Signal( & server->condv2 );
+		DMutex_Unlock( & server->mutex );
+	}else{
+		DaoCallServer_Add( future );
+	}
+}
+static DaoFuture* DaoCallServer_GetNextFuture()
+{
+	DaoCallServer *server = daoCallServer;
+	DaoFuture *first, *future, *precond;
+	DArray *timeouts = server->timeouts;
+	DArray *futures = server->futures;
+	DMap *pending = server->pending;
+	DMap *active = server->active;
+	int i;
+
+	for(i=0; i<timeouts->size; i++){
+		future = (DaoFuture*) timeouts->items.pVoid[i];
+		if( future->object && DMap_Find( active, future->object->rootObject ) ) continue;
+		if( future->process && DMap_Find( active, future->process ) ) continue;
+		DArray_Erase( timeouts, i, 1 );
+		DMap_Erase( pending, future );
+		if( future->object ) DMap_Insert( active, future->object->rootObject, NULL );
+		if( future->process ) DMap_Insert( active, future->process, NULL );
+		return future;
+	}
+	if( futures->size == 0 ) return NULL;
+	future = (DaoFuture*) futures->items.pVoid[0];
+	precond = future->precondition;
+	first = future;
+	while( precond && precond->state != DAO_CALL_FINISHED ){
+		DArray_PopFront( futures );
+		DArray_PushBack( futures, future );
+		future = (DaoFuture*) futures->items.pVoid[0];
 		precond = future->precondition;
 		if( future == first ) break;
 	}
-	for(i=0; i<pending->size; i++){
-		future = (DaoFuture*) pending->items.pVoid[i];
+	for(i=0; i<futures->size; i++){
+		future = (DaoFuture*) futures->items.pVoid[i];
 		if( future->precondition && future->precondition->state != DAO_CALL_FINISHED ) continue;
-		if( future->context && DMap_Find( active, future->context->object->that ) ) continue;
-		DArray_Erase( pending, i, 1 );
-		if( future->context ) DMap_Insert( active, future->context->object->that, NULL );
+		if( future->object && DMap_Find( active, future->object->rootObject ) ) continue;
+		if( future->process && DMap_Find( active, future->process ) ) continue;
+		DArray_Erase( futures, i, 1 );
+		DMap_Erase( pending, future );
+		if( future->object ) DMap_Insert( active, future->object->rootObject, NULL );
+		if( future->process ) DMap_Insert( active, future->process, NULL );
 		return future;
 	}
 	return NULL;
 }
-void DaoCallThread_Run( DaoCallThread *self )
+static void DaoCallThread_Run( DaoCallThread *self )
 {
-	DaoContext *ctx = NULL;
-	DaoVmProcess *proc = NULL;
 	DaoCallServer *server = daoCallServer;
-	DaoFuture *future = NULL;
-	DaoType *type = NULL;
+	DArray *array = DArray_New(0);
 	double wt = 0.001;
-	int timeout;
+	int i, timeout;
 
 	self->thdData = DThread_GetSpecific();
 	while(1){
+		DaoProcess *proc = NULL;
+		DaoProcess *proc2 = NULL;
+		DaoFuture *future = NULL;
+		DThreadTask function = NULL;
+		void *parameter = NULL;
+
 		self->thdData->state = 0;
 		DMutex_Lock( & server->mutex );
 		server->idle += 1;
-		while( server->pending->size == 0 ){
+		while( server->pending->size == server->waitings->size ){
 			if( server->finishing && server->idle == server->total ) break;
 			timeout = DCondVar_TimedWait( & server->condv, & server->mutex, wt );
 		}
 		DMutex_Unlock( & server->mutex );
 		if( server->pending->size == 0 && server->finishing && server->idle == server->total ) break;
-		if( server->pending->size == 0 ) continue;
 
 		DMutex_Lock( & server->mutex );
 		server->idle -= 1;
-		future = DaoFutures_GetFirstExecutable( server->pending, server->active );
+		if( server->parameters->size ){
+			function = (DThreadTask) DArray_Front( server->functions );
+			parameter = DArray_Front( server->parameters );
+			DArray_PopFront( server->functions );
+			DArray_PopFront( server->parameters );
+			DMap_Erase( server->pending, parameter );
+		}else{
+			future = DaoCallServer_GetNextFuture();
+		}
 		DMutex_Unlock( & server->mutex );
 
+		if( parameter ) (*function)( parameter );
 		if( future == NULL ) continue;
-		//printf( "future = %p %i: %i\n", future, server->pending->size, future->state );
 
-		ctx = NULL;
-		proc = NULL;
 		if( future->state == DAO_CALL_QUEUED ){
-			proc = future->process;
-			ctx = future->context;
-			if( proc == NULL ){
-				proc = future->process = DaoVmProcess_New( ctx->vmSpace );
-				GC_IncRC( proc );
+			int n = future->parCount;
+			if( future->process == NULL ){
+				proc2 = future->process = DaoVmSpace_AcquireProcess( server->vmspace );
+				GC_IncRC( future->process );
 			}
-			DaoVmProcess_PushContext( proc, ctx );
-			DaoVmProcess_Execute( proc );
+			proc = future->process;
+			for(i=0; i<n; i++) DaoValue_Copy( future->params[i], & proc->freeValues[i] );
+			future->parCount = 0;
+			DaoValue_ClearAll( future->params, n );
+			DaoProcess_PushRoutine( proc, future->routine, future->object );
+			proc->topFrame->parCount = n;
+			future->state = DAO_CALL_RUNNING;
+			DaoProcess_Execute( proc );
 		}else if( future->state == DAO_CALL_PAUSED ){
-			DValue *pars[1] = { NULL };
-			int npar = 0;
-			if( future->precondition ){
-				pars[0] = & future->precondition->value;
-				npar = 1;
-			}
-			DaoVmProcess_Resume( future->process, pars, npar, NULL );
+			future->state = DAO_CALL_RUNNING;
+			DaoProcess_Execute( future->process );
 			proc = future->process;
-			ctx = future->context;
 		}
-		if( ctx && ctx->object ){
+		if( future->object ){
 			DMutex_Lock( & server->mutex );
-			DMap_Erase( server->active, ctx->object->that );
+			DMap_Erase( server->active, future->object->rootObject );
 			DMutex_Unlock( & server->mutex );
 		}
 		if( proc == NULL ) continue;
-		type = future->unitype;
-		type = type && type->nested->size ? type->nested->items.pType[0] : NULL;
-		switch( proc->status ){
-		case DAO_VMPROC_FINISHED :
-		case DAO_VMPROC_ABORTED :
-			future->state = DAO_CALL_FINISHED;
-			DValue_Move( proc->returned, & future->value, type );
-			break;
-		case DAO_VMPROC_SUSPENDED : future->state = DAO_CALL_PAUSED; break;
-		case DAO_VMPROC_RUNNING :
-		case DAO_VMPROC_STACKED : future->state = DAO_CALL_RUNNING; break;
-		default : break;
+		DMutex_Lock( & server->mutex );
+		DMap_Erase( server->active, proc );
+		DMutex_Unlock( & server->mutex );
+
+		DaoProcess_ReturnFutureValue( proc, future );
+		if( future->state == DAO_CALL_FINISHED ){
+			DNode *node;
+			array->size = 0;
+			DMutex_Lock( & server->mutex );
+			for(node=DMap_First(server->waitings); node; node=DMap_Next(server->waitings,node)){
+				DaoFuture *fut = (DaoFuture*) node->value.pValue;
+				if( fut->precondition == future ){ /* remove from timed waiting list: */
+					DArray_Append( server->timeouts, fut );
+					DArray_Append( array, node->key.pVoid );
+				}
+			}
+			for(i=0; i<array->size; i++) DMap_Erase( server->waitings, array->items.pVoid[i] );
+			DCondVar_Signal( & server->condv2 );
+			DMutex_Unlock( & server->mutex );
+			if( proc2 ){
+				DaoVmSpace_ReleaseProcess( server->vmspace, proc2 );
+			}else if( proc->mutex && proc->condv ){
+				DMutex_Lock( proc->mutex );
+				DCondVar_Signal( proc->condv );
+				DMutex_Unlock( proc->mutex );
+			}
 		}
 		GC_DecRC( future );
 	}
-}
-void DaoCallServer_Init( DaoVmSpace *vms )
-{
-	int i, N = 2;
-	daoCallServer = DaoCallServer_New( vms, N );
-	for(i=0; i<N; i++){
-		DaoCallThread *calth = DaoCallThread_New();
-		DThread_Start( & calth->thread, (DThreadTask) DaoCallThread_Run, calth );
-	}
+	DArray_Delete( array );
+	DMutex_Lock( & server->mutex );
+	server->stopped += 1;
+	DMutex_Unlock( & server->mutex );
 }
 void DaoCallServer_Join( DaoVmSpace *vmSpace )
 {
 	DCondVar condv;
+	if( daoCallServer == NULL ) return;
 	DCondVar_Init( & condv );
 	daoCallServer->finishing = 1;
 	DMutex_Lock( & daoCallServer->mutex );
 	while( daoCallServer->pending->size || daoCallServer->idle != daoCallServer->total ){
+		/* printf( "finalizing: %3i %3i\n", daoCallServer->idle, daoCallServer->total ); */
+		DCondVar_TimedWait( & condv, & daoCallServer->mutex, 0.01 );
+	}
+	while( daoCallServer->stopped != daoCallServer->total || daoCallServer->timing ){
 		DCondVar_TimedWait( & condv, & daoCallServer->mutex, 0.01 );
 	}
 	DMutex_Unlock( & daoCallServer->mutex );
+	DCondVar_Destroy( & condv );
+	DaoCallServer_Delete( daoCallServer );
+	daoCallServer = NULL;
 }
 
 #endif

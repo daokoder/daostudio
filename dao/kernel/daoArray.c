@@ -17,15 +17,17 @@
 
 #include"daoArray.h"
 #include"daoType.h"
+#include"daoValue.h"
 #include"daoNumtype.h"
 #include"daoContext.h"
 #include"daoParser.h"
+#include"daoGC.h"
 
 void* dao_malloc( size_t size )
 {
 	void *p = malloc( size );
 	if( size && p == NULL ){
-		printf( "memory allocation %li failed\n", size );
+		printf( "memory allocation %lu failed\n", (unsigned long)size );
 		exit(1);
 	}
 	return p;
@@ -34,7 +36,7 @@ void* dao_calloc( size_t nmemb, size_t size )
 {
 	void *p = calloc( nmemb, size );
 	if( size && p == NULL ){
-		printf( "memory allocation %li failed\n", size * nmemb );
+		printf( "memory allocation %lu failed\n", (unsigned long)( size * nmemb ) );
 		exit(1);
 	}
 	return p;
@@ -43,7 +45,7 @@ void* dao_realloc( void *ptr, size_t size )
 {
 	void *p = realloc( ptr, size );
 	if( size && p == NULL ){
-		printf( "memory allocation %li failed\n", size );
+		printf( "memory allocation %lu failed\n", (unsigned long)size );
 		exit(1);
 	}
 	return p;
@@ -61,8 +63,9 @@ DArray* DArray_New( short type )
 	daoCountArray ++;
 #endif
 	DArray *self = (DArray*)dao_malloc( sizeof(DArray) );
-	self->buf.pVoid = self->items.pVoid = NULL;
+	self->items.pVoid = NULL;
 	self->size = self->bufsize = 0;
+	self->offset = 0;
 	self->type = type;
 	return self;
 }
@@ -102,21 +105,15 @@ static void DaoVmCodeX_Delete( DaoVmCodeX *self )
 {
 	dao_free( self );
 }
-static DaoJitCode* DaoJitCode_Copy( DaoJitCode *self )
-{
-	DaoJitCode* copy = dao_malloc( sizeof(DaoJitCode) );
-	memcpy( copy, self, sizeof(DaoJitCode) );
-	return copy;
-}
-static DVarray* DVarray_Copy( DVarray *self );
 static void* DArray_CopyItem( DArray *self, void *item )
 {
+	DaoValue *v;
+	if( item == NULL ) return NULL;
 	switch( self->type ){
+	case D_VALUE  : v = DaoValue_SimpleCopy( (DaoValue*) item ); GC_IncRC( v ); return v;
 	case D_VMCODE : return DaoVmCodeX_Copy( (DaoVmCodeX*) item );
 	case D_TOKEN  : return DaoToken_Copy( (DaoToken*) item );
-	case D_JITCODE : return DaoJitCode_Copy( (DaoJitCode*) item );
 	case D_STRING : return DString_Copy( (DString*) item );
-	case D_VARRAY : return DVarray_Copy( (DVarray*) item );
 	case D_ARRAY  : return DArray_Copy( (DArray*) item );
 	case D_MAP    : return DMap_Copy( (DMap*) item );
 	default : break;
@@ -126,11 +123,10 @@ static void* DArray_CopyItem( DArray *self, void *item )
 static void DArray_DeleteItem( DArray *self, void *item )
 {
 	switch( self->type ){
+	case D_VALUE  : GC_DecRC( item ); break;
 	case D_VMCODE : DaoVmCodeX_Delete( (DaoVmCodeX*) item ); break;
-	case D_JITCODE : dao_free( item ); break;
-	case D_TOKEN : DaoToken_Delete( (DaoToken*) item ); break;
+	case D_TOKEN  : DaoToken_Delete( (DaoToken*) item ); break;
 	case D_STRING : DString_Delete( (DString*) item ); break;
-	case D_VARRAY : DVarray_Delete( (DVarray*) item ); break;
 	case D_ARRAY  : DArray_Delete( (DArray*) item ); break;
 	case D_MAP    : DMap_Delete( (DMap*) item ); break;
 	default : break;
@@ -140,11 +136,10 @@ static void DArray_DeleteItems( DArray *self, size_t M, size_t N )
 {
 	size_t i;
 	switch( self->type ){
+	case D_VALUE  : for(i=M; i<N; i++) GC_DecRC( self->items.pValue[i] ); break;
 	case D_VMCODE : for(i=M; i<N; i++) DaoVmCodeX_Delete( self->items.pVmc[i] ); break;
 	case D_TOKEN  : for(i=M; i<N; i++) DaoToken_Delete( self->items.pToken[i] ); break;
-	case D_JITCODE: for(i=M; i<N; i++) dao_free( self->items.pJitc[i] ); break;
 	case D_STRING : for(i=M; i<N; i++) DString_Delete( self->items.pString[i] ); break;
-	case D_VARRAY : for(i=M; i<N; i++) DVarray_Delete( self->items.pVarray[i] ); break;
 	case D_ARRAY  : for(i=M; i<N; i++) DArray_Delete( self->items.pArray[i] ); break;
 	case D_MAP    : for(i=M; i<N; i++) DMap_Delete( self->items.pMap[i] ); break;
 	default : break;
@@ -152,26 +147,27 @@ static void DArray_DeleteItems( DArray *self, size_t M, size_t N )
 }
 void DArray_Resize( DArray *self, size_t size, void *val )
 {
+	void **buf = self->items.pVoid - self->offset;
 	size_t i;
-	if( size == self->size && self->bufsize>0 ) return;
 
+	if( size == self->size && self->bufsize>0 ) return;
 	DArray_DeleteItems( self, size, self->size );
 
-	if( self->items.pVoid > self->buf.pVoid ){
+	if( self->offset ){
 		size_t min = size > self->size ? self->size : size;
-		memmove( self->buf.pVoid, self->items.pVoid, min*sizeof(void*) );
-		self->items.pVoid = self->buf.pVoid;
+		memmove( buf, self->items.pVoid, min*sizeof(void*) );
+		self->items.pVoid = buf;
+		self->offset = 0;
 	}
 	/* When resize() is called, probably this is the intended size,
 	 * not to be changed frequently. */
 	if( size >= self->bufsize || size < self->bufsize /2 ){
 		self->bufsize = size;
-		self->buf.pVoid = dao_realloc( self->buf.pVoid, self->bufsize*sizeof(void*) );
-		self->items.pVoid = self->buf.pVoid;
+		self->items.pVoid = dao_realloc( buf, self->bufsize*sizeof(void*) );
 	}
 
 	if( self->type && val != NULL ){
-		for(i=self->size; i<size; i++ ) DArray_CopyItem( self, val );
+		for(i=self->size; i<size; i++ ) self->items.pVoid[i] = DArray_CopyItem( self, val );
 	}else{
 		for(i=self->size; i<size; i++ ) self->items.pVoid[i] = val;
 	}
@@ -179,10 +175,12 @@ void DArray_Resize( DArray *self, size_t size, void *val )
 }
 void DArray_Clear( DArray *self )
 {
+	void **buf = self->items.pVoid - self->offset;
 	DArray_DeleteItems( self, 0, self->size );
-	if( self->buf.pVoid ) dao_free( self->buf.pVoid );
-	self->buf.pVoid = self->items.pVoid = NULL;
+	if( buf ) dao_free( buf );
+	self->items.pVoid = NULL;
 	self->size = self->bufsize = 0;
+	self->offset = 0;
 }
 
 DArray* DArray_Copy( DArray *self )
@@ -211,22 +209,22 @@ void DArray_Assign( DArray *left, DArray *right )
 void DArray_Swap( DArray *left, DArray *right )
 {
 	size_t tmpSize = left->size;
+	size_t tmpOffset = left->offset;
 	size_t tmpBufSize = left->bufsize;
-	void *tmpBuf = left->buf.pVoid;
-	void *tmpItem = left->items.pVoid;
+	void **tmpItem = left->items.pVoid;
 	assert( left->type == right->type );
 	left->size = right->size;
+	left->offset = right->offset;
 	left->bufsize = right->bufsize;
-	left->buf.pVoid = right->buf.pVoid;
 	left->items.pVoid = right->items.pVoid;
 	right->size = tmpSize;
+	right->offset = tmpOffset;
 	right->bufsize = tmpBufSize;
-	right->buf.pVoid = tmpBuf;
 	right->items.pVoid = tmpItem;
 }
 void DArray_Insert( DArray *self, void *val, size_t id )
 {
-	size_t from = (size_t)( self->items.pVoid - self->buf.pVoid );
+	void **buf = self->items.pVoid - self->offset;
 	size_t i;
 	if( id == 0 ){
 		DArray_PushFront( self, val );
@@ -235,11 +233,11 @@ void DArray_Insert( DArray *self, void *val, size_t id )
 		DArray_PushBack( self, val );
 		return;
 	}
-	if( from + self->size + 1 >= self->bufsize ){
-		if( from > 0 ) memmove( self->buf.pVoid, self->items.pVoid, self->size*sizeof(void*) );
+	if( self->offset + self->size + 1 >= self->bufsize ){
+		if( self->offset > 0 ) memmove( buf, self->items.pVoid, self->size*sizeof(void*) );
 		self->bufsize += self->bufsize/5 + 5;
-		self->buf.pVoid = dao_realloc( self->buf.pVoid, (self->bufsize+1)*sizeof(void*) );
-		self->items.pVoid = self->buf.pVoid;
+		self->items.pVoid = dao_realloc( buf, (self->bufsize+1)*sizeof(void*) );
+		self->offset = 0;
 	}
 	if( self->type && val != NULL ){
 		for( i=self->size; i>id; i-- ) self->items.pVoid[i] = self->items.pVoid[i-1];
@@ -252,36 +250,31 @@ void DArray_Insert( DArray *self, void *val, size_t id )
 }
 void DArray_InsertArray( DArray *self, size_t at, DArray *array, size_t id, size_t n )
 {
-	size_t from = (size_t)( self->items.pVoid - self->buf.pVoid );
+	void **buf = self->items.pVoid - self->offset;
 	void **objs = array->items.pVoid;
 	size_t i;
 	assert( self->type == array->type );
 	n += id;
 	if( n > array->size ) n = array->size;
 	if( n ==0 || id >= array->size ) return;
-	if( from + self->size + n-id >= self->bufsize ){
-		if( from > 0 ) memmove( self->buf.pVoid, self->items.pVoid, self->size*sizeof(void*) );
-
+	if( self->offset + self->size + n-id >= self->bufsize ){
+		if( self->offset > 0 ) memmove( buf, self->items.pVoid, self->size*sizeof(void*) );
 		self->bufsize += self->bufsize/5 + 1 + ( n - id );
-		self->buf.pVoid = dao_realloc( self->buf.pVoid, (self->bufsize+1)*sizeof(void*) );
-		self->items.pVoid = self->buf.pVoid;
+		self->items.pVoid = dao_realloc( buf, (self->bufsize+1)*sizeof(void*) );
+		self->offset = 0;
 	}
 	if( self->type ){
 		if( at >= self->size ){
-			for(i=id; i<n; i++)
-				self->items.pVoid[ self->size+i-id ] = DArray_CopyItem( self, objs[i] );
+			for(i=id; i<n; i++) self->items.pVoid[ self->size+i-id ] = DArray_CopyItem( self, objs[i] );
 		}else{
-			memmove( self->items.pVoid+at+(n-id), self->items.pVoid+at, 
-					(self->size-at)*sizeof(void*) );
+			memmove( self->items.pVoid+at+(n-id), self->items.pVoid+at, (self->size-at)*sizeof(void*) );
 			for(i=id; i<n; i++) self->items.pVoid[ at+i-id ] = DArray_CopyItem( self, objs[i] );
 		}
 	}else{
 		if( at >= self->size ){
-			for(i=id; i<n; i++)
-				self->items.pVoid[ self->size+i-id ] = objs[i];
+			for(i=id; i<n; i++) self->items.pVoid[ self->size+i-id ] = objs[i];
 		}else{
-			memmove( self->items.pVoid+at+(n-id), self->items.pVoid+at, 
-					(self->size-at)*sizeof(void*) );
+			memmove( self->items.pVoid+at+(n-id), self->items.pVoid+at, (self->size-at)*sizeof(void*) );
 			for(i=id; i<n; i++) self->items.pVoid[ at+i-id ] = objs[i];
 		}
 	}
@@ -293,6 +286,7 @@ void DArray_AppendArray( DArray *self, DArray *array )
 }
 void DArray_Erase( DArray *self, size_t start, size_t n )
 {
+	void **buf = self->items.pVoid - self->offset;
 	size_t rest;
 	if( start >= self->size ) return;
 	if( n > self->size - start ) n = self->size - start;
@@ -311,25 +305,26 @@ void DArray_Erase( DArray *self, size_t start, size_t n )
 	memmove( self->items.pVoid + start, self->items.pVoid + start + n, rest * sizeof(void*) );
 	self->size -= n;
 	if( self->size < 0.5*self->bufsize && self->size + 10 < self->bufsize ){
-		if( self->items.pVoid >self->buf.pVoid )
-			memmove( self->buf.pVoid, self->items.pVoid, self->size * sizeof(void*));
+		if( self->offset ) memmove( buf, self->items.pVoid, self->size * sizeof(void*));
 		self->bufsize = (size_t)(0.6 * self->bufsize)+1;
-		self->buf.pVoid = dao_realloc( self->buf.pVoid, (self->bufsize+1)*sizeof(void*) );
-		self->items.pVoid = self->buf.pVoid;
+		self->items.pVoid = dao_realloc( buf, (self->bufsize+1)*sizeof(void*) );
+		self->offset = 0;
 	}
 
 }
 void DArray_PushFront( DArray *self, void *val )
 {
-	size_t from = (size_t)( self->items.pVoid - self->buf.pVoid );
-	if( from > 0 ){
+	void **buf = self->items.pVoid - self->offset;
+	if( self->offset > 0 ){
 		self->items.pVoid --;
 	}else{
-		from = self->bufsize/5 + 5;
-		self->bufsize += from;
-		self->buf.pVoid = dao_realloc( self->buf.pVoid, (self->bufsize+1)*sizeof(void*) );
-		memmove( self->buf.pVoid + from, self->buf.pVoid, self->size*sizeof(void*) );
-		self->items.pVoid = self->buf.pVoid + from - 1;
+		size_t moffset = ((size_t)-1)>>4;
+		size_t offset = self->bufsize/5 + 5;
+		self->offset = offset < moffset ? offset : moffset;
+		self->bufsize += self->offset;
+		buf = dao_realloc( buf, (self->bufsize+1)*sizeof(void*) );
+		memmove( buf + self->offset, buf, self->size*sizeof(void*) );
+		self->items.pVoid = buf + self->offset - 1;
 	}
 	if( self->type && val != NULL ){
 		self->items.pVoid[0] = DArray_CopyItem( self, val );
@@ -337,33 +332,39 @@ void DArray_PushFront( DArray *self, void *val )
 		self->items.pVoid[0] = val;
 	}
 	self->size ++;
+	self->offset --;
 }
 void DArray_PopFront( DArray *self )
 {
-	size_t from;
+	void **buf = self->items.pVoid - self->offset;
+	size_t moffset = ((size_t)-1)>>4;
 	if( self->size == 0 ) return;
 	self->size --;
+	self->offset ++;
 	if( self->type ) DArray_DeleteItem( self, self->items.pVoid[0] );
 	self->items.pVoid ++;
-	from = (size_t)( self->items.pVoid - self->buf.pVoid );
-	if( self->size < 0.5 * self->bufsize && self->size + 10 < self->bufsize ){
-		if( from < 0.1 * self->bufsize ){ /* shrink from back */
+	if( self->offset >= moffset ){
+		self->offset /= 2;
+		memmove( buf + self->offset, self->items.pVoid, self->size*sizeof(void*) );
+		self->items.pVoid = buf + self->offset;
+	}else if( self->size < 0.5 * self->bufsize && self->size + 10 < self->bufsize ){
+		if( self->offset < 0.1 * self->bufsize ){ /* shrink from back */
 			self->bufsize = (size_t)(0.6 * self->bufsize)+1;
 		}else{ /* shrink from front */
-			from = (size_t)(0.05 * self->bufsize);
-			memmove( self->buf.pVoid+from, self->items.pVoid, self->size*sizeof(void*) );
+			self->offset = (size_t)(0.05 * self->bufsize);
+			memmove( buf + self->offset, self->items.pVoid, self->size*sizeof(void*) );
 		}
-		self->buf.pVoid = dao_realloc( self->buf.pVoid, (self->bufsize+1)*sizeof(void*) );
-		self->items.pVoid = self->buf.pVoid + from;
+		buf = dao_realloc( buf, (self->bufsize+1)*sizeof(void*) );
+		self->items.pVoid = buf + self->offset;
 	}
 }
 void DArray_PushBack( DArray *self, void *val )
 {
-	size_t from = (size_t)( self->items.pVoid - self->buf.pVoid );
-	if( from + self->size + 1 >= self->bufsize ){
+	void **buf = self->items.pVoid - self->offset;
+	if( self->offset + self->size + 1 >= self->bufsize ){
 		self->bufsize += self->bufsize/5 + 5;
-		self->buf.pVoid = dao_realloc( self->buf.pVoid, (self->bufsize+1)*sizeof(void*) );
-		self->items.pVoid = self->buf.pVoid + from;
+		buf = dao_realloc( buf, (self->bufsize+1)*sizeof(void*) );
+		self->items.pVoid = buf + self->offset;
 	}
 	if( self->type && val != NULL ){
 		self->items.pVoid[ self->size ] = DArray_CopyItem( self, val );
@@ -374,20 +375,19 @@ void DArray_PushBack( DArray *self, void *val )
 }
 void DArray_PopBack( DArray *self )
 {
-	size_t from;
+	void **buf = self->items.pVoid - self->offset;
 	if( self->size == 0 ) return;
 	self->size --;
 	if( self->type ) DArray_DeleteItem( self, self->items.pVoid[ self->size ] );
-	from = (size_t)( self->items.pVoid - self->buf.pVoid );
 	if( self->size < 0.5 * self->bufsize && self->size + 10 < self->bufsize ){
-		if( from < 0.1 * self->bufsize ){ /* shrink from back */
+		if( self->offset < 0.1 * self->bufsize ){ /* shrink from back */
 			self->bufsize = (size_t)(0.6 * self->bufsize)+1;
 		}else{ /* shrink from front */
-			from = (size_t)(0.05 * self->bufsize);
-			memmove( self->buf.pVoid+from, self->items.pVoid, self->size*sizeof(void*) );
+			self->offset = (size_t)(0.05 * self->bufsize);
+			memmove( buf + self->offset, self->items.pVoid, self->size*sizeof(void*) );
 		}
-		self->buf.pVoid = dao_realloc( self->buf.pVoid, (self->bufsize+1)*sizeof(void*) );
-		self->items.pVoid = self->buf.pVoid + from;
+		buf = dao_realloc( buf, (self->bufsize+1)*sizeof(void*) );
+		self->items.pVoid = buf + self->offset;
 	}
 }
 void  DArray_SetItem( DArray *self, size_t index, void *value )
@@ -424,232 +424,6 @@ void** DArray_GetBuffer( DArray *self )
 	return self->items.pVoid;
 }
 
-
-
-DVarray* DVarray_New()
-{
-#ifdef DAO_GC_PROF
-	daoCountArray ++;
-#endif
-	DVarray *self = (DVarray*)dao_malloc( sizeof(DVarray) );
-	self->buf = self->data = NULL;
-	self->size = self->bufsize = 0;
-	return self;
-}
-void DVarray_Delete( DVarray *self )
-{
-#ifdef DAO_GC_PROF
-	daoCountArray --;
-#endif
-	DVarray_Clear( self );
-	dao_free( self );
-}
-
-void DVarray_Resize( DVarray *self, size_t size, DValue val )
-{
-	DValue nil = daoNullValue;
-	size_t i;
-	if( size == self->size && self->bufsize >0 && size > 0.8*self->bufsize ) return;
-
-	for(i=size; i<self->size; i++ ) DValue_Clear( self->data + i );
-
-	/* When resize() is called, probably this is the intended size,
-	 * not to be changed frequently. */
-	if( size > self->bufsize || size < self->bufsize /2 ){
-		if( self->data > self->buf ){
-			size_t min = size > self->size ? self->size : size;
-			memmove( self->buf, self->data, min*sizeof(DValue) );
-		}
-		self->bufsize = size;
-		self->buf = dao_realloc( self->buf, self->bufsize*sizeof(DValue) );
-		self->data = self->buf;
-	}
-
-	if( val.t <= DAO_DOUBLE ){
-		for(i=self->size; i<size; i++ ) self->data[i] = val;
-	}else{
-		for(i=self->size; i<size; i++ ){
-			self->data[i] = nil;
-			DValue_Copy( self->data + i, val );
-		}
-	}
-	self->size = size;
-}
-void DVarray_Clear( DVarray *self )
-{
-	size_t i;
-	for(i=0; i<self->size; i++ ) DValue_Clear( self->data + i );
-	if( self->buf ) dao_free( self->buf );
-	self->buf = self->data = NULL;
-	self->size = self->bufsize = 0;
-}
-/* for array of int, float and double only */
-void DVarray_FastClear( DVarray *self )
-{
-	if( self->buf ) dao_free( self->buf );
-	self->buf = self->data = NULL;
-	self->size = self->bufsize = 0;
-}
-void DVarray_Assign( DVarray *left, DVarray *right )
-{
-	size_t i;
-
-	if( right->size == 0 ){
-		DVarray_Clear( left );
-		return;
-	}
-	DVarray_Resize( left, right->size, daoNullValue );
-	for( i=0; i<right->size; i++ ) DValue_CopyExt( left->data + i, right->data[i], 0 );
-}
-DVarray* DVarray_Copy( DVarray *self )
-{
-	DVarray *copy = DVarray_New();
-	DVarray_Assign( copy, self );
-	return copy;
-}
-void DVarray_Swap( DVarray *left, DVarray *right )
-{
-	size_t tmpSize = left->size;
-	size_t tmpBufSize = left->bufsize;
-	void *tmpBuf = left->buf;
-	void *tmpItem = left->data;
-	left->size = right->size;
-	left->bufsize = right->bufsize;
-	left->buf = right->buf;
-	left->data = right->data;
-	right->size = tmpSize;
-	right->bufsize = tmpBufSize;
-	right->buf = tmpBuf;
-	right->data = tmpItem;
-}
-
-void DVarray_Insert( DVarray *self, DValue val, size_t id )
-{
-	size_t from = (size_t)( self->data - self->buf );
-	size_t i;
-	if( id == 0 ){
-		DVarray_PushFront( self, val );
-		return;
-	}else if( id >= self->size ){
-		DVarray_PushBack( self, val );
-		return;
-	}
-	if( from + self->size + 1 >= self->bufsize ){
-		if( from > 0 ) memmove( self->buf, self->data, self->size*sizeof(DValue) );
-
-		self->bufsize += self->bufsize/5 + 5;
-		self->buf = dao_realloc( self->buf, (self->bufsize+1)*sizeof(DValue) );
-		self->data = self->buf;
-	}
-	for( i=self->size; i>id; i-- ) self->data[i] = self->data[i-1];
-	self->data[id] = daoNullValue;
-	DValue_Copy( self->data + id, val );
-	self->size++;
-}
-void DVarray_Erase( DVarray *self, size_t start, size_t n )
-{
-	size_t i, rest;
-	if( start > self->size ) return;
-	if( n > self->size-start ) n = self->size-start;
-	if( n == 1 ){
-		if( start == 0 ){
-			DVarray_PopFront( self );
-			return;
-		}else if( start == self->size -1 ){
-			DVarray_PopBack( self );
-			return;
-		}
-	}
-	for( i=start; i<start+n; i++ ) DValue_Clear( self->data + i );
-
-	rest = self->size - start - n;
-	memmove( self->data + start, self->data + start + n, rest * sizeof(DValue) );
-	self->size -= n;
-	if( self->size < 0.5*self->bufsize && self->size + 10 < self->bufsize ){
-		if( self->data >self->buf ) memmove( self->buf, self->data, self->size * sizeof(DValue));
-		self->bufsize = (size_t)(0.6 * self->bufsize)+1;
-		self->buf = dao_realloc( self->buf, (self->bufsize+1)*sizeof(DValue) );
-		self->data = self->buf;
-	}
-
-}
-void DVarray_PushFront( DVarray *self, DValue val )
-{
-	size_t from = (size_t)( self->data - self->buf );
-	if( from > 0 ){
-		self->data --;
-	}else{
-		from = self->bufsize/5 + 5;
-		self->bufsize += from;
-		self->buf = dao_realloc( self->buf, (self->bufsize+1)*sizeof(DValue) );
-		memmove( self->buf + from, self->buf, self->size*sizeof(DValue) );
-		self->data = self->buf + from - 1;
-	}
-	self->data[0] = daoNullValue;
-	DValue_Copy( self->data, val );
-	self->size ++;
-}
-void DVarray_PopFront( DVarray *self )
-{
-	size_t from;
-	if( self->size == 0 ) return;
-	DValue_Clear( self->data );
-	self->size --;
-	self->data ++;
-	from = (size_t)( self->data - self->buf );
-	if( self->size < 0.5 * self->bufsize && self->size + 10 < self->bufsize ){
-		if( from < 0.1 * self->bufsize ){ /* shrink from back */
-			self->bufsize = (size_t)(0.6 * self->bufsize)+1;
-		}else{ /* shrink from front */
-			from = (size_t)(0.05 * self->bufsize);
-			memmove( self->buf+from, self->data, self->size*sizeof(DValue) );
-		}
-		self->buf = dao_realloc( self->buf, (self->bufsize+1)*sizeof(DValue) );
-		self->data = self->buf + from;
-	}
-}
-void DVarray_PushBack( DVarray *self, DValue val )
-{
-	size_t from = (size_t)( self->data - self->buf );
-	if( from + self->size + 1 >= self->bufsize ){
-		self->bufsize += self->bufsize/5 + 5;
-		self->buf = dao_realloc( self->buf, (self->bufsize+1)*sizeof(DValue) );
-		self->data = self->buf + from;
-	}
-	self->data[ self->size ] = daoNullValue;
-	DValue_Copy( self->data + self->size, val );
-	self->size++;
-}
-void DVarray_PopBack( DVarray *self )
-{
-	size_t from;
-	if( self->size == 0 ) return;
-	self->size --;
-	DValue_Clear( self->data + self->size );
-	from = (size_t)( self->data - self->buf );
-	if( self->size < 0.5 * self->bufsize && self->size + 10 < self->bufsize ){
-		if( from < 0.1 * self->bufsize ){ /* shrink from back */
-			self->bufsize = (size_t)(0.6 * self->bufsize)+1;
-		}else{ /* shrink from front */
-			from = (size_t)(0.05 * self->bufsize);
-			memmove( self->buf+from, self->data, self->size*sizeof(DValue) );
-		}
-		self->buf = dao_realloc( self->buf, (self->bufsize+1)*sizeof(DValue) );
-		self->data = self->buf + from;
-	}
-}
-DValue DVarray_Front( DVarray *self )
-{
-	DValue v = daoNullValue;
-	if( self->size ==0 || self->data ==NULL ) return v;
-	return self->data[0];
-}
-DValue DVarray_Back( DVarray *self )
-{
-	DValue v = daoNullValue;
-	if( self->size ==0 || self->data ==NULL ) return v;
-	return self->data[ self->size -1 ];
-}
 
 
 DaoVmcArray* DaoVmcArray_New()
@@ -833,8 +607,7 @@ void DaoVmcArray_Insert( DaoVmcArray *self, DaoVmCode code, size_t pos )
 		self->codes = self->buf;
 	}
 	if( pos < self->size ){
-		memmove( self->codes + pos + 1, self->codes + pos, 
-				(self->size-pos)*sizeof(DaoVmCode) );
+		memmove( self->codes + pos + 1, self->codes + pos, (self->size-pos)*sizeof(DaoVmCode) );
 	}
 	self->codes[ pos ] = code;
 	self->size ++;
@@ -959,83 +732,4 @@ void DArray_CleanupCodes( DArray *self )
 	DArray_Delete( dels );
 }
 
-DVaTuple* DVaTuple_New( size_t size, DValue val )
-{
-	DVaTuple *self = (DVaTuple*)dao_malloc( sizeof(DVaTuple) );
-	self->data = NULL;
-	self->size = 0;
-	if( size >0 ) DVaTuple_Resize( self, size, val );
-#ifdef DAO_GC_PROF
-	daoCountArray ++;
-#endif
-	return self;
-}
-void DVaTuple_Delete( DVaTuple *self )
-{
-	DVaTuple_Clear( self );
-	dao_free( self );
-#ifdef DAO_GC_PROF
-	daoCountArray --;
-#endif
-}
-void DVaTuple_Resize( DVaTuple *self, size_t size, DValue val )
-{
-	DValue nil = daoNullValue;
-	size_t i;
-	if( size == self->size ) return;
 
-	for(i=size; i<self->size; i++ ) DValue_Clear( self->data + i );
-	self->data = dao_realloc( self->data, size * sizeof(DValue) );
-
-	if( val.t <= DAO_DOUBLE ){
-		for(i=self->size; i<size; i++ ) self->data[i] = val;
-	}else{
-		for(i=self->size; i<size; i++ ){
-			self->data[i] = nil;
-			DValue_Copy( self->data + i, val );
-		}
-	}
-	self->size = size;
-}
-void DVaTuple_Clear( DVaTuple *self )
-{
-	size_t i;
-	for(i=0; i<self->size; i++ ) DValue_Clear( self->data + i );
-	if( self->data ) dao_free( self->data );
-	self->data = NULL;
-	self->size = 0;
-}
-
-DPtrTuple* DPtrTuple_New( size_t size, void *val )
-{
-	DPtrTuple *self = (DPtrTuple*)dao_malloc( sizeof(DPtrTuple) );
-	self->items.pVoid = NULL;
-	self->size = 0;
-	if( size ) DPtrTuple_Resize( self, size, val );
-#ifdef DAO_GC_PROF
-	daoCountArray ++;
-#endif
-	return self;
-}
-void DPtrTuple_Delete( DPtrTuple *self )
-{
-	DPtrTuple_Clear( self );
-	dao_free( self );
-#ifdef DAO_GC_PROF
-	daoCountArray --;
-#endif
-}
-void DPtrTuple_Resize( DPtrTuple *self, size_t size, void *val )
-{
-	size_t i;
-	if( size == self->size ) return;
-	self->items.pVoid = dao_realloc( self->items.pVoid, size * sizeof(void*) );
-	for(i=self->size; i<size; i++ ) self->items.pVoid[i] = val;
-	self->size = size;
-}
-void DPtrTuple_Clear( DPtrTuple *self )
-{
-	if( self->items.pVoid ) dao_free( self->items.pVoid );
-	self->items.pVoid = NULL;
-	self->size = 0;
-}

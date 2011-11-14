@@ -70,9 +70,9 @@ void DaoDebugger::SetBreakPoints( DaoRoutine *routine )
 		}
 	}
 }
-void DaoDebugger::ResetExecution( DaoContext *context, int line, int offset )
+void DaoDebugger::ResetExecution( DaoProcess *process, int line, int offset )
 {
-	DaoRoutine *routine = context->routine;
+	DaoRoutine *routine = process->activeRoutine;
 	DaoVmCodeX **annotCodes = routine->annotCodes->items.pVmc;
 	int i = 0, n = routine->annotCodes->size;
 	while( i < n && annotCodes[i]->line < line ) ++i;
@@ -80,8 +80,8 @@ void DaoDebugger::ResetExecution( DaoContext *context, int line, int offset )
 		++i;
 		--offset;
 	}
-	context->process->status = DAO_VMPROC_STACKED;
-	context->process->topFrame->entry = i;
+	process->status = DAO_VMPROC_STACKED;
+	process->topFrame->entry = i;
 }
 static QString NormalizeCodes( const QString & source, DArray *tokens )
 {
@@ -105,6 +105,7 @@ static short DaoVmCodeInfo[][5] =
 	{ 3, 0, 1, DVM_GETCL, DVM_GETCL } , 
 	{ 3, 0, 1, DVM_GETCK, DVM_GETCK } , 
 	{ 3, 0, 1, DVM_GETCG, DVM_GETCG } , 
+	{ 3, 3, 1, DVM_GETVH, DVM_GETVH } , 
 	{ 3, 3, 1, DVM_GETVL, DVM_GETVL } , 
 	{ 3, 3, 1, DVM_GETVO, DVM_GETVO } , 
 	{ 3, 3, 1, DVM_GETVK, DVM_GETVK } , 
@@ -113,6 +114,7 @@ static short DaoVmCodeInfo[][5] =
 	{ 0, 2, 1, DVM_GETMI, DVM_GETMI } , 
 	{ 1, 0, 1, DVM_GETF,  DVM_GETF } ,  
 	{ 1, 0, 1, DVM_GETMF, DVM_GETMF } ,  
+	{ 1, 3, 3, DVM_SETVH, DVM_SETVH } , 
 	{ 1, 3, 3, DVM_SETVL, DVM_SETVL } , 
 	{ 1, 3, 3, DVM_SETVO, DVM_SETVO } , 
 	{ 1, 3, 3, DVM_SETVK, DVM_SETVK } , 
@@ -164,7 +166,6 @@ static short DaoVmCodeInfo[][5] =
 	{ 1, 0, 1, DVM_ITER, DVM_ITER } , 
 	{ 1, 0, 0, DVM_TEST, DVM_TEST } , 
 	{ 0, 1, 1, DVM_MATH, DVM_MATH } , 
-	{ 0, 1, 1, DVM_FUNCT, DVM_FUNCT } , 
 	{ 0, 2, 1, DVM_CALL,  DVM_CALL } , 
 	{ 0, 2, 1, DVM_MCALL, DVM_MCALL } , 
 	{ 0, 2, 0, DVM_CRRE,  DVM_CRRE } , 
@@ -174,6 +175,45 @@ static short DaoVmCodeInfo[][5] =
 	{ 0, 2, 0, DVM_YIELD,  DVM_YIELD } , 
 	{ 0, 0, 0, DVM_DEBUG,  DVM_DEBUG } , 
 	{ 0, 0, 0, DVM_SECT,   DVM_SECT } ,   
+
+	{ 0, 0, 1, DVM_DATA_I, DVM_DATA_I } ,
+	{ 0, 0, 1, DVM_DATA_F, DVM_DATA_F } ,
+	{ 0, 0, 1, DVM_DATA_D, DVM_DATA_D } ,
+	{ 1, 3, 3, DVM_GETCL_I, DVM_GETCL_I } , 
+	{ 1, 3, 3, DVM_GETCL_F, DVM_GETCL_F } , 
+	{ 1, 3, 3, DVM_GETCL_D, DVM_GETCL_D } , 
+	{ 1, 3, 3, DVM_GETCK_I, DVM_GETCK_I } , 
+	{ 1, 3, 3, DVM_GETCK_F, DVM_GETCK_F } , 
+	{ 1, 3, 3, DVM_GETCK_D, DVM_GETCK_D } , 
+	{ 1, 3, 3, DVM_GETCG_I, DVM_GETCG_I } , 
+	{ 1, 3, 3, DVM_GETCG_F, DVM_GETCG_F } , 
+	{ 1, 3, 3, DVM_GETCG_D, DVM_GETCG_D } , 
+
+	{ 1, 3, 3, DVM_GETVH_I, DVM_GETVH_I } , 
+	{ 1, 3, 3, DVM_GETVH_F, DVM_GETVH_F } , 
+	{ 1, 3, 3, DVM_GETVH_D, DVM_GETVH_D } , 
+	{ 1, 3, 3, DVM_GETVL_I, DVM_GETVL_I } , 
+	{ 1, 3, 3, DVM_GETVL_F, DVM_GETVL_F } , 
+	{ 1, 3, 3, DVM_GETVL_D, DVM_GETVL_D } , 
+	{ 1, 3, 3, DVM_GETVO_I, DVM_GETVO_I } , 
+	{ 1, 3, 3, DVM_GETVO_F, DVM_GETVO_F } , 
+	{ 1, 3, 3, DVM_GETVO_D, DVM_GETVO_D } , 
+	{ 1, 3, 3, DVM_GETVK_I, DVM_GETVK_I } , 
+	{ 1, 3, 3, DVM_GETVK_F, DVM_GETVK_F } , 
+	{ 1, 3, 3, DVM_GETVK_D, DVM_GETVK_D } , 
+	{ 1, 3, 3, DVM_GETVG_I, DVM_GETVG_I } , 
+	{ 1, 3, 3, DVM_GETVG_F, DVM_GETVG_F } , 
+	{ 1, 3, 3, DVM_GETVG_D, DVM_GETVG_D } , 
+
+	{ 3, 3, 1, DVM_SETVH, DVM_SETVH_II } , 
+	{ 3, 3, 1, DVM_SETVH, DVM_SETVH_IF } , 
+	{ 3, 3, 1, DVM_SETVH, DVM_SETVH_ID } , 
+	{ 3, 3, 1, DVM_SETVH, DVM_SETVH_FI } , 
+	{ 3, 3, 1, DVM_SETVH, DVM_SETVH_FF } , 
+	{ 3, 3, 1, DVM_SETVH, DVM_SETVH_FD } , 
+	{ 3, 3, 1, DVM_SETVH, DVM_SETVH_DI } , 
+	{ 3, 3, 1, DVM_SETVH, DVM_SETVH_DF } , 
+	{ 3, 3, 1, DVM_SETVH, DVM_SETVH_DD } , 
 
 	{ 3, 3, 1, DVM_SETVL, DVM_SETVL_II } , 
 	{ 3, 3, 1, DVM_SETVL, DVM_SETVL_IF } , 
@@ -564,7 +604,7 @@ void DaoDebugger::Matching( int i, int j )
 		align2.append( j-1 );
 	}
 }
-static void DaoNS_UpdateLineInfo( DaoNameSpace *ns, int start, int diff )
+static void DaoNS_UpdateLineInfo( DaoNamespace *ns, int start, int diff )
 {
 	size_t i, j, n;
 	if( diff ==0 ) return;
@@ -583,9 +623,9 @@ static void DaoNS_UpdateLineInfo( DaoNameSpace *ns, int start, int diff )
 		for(j=0; j<n; j++) tokens[j]->line += diff;
 	}
 }
-bool DaoDebugger::EditContinue ( DaoContext *context, int newEntryLine, QList<int> & lineMap, QStringList & newCodes, QStringList & routCodes )
+bool DaoDebugger::EditContinue ( DaoProcess *process, int newEntryLine, QList<int> & lineMap, QStringList & newCodes, QStringList & routCodes )
 {
-	DaoRoutine *oldrout = context->routine;
+	DaoRoutine *oldrout = process->activeRoutine;
 	int i, j, k, dest = 0;
 	//printf( "=======%s\n", routCodes.join("\n").toLocal8Bit().data() );
 	//printf( "=======%s\n", newCodes.join("\n").toLocal8Bit().data() );
@@ -617,7 +657,7 @@ bool DaoDebugger::EditContinue ( DaoContext *context, int newEntryLine, QList<in
 	routine->bodyEnd = oldrout->bodyStart + newCodes.size() + 1;
 	routine->attribs = oldrout->attribs;
 	routine->parCount = oldrout->parCount;
-	parser->locRegCount = routine->parCount;
+	parser->regCount = routine->parCount;
 	parser->levelBase = oldrout->defLine != 0;
 	bool res = DaoParser_LexCode( parser, codes.toLocal8Bit().data(), 1 );
 	for(i=0; i<(int)parser->tokens->size; i++){
@@ -636,10 +676,17 @@ bool DaoDebugger::EditContinue ( DaoContext *context, int newEntryLine, QList<in
 		DaoRoutine_Delete( routine );
 		return false;
 	}
+	if( (process->stackSize - process->stackTop) < (routine->regCount + DAO_MAX_PARAM) ){
+		DaoProcess_PushFrame( process, routine->regCount );
+		DaoProcess_PopFrame( process );
+	}
 	DaoType **regTypes = routine->regType->items.pType;
-	DVaTuple *regArray = DVaTuple_New( routine->locRegCount, daoNullValue );
-	DValue **oldValues = context->regValues;
-	DValue **newValues = (DValue**)calloc( routine->locRegCount, sizeof(DValue*) );
+	DaoValue **newValues = process->activeValues;
+	DaoValue **oldValues = (DaoValue**)calloc( oldrout->regCount, sizeof(DaoValue*) );
+
+	memcpy( oldValues, newValues, oldrout->regCount * sizeof(DaoValue*) );
+	memset( newValues, 0, oldrout->regCount * sizeof(DaoValue*) );
+	DaoProcess_InitTopFrame( process, routine, process->activeObject );
 
 #if 0
 	DaoStream *stream = DaoStream_New();
@@ -647,15 +694,6 @@ bool DaoDebugger::EditContinue ( DaoContext *context, int newEntryLine, QList<in
 	DaoRoutine_PrintCode( routine, stream );
 #endif
 
-	for(i=0; i<routine->locRegCount; i++){
-		newValues[i] = regArray->data + i;
-		if( regTypes[i] && regTypes[i]->tid <= DAO_COMPLEX ){
-			regArray->data[i].t = regTypes[i]->tid;
-			if( regArray->data[i].t == DAO_COMPLEX ){
-				regArray->data[i].v.c = (complex16*) dao_malloc( sizeof(complex16) );
-			}
-		}
-	}
 	regmap.clear();
 	for(i=0; i<oldrout->parCount; i++) regmap[i] = i;
 
@@ -689,17 +727,13 @@ bool DaoDebugger::EditContinue ( DaoContext *context, int newEntryLine, QList<in
 	for(it=regmap.begin(); it != end; ++it){
 		j = it.key();
 		i = it.value();
-		if( oldValues[j] != context->regArray->data + j ){
-			newValues[i] = oldValues[j];
-		}else{
-			DValue_Move( *oldValues[j], newValues[i], regTypes[i] );
-		}
+		DaoValue_Move( oldValues[j], & newValues[i], regTypes[i] );
 	}
 
 	int offset = 0;
 	if( newEntryLine <0 ){
 		DaoVmCodeX **annotCodes = oldrout->annotCodes->items.pVmc;
-		int entry = (context->vmc - context->codes) + 1;
+		int entry = (process->activeCode - process->topFrame->codes) + 1;
 		int entryline = oldrout->annotCodes->items.pVmc[entry]->line;
 		/* if the entry line is NOT modified, use it */
 		entryline -= oldrout->bodyStart + 1;
@@ -718,17 +752,14 @@ bool DaoDebugger::EditContinue ( DaoContext *context, int newEntryLine, QList<in
 		newEntryLine += routine->bodyStart + 1;
 	}
 
-	DVaTuple_Delete( context->regArray );
-	free( context->regValues );
 	GC_ShiftRC( routine, oldrout );
 	GC_IncRC( routine );
 	oldrout->revised = routine;
-	context->routine = routine;
-	context->codes = routine->vmCodes->codes;
-	context->regArray = regArray;
-	context->regValues = newValues;
-	context->regTypes = regTypes;
-	ResetExecution( context, newEntryLine, offset );
+	process->activeRoutine = routine;
+	process->activeTypes = regTypes;
+	process->topFrame->codes = routine->vmCodes->codes;
+
+	ResetExecution( process, newEntryLine, offset );
 
 	i = newCodes.size() - routCodes.size();
 	DaoNS_UpdateLineInfo( routine->nameSpace, routine->bodyStart, i );

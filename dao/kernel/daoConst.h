@@ -14,11 +14,10 @@
 #ifndef DAO_CONST_H
 #define DAO_CONST_H
 
-#define DAO_MAX_PARAM  50
+#define DAO_MAX_PARAM  30
 #define DAO_MAX_INDEX  10
-#define DAO_MAX_SPEC_REG  20
-#define DAO_MAX_CTX_CACHES  100
-#define DAO_CALLER_PARAM (DAO_MAX_PARAM+1)
+
+#define DAO_MAX_SECTDEPTH  8
 
 #ifdef UNIX
 #define DAO_PATH "/usr/local/dao"
@@ -26,15 +25,9 @@
 #define DAO_PATH "C:\\dao"
 #endif
 
-#ifndef DAO_DIRECT_API
-#define DAO_DIRECT_API
-#endif
-
 #include"dao.h"
 
-#define DAO_UDF DAO_NIL  /* undefined type: for implicitly declared variables */
-
-#define DAO_REG_STACK 1
+#define DAO_UDF DAO_NONE  /* undefined type: for implicitly declared variables */
 
 enum DaoRTTI
 {
@@ -45,11 +38,11 @@ enum DaoRTTI
 	DAO_MACRO ,
 	DAO_ABROUTINE , /* abstract routine in interface */
 	DAO_FUNCURRY ,
-	DAO_CMODULE ,
-	DAO_THDMASTER ,
-	DAO_THREADID ,
 	DAO_FUTURE ,
+	DAO_TYPEKERNEL ,
+	DAO_CODEBLOCK ,
 
+	DAO_PAIR ,
 	DAO_LIST_EMPTY ,
 	DAO_ARRAY_EMPTY ,
 	DAO_MAP_EMPTY ,
@@ -66,10 +59,9 @@ enum DaoRTTI
 
 enum DaoBasicStruct
 {
-	D_VALUE = 1, /* for DMap only */
+	D_VALUE = 1,
 	D_VMCODE ,
 	D_TOKEN ,   /* for DArray only */
-	D_JITCODE , 
 	D_STRING ,
 	D_VARRAY ,
 	D_ARRAY ,
@@ -82,30 +74,6 @@ enum DaoValueMode
 {
 	DAO_VALUE_NORMAL ,
 	DAO_REFER_PARAM /* reference parameter */
-};
-
-enum DaoRegisterMode
-{
-	DAO_REG_VARIABLE = 1, /* explicit variables */
-	DAO_REG_INTERMED = 2, /* intermediate operands */
-	DAO_REG_INTERMED_SU = 3, /* single-use intermediate operands */
-	/* Mark a reference safe register, which should be an intermediate register
-	 * and is safe to hold a reference. It is considered safe if it used before
-	 * any operations that might invalidate the reference.
-	 *
-	 * Positive example: alist[i] + c
-	 * here the left operand register is safe to store a reference to "alist[i]",
-	 * because it is immediately used in the add operation and there is no other
-	 * operation before the add that can possibly cause reallocation of items of
-	 * "alist", hence invalidate the reference.
-	 *
-	 * Negative example: alist[i] + func()
-	 * here the left operand register is NOT safe to store the reference,
-	 * because func() may access "alist" and cause reallocation of the items.
-	 */
-	DAO_REG_REFER = 4
-	/* single-use and reference-safe intermediate operands can be used for
-	 * some basic optimizations (particularly for DaoJIT). */
 };
 
 /* It is for the typing system, to decide when to specialize a routine.
@@ -128,17 +96,16 @@ enum DaoMatchType
 	DAO_MT_EQ
 };
 
-enum DaoDataState
+enum DaoVarDeclaration
 {
-	DAO_DATA_LOCAL      = (1<<0), /* for compiling only */
-	DAO_DATA_MEMBER     = (1<<1), /* for compiling only */
-	DAO_DATA_GLOBAL     = (1<<2), /* for compiling only */
-	DAO_DATA_STATIC     = (1<<3), /* for compiling only */
-	DAO_DATA_VAR        = (1<<4), /* for compiling only */
-	DAO_DATA_NOCOPY     = (1<<6), /* data not for copying */
-	DAO_DATA_CONST      = (1<<7)  /* using the highest bit in the trait field */
+	DAO_DECL_LOCAL      = (1<<0), /* for compiling only */
+	DAO_DECL_MEMBER     = (1<<1), /* for compiling only */
+	DAO_DECL_GLOBAL     = (1<<2), /* for compiling only */
+	DAO_DECL_STATIC     = (1<<3), /* for compiling only */
+	DAO_DECL_VAR        = (1<<4), /* for compiling only */
+	DAO_DECL_CONST      = (1<<7)  /* using the highest bit in the trait field */
 };
-enum DaoDataStorage
+enum DaoVarStorage
 {
 	DAO_LOCAL_VARIABLE = 0,
 	DAO_LOCAL_CONSTANT = 1, /* lowest bit set to 1 for constant */
@@ -150,10 +117,17 @@ enum DaoDataStorage
 	DAO_LAST_REGISTER
 };
 
+enum DaoDataTrait
+{
+	DAO_DATA_CONST   = (1<<1), /* constant data object */
+	DAO_DATA_NOCOPY  = (1<<2), /* data object not for copying */
+	DAO_DATA_WIMETA  = (1<<3) /* data object with meta field */
+};
 enum DaoTypeAttribs
 {
 	DAO_TYPE_EMPTY = (1<<0),
 	DAO_TYPE_SELF = (1<<1),
+	DAO_TYPE_COROUTINE = (1<<2),
 	DAO_TYPE_NOTDEF = (1<<3),
 	DAO_TYPE_INTER = (1<<4)
 };
@@ -167,18 +141,18 @@ enum DaoCaseMode
 
 enum DaoCallMode
 {
-	DAO_CALL_INIT = (1<<8),
-	DAO_CALL_EXPAR = (1<<9),
-	DAO_CALL_COROUT = (1<<10),
-	DAO_CALL_NOVIRT = (1<<11)
+	DAO_CALL_INIT = (1<<8), /* call to initialize a parent object */
+	DAO_CALL_TAIL = (1<<9), /* may do tail call */
+	DAO_CALL_NOVIRT = (1<<10), /* call as non-virtual function */
+	DAO_CALL_COROUT = (1<<11), /* call for creating a coroutine vm process */
+	DAO_CALL_EXPAR = (1<<12), /* expand the last parameter of tuple type */
+	DAO_CALL_BLOCK = (1<<13) /* call with code block */
 };
 enum DaoVmProcPauseType
 {
 	DAO_VMP_NOPAUSE ,
-	DAO_VMP_ASYNC ,    /* by join mode of asynchronous call */
-	DAO_VMP_YIELD ,  /* by coroutine */
-	DAO_VMP_SPAWN ,  /* by message passing interface */
-	DAO_VMP_RECEIVE  /* by message passing interface */
+	DAO_VMP_ASYNC ,  /* by join mode of asynchronous call */
+	DAO_VMP_YIELD    /* by coroutine */
 };
 
 enum DaoDataPermission
@@ -189,9 +163,8 @@ enum DaoDataPermission
 };
 enum DaoClassAttrib
 {
-	DAO_CLS_FINAL = 1,
-	DAO_CLS_AUTO_DEFAULT = 2,
-	DAO_CLS_SYNCHRONOUS = 4
+	DAO_CLS_AUTO_DEFAULT = 1,
+	DAO_CLS_ASYNCHRONOUS = 2
 };
 enum DaoRoutineAttrib
 {
@@ -207,23 +180,9 @@ enum DaoRoutineAttrib
 #define DAO_TYPER_PRIV_FREE  (DAO_ROUT_MAIN<<1)
 #define DAO_OPER_OVERLOADED  (DAO_TYPER_PRIV_FREE<<1)
 
-enum DaoIoFormatKeyId
-{
-	DAO_IO_FMT_INT ,
-	DAO_IO_FMT_FLOAT ,
-	DAO_IO_FMT_QUOTES ,
-	DAO_IO_FMT_LIST_BGN ,
-	DAO_IO_FMT_LIST_DEL ,
-	DAO_IO_FMT_LIST_END ,
-	DAO_IO_FMT_MAP_BGN ,
-	DAO_IO_FMT_MAP_PR ,
-	DAO_IO_FMT_MAP_DEL ,
-	DAO_IO_FMT_MAP_END
-};
-
 enum DaoGlbConstShift
 {
-	DVR_NSC_NIL ,
+	DVR_NSC_NIL = 1 ,
 	DVR_NSC_MAIN 
 };
 enum DaoGlbVarShift
@@ -266,6 +225,7 @@ enum DaoArithOperType{
 	DAO_OPER_OR ,
 
 	DAO_OPER_IN ,
+	DAO_OPER_NOTIN ,
 
 	DAO_OPER_LT ,
 	DAO_OPER_GT ,
@@ -304,17 +264,23 @@ enum DaoCtInfoId
 	DAO_CTW_UN_EXPECTED ,
 	DAO_CTW_UN_DECLARED ,
 	DAO_CTW_WAS_DEFINED ,
+	DAO_WARN_STATEMENT_SEPERATION ,
+	DAO_WARN_ASSIGNMENT ,
 	DAO_NO_METHOD_TO_USE ,
+	DAO_NO_PUBLIC_IN_ASYNCLASS ,
+	DAO_NO_STATIC_IN_ASYNCLASS ,
 	DAO_SYMBOL_POSSIBLY_UNDEFINED ,
 	DAO_SYMBOL_NOT_DEFINED ,
 	DAO_SYMBOL_WAS_DEFINED ,
 	DAO_SYMBOL_NEED_CONSTANT ,
 	DAO_SYMBOL_NEED_CLASS ,
 	DAO_SYMBOL_NEED_CLASS_CTYPE ,
+	DAO_SYMBOL_NEED_ASYNCLASS ,
 	DAO_SYMBOL_NEED_INTERFACE ,
 	DAO_SYMBOL_NEED_BINDABLE ,
 	DAO_TOKEN_NEED_STRING ,
 	DAO_TOKEN_NEED_NAME ,
+	DAO_TOKEN_EXPECTING ,
 	DAO_TOKEN_NOT_FOUND ,
 	DAO_TOKEN_NOT_EXPECTED ,
 	DAO_TOKENS_NOT_PAIRED ,
@@ -325,7 +291,9 @@ enum DaoCtInfoId
 	DAO_INTERFACE_NOT_COMPATIBLE,
 	DAO_MISSING_INTERFACE_METHOD,
 	DAO_FAILED_INTERFACE_BIND ,
+	DAO_FAILED_INSTANTIATION ,
 	DAO_UNDEFINED_SCOPE_NAME ,
+	DAO_INVALID_TOKEN ,
 	DAO_INVALID_PATH ,
 	DAO_INVALID_ACCESS ,
 	DAO_INVALID_STORAGE ,
@@ -335,12 +303,15 @@ enum DaoCtInfoId
 	DAO_INVALID_DIGIT ,
 	DAO_INVALID_TYPE_NAME ,
 	DAO_INVALID_TYPE_FORM ,
+	DAO_INVALID_REFERENCE ,
 	DAO_INVALID_EXPRESSION ,
 	DAO_INVALID_STATEMENT ,
+	DAO_INVALID_SCOPE_ENDING ,
+	DAO_INVALID_FUNCTIONAL ,
 	DAO_INVALID_DEFINITION ,
 	DAO_INVALID_ENUM_DEFINITION ,
 	DAO_INVALID_CLASS_DEFINITION ,
-	DAO_INVALID_SYNC_CLASS_DEFINITION ,
+	DAO_INVALID_ASYNC_CLASS_DEFINITION ,
 	DAO_INVALID_FUNCTION_DEFINITION ,
 	DAO_INVALID_INTERFACE_DEFINITION ,
 	DAO_INVALID_FUNCTION_DECORATION ,
@@ -362,6 +333,7 @@ enum DaoCtInfoId
 	DAO_PARAM_IMPROPER_DEFAULT ,
 	DAO_PARAM_TOO_MANY ,
 	DAO_PARAM_INVALID_RETURN ,
+	DAO_SECTION_TOO_DEEP ,
 	DAO_STATEMENT_IN_CLASS ,
 	DAO_STATEMENT_IN_INTERFACE ,
 	DAO_STATEMENT_OUT_OF_CONTEXT ,
@@ -370,7 +342,6 @@ enum DaoCtInfoId
 	DAO_TYPE_PRESENTED ,
 	DAO_TYPE_EXPECTED ,
 	DAO_TYPE_NO_DEFAULT ,
-	DAO_CLASS_DERIVE_FINAL ,
 	DAO_ROUT_NEED_RETURN_TYPE ,
 	DAO_ROUT_INVALID_OPERATOR ,
 	DAO_ROUT_CONSTRU_RETURN ,
@@ -386,7 +357,12 @@ enum DaoCtInfoId
 	DAO_CASE_NOT_VALID ,
 	DAO_CASE_NOT_CONSTANT ,
 	DAO_LOAD_CYCLIC ,
-	DAO_FEATURE_DISABLED ,
+	DAO_DISABLED_NUMARRAY ,
+	DAO_DISABLED_SERIALIZATION ,
+	DAO_DISABLED_ASYNCLASS ,
+	DAO_DISABLED_TEMPCLASS ,
+	DAO_DISABLED_DYNCLASS ,
+	DAO_DISABLED_DECORATOR ,
 	DAO_CTW_PAR_NOT_CST_DEF ,
 	DAO_CTW_PAR_INVALID ,
 	DAO_CTW_PAR_INVA_NUM ,
@@ -415,8 +391,6 @@ enum DaoCtInfoId
 	DAO_CTW_INVA_MUL_ASSN ,
 	DAO_CTW_INVA_LITERAL ,
 	DAO_CTW_INVA_QUOTES ,
-	DAO_CTW_OPER_UNKNOWN ,
-	DAO_CTW_CHAR_SPEC ,
 	DAO_CTW_ASSIGN_INSIDE ,
 	DAO_CTW_DAO_H_UNMATCH ,
 	DAO_CTW_INVA_EMBED ,
@@ -436,7 +410,6 @@ enum DaoCtInfoId
 	DAO_CTW_INV_TYPE_FORM ,
 	DAO_CTW_INV_TYPE_NAME ,
 	DAO_CTW_INV_CONST_EXPR ,
-	DAO_CTW_DERIVE_FINAL ,
 	DAO_CTW_NO_PERMIT ,
 	DAO_CTW_TYPE_NOMATCH ,
 	DAO_CTW_FAIL_BINDING ,
@@ -461,42 +434,13 @@ extern const char* const daoExceptionInfo[];
 extern const char* getExceptName( int id );
 extern const char* getOpcodeName( int opc );
 
-static const char* const coreTypeNames[] =
-{
-	"?", "int", "float", "double", "complex", "long", "string", 
-	"enum", "array", "list", "map", "tuple", "stream"
-};
-static const char *const daoBitBoolArithOpers[] = {
-	"=", "!", "-", "~", "+", "-", "*", "/", "%", "**", 
-	"&&", "||", "<", "<=", "==", "!=", "in", "&", "|", "^", "<<", ">>"
-};
-static const char *const daoBitBoolArithOpers2[] = {
-	NULL, NULL, NULL, NULL, "+=", "-=", "*=", "/=", "%=", NULL, 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, "&=", "|=", "^=", NULL, NULL
-};
+extern const char* const coreTypeNames[];
+extern const char *const daoBitBoolArithOpers[];
+extern const char *const daoBitBoolArithOpers2[];
 
-static const char *daoRoutineCodeHeader =
-"   ID :    OPCODE    :     A ,     B ,     C ;  [ LINE ],  NOTES\n";
-static const char *daoRoutineCodeFormat = "%-11s : %5i , %5i , %5i ;  %4i;   %s\n";
+extern const char *daoRoutineCodeHeader;
+extern const char *daoRoutineCodeFormat;
 
-static const char utf8_markers[256] = 
-{
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 00 - 0F */
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 10 - 1F */
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 20 - 2F */
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 30 - 3F */
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 40 - 4F */
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 50 - 5F */
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 60 - 6F */
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 70 - 7F */
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, /* 80 - 8F */
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, /* 90 - 9F */
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, /* A0 - AF */
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, /* B0 - BF */
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* C0 - CF */
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* D0 - DF */
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, /* E0 - EF */
-	4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 7, 7  /* F0 - FF */
-};
+extern const char utf8_markers[256];
 
 #endif

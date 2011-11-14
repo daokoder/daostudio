@@ -14,7 +14,7 @@
 #ifndef DAO_NUMERIC_H
 #define DAO_NUMERIC_H
 
-#include"daoType.h"
+#include"daoStdtype.h"
 
 #define BBITS    (sizeof(unsigned short) * 8)
 #define BSIZE(x)  (((x) / 8) + sizeof(unsigned int))
@@ -86,30 +86,30 @@ complex16 tanh_c( const complex16 com );
 complex16 ceil_c( const complex16 com );
 complex16 floor_c( const complex16 com );
 
-#ifdef __STRICT_ANSI__
-#define LONG_BITS 7
-#else
-#define LONG_BITS 15
-#endif
+#define LONG_BITS 8
+#define LONG_BASE 256
+#define LONG_MASK 255
 
-#define LONG_BASE (1<<LONG_BITS)
-#define LONG_MASK ((int)(LONG_BASE-1))
+typedef signed char schar_t;
 
+/* bit integer */
 struct DLong
 {
-	ushort_t *data;
-	ushort_t *pbuf;
-	short     sign;
-	short     base;
+	uchar_t  *data;
+	uchar_t   base;
+	schar_t   sign;
+	ushort_t  offset;
 	size_t    size;
 	size_t    bufSize;
 };
 DLong* DLong_New();
+void DLong_Init( DLong *self );
 void DLong_Delete( DLong *self );
+void DLong_Detach( DLong *self );
 void DLong_Clear( DLong *self );
 void DLong_Resize( DLong *self, size_t size );
-void DLong_PushBack( DLong *self, ushort_t it );
-void DLong_PushFront( DLong *self, ushort_t it );
+void DLong_PushBack( DLong *self, uchar_t it );
+void DLong_PushFront( DLong *self, uchar_t it );
 int DLong_UCompare( DLong *x, DLong *y );
 int DLong_Compare( DLong *x, DLong *y );
 void DLong_Move( DLong *z, DLong *x );
@@ -136,37 +136,36 @@ int DLong_CompareToZero( DLong *self );
 int DLong_CompareToInteger( DLong *self, dint x );
 int DLong_CompareToDouble( DLong *self, double x );
 
-ushort_t DLong_UDivDigit( DLong *z, ushort_t digit );
+uchar_t DLong_UDivDigit( DLong *z, uchar_t digit );
 
 #define DLong_Append  DLong_PushBack
 
+/* Multi-dimensional array stored in row major order: */
 struct DaoArray
 {
 	DAO_DATA_COMMON;
 
-	size_t  size;
-	short   numType;
-	short   owner;
+	uchar_t  etype; /* element type; */
+	uchar_t  owner; /* own the data; */
+	short    ndim; /* number of dimensions; */
+	size_t   size; /* total number of elements; */
+	size_t  *dims; /* for i=0,...,ndim-1: dims[i], size of the i-th dimension; */
+	/* dims[ndim+i], products of the sizes of the remaining dimensions after the i-th; */
 
 	union{
 		void       *p;
-		int        *i;
+		dint       *i;
 		float      *f;
 		double     *d;
 		complex16  *c;
 	} data;
 
-	DArray  *dims;
-	DArray  *dimAccum;
-
-	size_t    subSize; /* size of the sub array / slice */
-	DArray   *slice; /* array of indexes in each dimension */
-	DaoArray *reference; /* reference array */
-
-	DaoMap  *meta;
 	DaoType *unitype;
 
-	void  **matrix;
+	size_t    count; /* count of sliced elements */
+	DArray   *slices; /* list of slicing in each dimension */
+	DaoArray *original; /* original array */
+
 };
 #ifdef DAO_WITH_NUMARRAY
 
@@ -175,21 +174,19 @@ DaoArray* DaoArray_Copy( DaoArray *self );
 int DaoArray_CopyArray( DaoArray *self, DaoArray *other );
 void DaoArray_Delete( DaoArray *self );
 
-void DaoArray_ResizeVector( DaoArray *self, int size );
+void DaoArray_SetDimCount( DaoArray *self, int D );
+void DaoArray_FinalizeDimData( DaoArray *self );
+
+void DaoArray_ResizeVector( DaoArray *self, size_t size );
 void DaoArray_ResizeArray( DaoArray *self, size_t *dims, int D );
 
 int DaoArray_Sliced( DaoArray *self );
 void DaoArray_UseData( DaoArray *self, void *data );
 
-int    DaoArray_GetInteger( DaoArray *na, int i );
-float  DaoArray_GetFloat( DaoArray *na, int i );
-double DaoArray_GetDouble( DaoArray *na, int i );
-complex16 DaoArray_GetComplex( DaoArray *na, int i );
-
-#define ARRAY_GET_INT( x, i ) DaoArray_GetInteger( x, i )
-#define ARRAY_GET_SF( x, i ) DaoArray_GetFloat( x, i )
-#define ARRAY_GET_DF( x, i ) DaoArray_GetDouble( x, i )
-#define ARRAY_GET_DC( x, i ) DaoArray_GetComplex( x, i )
+dint   DaoArray_GetInteger( DaoArray *na, size_t i );
+float  DaoArray_GetFloat( DaoArray *na, size_t i );
+double DaoArray_GetDouble( DaoArray *na, size_t i );
+complex16 DaoArray_GetComplex( DaoArray *na, size_t i );
 
 #endif
 

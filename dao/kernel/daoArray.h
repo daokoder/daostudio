@@ -14,49 +14,41 @@
 #ifndef DAO_ARRAY_H
 #define DAO_ARRAY_H
 
+#include<limits.h>
 #include"daoBase.h"
-
-struct DaoJitCode;
-
-typedef union DQuadUByte DQuadUByte;
-union DQuadUByte { void *p; struct{ unsigned char a, b, c, d; }X; };
 
 /* Array of pointers or integers: */
 struct DArray
 {
 	union{
-		dint                 *pInt;
-		size_t               *pSize;
-		DQuadUByte           *pQUB;
+		dint          *pInt;
+		size_t        *pSize;
+		void         **pVoid;
 
-		void                **pVoid;
-		struct DaoBase      **pBase;
-		struct DaoList      **pList;
-		struct DaoTuple     **pTuple;
-		struct DaoClass     **pClass;
-		struct DaoObject    **pObject;
-		struct DaoRoutine   **pRout;
-		struct DRoutine     **pRout2;
-		struct DaoCData     **pCData;
-		struct DaoType      **pType;
-		struct DaoNameSpace **pNS;
+		DaoValue     **pValue;
+		DaoList      **pList;
+		DaoTuple     **pTuple;
+		DaoClass     **pClass;
+		DaoObject    **pObject;
+		DaoRoutine   **pRout;
+		DRoutine     **pRout2;
+		DaoCdata     **pCdata;
+		DaoType      **pType;
+		DaoNamespace **pNS;
 
-		struct DValue       **pValue;
-		struct DString      **pString;
-		struct DArray       **pArray;
-		struct DMap         **pMap;
-		struct DVarray      **pVarray;
-		struct DaoInode     **pInode;
-		struct DaoVmCodeX   **pVmc;
+		DString      **pString;
+		DArray       **pArray;
+		DMap         **pMap;
+		DaoInode     **pInode;
+		DaoVmCodeX   **pVmc;
+		DaoToken     **pToken;
 
-		struct DaoJitCode   **pJitc;
-		struct DaoToken     **pToken;
+	} items;
 
-	} buf, items;
-
-	short  type; /* can be 0 (for integers or pointers), or, D_STRING, D_ARRAY, D_MAP */
 	size_t size;
 	size_t bufsize;
+	size_t offset : CHAR_BIT*sizeof(size_t) - 4;
+	size_t type   : 4; /* can be 0 (for integers or pointers), or, D_STRING, D_ARRAY, etc. */
 };
 
 /* See daolib.h */
@@ -84,6 +76,14 @@ void* DArray_Back( DArray *self );
 #define DArray_Top( self )           DArray_Back( self )
 #define DArray_TopInt( self )        (self)->items.pInt[ (self)->size -1 ]
 
+
+struct DaoVmcArray
+{
+	DaoVmCode *codes;
+	DaoVmCode *buf;
+	ushort_t   size;
+	ushort_t   bufsize;
+};
 DaoVmcArray* DaoVmcArray_New();
 void DaoVmcArray_Delete( DaoVmcArray *self );
 void DaoVmcArray_Clear( DaoVmcArray *self );
@@ -105,33 +105,5 @@ void DArray_CleanupCodes( DArray *self );
 #define DaoVmcArray_Append( self, code )  DaoVmcArray_PushBack( self, code )
 #define DaoVmcArray_Pop( self )  DaoVmcArray_PopBack( self )
 
-struct DPtrTuple
-{
-	union{
-		size_t             *pInt;
-		void              **pVoid;
-		struct DaoBase    **pBase;
-		struct DaoClass   **pClass;
-		struct DaoObject  **pObject;
-		struct DaoType    **pType;
-	} items;
 
-	size_t size;
-};
-
-/* See daolib.h */
-DPtrTuple* DPtrTuple_New(  size_t size, void *val );
-void DPtrTuple_Delete( DPtrTuple *self );
-void DPtrTuple_Resize( DPtrTuple *self, size_t size, void *val );
-void DPtrTuple_Clear( DPtrTuple *self );
-
-typedef struct DaoJitCode DaoJitCode;
-struct DaoJitCode
-{
-	short  opcode; /* basic opcode (not encoded) */
-	short  rmsti;  /* reg, mem, stack, (encoded) */
-	short  modsib; /* addressing mode, bit flags */
-	dint   extra; /* displacement, immediate data or SIB byte (encode) */
-	int    vmcID;
-};
 #endif

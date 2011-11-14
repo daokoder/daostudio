@@ -58,11 +58,11 @@ class DaoDebugger : public QObject
 	DaoDebugger();
 
 	void SetBreakPoints( DaoRoutine *routine );
-	void ResetExecution( DaoContext *context, int line, int offset );
+	void ResetExecution( DaoProcess *process, int line, int offset );
 	void Similarity( QList<DaoVmCode> & x, QList<DaoVmCode> & y );
 	void Matching( QList<DaoVmCode> & x, QList<DaoVmCode> & y );
 	void Matching( int i, int j );
-	bool EditContinue( DaoContext*, int, QList<int>&, QStringList&, QStringList& );
+	bool EditContinue( DaoProcess*, int, QList<int>&, QStringList&, QStringList& );
 
 	protected slots:
 

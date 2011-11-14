@@ -12,144 +12,6 @@
   =========================================================================================*/
 
 #include"daoConst.h"
-#include"daoOpcode.h"
-
-static const char *const vmOperNames[] = {
-	"NOP", "DATA", 
-	"GETCL", "GETCK", "GETCG", 
-	"GETVL", "GETVO", "GETVK", "GETVG", 
-	"GETI", "GETMI", "GETF", "GETMF",
-	"SETVL", "SETVO", "SETVK", "SETVG", 
-	"SETI", "SETMI", "SETF", "SETMF",
-	"LOAD", "CAST", "MOVE",
-	"NOT", "UNMS", "BITREV",
-	"ADD", "SUB", "MUL", "DIV", "MOD", "POW",
-	"AND", "OR", "LT", "LE", "EQ", "NE", "IN",
-	"BITAND", "BITOR", "BITXOR", "BITLFT", "BITRIT",
-	"CHECK", "NAMEVA", "PAIR", "TUPLE",
-	"LIST", "MAP", "HASH", "ARRAY", "MATRIX", "CURRY", "MCURRY",
-	"ROUTINE", "CLASS", "GOTO", "SWITCH", "CASE", "ITER", "TEST", 
-	"MATH", "FUNCT", "CALL", "MCALL", 
-	"CRRE", "JITC", "RETURN", "YIELD", "DEBUG", "SECT",
-	"SETVL_II", "SETVL_IF", "SETVL_ID", 
-	"SETVL_FI", "SETVL_FF", "SETVL_FD", 
-	"SETVL_DI", "SETVL_DF", "SETVL_DD",
-	"SETVO_II", "SETVO_IF", "SETVO_ID", 
-	"SETVO_FI", "SETVO_FF", "SETVO_FD", 
-	"SETVO_DI", "SETVO_DF", "SETVO_DD",
-	"SETVK_II", "SETVK_IF", "SETVK_ID", 
-	"SETVK_FI", "SETVK_FF", "SETVK_FD", 
-	"SETVK_DI", "SETVK_DF", "SETVK_DD",
-	"SETVG_II", "SETVG_IF", "SETVG_ID", 
-	"SETVG_FI", "SETVG_FF", "SETVG_FD", 
-	"SETVG_DI", "SETVG_DF", "SETVG_DD",
-	"MOVE_II", "MOVE_IF", "MOVE_ID",
-	"MOVE_FI", "MOVE_FF", "MOVE_FD",
-	"MOVE_DI", "MOVE_DF", "MOVE_DD",
-	"MOVE_CC", "MOVE_SS", "MOVE_PP",
-	"NOT_I", "NOT_F", "NOT_D", 
-	"UNMS_I", "UNMS_F", "UNMS_D",
-	"BITREV_I", "BITREV_F", "BITREV_D",
-	"UNMS_C",
-	"ADD_III", "SUB_III", "MUL_III", "DIV_III", "MOD_III", "POW_III",
-	"AND_III", "OR_III", "LT_III", "LE_III", "EQ_III", "NE_III", 
-	"BITAND_III", "BITOR_III", "BITXOR_III", "BITLFT_III", "BITRIT_III", 
-	"ADD_FFF", "SUB_FFF", "MUL_FFF", "DIV_FFF", "MOD_FFF", "POW_FFF",
-	"AND_FFF", "OR_FFF", "LT_FFF", "LE_FFF", "EQ_FFF", "NE_FFF", 
-	"BITAND_FFF", "BITOR_FFF", "BITXOR_FFF", "BITLFT_FFF", "BITRIT_FFF", 
-	"ADD_DDD", "SUB_DDD", "MUL_DDD", "DIV_DDD", "MOD_DDD", "POW_DDD",
-	"AND_DDD", "OR_DDD", "LT_DDD", "LE_DDD", "EQ_DDD", "NE_DDD", 
-	"BITAND_DDD", "BITOR_DDD", "BITXOR_DDD", "BITLFT_DDD", "BITRIT_DDD", 
-	"ADD_FNN", "SUB_FNN", "MUL_FNN", "DIV_FNN", "MOD_FNN", "POW_FNN",
-	"AND_FNN", "OR_FNN", "LT_FNN", "LE_FNN", "EQ_FNN", "NE_FNN", 
-	"BITLFT_FNN", "BITRIT_FNN", 
-	"ADD_DNN", "SUB_DNN", "MUL_DNN", "DIV_DNN", "MOD_DNN", "POW_DNN",
-	"AND_DNN", "OR_DNN", "LT_DNN", "LE_DNN", "EQ_DNN", "NE_DNN", 
-	"BITLFT_DNN", "BITRIT_DNN", 
-	"ADD_SS", "LT_SS", "LE_SS", "EQ_SS", "NE_SS",
-	"GETI_LI", "SETI_LI",
-	"GETI_SI", "SETI_SII",
-	"GETI_LII", "GETI_LFI", "GETI_LDI", "GETI_LSI",
-	"SETI_LIII", "SETI_LIIF", "SETI_LIID",
-	"SETI_LFII", "SETI_LFIF", "SETI_LFID",
-	"SETI_LDII", "SETI_LDIF", "SETI_LDID", "SETI_LSIS",
-	"GETI_AII", "GETI_AFI", "GETI_ADI",
-	"SETI_AIII", "SETI_AIIF", "SETI_AIID",
-	"SETI_AFII", "SETI_AFIF", "SETI_AFID",
-	"SETI_ADII", "SETI_ADIF", "SETI_ADID",
-	"GETI_TI", "SETI_TI", 
-	"GETF_T", "GETF_TI", "GETF_TF", "GETF_TD", "GETF_TS",
-	"SETF_T",
-	"SETF_TII", "SETF_TIF", "SETF_TID",
-	"SETF_TFI", "SETF_TFF", "SETF_TFD",
-	"SETF_TDI", "SETF_TDF", "SETF_TDD", "SETF_TSS",
-	"ADD_CC", "SUB_CC", "MUL_CC", "DIV_CC", 
-	"GETI_ACI", "SETI_ACI",
-	"GETI_AM", "SETI_AM",
-	"GETF_KC", "GETF_KG", "GETF_OC", "GETF_OG", "GETF_OV", 
-	"SETF_KG", "SETF_OG", "SETF_OV",
-	"GETF_KCI", "GETF_KGI",
-	"GETF_OCI", "GETF_OGI", "GETF_OVI",
-	"GETF_KCF", "GETF_KGF",
-	"GETF_OCF", "GETF_OGF", "GETF_OVF",
-	"GETF_KCD", "GETF_KGD",
-	"GETF_OCD", "GETF_OGD", "GETF_OVD",
-	"SETF_KGII", "SETF_OGII", "SETF_OVII",
-	"SETF_KGIF", "SETF_OGIF", "SETF_OVIF",
-	"SETF_KGID", "SETF_OGID", "SETF_OVID",
-	"SETF_KGFI", "SETF_KGFI", "SETF_OVFI", 
-	"SETF_KGFF", "SETF_KGFF", "SETF_OVFF",
-	"SETF_KGFD", "SETF_KGFD", "SETF_OVFD",
-	"SETF_KGDI", "SETF_OGDI", "SETF_OVDI",
-	"SETF_KGDF", "SETF_OGDF", "SETF_OVDF",
-	"SETF_KGDD", "SETF_OGDD", "SETF_OVDD",
-	"TEST_I", "TEST_F", "TEST_D",
-	"GOTO",
-	"???",
-
-	/* for compiling only */
-	"idx" ,
-	"incr" ,
-	"decr" ,
-	"comma" , 
-	"if" ,
-	"elif" ,
-	"else" ,
-	"while_aux" ,
-	"while" ,
-	"for_aux" ,
-	"for_step" ,
-	"for" ,
-	"do" ,
-	"until" ,
-	"dowhile" ,
-	"casetag" ,
-	"default" ,
-	"break" ,
-	"skip" ,
-	"lbra" ,
-	"rbra" ,
-	"lbra2" ,
-	"rbra2" ,
-	"try" ,
-	"retry" ,
-	"raise" ,
-	"rescue" ,
-	"label" ,
-	"scbegin" ,
-	"scend" ,
-	"enum" ,
-	"setvg_aux" ,
-	"refer" ,
-	"unused",
-	"unused2"
-};
-const char* getOpcodeName( int opc )
-{
-	if( opc >= 0 && opc < DVM_NULL ) return vmOperNames[ opc ];
-	if( opc > DVM_NULL && opc <= DVM_UNUSED ) return vmOperNames[ opc-DVM_IDX+DVM_NULL+1 ];
-	return "???";
-}
 
 static const char* const daoCtInfo[] = 
 {
@@ -162,17 +24,23 @@ static const char* const daoCtInfo[] =
 	"is not expected",
 	"is not declared",
 	"has been previously defined",
+	"Statements not seperated properly",
+	"Assignment inside expression",
 	"No method to use from",
+	"No public field is allowed in asynclass",
+	"No static field is allowed in asynclass",
 	"Symbol possibly undefined",
 	"Symbol not defined",
 	"Symbol was defined",
 	"Need symbol of constant",
 	"Need symbol of class",
 	"Need symbol of class or C type",
+	"Need symbol of asynchronous class",
 	"Need symbol of interface",
 	"Need bindable type (Dao class or C type)",
 	"Need string token",
 	"Need valid name" ,
+	"Expecting token" ,
 	"Token not found",
 	"Token not expected",
 	"Tokens not paired",
@@ -183,7 +51,9 @@ static const char* const daoCtInfo[] =
 	"Interface not compatible",
 	"Missing interface method",
 	"Failed interface binding",
+	"Failed type instantiation",
 	"Undefined scope name",
+	"Invalid token or unclosed string/comment/verbatim",
 	"Invalid path setting",
 	"Invalid access permission",
 	"Invalid storage type/combination",
@@ -193,12 +63,15 @@ static const char* const daoCtInfo[] =
 	"Invalid number digit",
 	"Invalid type name",
 	"Invalid type form",
+	"Invalid reference to non-local variable",
 	"Invalid expression",
 	"Invalid statement",
+	"Invalid scope ending",
+	"Invalid functional method",
 	"Invalid definition",
 	"Invalid enum definition",
 	"Invalid class definition",
-	"Invalid synchronous class definition",
+	"Invalid asynchronous class definition",
 	"Invalid function definition",
 	"Invalid interface definition",
 	"Invalid function decoration",
@@ -220,6 +93,7 @@ static const char* const daoCtInfo[] =
 	"Default value not matching parameter type",
 	"Too many parameters",
 	"Invalid return type",
+	"Too deeply nested code section" ,
 	"Statement in class body",
 	"Statement in interface body",
 	"Statement used out of context",
@@ -228,7 +102,6 @@ static const char* const daoCtInfo[] =
 	"Type of given value",
 	"Type of expected value",
 	"Type without default value",
-	"Finalized class cannot be derived",
 	"Function need return type",
 	"Invalid operator for overloading",
 	"Constructor cannot return",
@@ -244,7 +117,12 @@ static const char* const daoCtInfo[] =
 	"Invalid case statement",
 	"Case value not constant",
 	"Cyclic loading detected",
-	"Feature is disabled",
+	"Numeric array is disabled",
+	"Serialization is disabled",
+	"Synchronous class is disabled",
+	"Template class is disabled",
+	"Runtime class creation is disabled",
+	"Function decorator is disabled",
 	"default parameter is not const",
 	"invalid parameter list",
 	"parameter number not correct",
@@ -273,8 +151,6 @@ static const char* const daoCtInfo[] =
 	"invalid multi-assignment",
 	"invalid string literal",
 	"un-paired quotation symbol",
-	"unknown operator",
-	"unknown escape char",
 	"for assignment inside an expression, use :=",
 	"different version of dao.h is used",
 	"invalid Dao script embedding",
@@ -294,7 +170,6 @@ static const char* const daoCtInfo[] =
 	"invalid type form",
 	"invalid type name",
 	"invalid constant expression",
-	"deriving from a finalized class",
 	"not permited in the safe running mode",
 	"type not matched",
 	"interface binding failed",
@@ -363,4 +238,42 @@ const char* const daoExceptionInfo[] =
 	"file error",
 	"invalid syntax" ,
 	"invalid value for the operation"
+};
+
+const char* const coreTypeNames[] =
+{
+	"none", "int", "float", "double", "complex", "long", "string", 
+	"enum", "array", "list", "map", "tuple", "stream"
+};
+const char *const daoBitBoolArithOpers[] = {
+	"=", "!", "-", "~", "+", "-", "*", "/", "%", "**", 
+	"&&", "||", "<", "<=", "==", "!=", "in", "&", "|", "^", "<<", ">>"
+};
+const char *const daoBitBoolArithOpers2[] = {
+	NULL, NULL, NULL, NULL, "+=", "-=", "*=", "/=", "%=", NULL, 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, "&=", "|=", "^=", NULL, NULL
+};
+
+const char *daoRoutineCodeHeader =
+"   ID :    OPCODE    :     A ,     B ,     C ;  [ LINE ],  NOTES\n";
+const char *daoRoutineCodeFormat = "%-11s : %5i , %5i , %5i ;  %4i;   %s\n";
+
+const char utf8_markers[256] = 
+{
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 00 - 0F */
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 10 - 1F */
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 20 - 2F */
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 30 - 3F */
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 40 - 4F */
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 50 - 5F */
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 60 - 6F */
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 70 - 7F */
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, /* 80 - 8F */
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, /* 90 - 9F */
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, /* A0 - AF */
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, /* B0 - BF */
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* C0 - CF */
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* D0 - DF */
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, /* E0 - EF */
+	4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 7, 7  /* F0 - FF */
 };

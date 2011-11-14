@@ -121,8 +121,7 @@ class DaoConsole : public DaoTextEdit
 	void Quit();
 
 	DaoVmSpace   *vmSpace;
-	DaoEditor	*editor;
-	DaoContext   *context;
+	DaoEditor	 *editor;
 	DaoTabEditor *tabWidget;
 	QLocalSocket *debugSocket;
 	QLocalSocket *stdinSocket;

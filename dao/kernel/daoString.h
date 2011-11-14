@@ -16,6 +16,7 @@
 
 #include<wctype.h>
 #include<wchar.h>
+#include<limits.h>
 
 #define MAXSIZE ((size_t)(-1))
 
@@ -23,25 +24,23 @@
 
 struct DString
 {
-	size_t   size;
-	size_t   bufSize;
-	size_t  *data;
+	size_t   size    : CHAR_BIT*sizeof(size_t)-1;
+	size_t   dummy   : 1;
+	size_t   bufSize : CHAR_BIT*sizeof(size_t)-1;
+	size_t   shared  : 1;
 	char    *mbs;
 	wchar_t *wcs;
-	/* if data==mbs or data==wcs, no implicit sharing;
-	   otherwise, data+1 must be equal to mbs or wcs, 
-	   and data[0] will be the reference count. */
 };
 
 DString* DString_New( int mbs );
+void DString_Init( DString *self, int mbs );
+void DString_DeleteData( DString *self );
 void DString_Delete( DString *self );
 void DString_Detach( DString *self );
 
 void DString_SetSharing( DString *self, int sharing );
 
 int DString_IsMBS( DString *self );
-int DString_IsDigits( DString *self );
-int DString_IsDecimal( DString *self );
 size_t DString_CheckUTF8( DString *self );
 
 char* DString_GetMBS( DString *self );
@@ -112,6 +111,7 @@ int DString_Decrypt( DString *self, DString *key, int hex );
 size_t DString_BalancedChar( DString *self, uint_t ch0, uint_t lch0, uint_t rch0, 
 		uint_t esc0, size_t start, size_t end, int countonly );
 
+DString DString_WrapBytes( const char *mbs, int n );
 DString DString_WrapMBS( const char *mbs );
 DString DString_WrapWCS( const wchar_t *wcs );
 

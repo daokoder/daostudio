@@ -17,38 +17,19 @@
 #include"daoType.h"
 #include"daoLexer.h"
 
-struct DaoInode
-{
-	unsigned short  code; /* opcode */
-	unsigned short  a, b, c; /* register ids for operands */
-	unsigned short  level; /* lexical level */
-	unsigned short  line; /* line number in source file */
-	unsigned int    first;
-	unsigned short  middle;
-	unsigned short  last;
-
-	int id;
-	int extra;
-
-	DaoInode *jumpTrue;
-	DaoInode *jumpFalse;
-
-	DaoInode *prev;
-	DaoInode *next;
-	DaoInode *below;
-};
-DaoInode* DaoInode_New();
 
 struct DaoParser
 {
 	DaoVmSpace   *vmSpace;
-	DaoNameSpace *nameSpace;
+	DaoNamespace *nameSpace;
 
 	DString *fileName;
 
 	DaoParser *defParser;
 	int parStart;
 	int parEnd;
+
+	int curToken;
 
 	DArray  *tokens;
 	DArray  *partoks;
@@ -62,12 +43,12 @@ struct DaoParser
 	DaoInode *vmcBase;
 	DaoInode *vmcFirst;
 	DaoInode *vmcLast;
-	DaoInode *vmcTop;
 	int vmcCount;
 
 	/* Stack of maps: mapping local variable names to virtual register ids at each level: */
 	DArray  *localVarMap; /* < DMap<DString*,int> > */
 	DArray  *localCstMap; /* < DMap<DString*,int> > */
+	DArray  *localDecMap; /* < DMap<DString*,int> > */
 	DArray  *switchMaps;
 	DArray  *enumTypes; /* <DaoType*> */
 
@@ -75,7 +56,6 @@ struct DaoParser
 	 * with respect to the first line in the routine body;
 	 * -1 is used for register for parameters */
 	DArray *regLines; /* <int> : obsolete */
-	DArray *regRefers;
 
 	short levelBase;
 	short lexLevel;
@@ -84,11 +64,11 @@ struct DaoParser
 
 	DArray *routCompilable; /* list of defined routines with bodies */
 
-	int    locRegCount;
-	DMap  *varFunctional; /* <DString*,int>: variables in functional blocks. */
+	int    regCount;
+	int    lastValue;
 	DMap  *initTypes; /* type holders @T from parameters and the up routine */
 
-	int nullValue;
+	int noneValue;
 	int integerZero;
 	int integerOne;
 	int imaginaryOne;
@@ -105,14 +85,16 @@ struct DaoParser
 	char isInterBody;
 	char isDynamicClass;
 	char permission;
-	char warnAssn;
-	char pairLtGt; /* <> */
+	char isFunctional;
 
 	DaoInterface *hostInter;
 	DaoClass     *hostClass;
-	DaoType      *hostCData;
+	DaoType      *hostCdata;
 	DaoType      *hostType;
 	DaoParser    *outParser;
+
+	DaoType      *cblockType;
+	DaoType      *returnType;
 
 	int curLine;
 	int lineCount;
@@ -120,23 +102,27 @@ struct DaoParser
 	short defined;
 	short error;
 	short parsed;
-	DArray *scoping; /* <size_t> */
+	DArray *scopeOpenings; /* <DaoInode*> */
+	DArray *scopeClosings; /* <DaoInode*> */
 	DArray *errors;
+	DArray *warnings;
 	DArray *bindtos;
 	DArray *uplocs;
+	DArray *outers;
 	DArray *decoFuncs;
 	DArray *decoParams;
 
 	/* members for convenience */
+	DaoEnum   *denum;
 	DLong     *bigint;
-	DEnum     *denum;
 	DString   *mbs;
 	DString   *mbs2;
 	DString   *str;
 	DMap      *lvm; /* <DString*,int>, for localVarMap; */
 	DArray    *toks;
-	complex16  combuf;
-	complex16  imgone;
+
+	DArray  *strings;
+	DArray  *arrays;
 };
 
 DaoParser* DaoParser_New();
@@ -144,10 +130,9 @@ void DaoParser_Delete( DaoParser *self );
 
 int DaoParser_LexCode( DaoParser *self, const char *source, int replace );
 int DaoParser_ParsePrototype( DaoParser *self, DaoParser *module, int key, int start );
-int DaoParser_ParseParams( DaoParser *self, int defkey );
 int DaoParser_ParseScript( DaoParser *self );
 int DaoParser_ParseRoutine( DaoParser *self );
 
-DaoType* DaoParser_ParseTypeName( const char *type, DaoNameSpace *ns, DaoClass *cls, DaoRoutine *rout );
+DaoType* DaoParser_ParseTypeName( const char *type, DaoNamespace *ns, DaoClass *cls );
 
 #endif

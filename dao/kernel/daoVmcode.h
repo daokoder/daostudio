@@ -11,8 +11,10 @@
   See the GNU Lesser General Public License for more details.
   =========================================================================================*/
 
-#ifndef DAO_OPCODE_H
-#define DAO_OPCODE_H
+#ifndef DAO_VMCODE_H
+#define DAO_VMCODE_H
+
+#include"daoBase.h"
 
 enum DaoOpcode
 {
@@ -21,6 +23,7 @@ enum DaoOpcode
 	DVM_GETCL , /* get local const: C = A::B; current routine, A=0; up routine: A=1; */
 	DVM_GETCK , /* get class const: C = A::B; current class, A=0; parent class: A>=1; */
 	DVM_GETCG , /* get global const: C = A::B; current namespace, A=0; loaded: A>=1; */
+	DVM_GETVH , /* get host variable in code section: C = A::B; A, outer level; */
 	DVM_GETVL , /* get local variables: C = A::B; A=1, up routine; */
 	DVM_GETVO , /* get instance object variables: C = A::B; A=0; */
 	DVM_GETVK , /* get class global variables: C = A::B; A: the same as GETCK; */
@@ -29,6 +32,7 @@ enum DaoOpcode
 	DVM_GETMI , /* GET Item(s) : C = A[A+1, ..., A+B]; */
 	DVM_GETF ,  /* GET Field : C = A.B */
 	DVM_GETMF , /* GET Meta Field: C = A->B */
+	DVM_SETVH , /* set host variable in code section: C::B = A; C, outer level; */
 	DVM_SETVL , /* set local variables: C::B = A, C the same as A in DVM_GETVL */
 	DVM_SETVO , /* set object variables: C::B = A, C the same as A in DVM_GETVO */
 	DVM_SETVK , /* set class variables: C::B = A, C the same as A in DVM_GETVK */
@@ -80,19 +84,55 @@ enum DaoOpcode
 	DVM_ITER , /* create or reset an iterator at C for A; */
 	DVM_TEST , /* if A, go to the next one; else, goto B-th instruction; */
 	DVM_MATH , /* C = A( B ); A: sin,cos,...; B: double,complex */
-	DVM_FUNCT , /* C = A( B ); A: map,reduce,...; B: list,tuple */
-	DVM_CALL , /* call C = A( A+1, A+2, ..., A+B ); If B==0, no parameters;
-				  call with caller's params C = A( 0, 1, ... ), if B==DAO_CALLER_PARAM. */
+	DVM_CALL , /* call C = A( A+1, A+2, ..., A+B ); If B==0, no parameters; */
 	DVM_MCALL , /* method call: x.y(...), pass x as the first parameter */
 	DVM_CRRE , /* Check(B=0), Raise(C=0) or Rescue(C>0, goto C if not matching) Exceptions:
 				  A,A+1,..,A+B-2; If B==1, no exception to raise or rescue. */
 	DVM_JITC , /* run Just-In-Time compiled Code A, and skip the next B instructions */
 	DVM_RETURN , /* return A,A+1,..,A+B-1; B==0: no returns; C==1: return from functional */
 	DVM_YIELD , /* yield A, A+1,.., A+B-1; return data at C when resumed; */
-	DVM_DEBUG , /* prompt to debugging mode */
-	DVM_SECT ,   /* indicate the starting of a code subsection, A is the id. */
+	DVM_DEBUG , /* prompt to debugging mode; */
+	DVM_SECT ,   /* code subsection label, parameters: A,A+1,...,A+B-1; C # explicit parameters; */
 
 	/* optimized opcodes: */
+	DVM_DATA_I ,
+	DVM_DATA_F ,
+	DVM_DATA_D ,
+	DVM_GETCL_I , 
+	DVM_GETCL_F , 
+	DVM_GETCL_D , 
+	DVM_GETCK_I , 
+	DVM_GETCK_F , 
+	DVM_GETCK_D , 
+	DVM_GETCG_I , 
+	DVM_GETCG_F , 
+	DVM_GETCG_D , 
+
+	DVM_GETVH_I , 
+	DVM_GETVH_F , 
+	DVM_GETVH_D , 
+	DVM_GETVL_I , 
+	DVM_GETVL_F , 
+	DVM_GETVL_D , 
+	DVM_GETVO_I , 
+	DVM_GETVO_F , 
+	DVM_GETVO_D , 
+	DVM_GETVK_I , 
+	DVM_GETVK_F , 
+	DVM_GETVK_D , 
+	DVM_GETVG_I , 
+	DVM_GETVG_F , 
+	DVM_GETVG_D , 
+
+	DVM_SETVH_II , 
+	DVM_SETVH_IF , 
+	DVM_SETVH_ID , 
+	DVM_SETVH_FI , 
+	DVM_SETVH_FF , 
+	DVM_SETVH_FD , 
+	DVM_SETVH_DI , 
+	DVM_SETVH_DF , 
+	DVM_SETVH_DD , 
 	DVM_SETVL_II , 
 	DVM_SETVL_IF , 
 	DVM_SETVL_ID , 
@@ -324,47 +364,47 @@ enum DaoOpcode
 
 	/* C=A.B : GETF and MOVE */
 	DVM_GETF_KCI , /* GET Member Field Const Integer */
-	DVM_GETF_KGI ,
-	DVM_GETF_OCI , /* GET Member Field Const Integer */
-	DVM_GETF_OGI ,
-	DVM_GETF_OVI ,
 	DVM_GETF_KCF , /* GET Member Field Const Float */
-	DVM_GETF_KGF ,
-	DVM_GETF_OCF , /* GET Member Field Const Float */
-	DVM_GETF_OGF ,
-	DVM_GETF_OVF ,
 	DVM_GETF_KCD , /* GET Member Field Const Double*/
+	DVM_GETF_KGI ,
+	DVM_GETF_KGF ,
 	DVM_GETF_KGD ,
+	DVM_GETF_OCI , /* GET Member Field Const Integer */
+	DVM_GETF_OCF , /* GET Member Field Const Float */
 	DVM_GETF_OCD , /* GET Member Field Const Double*/
+	DVM_GETF_OGI ,
+	DVM_GETF_OGF ,
 	DVM_GETF_OGD ,
+	DVM_GETF_OVI ,
+	DVM_GETF_OVF ,
 	DVM_GETF_OVD ,
 	/* C.B=A specialize according to both: C.B and A */
 	DVM_SETF_KGII ,
-	DVM_SETF_OGII ,
-	DVM_SETF_OVII ,
 	DVM_SETF_KGIF ,
-	DVM_SETF_OGIF ,
-	DVM_SETF_OVIF ,
 	DVM_SETF_KGID ,
-	DVM_SETF_OGID ,
-	DVM_SETF_OVID ,
 	DVM_SETF_KGFI ,
-	DVM_SETF_OGFI ,
-	DVM_SETF_OVFI ,
 	DVM_SETF_KGFF ,
-	DVM_SETF_OGFF ,
-	DVM_SETF_OVFF ,
 	DVM_SETF_KGFD ,
-	DVM_SETF_OGFD ,
-	DVM_SETF_OVFD ,
 	DVM_SETF_KGDI ,
-	DVM_SETF_OGDI ,
-	DVM_SETF_OVDI ,
 	DVM_SETF_KGDF ,
-	DVM_SETF_OGDF ,
-	DVM_SETF_OVDF ,
 	DVM_SETF_KGDD ,
+	DVM_SETF_OGII ,
+	DVM_SETF_OGIF ,
+	DVM_SETF_OGID ,
+	DVM_SETF_OGFI ,
+	DVM_SETF_OGFF ,
+	DVM_SETF_OGFD ,
+	DVM_SETF_OGDI ,
+	DVM_SETF_OGDF ,
 	DVM_SETF_OGDD ,
+	DVM_SETF_OVII ,
+	DVM_SETF_OVIF ,
+	DVM_SETF_OVID ,
+	DVM_SETF_OVFI ,
+	DVM_SETF_OVFF ,
+	DVM_SETF_OVFD ,
+	DVM_SETF_OVDI ,
+	DVM_SETF_OVDF ,
 	DVM_SETF_OVDD ,
 
 	DVM_TEST_I ,
@@ -385,45 +425,17 @@ typedef enum DaoOpcode DaoOpcode;
  */
 enum DaoOpcodeExtra
 {
-	DVM_IDX = 1000,
-	DVM_INCR ,
-	DVM_DECR ,
-	DVM_COMMA , 
-	DVM_IF ,
-	DVM_ELIF ,
-	DVM_ELSE ,
-	DVM_WHILE_AUX , /* B=jump_to_exit/break_loop, C=jump_to_skip_loop */
-	DVM_WHILE ,
-	DVM_FOR_AUX , /* B=jump_to_exit/break_loop, C=jump_to_skip_loop */
-	DVM_FOR_STEP ,
-	DVM_FOR ,
+	DVM_LABEL = 1000,
+	DVM_LOAD2 ,
+	DVM_LOOP ,
+	DVM_BRANCH ,
 	DVM_DO ,
-	DVM_UNTIL ,
-	DVM_DOWHILE ,
-	DVM_CASETAG ,
-	DVM_DEFAULT ,
-	DVM_BREAK ,
-	DVM_SKIP ,
 	DVM_LBRA ,
 	DVM_RBRA ,
-	DVM_LBRA2 ,
-	DVM_RBRA2 ,
 	DVM_TRY ,
-	DVM_RETRY ,
 	DVM_RAISE ,
-	DVM_RESCUE ,
-	DVM_LABEL ,
-	DVM_SCBEGIN ,
-	DVM_SCEND ,
-	DVM_ENUM ,
-	/* XXX: global a = "abc"; a.toupper();
-	   generate DVM_SETVG_AUX after a call invoked by a global object,
-	   remove it in typing system if the object is not a number or string.
-	 */
-	DVM_SETVG_AUX , 
-	DVM_REFER ,
-	DVM_UNUSED ,
-	DVM_UNUSED2
+	DVM_CATCH ,
+	DVM_UNUSED
 };
 
 enum DaoMathFunct
@@ -456,21 +468,38 @@ enum DaoFunctMeth
 	DVM_FUNCT_MAP ,
 	DVM_FUNCT_FOLD ,
 	DVM_FUNCT_UNFOLD ,
+	DVM_FUNCT_FIND ,
 	DVM_FUNCT_SELECT ,
 	DVM_FUNCT_INDEX ,
 	DVM_FUNCT_COUNT ,
-	DVM_FUNCT_EACH ,
-	DVM_FUNCT_REPEAT ,
+	DVM_FUNCT_ITERATE ,
 	DVM_FUNCT_STRING ,
 	DVM_FUNCT_ARRAY ,
 	DVM_FUNCT_LIST ,
+	DVM_FUNCT_KEYS ,
+	DVM_FUNCT_VALUES ,
 	DVM_FUNCT_NULL
 };
 
-#define DVR_MAX       0x70000
+struct DaoVmCode
+{
+	unsigned short  code; /* opcode */
+	unsigned short  a, b, c; /* register ids for operands */
+};
 
-#define BITS_HIGH4 (0xffff<<12)
-#define BITS_LOW12 (0xffff>>4)
+struct DaoVmCodeX
+{
+	unsigned short  code; /* opcode */
+	unsigned short  a, b, c; /* register ids for operands */
+	unsigned short  level; /* lexical level */
+	unsigned short  line; /* line number in the source file */
+	unsigned int    first; /* first token */
+	unsigned short  middle; /* middle token, with respect to first */
+	unsigned short  last; /* last token, with respect to first */
+};
+void DaoVmCode_Print( DaoVmCode self, char *buffer );
+void DaoVmCodeX_Print( DaoVmCodeX self, char *buffer );
 
+#define DaoGetSectionCode(C) ((C[1].code == DVM_GOTO && C[2].code == DVM_SECT) ? C+2 : NULL)
 
 #endif

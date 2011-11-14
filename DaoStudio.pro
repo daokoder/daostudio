@@ -8,12 +8,15 @@ CONFIG += thread release
 #QT += webkit
 QT += network
 DEPENDPATH += . src
-INCLUDEPATH += . src dao/kernel libssh2/include libssh2/src
+INCLUDEPATH += . src dao/kernel
 
 DEFINES += DAO_WITH_MACRO
-DEFINES += DAO_WITH_NUMARRAY
 DEFINES += DAO_WITH_THREAD
-DEFINES += DAO_WITH_SYNCLASS
+DEFINES += DAO_WITH_NUMARRAY
+DEFINES += DAO_WITH_ASYNCLASS
+DEFINES += DAO_WITH_DYNCLASS
+DEFINES += DAO_WITH_DECORATOR
+DEFINES += DAO_WITH_SERIALIZATION
 
 DESTDIR = .
 
@@ -26,7 +29,6 @@ HEADERS += src/daoConsole.h \
 		   src/daoStudio.h \
 		   src/daoStudioMain.h \
 		   dao/kernel/dao.h \
-		   dao/kernel/daolib.h \
 		   dao/kernel/daoBase.h \
 		   dao/kernel/daoType.h \
 		   dao/kernel/daoStdtype.h \
@@ -37,7 +39,7 @@ HEADERS += src/daoConsole.h \
 		   dao/kernel/daoLexer.h \
 		   dao/kernel/daoParser.h \
 		   dao/kernel/daoMacro.h \
-		   dao/kernel/daoAsmbc.h \
+		   dao/kernel/daoVmcode.h \
 		   dao/kernel/daoRegex.h \
 		   dao/kernel/daoValue.h \
 		   dao/kernel/daoContext.h \
@@ -52,23 +54,7 @@ HEADERS += src/daoConsole.h \
 		   dao/kernel/daoSched.h \
 		   dao/kernel/daoStream.h \
 		   dao/kernel/daoString.h \
-		   dao/kernel/daoVmspace.h \
-		   libssh2/include/libssh2.h \
-		   libssh2/include/libssh2_publickey.h \
-		   libssh2/include/libssh2_sftp.h \
-		   libssh2/src/channel.h \
-		   libssh2/src/comp.h \
-		   libssh2/src/crypto.h \
-		   libssh2/src/libgcrypt.h \
-		   libssh2/src/libssh2_priv.h \
-		   libssh2/src/mac.h \
-		   libssh2/src/misc.h \
-		   libssh2/src/openssl.h \
-		   libssh2/src/packet.h \
-		   libssh2/src/session.h \
-		   libssh2/src/sftp.h \
-		   libssh2/src/transport.h \
-		   libssh2/src/userauth.h
+		   dao/kernel/daoVmspace.h
 
 SOURCES += src/daoConsole.cpp \
 		   src/daoEditor.cpp \
@@ -86,7 +72,7 @@ SOURCES += src/daoConsole.cpp \
 		   dao/kernel/daoLexer.c \
 		   dao/kernel/daoParser.c \
 		   dao/kernel/daoMacro.c \
-		   dao/kernel/daoAsmbc.c \
+		   dao/kernel/daoVmcode.c \
 		   dao/kernel/daoRegex.c \
 		   dao/kernel/daoValue.c \
 		   dao/kernel/daoContext.c \
@@ -101,29 +87,7 @@ SOURCES += src/daoConsole.cpp \
 		   dao/kernel/daoSched.c \
 		   dao/kernel/daoStream.c \
 		   dao/kernel/daoString.c \
-		   dao/kernel/daoVmspace.c \
-		   libssh2/src/agent.c \
-		   libssh2/src/channel.c \
-		   libssh2/src/comp.c \
-		   libssh2/src/crypt.c \
-		   libssh2/src/global.c \
-		   libssh2/src/hostkey.c \
-		   libssh2/src/keepalive.c \
-		   libssh2/src/kex.c \
-		   libssh2/src/knownhost.c \
-		   libssh2/src/libgcrypt.c \
-		   libssh2/src/mac.c \
-		   libssh2/src/misc.c \
-		   libssh2/src/openssl.c \
-		   libssh2/src/packet.c \
-		   libssh2/src/pem.c \
-		   libssh2/src/publickey.c \
-		   libssh2/src/scp.c \
-		   libssh2/src/session.c \
-		   libssh2/src/sftp.c \
-		   libssh2/src/transport.c \
-		   libssh2/src/userauth.c \
-		   libssh2/src/version.c 
+		   dao/kernel/daoVmspace.c
 
 FORMS += src/daoStudio.ui \
 		 src/daoMonitor.ui \
@@ -139,19 +103,17 @@ TRANSLATIONS = langs/daostudio_zh_cn.ts
 win32 {
 	RC_FILE = DaoStudio.rc
 	DEFINES += WIN32
-	LIBS += -lwinmm -lwsock32
-	INCLUDEPATH += libssh2/win32
+	#LIBS += -lwinmm -lwsock32
 }
 unix {
 	DEFINES += UNIX
 	LIBS += -lz -lssl -lcrypto
 	#QMAKE_LFLAGS += -Xlinker -rpath -Xlinker .
-	INCLUDEPATH += libssh2/unix
 }
 mac {
 	ICON = icons/daostudio.icns
 	QMAKESPEC = macx-g++
 	DEFINES += UNIX MAC_OSX
-	LIBS += -lz -lssl -lcrypto
-	INCLUDEPATH += libssh2/unix
+	#LIBS += -lz -lssl -lcrypto
 }
+

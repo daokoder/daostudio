@@ -14,7 +14,7 @@
 #ifndef DAO_BASE_H
 #define DAO_BASE_H
 
-#include"daolib.h"
+#include"dao.h"
 
 #if defined (__GNUC__)
 
@@ -78,43 +78,34 @@
 #define pclose _pclose
 #endif
 
-typedef unsigned short ushort_t;
-typedef unsigned long ulong_t;
 
-#ifdef __STRICT_ANSI__
-typedef   signed long llong_t;
-typedef unsigned long ullong_t;
-#else
-typedef   signed long long llong_t;
-typedef unsigned long long ullong_t;
-#endif
+typedef struct DRoutine   DRoutine;
 
-typedef struct DaoToken    DaoToken;
-typedef struct DaoInode    DaoInode;
+typedef struct DaoFunCurry   DaoFunCurry;
+typedef struct DaoCdataCore  DaoCdataCore;
+typedef struct DaoTypeKernel DaoTypeKernel;
 
-typedef struct DaoVmFrame  DaoVmFrame;
+typedef struct DaoToken      DaoToken;
+typedef struct DaoInode      DaoInode;
 
-typedef struct DaoVmCode       DaoVmCode;
-typedef struct DaoVmCodeX      DaoVmCodeX;
-typedef struct DaoVmcArray     DaoVmcArray;
+typedef struct DaoVmCode     DaoVmCode;
+typedef struct DaoVmCodeX    DaoVmCodeX;
+typedef struct DaoVmcArray   DaoVmcArray;
 
-typedef struct DaoCModule      DaoCModule;
-typedef struct DaoException    DaoException;
+typedef struct DaoException  DaoException;
+typedef struct DaoNameValue  DaoNameValue;
 
-typedef struct DaoMacro        DaoMacro;
-typedef struct DaoParser       DaoParser;
-typedef struct DaoAsmWriter    DaoAsmWriter;
+typedef struct DaoMacro      DaoMacro;
+typedef struct DaoParser     DaoParser;
 
-typedef struct DaoGarbageCollector  DaoGarbageCollector;
-
-typedef DaoBase* (*NewPtr)();
-typedef void     (*DelPtr)( DaoBase * );
+typedef struct DaoStackFrame    DaoStackFrame;
 
 #define STRCMP( x, y ) strcmp( (x)->mbs, y )
 #define TOKCMP( x, y ) strcmp( (x)->string->mbs, y )
 
-/* bit structure of lookup index: S4P2U12I16 */
-/* S: storage; P: permission; U: up/parent; I: index*/
+/* bit structure of lookup index:
+ * S4P2U12I16 = SSSSPPUUUUUUUUUUUUIIIIIIIIIIIIIIII
+ * S: storage; P: permission; U: up/parent; I: index*/
 #define LOOKUP_BIND( st, pm, up, id )  (((st)<<28)|((pm)<<26)|((up)<<16)|id)
 
 #define LOOKUP_BIND_LC( id ) ((DAO_LOCAL_CONSTANT<<28)|id)
@@ -142,29 +133,11 @@ struct DaoConfig
 	short iscgi;     /* is CGI script */
 	short tabspace;  /* number of spaces counted for a tab */
 	short chindent;  /* check indentation */
+	short mbs; /* MBS only */
+	short wcs; /* WCS only */
 };
 
 extern DaoConfig daoConfig;
 
-typedef struct DaoJitMemory  DaoJitMemory;
-
-struct DaoVmCode
-{
-	unsigned short  code; /* opcode */
-	unsigned short  a, b, c; /* register ids for operands */
-};
-
-struct DaoVmCodeX
-{
-	unsigned short  code; /* opcode */
-	unsigned short  a, b, c; /* register ids for operands */
-	unsigned short  level; /* lexical level */
-	unsigned short  line; /* line number in the source file */
-	unsigned int    first; /* first token */
-	unsigned short  middle; /* middle token, with respect to first */
-	unsigned short  last; /* last token, with respect to first */
-};
-void DaoVmCode_Print( DaoVmCode self, char *buffer );
-void DaoVmCodeX_Print( DaoVmCodeX self, char *buffer );
 
 #endif

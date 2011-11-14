@@ -1319,11 +1319,10 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 			format = formatStorage;
 			break;
 		case DKEY_IF : case DKEY_ELSE :
-		case DKEY_WHILE : case DKEY_DO : case DKEY_UNTIL :
+		case DKEY_WHILE : case DKEY_DO :
 		case DKEY_FOR : case DKEY_IN :
 		case DKEY_SKIP : case DKEY_BREAK : case DKEY_CONTINUE :
-		case DKEY_TRY : case DKEY_RESCUE :
-		case DKEY_RETRY : case DKEY_RAISE :
+		case DKEY_TRY : case DKEY_RETRY : case DKEY_RAISE :
 		case DKEY_RETURN : case DKEY_YIELD :
 		case DKEY_SWITCH : case DKEY_CASE : case DKEY_DEFAULT :
 			format = formatStmtKey;
@@ -1335,10 +1334,6 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 		case DKEY_LIST : case DKEY_MAP : case DKEY_TUPLE : case DKEY_ARRAY :
 		case DKEY_CLASS : case DKEY_FUNCTION : case DKEY_ROUTINE : case DKEY_SUB :
 		case DKEY_OPERATOR :
-		case DKEY_FOLD : case DKEY_UNFOLD : case DKEY_REDUCE : 
-		case DKEY_INDEX : case DKEY_SELECT : case DKEY_COUNT :
-		case DKEY_EACH : case DKEY_REPEAT : 
-		case DKEY_SORT : case DKEY_APPLY :
 			format = formatTypeStruct;
 			break;
 		case DKEY_SELF :

@@ -16,47 +16,49 @@
 
 #include"daoType.h"
 
+#define DAO_MAX_PARENT 16
+
 struct DaoClass
 {
 	DAO_DATA_COMMON;
 
 	/* Holding index of class members, including data from its parents: */
 	/* negative index indicates an inaccessible private member from a parent? XXX */
-	DMap *lookupTable; /* <DString*,size_t> */
+	DMap  *lookupTable; /* <DString*,size_t> */
 
-	DArray   *cstDataTable; /* <DVarray*> */
-	DArray   *glbDataTable; /* <DVarray*> */
-	DArray   *glbTypeTable; /* <DArray*> */
+	DArray  *cstDataTable; /* <DVarray*> */
+	DArray  *glbDataTable; /* <DVarray*> */
+	DArray  *glbTypeTable; /* <DArray*> */
 
-	DArray   *objDataName;  /* <DString*>: keep tracking field declaration order: */
-	DArray   *objDataType;  /* <DaoType*> */
-	DVarray  *objDataDefault; /* <DValue>, NULL: no default, not for parent classes */
+	DArray  *objDataName;  /* <DString*>: keep tracking field declaration order: */
+	DArray  *objDataType;  /* <DaoType*> */
+	DArray  *objDataDefault; /* <DaoValue*>, NULL: no default, not for parent classes */
 
-	DArray   *cstDataName;  /* <DString*>: keep track field declaration order: */
+	DArray  *cstDataName;  /* <DString*>: keep track field declaration order: */
 	/* Holding class consts and routines - class data: */
 	/* For both this class and its parents: */
-	DVarray  *cstData;
+	DArray  *cstData;
 
-	DArray   *glbDataName;  /* <DString*>: keep track field declaration order: */
-	DArray   *glbDataType;  /* <DaoType*> */
-	DVarray  *glbData;      /* <DValue> */
+	DArray  *glbDataName;  /* <DString*>: keep track field declaration order: */
+	DArray  *glbDataType;  /* <DaoType*> */
+	DArray  *glbData;      /* <DaoValue*> */
 
-	DArray *superClass; /* <DaoClass/DaoCData*>: direct super classes. */
-	DArray *superAlias;
+	DArray  *superClass; /* <DaoClass/DaoCData*>: direct super classes. */
+	DArray  *superAlias;
 
 	/* Routines with overloading signatures: */
 	/* They are inserted into cstData, no refCount updating for this. */
-	DMap   *ovldRoutMap; /* <DString*,DaoRoutine*> */
+	DMap  *ovldRoutMap; /* <DString*,DaoRoutine*> */
+	DMap  *vtable; /* <DRoutine*,DRoutine*> */
 
-	DMap *vtable; /* <DRoutine*,DRoutine*> */
-	DaoRoutine *classRoutine; /* Default class constructor. */
-	DaoMetaRoutine *classRoutines; /* All explicitly defined constructors */
+	DaoRoutine   *classRoutine; /* Default class constructor. */
+	DaoFunctree  *classRoutines; /* All explicitly defined constructors; GC handled in cstData; */
 
-	DString *className;
-	DString *classHelp;
+	DString  *className;
+	DString  *classHelp;
 
 	DaoType  *clsType;
-	DaoType  *objType;
+	DaoType  *objType; /* GC handled in cstData; */
 	DMap     *abstypes;
 	DMap     *deflines;
 
@@ -67,7 +69,7 @@ struct DaoClass
 	 * this proto-class. */
 	DMap     *protoValues; /* <int,DString*> */
 
-	/* for template class: class name[@S,@T=some_type] */
+	/* for template class: class name<@S,@T=some_type> */
 	DArray   *typeHolders; /* @S, @T */
 	DArray   *typeDefaults; /* some_type */
 	DMap     *instanceClasses; /* instantiated classes */
@@ -87,36 +89,36 @@ void DaoClass_Delete( DaoClass *self );
 void DaoClass_PrintCode( DaoClass *self, DaoStream *stream );
 void DaoClass_AddReference( DaoClass *self, void *reference );
 
-void DaoClass_CopyField( DaoClass *self, DaoClass *other, DMap *deftypes );
-void DaoClass_SetName( DaoClass *self, DString *name, DaoNameSpace *ns );
+int DaoClass_CopyField( DaoClass *self, DaoClass *other, DMap *deftypes );
+void DaoClass_SetName( DaoClass *self, DString *name, DaoNamespace *ns );
 void DaoClass_DeriveClassData( DaoClass *self );
 void DaoClass_DeriveObjectData( DaoClass *self );
 void DaoClass_ResetAttributes( DaoClass *self );
 
 DaoClass* DaoClass_Instantiate( DaoClass *self, DArray *types );
 
-int  DaoClass_FindSuper( DaoClass *self, DaoBase *super );
-int  DaoClass_ChildOf( DaoClass *self, DaoBase *super );
-void DaoClass_AddSuperClass( DaoClass *self, DaoBase *super, DString *alias );
-DaoBase* DaoClass_MapToParent( DaoClass *self, DaoType *parent );
+int  DaoClass_FindSuper( DaoClass *self, DaoValue *super );
+int  DaoClass_ChildOf( DaoClass *self, DaoValue *super );
+void DaoClass_AddSuperClass( DaoClass *self, DaoValue *super, DString *alias );
+DaoValue* DaoClass_MapToParent( DaoClass *self, DaoType *parent );
 
 int  DaoClass_FindConst( DaoClass *self, DString *name );
-DValue DaoClass_GetConst( DaoClass *self, int id );
-void DaoClass_SetConst( DaoClass *self, int id, DValue value );
-int DaoClass_GetData( DaoClass *self, DString *name, DValue *value, DaoClass *thisClass/*=0*/, DValue **d2 );
+DaoValue* DaoClass_GetConst( DaoClass *self, int id );
+void DaoClass_SetConst( DaoClass *self, int id, DaoValue *value );
+int DaoClass_GetData( DaoClass *self, DString *name, DaoValue **value, DaoClass *thisClass/*=0*/ );
 
 DaoType** DaoClass_GetDataType( DaoClass *self, DString *name, int *res, DaoClass *thisClass );
 int DaoClass_GetDataIndex( DaoClass *self, DString *name );
 
-int DaoClass_AddConst( DaoClass *self, DString *name, DValue value, int s, int l );
-int DaoClass_AddGlobalVar( DaoClass *self, DString *name, DValue value, DaoType *t, int s, int l );
-int DaoClass_AddObjectVar( DaoClass *self, DString *name, DValue deft, DaoType *t, int s, int l );
+int DaoClass_AddConst( DaoClass *self, DString *name, DaoValue *value, int s, int l );
+int DaoClass_AddGlobalVar( DaoClass *self, DString *name, DaoValue *value, DaoType *t, int s, int l );
+int DaoClass_AddObjectVar( DaoClass *self, DString *name, DaoValue *deft, DaoType *t, int s, int l );
 
 int DaoClass_AddType( DaoClass *self, DString *name, DaoType *tp );
 
 void DaoClass_AddOvldRoutine( DaoClass *self, DString *signature, DaoRoutine *rout );
 DaoRoutine* DaoClass_GetOvldRoutine( DaoClass *self, DString *signature );
 
-DaoBase* DaoClass_FindOperator( DaoClass *self, const char *oper, DaoClass *scoped );
+DaoValue* DaoClass_FindOperator( DaoClass *self, const char *oper, DaoClass *scoped );
 
 #endif

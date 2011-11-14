@@ -15,7 +15,6 @@
 #define DAO_MAP_H
 
 #include"daoBase.h"
-#include"daoValue.h"
 
 typedef enum{ KEY_EQ=0, KEY_LE, KEY_GE } KeySearchType;
 
@@ -24,10 +23,9 @@ typedef union
 	dint       pInt;
 	size_t     pSize;
 	void      *pVoid;
-	DValue    *pValue;
 	DString   *pString;
 	DArray    *pArray;
-	DaoBase   *pBase;
+	DaoValue  *pValue;
 	DaoClass  *pClass;
 	DaoType   *pType;
 	DaoInode  *pInode;
@@ -46,8 +44,6 @@ struct DNode
 	DNodeData key;
 	DNodeData value;
 };
-extern DNode* DNode_Next( DNode *self );
-extern DNode* DNode_First( DNode *self );
 
 typedef DMap DHash;
 
@@ -57,8 +53,8 @@ struct DMap
 	DNode  *root;
 	DNode  *first;
 	DNode  *last;
-	int     size;
-	int     tsize;
+	size_t  size;
+	size_t  tsize;
 	char    keytype;
 	char    valtype;
 	char    hashing;

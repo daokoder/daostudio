@@ -20,27 +20,31 @@ struct DaoObject
 {
 	DAO_DATA_COMMON;
 
-	DValue     *objValues;
-	DVaTuple   *objData;
-	DaoClass   *myClass;
-	DPtrTuple  *superObject; /*DPtrTuple<DaoObject/DaoCData*>*/
-	DaoObject  *that;
-	DaoMap     *meta;
+	uchar_t     isRoot     : 1;
+	uchar_t     isDefault  : 1;
+	uchar_t     baseCount  : 6;
+	uchar_t     baseCount2 : 6;
+	ushort_t    valueCount;
+
+	DaoClass   *defClass; /* definition class; */
+	DaoObject  *rootObject; /* root object for safe down-casting; */
+	DaoValue  **objValues; /* instance variable values; */
+	DaoValue   *parents[1]; /* the actual size is equal to ::baseCount; */
 };
 
-DaoObject* DaoObject_Allocate( DaoClass *klass );
-DaoObject* DaoObject_New( DaoClass *klass, DaoObject *that, int offset );
+DaoObject* DaoObject_Allocate( DaoClass *klass, int value_count );
+DaoObject* DaoObject_New( DaoClass *klass );
 void DaoObject_Init( DaoObject *self, DaoObject *that, int offset );
 void DaoObject_Delete( DaoObject *self );
 
-int DaoObject_ChildOf( DaoObject *self, DaoObject *obj );
+int DaoObject_ChildOf( DaoValue *self, DaoValue *obj );
 
-DaoBase* DaoObject_MapThisObject( DaoObject *self, DaoType *host );
-DaoObject* DaoObject_SetParentCData( DaoObject *self, DaoCData *parent );
+DaoValue* DaoObject_MapThisObject( DaoObject *self, DaoType *host );
+DaoObject* DaoObject_SetParentCdata( DaoObject *self, DaoCdata *parent );
 
-void DaoObject_AddData( DaoObject *self, DString *name, DaoBase  *data );
+void DaoObject_AddData( DaoObject *self, DString *name, DaoValue *data );
 
-int DaoObject_SetData( DaoObject *self, DString *name, DValue value, DaoObject *objThis );
-int DaoObject_GetData( DaoObject *self, DString *name, DValue *data, DaoObject *objThis, DValue **d2 );
+int DaoObject_SetData( DaoObject *self, DString *name, DaoValue *value, DaoObject *objThis );
+int DaoObject_GetData( DaoObject *self, DString *name, DaoValue **data, DaoObject *objThis );
 
 #endif
