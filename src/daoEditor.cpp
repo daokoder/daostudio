@@ -2620,13 +2620,15 @@ void DaoEditor::MarkLine( int y )
 		}
 		QLocalSocket socket;
 		socket.connectToServer( DaoStudioSettings::socket_breakpoints );
-		QByteArray data;
-		data.append( fullName );
-		data += '\0' + QByteArray::number( ud->breaking );
-		data += '\0' + QByteArray::number( blockNumber + 1 );
-		socket.write( data );
-		socket.flush();
-		socket.disconnectFromServer();
+		if( socket.waitForConnected( 5000 ) ){
+			QByteArray data;
+			data.append( fullName );
+			data += '\0' + QByteArray::number( ud->breaking );
+			data += '\0' + QByteArray::number( blockNumber + 1 );
+			socket.write( data );
+			socket.flush();
+			socket.disconnectFromServer();
+		}
 	}else if( act ){
 		blockEntry = block;
 	}

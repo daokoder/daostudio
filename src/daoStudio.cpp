@@ -283,7 +283,6 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	
 	
 	slotWriteLog( tr("start Dao Studio") + " (" + program + ")" );
-	SetPathWorking( "." );
 	SetPathBrowsing( "." );
 	DaoVmSpace_AddPath( vmSpace, programPath.toLocal8Bit().data() );
 	
@@ -345,6 +344,7 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	}else{
 		slotWriteLog( tr("connected to running") + " DaoMonitor" );
 	}
+	SetPathWorking( "." );
 	connect( monitor, SIGNAL(readyReadStandardOutput()),
 		wgtConsole, SLOT(slotReadStdOut()));
 	//connect( monitor, SIGNAL(readyReadStandardError()),
@@ -403,11 +403,12 @@ void DaoStudio::LoadPath( QListWidget *wgtList, const QString & path, const QStr
 void DaoStudio::SendPathWorking()
 {
 	socket.connectToServer( DaoStudioSettings::socket_script );
-	socket.waitForConnected( 500 );
-	socket.putChar( DAO_SET_PATH );
-	socket.write( pathWorking.toUtf8().data() );
-	socket.flush();
-	socket.waitForDisconnected();
+	if( socket.waitForConnected( 500 ) ){
+		socket.putChar( DAO_SET_PATH );
+		socket.write( pathWorking.toUtf8().data() );
+		socket.flush();
+		socket.waitForDisconnected();
+	}
 }
 void DaoStudio::SetPathWorking( const QString & path )
 {
@@ -631,6 +632,7 @@ DaoEditor* DaoStudio::NewEditor( const QString & name, const QString & tip )
 	editor->SetModeSelector( wgtEditorMode );
 	editor->SetColorScheme( wgtEditorColor->currentIndex() );
 	editor->SetTabVisibility( wgtTabVisibility->currentIndex() );
+	editor->SetFontSize( wgtFontSize->currentIndex() + 10 );
 	connect( editor, SIGNAL(signalFocusIn()), this, SLOT(slotMaxEditor()) );
 	connect( editor, SIGNAL(signalTextChanged(bool)), this, SLOT(slotTextChanged(bool)) );
 	wgtEditorTabs->setTabToolTip( id, tip );

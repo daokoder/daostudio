@@ -34,6 +34,7 @@
 #include<QCheckBox>
 #include<QLocalServer>
 #include<QLocalSocket>
+#include<QMutex>
 #include<QThread>
 #include<QProcess>
 
@@ -137,7 +138,7 @@ Q_OBJECT
 	void ViewRoutine( DaoRoutine *routine );
 	void ViewStackFrame( DaoStackFrame *frame, DaoProcess *process );
 	void ViewNamespace( DaoNamespace *nspace );
-	void ViewProcess( DaoProcess *process );
+	void ViewProcess( DaoProcess *process, DaoStackFrame *frame = NULL );
 
 	void SetDataList( QListWidget *list ){ wgtDataList = list; }
 
@@ -170,6 +171,7 @@ class DaoValueItem : public QListWidgetItem
 		DaoNamespace *nspace;
 		DaoProcess   *process;
 	};
+	DaoStackFrame *frame;
 
 	DaoValueItem  *parent;
 	DaoDataWidget *dataWidget;
@@ -219,6 +221,7 @@ public:
 
 	bool waiting;
 	unsigned int time;
+	QMutex  mutex;
 	DaoProcess  *debugProcess;
 	DaoVmSpace  *vmSpace;
 

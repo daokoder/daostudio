@@ -45,6 +45,7 @@ extern "C"{
 #include<daoValue.h>
 #include<daoMap.h>
 #include<daoRegex.h>
+#include<daoSched.h>
 }
 
 #include"daoStudioMain.h"

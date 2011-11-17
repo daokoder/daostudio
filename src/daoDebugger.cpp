@@ -61,12 +61,11 @@ void DaoDebugger::SetBreakPoints( DaoRoutine *routine )
 	//printf( "break points: %i\n", breakPointLines.size() );
 	for(i=0; i<breakPointLines.size(); i++){
 		int k = breakPointLines[i];
-		//printf( "1 break point:  %3i  %3i\n", i, k );
 		while( j < n && annots[j]->line < k ) j ++;
 		while( j < n && annots[j]->line == k && codes[j].code != DVM_NOP ) j ++;
-		if( codes[j].code == DVM_NOP ){
+		if( j < n && annots[j]->line == k && codes[j].code == DVM_NOP ){
+			//printf( "1 break point:  %3i  %3i\n", i, k );
 			codes[j].code = DVM_DEBUG;
-			break;
 		}
 	}
 }

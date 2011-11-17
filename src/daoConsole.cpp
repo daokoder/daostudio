@@ -293,7 +293,7 @@ void DaoConsole::keyPressEvent ( QKeyEvent * event )
 				int len = src.size() - 1 - ( src[src.size()-1] == ';' );
 				src = "io.writeln( " + src.mid( 1, len ) + ")";
 			}else if( src[0] == '\\' && rgxDaoFile.indexIn( src ) >=0 ){
-				src = "std.load( \"" + src.mid( 1 ) + "\", 0 )";
+				src = "std.load( \"" + src.mid( 1 ) + "\", 0, 1 )";
 			}else if( src[0] == '\\' ){
 				shellTop = (src.indexOf( QRegExp( "\\\\top(\\s|$)" ) ) ==0);
 				shell = true;
@@ -599,7 +599,7 @@ void DaoConsole::RunScript( const QString & src, bool debug )
 }
 void DaoConsole::LoadScript( const QString & file, bool debug )
 {
-	QString code = "std.load( \"" + file + "\", 0 )\n";
+	QString code = "std.load( \"" + file + "\", 0, 1 )\n";
 	AppendCmdHistory( code.trimmed() );
 	ClearCommand();
 	insertPlainText( code );

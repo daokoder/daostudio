@@ -27,6 +27,7 @@ DaoValueItem::DaoValueItem( DaoValue *p, QListWidget *w ) : QListWidgetItem(w)
 {
 	type = p->type;
 	value = p;
+	frame = NULL;
 	parent = NULL;
 	dataWidget = NULL;
 }
@@ -72,28 +73,31 @@ DaoDataWidget::~DaoDataWidget()
 void DaoDataWidget::slotDataTableClicked(int row, int col)
 {
 	DaoValueItem *it = NULL;
-	DaoValue *value = currentValue;
+	DaoStackFrame *frame = currentFrame;
+	DaoValue *value = NULL;
 
-	if( value ){
-		switch( value->type ){
+	currentFrame = NULL;
+	if( currentValue ){
+		switch( currentValue->type ){
 		case DAO_PROCESS :
-			if( currentFrame ){
-				value = value->xProcess.activeValues[row];
+			if( frame ){
+				value = currentValue->xProcess.activeValues[row];
 			}else{
-				currentFrame = value->xProcess.topFrame;
+				currentFrame = currentValue->xProcess.topFrame;
 				while( (row--) >0 ) currentFrame = currentFrame->prev;
-				ViewStackFrame( currentFrame, (DaoProcess*) value );
-				it = new DaoValueItem( value );
+				ViewStackFrame( currentFrame, (DaoProcess*) currentValue );
+				it = new DaoValueItem( currentValue );
+				it->frame = currentFrame;
 			}
 			break;
 		case DAO_ARRAY : break;
-		case DAO_LIST : value = value->xList.items.items.pValue[row]; break;
+		case DAO_LIST : value = currentValue->xList.items.items.pValue[row]; break;
 		case DAO_MAP : value = itemValues[ 2*row + (col>=2) ]; break;
-		case DAO_TUPLE : value = value->xTuple.items[row]; break;
-		case DAO_CLASS : value = value->xClass.cstData->items.pValue[row]; break;
-		case DAO_OBJECT : value = value->xObject.objValues[row]; break;
-		case DAO_ROUTINE : value = value->xRoutine.routConsts->items.pValue[row]; break;
-		case DAO_NAMESPACE : value = value->xNamespace.cstData->items.pValue[row]; break;
+		case DAO_TUPLE : value = currentValue->xTuple.items[row]; break;
+		case DAO_CLASS : value = currentValue->xClass.cstData->items.pValue[row]; break;
+		case DAO_OBJECT : value = currentValue->xObject.objValues[row]; break;
+		case DAO_ROUTINE : value = currentValue->xRoutine.routConsts->items.pValue[row]; break;
+		case DAO_NAMESPACE : value = currentValue->xNamespace.cstData->items.pValue[row]; break;
 		default : break;
 		}
 	}
@@ -118,7 +122,7 @@ void DaoDataWidget::slotInfoTableClicked(int row, int)
 		if( row == 0 )
 			ViewClass( currentValue->xObject.defClass );
 		else
-			//XXX ViewObject( currentValue->xObject.parents[row-1] );
+			ViewValue( currentValue->xObject.parents[row-1] );
 		break;
 	case DAO_ROUTINE :
 		switch( row ){
@@ -127,21 +131,31 @@ void DaoDataWidget::slotInfoTableClicked(int row, int)
 		default : break;
 		}
 		break;
-#if 0
-	case DAO_CONTEXT :
-		switch( row ){
-		case 0 : ViewNamespace( ref.context.nameSpace ); break;
-		case 1 : ViewRoutine( ref.context.routine ); break;
-		case 2 : ViewObject( ref.context.object ); break;
-		default : break;
+	case DAO_PROCESS :
+		if( currentFrame ){
+			if( currentFrame->routine ){
+				switch( row ){
+				case 0 : ViewNamespace( currentFrame->routine->nameSpace ); break;
+				case 1 : ViewRoutine( currentFrame->routine ); break;
+				case 2 : ViewObject( currentFrame->object ); break;
+				default : break;
+				}
+			}else{
+				switch( row ){
+				case 0 : ViewNamespace( currentFrame->function->nameSpace ); break;
+				case 1 : ViewFunction( currentFrame->function ); break;
+				case 2 : ViewObject( currentFrame->object ); break;
+				default : break;
+				}
+			}
 		}
 		break;
-#endif
 	case DAO_NAMESPACE :
 		ViewNamespace( currentValue->xNamespace.nsLoaded->items.pNS[row] );
 		break;
 	default : break;
 	}
+	// View methods may have changed "currentValue", but did not add item in the value stack:
 	if( currentValue && currentValue != oldValue ){
 		DaoValueItem *it = new DaoValueItem( currentValue );
 		it->setText( itemName );
@@ -151,12 +165,12 @@ void DaoDataWidget::slotInfoTableClicked(int row, int)
 void DaoDataWidget::slotExtraTableClicked(int row, int col)
 {
 	DaoValueItem *it = NULL;
-	DaoValue *value = currentValue;
-	if( value ){
-		switch( value->type ){
-		//XXX case DAO_CONTEXT : ResetExecutionPoint( row, col ); break;
-		case DAO_CLASS : value = value->xClass.glbData->items.pValue[row]; break;
-		case DAO_NAMESPACE : value = value->xNamespace.varData->items.pValue[row]; break;
+	DaoValue *value = NULL;
+	if( currentValue ){
+		switch( currentValue->type ){
+		case DAO_PROCESS : if( currentFrame ) ResetExecutionPoint( row, col ); break;
+		case DAO_CLASS : value = currentValue->xClass.glbData->items.pValue[row]; break;
+		case DAO_NAMESPACE : value = currentValue->xNamespace.varData->items.pValue[row]; break;
 		default : break;
 		}
 	}
@@ -171,11 +185,10 @@ void DaoDataWidget::slotExtraTableClicked(int row, int col)
 }
 void DaoDataWidget::ResetExecutionPoint(int row, int col)
 {
-#if 0
-	XXX
-	if( currentObject == NULL || currentObject->type != DAO_CONTEXT ) return;
-	DaoContext *context = (DaoContext*)currentObject;
-	DaoProcess *vmp = context->process;
+	if( currentFrame == NULL ) return;
+	if( currentValue == NULL || currentValue->type != DAO_PROCESS ) return;
+
+	DaoProcess *vmp = (DaoProcess*) currentValue;
 	if( col ) return;
 	if( row >= vmcEntry ){
 		QMessageBox::warning( this, tr("DaoStudio - Change execution point"),
@@ -184,7 +197,7 @@ void DaoDataWidget::ResetExecutionPoint(int row, int col)
 		return;
 	}
 	if( row == vmcNewEntry ) return;
-	if( context != vmp->topFrame->context ){
+	if( currentFrame != vmp->topFrame ){
 		int ret = QMessageBox::warning( this, tr("DaoStudio - Change execution point"),
 				tr("This frame is not in the top of the execution stack.\n"
 					"Setting this new execution point will remove those frames "
@@ -196,10 +209,9 @@ void DaoDataWidget::ResetExecutionPoint(int row, int col)
 	wgtExtraTable->item( vmcNewEntry, 0 )->setIcon( QIcon() );
 	wgtExtraTable->item( row, 0 )->setIcon( icon );
 	vmcNewEntry = row;
-	while( context != vmp->topFrame->context ) DaoProcess_PopContext( vmp );
+	while( currentFrame != vmp->topFrame ) DaoProcess_PopFrame( vmp );
 	vmp->topFrame->entry = row;
 	vmp->status = DAO_VMPROC_STACKED;
-#endif
 }
 void DaoDataWidget::EnableNoneTable()
 {
@@ -308,7 +320,7 @@ void DaoDataWidget::ViewValue( DaoValue *value )
 	case DAO_ROUTINE : ViewRoutine( (DaoRoutine*) value ); break;
 	case DAO_FUNCTION : ViewFunction( (DaoFunction*) value ); break;
 	case DAO_NAMESPACE : ViewNamespace( (DaoNamespace*) value ); break;
-	case DAO_PROCESS : ViewProcess( (DaoProcess*) value ); break;
+	case DAO_PROCESS : ViewProcess( (DaoProcess*) value, currentFrame ); break;
 	default: break;
 	}
 }
@@ -759,7 +771,10 @@ void DaoDataWidget::FillTable( QTableWidget *table,
 	for(i=0; i<size; i++){
 		DaoValue *val = data[i];
 		rowlabs<<QString::number(i);
-		if( idnames.find(i) != idnames.end() ){
+		if( val == NULL ){
+			it = new QTableWidgetItem( "none" );
+			table->setItem( i, 0, it );
+		}else if( idnames.find(i) != idnames.end() ){
 			it = new QTableWidgetItem( idnames[i] );
 			table->setItem( i, 0, it );
 		}else if( val->type == DAO_CLASS ){
@@ -775,9 +790,9 @@ void DaoDataWidget::FillTable( QTableWidget *table,
 			it = new QTableWidgetItem( itp->name->mbs );
 			table->setItem( i, 1, it );
 		}
-		DaoValue_GetString( val, daoString );
+		if( val ) DaoValue_GetString( val, daoString );
 		if( DString_Size( daoString ) > 50 ) DString_Erase( daoString, 50, (size_t)-1 );
-		it = new QTableWidgetItem( DString_GetMBS( daoString ) );
+		it = new QTableWidgetItem( val ? DString_GetMBS( daoString ) : "null" );
 		table->setItem( i, 2, it );
 	}
 	table->setVerticalHeaderLabels( rowlabs );
@@ -805,7 +820,10 @@ void DaoDataWidget::FillTable2( QTableWidget *table,
 	for(i=0; i<size; i++){
 		DaoValue *val = data[i];
 		rowlabs<<QString::number(i);
-		if( idnames.find(i) != idnames.end() ){
+		if( val == NULL ){
+			it = new QTableWidgetItem( "none" );
+			table->setItem( i, 0, it );
+		}else if( idnames.find(i) != idnames.end() ){
 			it = new QTableWidgetItem( idnames[i] );
 			table->setItem( i, 0, it );
 		}else if( val->type == DAO_CLASS ){
@@ -821,9 +839,9 @@ void DaoDataWidget::FillTable2( QTableWidget *table,
 			it = new QTableWidgetItem( itp->name->mbs );
 			table->setItem( i, 1, it );
 		}
-		DaoValue_GetString( val, daoString );
+		if( val ) DaoValue_GetString( val, daoString );
 		if( DString_Size( daoString ) > 50 ) DString_Erase( daoString, 50, (size_t)-1 );
-		it = new QTableWidgetItem( DString_GetMBS( daoString ) );
+		it = new QTableWidgetItem( val ? DString_GetMBS( daoString ) : "none" );
 		table->setItem( i, 2, it );
 	}
 	table->setVerticalHeaderLabels( rowlabs );
@@ -878,13 +896,18 @@ void DaoDataWidget::ViewNamespace( DaoNamespace *nspace )
 			it->setBackground( QColor(200,250,200) );
 	}
 }
-void DaoDataWidget::ViewProcess( DaoProcess *process )
+void DaoDataWidget::ViewProcess( DaoProcess *process, DaoStackFrame *frame )
 {
+	currentFrame = frame;
+	if( frame ){
+		ViewStackFrame( frame, process );
+		return;
+	}
 	EnableOneTable( (DaoValue*) process );
 	nameSpace = process->activeNamespace;
 
 	int index = 0;
-	DaoStackFrame *frame = process->topFrame;
+	frame = process->topFrame;
 	while(frame && frame != process->firstFrame) {
 		frame = frame->prev;
 		index++;
@@ -1037,6 +1060,7 @@ static void DaoResetExecution( DaoProcess *process, int line, int offset=0 )
 }
 static void DaoStdioRead( DaoEventHandler *self, DString *buf, int count )
 {
+	self->monitor->mutex.lock();
 	fflush( stdout );
 	self->socket2.flush();
 	self->socket.connectToServer( DaoStudioSettings::socket_stdin );
@@ -1055,6 +1079,7 @@ static void DaoStdioRead( DaoEventHandler *self, DString *buf, int count )
 	data += self->socket.readAll();
 	//QString s = QString::fromUtf8( data.data(), data.size() );
 	DString_SetDataMBS( buf, data.data(), data.size() );
+	self->monitor->mutex.unlock();
 }
 static void DaoStdioWrite( DaoEventHandler *self, DString *buf )
 {
@@ -1063,11 +1088,15 @@ static void DaoStdioWrite( DaoEventHandler *self, DString *buf )
 	fprintf( fout, "%s\n", DString_GetMBS( buf ) );
 	fclose( fout );
 #endif
+	self->monitor->mutex.lock();
 	self->socket2.write( DString_GetMBS( buf ), DString_Size( buf ) );
 	self->socket2.flush();
+	self->monitor->mutex.unlock();
 }
 static void DaoConsDebug( DaoEventHandler *self, DaoProcess *process )
 {
+	self->monitor->mutex.lock();
+
 	DaoVmCode *codes = process->activeRoutine->vmCodes->codes;
 	DaoVmCodeX **annots = process->activeRoutine->annotCodes->items.pVmc;
 	int oldline = annots[ process->activeCode - codes + 1]->line;
@@ -1113,10 +1142,14 @@ static void DaoConsDebug( DaoEventHandler *self, DaoProcess *process )
 	//printf( "all:\n%s\n", QString(data).toUtf8().data() );
 	//printf( "new:\n%s\n", newCodes.join("\n").toUtf8().data() );
 	//printf( "old:\n%s\n", routCodes.join("\n").toUtf8().data() );
-	if( debugger.EditContinue( process, entry, lineMap, newCodes, routCodes ) == false ) return;
-	if( old == process->activeRoutine && entry != oldline ) DaoResetExecution( process, entry );
+	if( debugger.EditContinue( process, entry, lineMap, newCodes, routCodes ) ){
+		if( old == process->activeRoutine && entry != oldline )
+			DaoResetExecution( process, entry );
+	}
 	//printf( "%i %s\n", data.size(), data.data() );
 	//QMessageBox::about( self->monitor, "test", "test" );
+
+	self->monitor->mutex.unlock();
 }
 static void DaoSetBreaks( DaoEventHandler *self, DaoRoutine *routine )
 {
@@ -1347,6 +1380,7 @@ void DaoMonitor::slotStartExecution()
 		DString *mbs = DString_New(1);
 		DString_AppendDataMBS( mbs, script.data(), script.size() );
 		res = (int) DaoProcess_Eval( vmp, ns, mbs, 1 );
+		DaoCallServer_Join();
 		DString_Delete( mbs );
 	}
 	fflush( stdout );
@@ -1421,7 +1455,7 @@ void DaoMonitor::ViewValue( DaoDataWidget *dataView, DaoValueItem *it )
 	case DAO_OBJECT : dataView->ViewObject( it->object ); break;
 	case DAO_ROUTINE : dataView->ViewRoutine( it->routine ); break;
 	case DAO_NAMESPACE : dataView->ViewNamespace( it->nspace ); break;
-	case DAO_PROCESS : dataView->ViewProcess( it->process ); break;
+	case DAO_PROCESS : dataView->ViewProcess( it->process, it->frame ); break;
 	default : dataView->ViewValue( it->value ); break;
 	}
 }
