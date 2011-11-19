@@ -123,8 +123,12 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	
 	vmSpace = wgtConsole->vmSpace;
 	wgtConsole->tabWidget = wgtEditorTabs;
+	wgtConsole->scriptTab = wgtScriptTabs;
 	wgtConsole->studio = this;
 	wgtConsole->SetModeSelector( wgtConsoleMode );
+	wgtMonitor->scriptTab = wgtScriptTabs;
+	wgtMonitor->studio = this;
+	wgtMonitor->SetNamespace( vmSpace->mainNamespace );
 	
 	//QPalette p = palette();
 	//p.setColor( QPalette::Text, QColor( 255, 255, 0, 200) );
@@ -137,6 +141,9 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	((DaoLogBrowser*)wgtLogText)->studio = this;
 	((DaoLogBrowser*)wgtLogText)->tabWidget = wgtEditorTabs;
 	connect( wgtLogText, SIGNAL(signalFocusIn()), this, SLOT(slotMaxEditor()) );
+	connect( wgtMonitor, SIGNAL(signalFocusIn()), this, SLOT(slotMaxConsole()) );
+
+	connect( wgtScriptTabs, SIGNAL(currentChanged(int)), this, SLOT(slotMaxConsole(int)) );
 	
 	docViewer = new DaoDocViewer(wgtEditorTabs, programPath);
 	docViewer->setSearchPaths( QStringList( programPath + "/doc/html/" ) );
@@ -324,7 +331,7 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 #ifdef Q_WS_WIN
 		command = "\"" + program + "\"";
 #endif
-		command += " --monitor";
+		command += " --interpreter";
 		if( add_suffix ){
 			DaoStudioSettings::AppendSuffix( "@" );
 			socket.connectToServer( DaoStudioSettings::socket_script );
@@ -527,7 +534,7 @@ void DaoStudio::RestartMonitor()
 	text = QString::fromUtf8( output.data(), output.size() );
 	wgtConsole->slotPrintOutput( text );
 	
-	monitor->start( program + " --monitor", QIODevice::ReadWrite | QIODevice::Unbuffered );
+	monitor->start( program + " --interpreter", QIODevice::ReadWrite | QIODevice::Unbuffered );
 	monitor->waitForStarted();
 	do{ socket.connectToServer( DaoStudioSettings::socket_script );
 	}while( socket.state() != QLocalSocket::ConnectedState );
@@ -632,7 +639,9 @@ DaoEditor* DaoStudio::NewEditor( const QString & name, const QString & tip )
 	editor->SetModeSelector( wgtEditorMode );
 	editor->SetColorScheme( wgtEditorColor->currentIndex() );
 	editor->SetTabVisibility( wgtTabVisibility->currentIndex() );
-	editor->SetFontSize( wgtFontSize->currentIndex() + 10 );
+	//XXX fix font and cursor in editor:
+	//XXX editor->SetFontSize( wgtFontSize->currentIndex() + 10 );
+	//XXX editor->SetFontFamily( wgtFontFamily->currentText() );
 	connect( editor, SIGNAL(signalFocusIn()), this, SLOT(slotMaxEditor()) );
 	connect( editor, SIGNAL(signalTextChanged(bool)), this, SLOT(slotTextChanged(bool)) );
 	wgtEditorTabs->setTabToolTip( id, tip );
@@ -930,7 +939,7 @@ void DaoStudio::slotCloseEditor( int id )
 	wgtEditorTabs->removeTab( id );
 	delete editor;
 }
-void DaoStudio::slotMaxConsole()
+void DaoStudio::slotMaxConsole( int )
 {
 	wgtConsole->setFocus();
 	wgtConsole->ensureCursorVisible();

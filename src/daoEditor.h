@@ -262,7 +262,7 @@ class DaoTextEdit : public QPlainTextEdit
 		virtual void BeforeRedoHighlight(){}
 		virtual void AfterRedoHighlight(){}
 
-		DaoStudio	*studio;
+		DaoStudio  *studio;
 
 	protected:
 		void AdjustMove( QTextCursor *cursor, int key, QTextCursor::MoveMode m=QTextCursor::MoveAnchor );

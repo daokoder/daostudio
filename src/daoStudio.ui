@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>916</width>
-    <height>671</height>
+    <width>1127</width>
+    <height>721</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -29,14 +29,11 @@
     <normaloff>:/images/daostudio2.png</normaloff>:/images/daostudio2.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout_3">
     <item>
      <widget class="QSplitter" name="mainSplitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="handleWidth">
-       <number>8</number>
       </property>
       <widget class="QToolBox" name="toolBox">
        <property name="sizePolicy">
@@ -83,8 +80,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>279</width>
-          <height>460</height>
+          <width>332</width>
+          <height>510</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -311,8 +308,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>100</width>
-          <height>88</height>
+          <width>332</width>
+          <height>510</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -379,8 +376,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>100</width>
-          <height>375</height>
+          <width>332</width>
+          <height>510</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -750,18 +747,6 @@
        </widget>
       </widget>
       <widget class="QSplitter" name="splitter">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>400</width>
-         <height>0</height>
-        </size>
-       </property>
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
@@ -822,21 +807,60 @@
          </attribute>
         </widget>
        </widget>
-       <widget class="DaoConsole" name="wgtConsole">
+       <widget class="QTabWidget" name="wgtScriptTabs">
         <property name="minimumSize">
          <size>
-          <width>600</width>
+          <width>500</width>
           <height>100</height>
          </size>
         </property>
-        <property name="font">
-         <font>
-          <family>Courier 10 Pitch</family>
-          <pointsize>14</pointsize>
-          <weight>50</weight>
-          <bold>false</bold>
-         </font>
+        <property name="tabPosition">
+         <enum>QTabWidget::South</enum>
         </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="tab_2">
+         <attribute name="title">
+          <string>Dao Console</string>
+         </attribute>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="DaoConsole" name="wgtConsole">
+            <property name="minimumSize">
+             <size>
+              <width>600</width>
+              <height>100</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>Courier 10 Pitch</family>
+              <pointsize>14</pointsize>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_4">
+         <attribute name="title">
+          <string>Virtual Machine Monitor</string>
+         </attribute>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="DaoDataWidget" name="wgtMonitor" native="true"/>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </widget>
      </widget>
@@ -848,7 +872,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>916</width>
+     <width>1127</width>
      <height>22</height>
     </rect>
    </property>
@@ -1124,6 +1148,12 @@
    <class>DaoTabEditor</class>
    <extends>QTabWidget</extends>
    <header>daoEditor.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>DaoDataWidget</class>
+   <extends>QWidget</extends>
+   <header>daoMonitor.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -22,6 +22,35 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #define TIME_YIELD 20
 #define TIME_EVENT 5
 
+#define CODE_ITEM_TYPE   "tuple<code:int,a:int,b:int,c:int,line:int,annot:string>"
+#define VALUE_ITEM_TYPE  "tuple<name:string,type:string,value:string>"
+#define EXTRA_ITEM_TYPE  "tuple<string,string,string>"
+
+#define VALUE_INFO_TYPE \
+"tuple<stack:int,type:int,address:int,name:string,info:string,value:string," \
+"extras:list<tuple<string,string,string>>," \
+"consts:list<tuple<name:string,type:string,value:string>>," \
+"vars:list<tuple<name:string,type:string,value:string>>," \
+"codes:list<tuple<code:int,a:int,b:int,c:int,line:int,annot:string>>," \
+"entry:int>"
+
+#define INDEX_INIT    0
+#define INDEX_TYPE    1
+#define INDEX_ADDR    2
+#define INDEX_NAME    3
+#define INDEX_INFO    4
+#define INDEX_VALUE   5
+#define INDEX_EXTRAS  6
+#define INDEX_CONSTS  7
+#define INDEX_VARS    8
+#define INDEX_CODES   9
+#define INDEX_ENTRY  10
+
+#define DATA_REQUEST_TYPE "tuple<object:string,table:int,row:int,column:int>"
+#define INFO_TABLE 1
+#define DATA_TABLE 2
+#define CODE_TABLE 3
+
 enum
 {
 	DAO_RUN_SCRIPT ,
@@ -40,6 +69,7 @@ public:
 	static QString program_path;
 	static QString socket_suffix;
 	static QString socket_monitor;
+	static QString socket_data;
 	static QString socket_script;
 	static QString socket_stdin;
 	static QString socket_stdout;

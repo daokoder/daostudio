@@ -14,8 +14,8 @@
 */
 //=============================================================================
 
-#ifndef _DAO_MONITOR_H_
-#define _DAO_MONITOR_H_
+#ifndef _DAO_INTERPRETER_H_
+#define _DAO_INTERPRETER_H_
 
 #include"ui_daoMonitor.h"
 #include"ui_daoAbout.h"
@@ -40,13 +40,10 @@
 
 #include<daoCodeSHL.h>
 #include<daoDebugger.h>
-#include<daoInterpreter.h>
 #include<daoStudioMain.h>
 
-class DaoMonitor;
-class DaoStudio;
+class DaoInterpreter;
 
-#if 0
 class DaoTimer : public QThread
 {
 	public:
@@ -62,21 +59,20 @@ class DaoTimer : public QThread
 		}
 	}
 };
-#endif
 
 extern "C"{
 
-struct DaoEventHandler2
+struct DaoEventHandler
 {
-	void (*stdRead)( DaoEventHandler2 *self, DString *buf, int count );
-	void (*stdWrite)( DaoEventHandler2 *self, DString *str );
-	void (*stdFlush)( DaoEventHandler2 *self );
-	void (*debug)( DaoEventHandler2 *self, DaoProcess *process );
-	void (*breaks)( DaoEventHandler2 *self, DaoRoutine *breaks );
-	void (*Called)( DaoEventHandler2 *self, DaoRoutine *caller, DaoRoutine *callee );
-	void (*Returned)( DaoEventHandler2 *self, DaoRoutine *caller, DaoRoutine *callee );
-	void (*InvokeHost)( DaoEventHandler2 *self, DaoProcess *process );
-	DaoMonitor	 *monitor;
+	void (*stdRead)( DaoEventHandler *self, DString *buf, int count );
+	void (*stdWrite)( DaoEventHandler *self, DString *str );
+	void (*stdFlush)( DaoEventHandler *self );
+	void (*debug)( DaoEventHandler *self, DaoProcess *process );
+	void (*breaks)( DaoEventHandler *self, DaoRoutine *breaks );
+	void (*Called)( DaoEventHandler *self, DaoRoutine *caller, DaoRoutine *callee );
+	void (*Returned)( DaoEventHandler *self, DaoRoutine *caller, DaoRoutine *callee );
+	void (*InvokeHost)( DaoEventHandler *self, DaoProcess *process );
+	DaoInterpreter	*interpreter;
 	DaoProcess   *process;
 	QLocalSocket  socket;
 	QLocalSocket  socket2;
@@ -89,6 +85,7 @@ struct DaoEventHandler2
 
 class DaoValueItem;
 
+#if 0
 class DaoDataWidget : public QWidget, private Ui::DaoDataWidget
 {
 Q_OBJECT
@@ -96,25 +93,17 @@ Q_OBJECT
 	DaoCodeSHL *hlDataInfo;
 	DaoCodeSHL *hlDataValue;
 
-	DaoNamespace *mainNamespace;
 	DaoNamespace *nameSpace;
 
 	DaoValue      *currentValue;
 	DaoStackFrame *currentFrame;
 
-	DaoTuple *requestTuple;
-
 	DArray	*tokens;
 	DString *daoString;
 	DLong	*daoLong;
 
-	QLocalServer  monitorServer;
-	QLocalSocket *monitorSocket;
-
 	int vmcEntry;
 	int vmcNewEntry;
-
-	dint currentAddress;
 
 	void EnableNoneTable();
 	void EnableOneTable( DaoValue *p );
@@ -124,10 +113,8 @@ Q_OBJECT
 	// for DaoMap, whose values are not in a array
 	QVector<DaoValue*> itemValues;
 
+	QListWidget *wgtDataList;
 	QString itemName;
-
-	void FillTable( QTableWidget *table, DaoList *list );
-	void FillCodes( QTableWidget *table, DaoList *list );
 
 	void RoutineInfo( DaoRoutine *routine, void *address );
 	void FillTable( QTableWidget *table, DaoValue **data, int size, DArray *type, DMap *names, int fileter );
@@ -136,21 +123,11 @@ Q_OBJECT
 	void ResetExecutionPoint(int row, int col);
 
 	QString StringAddress( void *p ){ return "0x"+QString::number( (size_t) p, 16 ); }
-	void SendDataRequest();
 
 	public:
 
-	DaoStudio  *studio;
-	QTabWidget *scriptTab;
-
-	DaoDataWidget( QWidget *parent = NULL );
+	DaoDataWidget();
 	~DaoDataWidget();
-
-	void SetNamespace( DaoNamespace *ns ){ mainNamespace = ns; }
-
-	void ClearDataStack();
-	void ViewNamespace( DaoTuple *tuple );
-	void ViewProcess( DaoTuple *tuple );
 
 	void ViewValue( DaoValue *value );
 	void ViewArray( DaoArray *array );
@@ -165,9 +142,7 @@ Q_OBJECT
 	void ViewNamespace( DaoNamespace *nspace );
 	void ViewProcess( DaoProcess *process, DaoStackFrame *frame = NULL );
 
-protected:
-	void keyPressEvent( QKeyEvent * e );
-	void focusInEvent( QFocusEvent * event );
+	void SetDataList( QListWidget *list ){ wgtDataList = list; }
 
 protected slots:
 	void slotDataTableClicked(int, int);
@@ -176,12 +151,8 @@ protected slots:
 	void slotElementChanged(int, int);
 	void slotUpdateValue();
 
-	void slotUpdateMonitor();
-	void slotValueActivated(QListWidgetItem*);
-
 signals:
 	void signalViewElement( DaoValueItem *, DaoValue * );
-	void signalFocusIn();
 };
 
 class DaoValueItem : public QListWidgetItem
@@ -207,13 +178,11 @@ class DaoValueItem : public QListWidgetItem
 	DaoValueItem  *parent;
 	DaoDataWidget *dataWidget;
 };
+#endif
 
-class DaoMonitor : public QMainWindow, private Ui::DaoMonitor
+class DaoInterpreter : public QObject
 {
 Q_OBJECT
-
-	QLocalServer   server;
-	DaoDataWidget *dataWidget;
 
 	QString	locale;
 	QString	program;
@@ -221,20 +190,32 @@ Q_OBJECT
 
 	QProcess *shell;
 
-	QLineEdit	*wgtFind;
-	QLineEdit	*wgtReplace;
-	QCheckBox	*chkReplaceAll;
-	QCheckBox	*chkCaseSensitive;
-	QComboBox	*wgtFontSize;
-	QComboBox	*wgtEditorColor;
+	QString  script;
+	QString  pathWorking;
+	QString  pathImage;
 
-	QString		 script;
-	QString		 pathWorking;
-	QString		 pathImage;
-
-	DaoEventHandler2	handler;
-	QLocalSocket	*scriptSocket;
+	DaoEventHandler	handler;
+	QLocalServer  dataServer;
+	QLocalServer  scriptServer;
+	QLocalSocket *dataSocket;
+	QLocalSocket *scriptSocket;
+	QLocalSocket  monitorSocket;
 	QTimer timer;
+
+	DaoType  *codeType;
+	DaoType  *valueType;
+	DaoType  *extraType;
+	DaoType  *messageType;
+	DaoTuple *codeTuple;
+	DaoTuple *valueTuple;
+	DaoTuple *extraTuple;
+	DaoTuple *messageTuple;
+	DaoList  *extraList;
+	DaoList  *constList;
+	DaoList  *varList;
+	DaoList  *codeList;
+
+	DaoList  *valueStack;
 
 	DaoValue *itemValues;
 	DString  *daoString;
@@ -246,9 +227,19 @@ Q_OBJECT
 	int index;
 	int vmState;
 
+	QString StringAddress( void *p ){ return "0x"+QString::number( (size_t) p, 16 ); }
+
+	void ViewValue( DaoValue *value );
+	void ViewNamespace( DaoNamespace *nspace );
+	void ViewProcess( DaoProcess *process );
+
+	void MakeList( DaoList *list, DaoValue **data, int size, DArray *type, DMap *names, int filter );
+
+	void ViewNamespaceData( DaoNamespace *ns, DaoTuple *request );
+
 public:
-	DaoMonitor( const char *program=NULL );
-	~DaoMonitor();
+	DaoInterpreter( const char *program=NULL );
+	~DaoInterpreter();
 
 	bool waiting;
 	unsigned int time;
@@ -258,13 +249,13 @@ public:
 
 	void SetPathWorking( const QString & path );
 
-	void ViewValue( DaoDataWidget *dataView, DaoValueItem *it );
-	void ReduceValueItems( QListWidgetItem *item );
+	//void ViewValue( DaoDataWidget *dataView, DaoValueItem *it );
+	//void ReduceValueItems( QListWidgetItem *item );
 	void EraseDebuggingProcess();
 	void InitDataBrowser();
+	void SendDataInformation();
 
 protected:
-	void closeEvent ( QCloseEvent *e );
 
 public slots:
 	void slotExitWaiting();
@@ -272,9 +263,10 @@ public slots:
 	void slotReadStdOut();
 	void slotShellFinished(int, QProcess::ExitStatus);
 protected slots:
+	void slotServeData();
 	void slotStartExecution();
 	void slotStopExecution();
-	void slotValueActivated(QListWidgetItem*);
+	//void slotValueActivated(QListWidgetItem*);
 
 signals:
 

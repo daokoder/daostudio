@@ -229,13 +229,10 @@ void DaoConsole::keyPressEvent ( QKeyEvent * event )
 			studio->slotMaxEditor();
 			return;
 		}else if( key == Qt::Key_Left ){
-			studio->slotMaxEditor();
-			tabWidget->setCurrentIndex( 0 );
+			scriptTab->setCurrentIndex( 1 );
 			return;
 		}else if( key == Qt::Key_Right ){
-			int n = tabWidget->count();
-			studio->slotMaxEditor();
-			tabWidget->setCurrentIndex( n-1 );
+			scriptTab->setCurrentIndex( 1 );
 			return;
 		}
 	}

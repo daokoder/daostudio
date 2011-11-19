@@ -19,6 +19,7 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #include<QDir>
 
 #include<daoMonitor.h>
+#include<daoInterpreter.h>
 #include<daoStudio.h>
 #include<daoStudioMain.h>
 
@@ -27,6 +28,8 @@ QString DaoStudioSettings::locale;
 QString DaoStudioSettings::program;
 QString DaoStudioSettings::program_path;
 QString DaoStudioSettings::socket_suffix;
+QString DaoStudioSettings::socket_monitor;
+QString DaoStudioSettings::socket_data;
 QString DaoStudioSettings::socket_script;
 QString DaoStudioSettings::socket_stdin;
 QString DaoStudioSettings::socket_stdout;
@@ -55,6 +58,8 @@ void DaoStudioSettings::SetProgramPath( const char *cmd, const char *suffix )
 
 	if( suffix ) socket_suffix = suffix;
 
+	socket_monitor = path + ".daostudio.socket.monitor" + socket_suffix;
+	socket_data = path + ".daostudio.socket.data" + socket_suffix;
 	socket_script = path + ".daostudio.socket.script" + socket_suffix;
 	socket_stdin = path + ".daostudio.socket.stdin" + socket_suffix;
 	socket_stdout = path + ".daostudio.socket.stdout" + socket_suffix;
@@ -65,6 +70,8 @@ void DaoStudioSettings::SetProgramPath( const char *cmd, const char *suffix )
 void DaoStudioSettings::AppendSuffix( const QString & suffix )
 {
 	socket_suffix += suffix;
+	socket_monitor += suffix;
+	socket_data += suffix;
 	socket_script += suffix;
 	socket_stdin += suffix;
 	socket_stdout += suffix;
@@ -95,14 +102,24 @@ int MonitorMain( QApplication & app, int argc, char *argv[] )
 	return app.exec();
 }
 
+int InterpreterMain( int argc, char *argv[] )
+{
+	QCoreApplication app( argc, argv );
+	DaoInterpreter interperter( argv[0] );
+	return app.exec();
+};
+
 int main( int argc, char *argv[] )
 {
 	char *suffix = NULL;
 	bool monitor = false;
+	bool interpreter = false;
 	int i;
 	for(i=1; i<argc; i++){
 		if( strcmp( argv[i], "--monitor" ) ==0 ){
 			monitor = true;
+		}else if( strcmp( argv[i], "--interpreter" ) ==0 ){
+			interpreter = true;
 		}else if( strcmp( argv[i], "--socket-suffix" ) ==0 ){
 			i += 1;
 			if( i < argc ) suffix = argv[i];
@@ -110,9 +127,11 @@ int main( int argc, char *argv[] )
 	}
 	DaoInit();
 	setlocale( LC_CTYPE, "" );
+	DaoStudioSettings::SetProgramPath( argv[0], suffix );
+	if( interpreter ) return InterpreterMain( argc, argv );
+
 	QApplication app( argc, argv );
 	DaoLanguages languages;
-	DaoStudioSettings::SetProgramPath( argv[0], suffix );
 
 	QFileInfo finfo( argv[0] ); 
 	QTranslator translator;

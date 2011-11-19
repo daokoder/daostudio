@@ -3,8 +3,8 @@
 ######################################################################
 
 TEMPLATE = app
-CONFIG += thread release
-#CONFIG += thread debug
+#CONFIG += thread release
+CONFIG += thread debug
 #QT += webkit
 QT += network
 DEPENDPATH += . src
@@ -24,6 +24,7 @@ DESTDIR = .
 HEADERS += src/daoConsole.h \
 		   src/daoEditor.h \
 		   src/daoCodeSHL.h \
+		   src/daoInterpreter.h \
 		   src/daoDebugger.h \
 		   src/daoMonitor.h \
 		   src/daoStudio.h \
@@ -59,6 +60,7 @@ HEADERS += src/daoConsole.h \
 SOURCES += src/daoConsole.cpp \
 		   src/daoEditor.cpp \
 		   src/daoCodeSHL.cpp \
+		   src/daoInterpreter.cpp \
 		   src/daoDebugger.cpp \
 		   src/daoMonitor.cpp \
 		   src/daoStudio.cpp \

@@ -123,6 +123,7 @@ class DaoConsole : public DaoTextEdit
 	DaoVmSpace   *vmSpace;
 	DaoEditor	 *editor;
 	DaoTabEditor *tabWidget;
+	QTabWidget   *scriptTab;
 	QLocalSocket *debugSocket;
 	QLocalSocket *stdinSocket;
 	QLocalSocket *stdoutSocket;
