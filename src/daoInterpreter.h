@@ -210,12 +210,14 @@ Q_OBJECT
 	DaoTuple *valueTuple;
 	DaoTuple *extraTuple;
 	DaoTuple *messageTuple;
+	DaoArray *numArray;
 	DaoList  *extraList;
 	DaoList  *constList;
 	DaoList  *varList;
 	DaoList  *codeList;
 
 	DaoList  *valueStack;
+	DArray   *extraStack;
 
 	DaoValue *itemValues;
 	DString  *daoString;
@@ -229,13 +231,23 @@ Q_OBJECT
 
 	QString StringAddress( void *p ){ return "0x"+QString::number( (size_t) p, 16 ); }
 
+	void InitMessage( DaoValue *value );
 	void ViewValue( DaoValue *value );
+	void ViewArray( DaoArray *array );
+	void ViewList( DaoList *list );
+	void ViewMap( DaoMap *map );
+	void ViewTuple( DaoTuple *tuple );
 	void ViewNamespace( DaoNamespace *nspace );
 	void ViewProcess( DaoProcess *process );
+	void ViewStackFrame( DaoStackFrame *frame, DaoProcess *process );
 
 	void MakeList( DaoList *list, DaoValue **data, int size, DArray *type, DMap *names, int filter );
+	void ViewVmCodes( DaoList *list, DaoRoutine *routine );
+	QString RoutineInfo( DaoRoutine *routine, void *address );
 
 	void ViewNamespaceData( DaoNamespace *ns, DaoTuple *request );
+	void ViewProcessStack( DaoProcess *proc, DaoTuple *request );
+	void ViewStackData( DaoProcess *proc, DaoStackFrame *frame, DaoTuple *request );
 
 public:
 	DaoInterpreter( const char *program=NULL );
@@ -246,6 +258,7 @@ public:
 	QMutex  mutex;
 	DaoProcess  *debugProcess;
 	DaoVmSpace  *vmSpace;
+	DaoNamespace *nameSpace;
 
 	void SetPathWorking( const QString & path );
 

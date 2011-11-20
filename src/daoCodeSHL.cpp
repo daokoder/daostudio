@@ -1309,7 +1309,7 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 			format = formatSBracket;
 			break;
 		case DKEY_USE : case DKEY_LOAD : case DKEY_IMPORT : case DKEY_BIND :
-		case DKEY_REQUIRE : case DKEY_BY : case DKEY_AS : case DKEY_SYNTAX : 
+		case DKEY_REQUIRE : case DKEY_AS : case DKEY_SYNTAX : 
 		case DKEY_AND : case DKEY_OR : case DKEY_NOT :
 		case DKEY_VIRTUAL :
 			format = formatStmtKey;
@@ -1327,7 +1327,7 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 		case DKEY_SWITCH : case DKEY_CASE : case DKEY_DEFAULT :
 			format = formatStmtKey;
 			break;
-		case DKEY_ANY : case DKEY_ENUM :
+		case DKEY_ANY : case DKEY_NONE : case DKEY_ENUM :
 		case DKEY_INT : case DKEY_LONG :
 		case DKEY_FLOAT : case DKEY_DOUBLE :
 		case DKEY_STRING : case DKEY_COMPLEX :

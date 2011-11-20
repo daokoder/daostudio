@@ -60,6 +60,7 @@ const char* const DaoKeyWords[] =
 	"routine",
 	"function",
 	"self",
+	"none",
 	//	"int",
 	"float",
 	"double",

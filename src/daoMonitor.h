@@ -115,6 +115,9 @@ Q_OBJECT
 	int vmcNewEntry;
 
 	dint currentAddress;
+	int currentType;
+	int currentEntry;
+	int currentTop;
 
 	void EnableNoneTable();
 	void EnableOneTable( DaoValue *p );
@@ -149,14 +152,19 @@ Q_OBJECT
 	void SetNamespace( DaoNamespace *ns ){ mainNamespace = ns; }
 
 	void ClearDataStack();
+	void ViewArray( DaoTuple *tuple );
+	void ViewList( DaoTuple *tuple );
+	void ViewMap( DaoTuple *tuple );
+	void ViewTuple( DaoTuple *tuple );
 	void ViewNamespace( DaoTuple *tuple );
 	void ViewProcess( DaoTuple *tuple );
+	void ViewStackFrame( DaoTuple *tuple );
 
 	void ViewValue( DaoValue *value );
 	void ViewArray( DaoArray *array );
 	void ViewList( DaoList *list );
 	void ViewMap( DaoMap *map );
-	void ViewTuple( DaoTuple *tuple );
+	void ViewTuple2( DaoTuple *tuple );
 	void ViewClass( DaoClass *klass );
 	void ViewObject( DaoObject *object );
 	void ViewFunction( DaoFunction *function );

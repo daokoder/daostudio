@@ -48,6 +48,9 @@ DaoDataWidget::DaoDataWidget( QWidget *parent ) : QWidget( parent )
 	currentValue = NULL;
 	currentFrame = NULL;
 	currentAddress = 0;
+	currentType = 0;
+	currentEntry = 0;
+	currentTop = 0;
 
 	requestTuple = NULL;
 
@@ -119,22 +122,34 @@ void DaoDataWidget::slotUpdateMonitor()
 
 	printf( "value = %p\n", value );
 	DaoTuple *tuple = (DaoTuple*) value;
-	if( tuple->items[INDEX_INIT]->xInteger.value == 1 ) ClearDataStack();
+	if( tuple->items[INDEX_INIT]->xInteger.value == 1 ) wgtDataList->clear();// ClearDataStack();
 #if 0
 	if( tuple->items[INDEX_ADDR]->xInteger.value == currentAddress ){
 		DaoTuple_Delete( tuple );
 		return;
 	}
 #endif
+	currentType = tuple->items[INDEX_TYPE]->xInteger.value;
+	currentEntry = tuple->items[INDEX_ENTRY]->xInteger.value;
+	currentTop = tuple->items[INDEX_TOP]->xInteger.value;
 	currentAddress = tuple->items[INDEX_ADDR]->xInteger.value;
 
 	QListWidgetItem *it = new QListWidgetItem( tuple->items[INDEX_NAME]->xString.data->mbs );
 	wgtDataList->insertItem( 0, it );
 
-	switch( tuple->items[INDEX_TYPE]->xInteger.value ){
+	wgtDataInfo->setPlainText( tuple->items[INDEX_INFO]->xString.data->mbs );
+	wgtDataValue->setPlainText( tuple->items[INDEX_VALUE]->xString.data->mbs );
+
+	switch( currentType ){
+	case DAO_ARRAY : ViewArray( tuple ); break;
+	case DAO_TUPLE : ViewTuple( tuple ); break;
+	case DAO_LIST : ViewList( tuple ); break;
+	case DAO_MAP : ViewMap( tuple ); break;
 	case DAO_NAMESPACE : ViewNamespace( tuple ); break;
 	case DAO_PROCESS : ViewProcess( tuple ); break;
-	default : break;
+	case DAO_FRAME_ROUT : ViewStackFrame( tuple ); break;
+	case DAO_FRAME_FUNC : ViewStackFrame( tuple ); break;
+	default : EnableNoneTable(); break;
 	}
 	DaoTuple_Delete( tuple );
 }
@@ -155,6 +170,142 @@ void DaoDataWidget::ClearDataStack()
 		}
 	}
 }
+void DaoDataWidget::ViewArray( DaoTuple *tuple )
+{
+	EnableOneTable( NULL );
+
+	QVector<int> tmp;
+	QStringList headers;
+	DaoArray *array = (DaoArray*)tuple->items[INDEX_NUMBERS];
+	size_t i, n, row, col;
+
+	n = array->dims[array->ndim-1];
+	wgtDataTable->setRowCount( array->size / n );
+	wgtDataTable->setColumnCount( n );
+	for(i=0; i<n; i++) wgtDataTable->setColumnWidth( i, 80 );
+	wgtDataTable->setEditTriggers( QAbstractItemView::DoubleClicked );
+
+	tmp.resize( array->ndim );
+	row = -1;
+	col = 0;
+	for(i=0; i<array->size; i++){
+		size_t *dims = array->dims;
+		int j, mod = i;
+		for(j=array->ndim-1; j >=0; j--){
+			int res = ( mod % dims[j] );
+			mod /= dims[j];
+			tmp[j] = res;
+		}
+		if( tmp[array->ndim-1] ==0 ){
+			QString hd;
+			for(j=0; j+1<(int)array->ndim; j++) hd += QString::number(tmp[j]) + ",";
+			headers << "row[" + hd + ":]";
+			row ++;
+			col = 0;
+		}
+		QString elem;
+		switch( array->etype ){
+		case DAO_INTEGER :
+			elem = QString::number( array->data.i[i] );
+			break;
+		case DAO_FLOAT :
+			elem = QString::number( array->data.f[i] );
+			break;
+		case DAO_DOUBLE :
+			elem = QString::number( array->data.d[i] );
+			break;
+		case DAO_COMPLEX :
+			elem = "(" + QString::number( array->data.c[i].real );
+			elem += "," + QString::number( array->data.c[i].imag ) + ")";
+			break;
+		}
+		wgtDataTable->setItem( row, col, new QTableWidgetItem( elem ) );
+		col ++;
+	}
+	wgtDataTable->setVerticalHeaderLabels( headers );
+}
+void DaoDataWidget::ViewTuple( DaoTuple *tuple )
+{
+	EnableOneTable( (DaoValue*) tuple );
+	labDataTable->setText( tr("Items") );
+	labExtraTable->setText( "" );
+
+	QTableWidgetItem *it;
+	QStringList headers, rowlabs;
+	DArray *items = & tuple->items[INDEX_VARS]->xList.items;
+	size_t i, j, n = items->size;
+
+	wgtDataTable->setRowCount( tuple->size );
+	wgtDataTable->setColumnCount( 3 );
+	headers<<tr("Field")<<tr("Type")<<tr("Value");
+	wgtDataTable->setHorizontalHeaderLabels( headers );
+	wgtDataTable->setColumnWidth( 0, 150 );
+	wgtDataTable->setColumnWidth( 1, 150 );
+	wgtDataTable->setColumnWidth( 2, 300 );
+
+	for(i=0; i<n; i++){
+		DaoTuple *itup = items->items.pTuple[i];
+		rowlabs<<QString::number(i);
+		for(j=0; j<3; j++){
+			wgtDataTable->setItem( i, j, new QTableWidgetItem( itup->items[j]->xString.data->mbs ) );
+		}
+	}
+	wgtDataTable->setVerticalHeaderLabels( rowlabs );
+}
+void DaoDataWidget::ViewList( DaoTuple *tuple )
+{
+	EnableOneTable( NULL );
+
+	QTableWidgetItem *it;
+	QStringList headers, rowlabs;
+	DArray *items = & tuple->items[INDEX_VARS]->xList.items;
+	size_t i, j, n = items->size;
+
+	wgtDataTable->setRowCount( n );
+	wgtDataTable->setColumnCount( 2 );
+	headers<<tr("Type")<<tr("Value");
+	wgtDataTable->setHorizontalHeaderLabels( headers );
+	wgtDataTable->setColumnWidth( 0, 200 );
+	wgtDataTable->setColumnWidth( 1, 300 );
+
+	for(i=0; i<n; i++){
+		DaoTuple *itup = items->items.pTuple[i];
+		rowlabs<<QString::number(i);
+		for(j=0; j<2; j++){
+			wgtDataTable->setItem( i, j, new QTableWidgetItem( itup->items[j]->xString.data->mbs ) );
+		}
+	}
+	wgtDataTable->setVerticalHeaderLabels( rowlabs );
+}
+void DaoDataWidget::ViewMap( DaoTuple *tuple )
+{
+	EnableOneTable( NULL );
+
+	QTableWidgetItem *it;
+	QStringList headers;
+	DArray *keys = & tuple->items[INDEX_CONSTS]->xList.items;
+	DArray *values = & tuple->items[INDEX_VARS]->xList.items;
+	size_t i, j, n = keys->size;
+
+	wgtDataTable->setRowCount( n );
+	wgtDataTable->setColumnCount( 4 );
+	headers<<tr("Key Type")<<tr("Key Data")<<tr("Value Type")<<tr("Value Data");
+	wgtDataTable->setHorizontalHeaderLabels( headers );
+	wgtDataTable->setColumnWidth( 0, 100 );
+	wgtDataTable->setColumnWidth( 1, 200 );
+	wgtDataTable->setColumnWidth( 2, 100 );
+	wgtDataTable->setColumnWidth( 3, 200 );
+	for(i=0; i<n; i++){
+		DaoTuple *itup = keys->items.pTuple[i];
+		for(j=0; j<2; j++){
+			wgtDataTable->setItem( i, j, new QTableWidgetItem( itup->items[j]->xString.data->mbs ) );
+		}
+		itup = values->items.pTuple[i];
+		for(j=0; j<2; j++){
+			wgtDataTable->setItem( i, j+2, new QTableWidgetItem( itup->items[j]->xString.data->mbs ) );
+		}
+	}
+}
 void DaoDataWidget::ViewNamespace( DaoTuple *tuple )
 {
 	EnableThreeTable( NULL );
@@ -164,7 +315,6 @@ void DaoDataWidget::ViewNamespace( DaoTuple *tuple )
 	size_t i, j;
 	QTableWidgetItem *it;
 	QStringList headers;
-	wgtDataInfo->setPlainText( tuple->items[INDEX_INFO]->xString.data->mbs );
 	wgtDataValue->clear();
 
 	DArray *extras = & tuple->items[INDEX_EXTRAS]->xList.items;
@@ -199,7 +349,6 @@ void DaoDataWidget::ViewProcess( DaoTuple *tuple )
 	DArray *array = & tuple->items[INDEX_CONSTS]->xList.items;
 	EnableOneTable( NULL );
 
-	wgtDataInfo->setPlainText( tuple->items[INDEX_INFO]->xString.data->mbs );
 	wgtDataValue->clear();
 
 	labDataTable->setText( tr("Function Call Stack") );
@@ -219,6 +368,41 @@ void DaoDataWidget::ViewProcess( DaoTuple *tuple )
 			wgtDataTable->setItem( i, j, new QTableWidgetItem( itup->items[j]->xString.data->mbs ) );
 		}
 	}
+}
+void DaoDataWidget::ViewStackFrame( DaoTuple *tuple )
+{
+	EnableThreeTable( NULL );
+	labDataTable->setText( tr("Local Variables") );
+	labInfoTable->setText( tr("Associated Data") );
+	labExtraTable->setText( tr("VM Instructions") );
+
+	wgtDataValue->clear();
+
+	QStringList rowlabs;
+	int i, j, entry = tuple->items[INDEX_ENTRY]->xInteger.value;
+
+	DArray *extras = & tuple->items[INDEX_EXTRAS]->xList.items;
+	wgtInfoTable->setRowCount( extras->size );
+	wgtInfoTable->setColumnCount(1);
+	wgtInfoTable->setColumnWidth(0, 150);
+	rowlabs<<tr("Namespace")<<tr("Routine");
+	if( extras->size == 3 ) rowlabs<<tr("Object");
+	wgtInfoTable->setHorizontalHeaderLabels( QStringList( tr("Data") ) );
+	wgtInfoTable->setVerticalHeaderLabels( rowlabs );
+	rowlabs.clear();
+
+	for(i=0; i<extras->size; i++){
+		DaoTuple *itup = extras->items.pTuple[i];
+		for(j=0; j<2; j++){
+			wgtInfoTable->setItem( i, j, new QTableWidgetItem( itup->items[j]->xString.data->mbs ) );
+		}
+	}
+
+	FillTable( wgtDataTable, (DaoList*)tuple->items[INDEX_VARS] );
+	FillCodes( wgtExtraTable, (DaoList*)tuple->items[INDEX_CODES] );
+	for(j=1; j<4; j++) wgtExtraTable->item( entry, j )->setBackground( QColor(200,200,250) );
+	QIcon icon( QPixmap( ":/images/start.png" ) );
+	wgtExtraTable->item( entry, 0 )->setIcon( icon );
 }
 void DaoDataWidget::FillTable( QTableWidget *table, DaoList *list )
 {
@@ -256,9 +440,12 @@ void DaoDataWidget::FillCodes( QTableWidget *table, DaoList *list )
 	for(i=0; i<n; i++){
 		DaoTuple *itup = list->items.items.pTuple[i];
 		rowlabs<<QString::number(i);
-		for(j=0; j<6; j++){
-			table->setItem( i, j, new QTableWidgetItem( itup->items[j]->xString.data->mbs ) );
+		table->setItem( i, 0, new QTableWidgetItem( getOpcodeName( itup->items[0]->xInteger.value ) ) );
+		for(j=1; j<5; j++){
+			QString s = QString::number( itup->items[j]->xInteger.value );
+			table->setItem( i, j, new QTableWidgetItem( s ) );
 		}
+		table->setItem( i, 5, new QTableWidgetItem( itup->items[5]->xString.data->mbs ) );
 		table->item( i, 0 )->setToolTip( 
 				tr("Double click on an Opcode cell to change\nthe current execution point") );
 		table->item( i, 0 )->setBackground( QColor(200,250,200) );
@@ -288,147 +475,46 @@ void DaoDataWidget::slotDataTableClicked(int row, int col)
 	requestTuple->items[2]->xInteger.value = row;
 	requestTuple->items[3]->xInteger.value = col;
 	SendDataRequest();
-
-	DaoValueItem *it = NULL;
-	DaoStackFrame *frame = currentFrame;
-	DaoValue *value = NULL;
-
-	currentFrame = NULL;
-	if( currentValue ){
-		switch( currentValue->type ){
-		case DAO_PROCESS :
-			if( frame ){
-				value = currentValue->xProcess.activeValues[row];
-			}else{
-				currentFrame = currentValue->xProcess.topFrame;
-				while( (row--) >0 ) currentFrame = currentFrame->prev;
-				ViewStackFrame( currentFrame, (DaoProcess*) currentValue );
-				it = new DaoValueItem( currentValue );
-				it->frame = currentFrame;
-			}
-			break;
-		case DAO_ARRAY : break;
-		case DAO_LIST : value = currentValue->xList.items.items.pValue[row]; break;
-		case DAO_MAP : value = itemValues[ 2*row + (col>=2) ]; break;
-		case DAO_TUPLE : value = currentValue->xTuple.items[row]; break;
-		case DAO_CLASS : value = currentValue->xClass.cstData->items.pValue[row]; break;
-		case DAO_OBJECT : value = currentValue->xObject.objValues[row]; break;
-		case DAO_ROUTINE : value = currentValue->xRoutine.routConsts->items.pValue[row]; break;
-		case DAO_NAMESPACE : value = currentValue->xNamespace.cstData->items.pValue[row]; break;
-		default : break;
-		}
-	}
-	if( value ){
-		ViewValue( value );
-		it = new DaoValueItem( value );
-	}
-	if( it ){
-		it->setText( itemName );
-		wgtDataList->insertItem( 0, it );
-	}
 }
-void DaoDataWidget::slotInfoTableClicked(int row, int)
+void DaoDataWidget::slotInfoTableClicked(int row, int col)
 {
-	DaoValue *oldValue = currentValue;
-	if( currentValue == NULL ) return;
-	switch( currentValue->type ){
-	case DAO_CLASS :
-		ViewClass( currentValue->xClass.superClass->items.pClass[row] );
-		break;
-	case DAO_OBJECT :
-		if( row == 0 )
-			ViewClass( currentValue->xObject.defClass );
-		else
-			ViewValue( currentValue->xObject.parents[row-1] );
-		break;
-	case DAO_ROUTINE :
-		switch( row ){
-		case 0 : ViewNamespace( currentValue->xRoutine.nameSpace ); break;
-		case 1 : ViewClass( ( DaoClass*) currentValue->xRoutine.routHost->aux ); break;
-		default : break;
-		}
-		break;
-	case DAO_PROCESS :
-		if( currentFrame ){
-			if( currentFrame->routine ){
-				switch( row ){
-				case 0 : ViewNamespace( currentFrame->routine->nameSpace ); break;
-				case 1 : ViewRoutine( currentFrame->routine ); break;
-				case 2 : ViewObject( currentFrame->object ); break;
-				default : break;
-				}
-			}else{
-				switch( row ){
-				case 0 : ViewNamespace( currentFrame->function->nameSpace ); break;
-				case 1 : ViewFunction( currentFrame->function ); break;
-				case 2 : ViewObject( currentFrame->object ); break;
-				default : break;
-				}
-			}
-		}
-		break;
-	case DAO_NAMESPACE :
-		ViewNamespace( currentValue->xNamespace.nsLoaded->items.pNS[row] );
-		break;
-	default : break;
-	}
-	// View methods may have changed "currentValue", but did not add item in the value stack:
-	if( currentValue && currentValue != oldValue ){
-		DaoValueItem *it = new DaoValueItem( currentValue );
-		it->setText( itemName );
-		wgtDataList->insertItem( 0, it );
-	}
+	DString_SetMBS( requestTuple->items[0]->xString.data, wgtDataList->item(0)->text().toUtf8().data() );
+	requestTuple->items[1]->xInteger.value = INFO_TABLE;
+	requestTuple->items[2]->xInteger.value = row;
+	requestTuple->items[3]->xInteger.value = col;
+	SendDataRequest();
 }
 void DaoDataWidget::slotExtraTableClicked(int row, int col)
 {
-	DaoValueItem *it = NULL;
-	DaoValue *value = NULL;
-	if( currentValue ){
-		switch( currentValue->type ){
-		case DAO_PROCESS : if( currentFrame ) ResetExecutionPoint( row, col ); break;
-		case DAO_CLASS : value = currentValue->xClass.glbData->items.pValue[row]; break;
-		case DAO_NAMESPACE : value = currentValue->xNamespace.varData->items.pValue[row]; break;
-		default : break;
+	if( currentType == DAO_FRAME_ROUT ){
+		if( row == currentEntry || col ) return;
+		if( row > currentEntry ){
+			QMessageBox::warning( this, tr("DaoStudio - Change execution point"),
+					tr("Only possible to go back to a previously executed point"), 
+					QMessageBox::Cancel );
+			return;
 		}
+		if( currentTop == 0 ){
+			int ret = QMessageBox::warning( this, tr("DaoStudio - Change execution point"),
+					tr("This frame is not in the top of the execution stack.\n"
+						"Setting this new execution point will remove those frames "
+						"that are above this one.\n\nProceed?"), 
+					QMessageBox::Yes | QMessageBox::No );
+			if( ret == QMessageBox::No ) return;
+		}
+		QIcon icon( QPixmap( ":/images/start.png" ) );
+		wgtExtraTable->item( currentEntry, 0 )->setIcon( QIcon() );
+		wgtExtraTable->item( row, 0 )->setIcon( icon );
+		currentEntry = row;
 	}
-	if( value ){
-		ViewValue( value );
-		it = new DaoValueItem( value );
-	}
-	if( it ){
-		it->setText( itemName );
-		wgtDataList->insertItem( 0, it );
-	}
+	DString_SetMBS( requestTuple->items[0]->xString.data, wgtDataList->item(0)->text().toUtf8().data() );
+	requestTuple->items[1]->xInteger.value = CODE_TABLE;
+	requestTuple->items[2]->xInteger.value = row;
+	requestTuple->items[3]->xInteger.value = col;
+	SendDataRequest();
 }
 void DaoDataWidget::ResetExecutionPoint(int row, int col)
 {
-	if( currentFrame == NULL ) return;
-	if( currentValue == NULL || currentValue->type != DAO_PROCESS ) return;
-
-	DaoProcess *vmp = (DaoProcess*) currentValue;
-	if( col ) return;
-	if( row >= vmcEntry ){
-		QMessageBox::warning( this, tr("DaoStudio - Change execution point"),
-				tr("Only possible to go back to a previously executed point"), 
-				QMessageBox::Cancel );
-		return;
-	}
-	if( row == vmcNewEntry ) return;
-	if( currentFrame != vmp->topFrame ){
-		int ret = QMessageBox::warning( this, tr("DaoStudio - Change execution point"),
-				tr("This frame is not in the top of the execution stack.\n"
-					"Setting this new execution point will remove those frames "
-					"that are above this one.\n\nProceed?"), 
-				QMessageBox::Yes | QMessageBox::No );
-		if( ret == QMessageBox::No ) return;
-	}
-	QIcon icon( QPixmap( ":/images/start.png" ) );
-	wgtExtraTable->item( vmcNewEntry, 0 )->setIcon( QIcon() );
-	wgtExtraTable->item( row, 0 )->setIcon( icon );
-	vmcNewEntry = row;
-	while( currentFrame != vmp->topFrame ) DaoProcess_PopFrame( vmp );
-	vmp->topFrame->entry = row;
-	vmp->status = DAO_VMPROC_STACKED;
 }
 void DaoDataWidget::EnableNoneTable()
 {
@@ -689,7 +775,7 @@ void DaoDataWidget::ViewMap( DaoMap *map )
 		wgtDataTable->setItem( i, 3, it );
 	}
 }
-void DaoDataWidget::ViewTuple( DaoTuple *tuple )
+void DaoDataWidget::ViewTuple2( DaoTuple *tuple )
 {
 	EnableOneTable( (DaoValue*) tuple );
 	labDataTable->setText( tr("Items") );

@@ -27,12 +27,13 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #define EXTRA_ITEM_TYPE  "tuple<string,string,string>"
 
 #define VALUE_INFO_TYPE \
-"tuple<stack:int,type:int,address:int,name:string,info:string,value:string," \
+"tuple<init:int,type:int,address:int,name:string,info:string,value:string," \
+"numbers:array<int>|array<float>|array<float>|array<double>|array<complex>," \
 "extras:list<tuple<string,string,string>>," \
 "consts:list<tuple<name:string,type:string,value:string>>," \
 "vars:list<tuple<name:string,type:string,value:string>>," \
 "codes:list<tuple<code:int,a:int,b:int,c:int,line:int,annot:string>>," \
-"entry:int>"
+"entry:int,top:int>"
 
 #define INDEX_INIT    0
 #define INDEX_TYPE    1
@@ -40,16 +41,21 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #define INDEX_NAME    3
 #define INDEX_INFO    4
 #define INDEX_VALUE   5
-#define INDEX_EXTRAS  6
-#define INDEX_CONSTS  7
-#define INDEX_VARS    8
-#define INDEX_CODES   9
-#define INDEX_ENTRY  10
+#define INDEX_NUMBERS 6
+#define INDEX_EXTRAS  7
+#define INDEX_CONSTS  8
+#define INDEX_VARS    9
+#define INDEX_CODES  10
+#define INDEX_ENTRY  11
+#define INDEX_TOP    12
 
 #define DATA_REQUEST_TYPE "tuple<object:string,table:int,row:int,column:int>"
 #define INFO_TABLE 1
 #define DATA_TABLE 2
 #define CODE_TABLE 3
+
+#define DAO_FRAME_ROUT (END_NOT_TYPES + 1)
+#define DAO_FRAME_FUNC (END_NOT_TYPES + 2)
 
 enum
 {

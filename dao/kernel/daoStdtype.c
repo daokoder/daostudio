@@ -2429,7 +2429,13 @@ static void PartialQuickSort( DaoProcess *proc, int entry, int r0, int r1,
 	if( upper >= part ) return;
 	if( upper+1 < last ) PartialQuickSort( proc, entry, r0, r1, data, upper+1, last, part );
 }
-void QuickSort( IndexValue *data, size_t first, size_t last, size_t part, int asc )
+typedef struct IndexValue IndexValue;
+struct IndexValue
+{
+	size_t     index;
+	DaoValue  *value;
+};
+static void QuickSort( IndexValue *data, size_t first, size_t last, size_t part, int asc )
 {
 	size_t lower=first+1, upper=last;
 	IndexValue val;
@@ -3961,17 +3967,9 @@ DaoNameValue* DaoNameValue_New( DString *name, DaoValue *value )
 /* ---------------------
  * Dao Tuple
  * ---------------------*/
-static int DaoTuple_GetIndex( DaoTuple *self, DaoProcess *proc, DString *name )
+static int DaoTuple_GetIndexE( DaoTuple *self, DaoProcess *proc, DString *name )
 {
-	DaoType *abtp = self->unitype;
-	DNode *node = NULL;
-	int id;
-	if( abtp && abtp->mapNames ) node = MAP_Find( abtp->mapNames, name );
-	if( node == NULL ){
-		DaoProcess_RaiseException( proc, DAO_ERROR, "invalid field" );
-		return -1;
-	}
-	id = node->value.pInt;
+	int id = DaoTuple_GetIndex( self, name );
 	if( id <0 || id >= self->size ){
 		DaoProcess_RaiseException( proc, DAO_ERROR, "invalid tuple" );
 		return -1;
@@ -3981,7 +3979,7 @@ static int DaoTuple_GetIndex( DaoTuple *self, DaoProcess *proc, DString *name )
 static void DaoTupleCore_GetField( DaoValue *self0, DaoProcess *proc, DString *name )
 {
 	DaoTuple *self = & self0->xTuple;
-	int id = DaoTuple_GetIndex( self, proc, name );
+	int id = DaoTuple_GetIndexE( self, proc, name );
 	if( id <0 ) return;
 	DaoProcess_PutReference( proc, self->items[id] );
 }
@@ -3989,7 +3987,7 @@ static void DaoTupleCore_SetField( DaoValue *self0, DaoProcess *proc, DString *n
 {
 	DaoTuple *self = & self0->xTuple;
 	DaoType *t, **type = self->unitype->nested->items.pType;
-	int id = DaoTuple_GetIndex( self, proc, name );
+	int id = DaoTuple_GetIndexE( self, proc, name );
 	if( id <0 ) return;
 	t = type[id];
 	if( t->tid == DAO_PAR_NAMED ) t = & t->aux->xType;
@@ -4150,6 +4148,14 @@ void DaoTuple_Delete( DaoTuple *self )
 int  DaoTuple_Size( DaoTuple *self )
 {
 	return self->size;
+}
+int DaoTuple_GetIndex( DaoTuple *self, DString *name )
+{
+	DaoType *abtp = self->unitype;
+	DNode *node = NULL;
+	if( abtp && abtp->mapNames ) node = MAP_Find( abtp->mapNames, name );
+	if( node == NULL || node->value.pInt >= self->size ) return -1;
+	return node->value.pInt;
 }
 void DaoTuple_SetItem( DaoTuple *self, DaoValue *it, int pos )
 {
