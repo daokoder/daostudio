@@ -93,7 +93,6 @@ SOURCES += src/daoConsole.cpp \
 
 FORMS += src/daoStudio.ui \
 		 src/daoMonitor.ui \
-		 src/daoDataWidget.ui \
 		 src/daoAbout.ui \
 		 src/daoHelpVIM.ui
 
