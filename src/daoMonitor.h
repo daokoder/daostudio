@@ -46,46 +46,7 @@
 class DaoMonitor;
 class DaoStudio;
 
-#if 0
-class DaoTimer : public QThread
-{
-	public:
-	DaoTimer(){ time = 0; }
 
-	unsigned int time;
-
-	protected:
-	void run(){
-		while(1){
-			msleep( TIME_YIELD );
-			time += 1;
-		}
-	}
-};
-#endif
-
-extern "C"{
-
-struct DaoEventHandler2
-{
-	void (*stdRead)( DaoEventHandler2 *self, DString *buf, int count );
-	void (*stdWrite)( DaoEventHandler2 *self, DString *str );
-	void (*stdFlush)( DaoEventHandler2 *self );
-	void (*debug)( DaoEventHandler2 *self, DaoProcess *process );
-	void (*breaks)( DaoEventHandler2 *self, DaoRoutine *breaks );
-	void (*Called)( DaoEventHandler2 *self, DaoRoutine *caller, DaoRoutine *callee );
-	void (*Returned)( DaoEventHandler2 *self, DaoRoutine *caller, DaoRoutine *callee );
-	void (*InvokeHost)( DaoEventHandler2 *self, DaoProcess *process );
-	DaoMonitor	 *monitor;
-	DaoProcess   *process;
-	QLocalSocket  socket;
-	QLocalSocket  socket2;
-	DaoDebugger	  debugger;
-	DaoTimer      timer;
-	unsigned int  time;
-};
-
-}
 
 class DaoValueItem;
 
@@ -144,7 +105,6 @@ Q_OBJECT
 	public:
 
 	DaoStudio  *studio;
-	QTabWidget *scriptTab;
 
 	DaoDataWidget( QWidget *parent = NULL );
 	~DaoDataWidget();
@@ -156,6 +116,10 @@ Q_OBJECT
 	void ViewList( DaoTuple *tuple );
 	void ViewMap( DaoTuple *tuple );
 	void ViewTuple( DaoTuple *tuple );
+	void ViewRoutine( DaoTuple *tuple );
+	void ViewFunction( DaoTuple *tuple );
+	void ViewClass( DaoTuple *tuple );
+	void ViewObject( DaoTuple *tuple );
 	void ViewNamespace( DaoTuple *tuple );
 	void ViewProcess( DaoTuple *tuple );
 	void ViewStackFrame( DaoTuple *tuple );
@@ -215,78 +179,5 @@ class DaoValueItem : public QListWidgetItem
 	DaoValueItem  *parent;
 	DaoDataWidget *dataWidget;
 };
-
-class DaoMonitor : public QMainWindow, private Ui::DaoMonitor
-{
-Q_OBJECT
-
-	QLocalServer   server;
-	DaoDataWidget *dataWidget;
-
-	QString	locale;
-	QString	program;
-	QString	programPath;
-
-	QProcess *shell;
-
-	QLineEdit	*wgtFind;
-	QLineEdit	*wgtReplace;
-	QCheckBox	*chkReplaceAll;
-	QCheckBox	*chkCaseSensitive;
-	QComboBox	*wgtFontSize;
-	QComboBox	*wgtEditorColor;
-
-	QString		 script;
-	QString		 pathWorking;
-	QString		 pathImage;
-
-	DaoEventHandler2	handler;
-	QLocalSocket	*scriptSocket;
-	QTimer timer;
-
-	DaoValue *itemValues;
-	DString  *daoString;
-	DLong    *daoLong;
-	DArray   *tokens;
-	int itemCount;
-	int vmcEntry;
-	int vmcNewEntry;
-	int index;
-	int vmState;
-
-public:
-	DaoMonitor( const char *program=NULL );
-	~DaoMonitor();
-
-	bool waiting;
-	unsigned int time;
-	QMutex  mutex;
-	DaoProcess  *debugProcess;
-	DaoVmSpace  *vmSpace;
-
-	void SetPathWorking( const QString & path );
-
-	void ViewValue( DaoDataWidget *dataView, DaoValueItem *it );
-	void ReduceValueItems( QListWidgetItem *item );
-	void EraseDebuggingProcess();
-	void InitDataBrowser();
-
-protected:
-	void closeEvent ( QCloseEvent *e );
-
-public slots:
-	void slotExitWaiting();
-	void slotFlushStdout();
-	void slotReadStdOut();
-	void slotShellFinished(int, QProcess::ExitStatus);
-protected slots:
-	void slotStartExecution();
-	void slotStopExecution();
-	void slotValueActivated(QListWidgetItem*);
-
-signals:
-
-};
-
 
 #endif

@@ -123,10 +123,8 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	
 	vmSpace = wgtConsole->vmSpace;
 	wgtConsole->tabWidget = wgtEditorTabs;
-	wgtConsole->scriptTab = wgtScriptTabs;
 	wgtConsole->studio = this;
 	wgtConsole->SetModeSelector( wgtConsoleMode );
-	wgtMonitor->scriptTab = wgtScriptTabs;
 	wgtMonitor->studio = this;
 	wgtMonitor->SetNamespace( vmSpace->mainNamespace );
 	
@@ -141,10 +139,14 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	((DaoLogBrowser*)wgtLogText)->studio = this;
 	((DaoLogBrowser*)wgtLogText)->tabWidget = wgtEditorTabs;
 	connect( wgtLogText, SIGNAL(signalFocusIn()), this, SLOT(slotMaxEditor()) );
-	connect( wgtMonitor, SIGNAL(signalFocusIn()), this, SLOT(slotMaxConsole()) );
+	connect( wgtGroupMonitor, SIGNAL(clicked()), this, SLOT(slotMaxMonitor()) );
+	connect( wgtMonitorArea->verticalScrollBar(), SIGNAL(valueChanged(int)),
+			this, SLOT(slotMaxMonitor(int)) );
+	connect( wgtMonitorArea->verticalScrollBar(), SIGNAL(sliderMoved(int)),
+			this, SLOT(slotMaxMonitor(int)) );
+	connect( wgtMonitorArea->verticalScrollBar(), SIGNAL(sliderPressed()),
+			this, SLOT(slotMaxMonitor()) );
 
-	connect( wgtScriptTabs, SIGNAL(currentChanged(int)), this, SLOT(slotMaxConsole(int)) );
-	
 	docViewer = new DaoDocViewer(wgtEditorTabs, programPath);
 	docViewer->setSearchPaths( QStringList( programPath + "/doc/html/" ) );
 	docViewer->studio = this;
@@ -159,9 +161,11 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	delete wgtEditorTabs->widget(0);
 	delete wgtEditorTabs->widget(0);
 	
-	wgtEditorTabs->setMinimumHeight( 100 );
+	wgtEditorTabs->setMinimumHeight( 80 );
 	wgtEditorTabs->setMaximumHeight( 5000 );
-	wgtConsole->setMinimumHeight( 100 );
+	wgtGroupMonitor->setMinimumHeight( 80 );
+	wgtGroupMonitor->setMaximumHeight( 5000 );
+	wgtConsole->setMinimumHeight( 80 );
 	wgtConsole->setMaximumHeight( 5000 );
 	mainSplitter->setStretchFactor( 1, 4 );
 	
@@ -939,16 +943,6 @@ void DaoStudio::slotCloseEditor( int id )
 	wgtEditorTabs->removeTab( id );
 	delete editor;
 }
-void DaoStudio::slotMaxConsole( int )
-{
-	wgtConsole->setFocus();
-	wgtConsole->ensureCursorVisible();
-	if( actionMSplit->isChecked() ) return;
-	int h = splitter->height();
-	QList<int> sizes;
-	sizes<<100<<(h-100);
-	splitter->setSizes( sizes );
-}
 void DaoStudio::slotMaxEditor( int )
 {
 	wgtEditorTabs->currentWidget()->setFocus();
@@ -958,7 +952,25 @@ void DaoStudio::slotMaxEditor( int )
 	if( actionMSplit->isChecked() ) return;
 	int h = splitter->height();
 	QList<int> sizes;
-	sizes<<(h-100)<<100;
+	sizes<<(h-160)<<80<<80;
+	splitter->setSizes( sizes );
+}
+void DaoStudio::slotMaxMonitor( int )
+{
+	if( actionMSplit->isChecked() ) return;
+	int h = splitter->height();
+	QList<int> sizes;
+	sizes<<80<<(h-160)<<80;
+	splitter->setSizes( sizes );
+}
+void DaoStudio::slotMaxConsole( int )
+{
+	wgtConsole->setFocus();
+	wgtConsole->ensureCursorVisible();
+	if( actionMSplit->isChecked() ) return;
+	int h = splitter->height();
+	QList<int> sizes;
+	sizes<<80<<80<<(h-160);
 	splitter->setSizes( sizes );
 }
 void DaoStudio::slotStart()

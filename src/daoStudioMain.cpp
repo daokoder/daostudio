@@ -91,17 +91,6 @@ int StudioMain( QApplication & app, int argc, char *argv[] )
 	return app.exec();
 }
 
-int MonitorMain( QApplication & app, int argc, char *argv[] )
-{
-	DaoMonitor monitor( argv[0] );
-	QRect size = QApplication::desktop()->screenGeometry();
-	monitor.resize( 0.7*size.width(), 0.7*size.height() );
-	app.setActiveWindow( & monitor );
-	//monitor.showMaximized();
-	monitor.show();
-	return app.exec();
-}
-
 int InterpreterMain( int argc, char *argv[] )
 {
 	QCoreApplication app( argc, argv );
@@ -145,8 +134,6 @@ int main( int argc, char *argv[] )
 	QFontInfo fi( DaoStudioSettings::codeFont );
 	if( fi.family() != "Courier 10 Pitch" )
 		DaoStudioSettings::codeFont.setFamily( "Courier New" );
-
-	if( monitor ) return MonitorMain( app, argc, argv );
 
 	QLocalSocket socket;
     socket.connectToServer( DaoStudioSettings::socket_stdout );

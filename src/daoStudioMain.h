@@ -50,6 +50,7 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #define INDEX_TOP    12
 
 #define DATA_REQUEST_TYPE "tuple<object:string,table:int,row:int,column:int>"
+#define DATA_STACK 0
 #define INFO_TABLE 1
 #define DATA_TABLE 2
 #define CODE_TABLE 3

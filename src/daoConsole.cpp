@@ -228,12 +228,6 @@ void DaoConsole::keyPressEvent ( QKeyEvent * event )
 		if( key == Qt::Key_Up || key == Qt::Key_Down ){
 			studio->slotMaxEditor();
 			return;
-		}else if( key == Qt::Key_Left ){
-			scriptTab->setCurrentIndex( 1 );
-			return;
-		}else if( key == Qt::Key_Right ){
-			scriptTab->setCurrentIndex( 1 );
-			return;
 		}
 	}
 	if( state ==0 && idCommand >= commandHistory.size() )

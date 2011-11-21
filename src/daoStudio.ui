@@ -29,7 +29,7 @@
     <normaloff>:/images/daostudio2.png</normaloff>:/images/daostudio2.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_3">
+   <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <widget class="QSplitter" name="mainSplitter">
       <property name="orientation">
@@ -80,7 +80,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>332</width>
+          <width>344</width>
           <height>510</height>
          </rect>
         </property>
@@ -308,8 +308,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>332</width>
-          <height>510</height>
+          <width>100</width>
+          <height>88</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -376,8 +376,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>332</width>
-          <height>510</height>
+          <width>100</width>
+          <height>375</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -807,60 +807,72 @@
          </attribute>
         </widget>
        </widget>
-       <widget class="QTabWidget" name="wgtScriptTabs">
-        <property name="minimumSize">
-         <size>
-          <width>500</width>
-          <height>100</height>
-         </size>
+       <widget class="QGroupBox" name="wgtGroupMonitor">
+        <property name="title">
+         <string>Virtual Machine Monitor</string>
         </property>
-        <property name="tabPosition">
-         <enum>QTabWidget::South</enum>
-        </property>
-        <property name="currentIndex">
-         <number>0</number>
-        </property>
-        <widget class="QWidget" name="tab_2">
-         <attribute name="title">
-          <string>Dao Console</string>
-         </attribute>
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <property name="margin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="DaoConsole" name="wgtConsole">
+        <layout class="QVBoxLayout" name="verticalLayout_8">
+         <property name="margin">
+          <number>2</number>
+         </property>
+         <item>
+          <widget class="QScrollArea" name="wgtMonitorArea">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>100</height>
+            </size>
+           </property>
+           <property name="widgetResizable">
+            <bool>true</bool>
+           </property>
+           <widget class="DaoDataWidget" name="wgtMonitor">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>723</width>
+              <height>400</height>
+             </rect>
+            </property>
             <property name="minimumSize">
              <size>
-              <width>600</width>
-              <height>100</height>
+              <width>0</width>
+              <height>400</height>
              </size>
             </property>
-            <property name="font">
-             <font>
-              <family>Courier 10 Pitch</family>
-              <pointsize>14</pointsize>
-              <weight>50</weight>
-              <bold>false</bold>
-             </font>
-            </property>
            </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="tab_4">
-         <attribute name="title">
-          <string>Virtual Machine Monitor</string>
-         </attribute>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <property name="margin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="DaoDataWidget" name="wgtMonitor" native="true"/>
-          </item>
-         </layout>
-        </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QGroupBox" name="wgtGroupConsole">
+        <property name="title">
+         <string>Dao Console</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_9">
+         <property name="margin">
+          <number>2</number>
+         </property>
+         <item>
+          <widget class="DaoConsole" name="wgtConsole">
+           <property name="minimumSize">
+            <size>
+             <width>600</width>
+             <height>100</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Courier 10 Pitch</family>
+             <pointsize>14</pointsize>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </widget>
      </widget>

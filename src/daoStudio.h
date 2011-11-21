@@ -147,8 +147,9 @@ protected:
 	void slotWriteLog( const QString & );
 	void slotSetPathWorking();
 	void slotSetPathBrowsing();
-	void slotMaxConsole( int id = 0 );
 	void slotMaxEditor( int id = 0 );
+	void slotMaxMonitor( int id = 0 );
+	void slotMaxConsole( int id = 0 );
 	void slotSave();
 	void slotSaveAs();
 	protected slots:
