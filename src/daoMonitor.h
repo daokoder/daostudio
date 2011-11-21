@@ -18,39 +18,20 @@
 #define _DAO_MONITOR_H_
 
 #include"ui_daoMonitor.h"
-#include"ui_daoAbout.h"
-#include"ui_daoDataWidget.h"
 
-#include<QMainWindow>
-#include<QTime>
-#include<QTimer>
-#include<QLabel>
-#include<QStack>
-#include<QProgressBar>
-#include<QRegExp>
 #include<QScrollArea>
 #include<QTextBrowser>
-#include<QFileSystemWatcher>
-#include<QCheckBox>
 #include<QLocalServer>
 #include<QLocalSocket>
-#include<QMutex>
-#include<QThread>
-#include<QProcess>
 
 #include<daoCodeSHL.h>
 #include<daoDebugger.h>
 #include<daoInterpreter.h>
 #include<daoStudioMain.h>
 
-class DaoMonitor;
 class DaoStudio;
 
-
-
-class DaoValueItem;
-
-class DaoDataWidget : public QWidget, private Ui::DaoDataWidget
+class DaoMonitor : public QWidget, private Ui::DaoMonitor
 {
 Q_OBJECT
 
@@ -72,9 +53,6 @@ Q_OBJECT
 	QLocalServer  monitorServer;
 	QLocalSocket *monitorSocket;
 
-	int vmcEntry;
-	int vmcNewEntry;
-
 	dint currentAddress;
 	int currentType;
 	int currentEntry;
@@ -85,29 +63,17 @@ Q_OBJECT
 	void EnableTwoTable( DaoValue *p );
 	void EnableThreeTable( DaoValue *p );
 
-	// for DaoMap, whose values are not in a array
-	QVector<DaoValue*> itemValues;
-
-	QString itemName;
-
 	void FillTable( QTableWidget *table, DaoList *list );
 	void FillCodes( QTableWidget *table, DaoList *list );
 
-	void RoutineInfo( DaoRoutine *routine, void *address );
-	void FillTable( QTableWidget *table, DaoValue **data, int size, DArray *type, DMap *names, int fileter );
-	void FillTable2( QTableWidget *table, DaoValue **data, int size, DArray *type, DMap *names );
-	void ViewVmCodes( QTableWidget *table, DaoRoutine *routine );
-	void ResetExecutionPoint(int row, int col);
-
-	QString StringAddress( void *p ){ return "0x"+QString::number( (size_t) p, 16 ); }
 	void SendDataRequest();
 
 	public:
 
 	DaoStudio  *studio;
 
-	DaoDataWidget( QWidget *parent = NULL );
-	~DaoDataWidget();
+	DaoMonitor( QWidget *parent = NULL );
+	~DaoMonitor();
 
 	void SetNamespace( DaoNamespace *ns ){ mainNamespace = ns; }
 
@@ -118,24 +84,12 @@ Q_OBJECT
 	void ViewTuple( DaoTuple *tuple );
 	void ViewRoutine( DaoTuple *tuple );
 	void ViewFunction( DaoTuple *tuple );
+	void ViewFunctree( DaoTuple *tuple );
 	void ViewClass( DaoTuple *tuple );
 	void ViewObject( DaoTuple *tuple );
 	void ViewNamespace( DaoTuple *tuple );
 	void ViewProcess( DaoTuple *tuple );
 	void ViewStackFrame( DaoTuple *tuple );
-
-	void ViewValue( DaoValue *value );
-	void ViewArray( DaoArray *array );
-	void ViewList( DaoList *list );
-	void ViewMap( DaoMap *map );
-	void ViewTuple2( DaoTuple *tuple );
-	void ViewClass( DaoClass *klass );
-	void ViewObject( DaoObject *object );
-	void ViewFunction( DaoFunction *function );
-	void ViewRoutine( DaoRoutine *routine );
-	void ViewStackFrame( DaoStackFrame *frame, DaoProcess *process );
-	void ViewNamespace( DaoNamespace *nspace );
-	void ViewProcess( DaoProcess *process, DaoStackFrame *frame = NULL );
 
 protected:
 	void keyPressEvent( QKeyEvent * e );
@@ -152,32 +106,7 @@ protected slots:
 	void slotValueActivated(QListWidgetItem*);
 
 signals:
-	void signalViewElement( DaoValueItem *, DaoValue * );
 	void signalFocusIn();
-};
-
-class DaoValueItem : public QListWidgetItem
-{
-	public:
-	DaoValueItem( DaoValue *value, QListWidget *parent=0 );
-
-	short type;
-	union {
-		DaoValue     *value;
-		DaoArray     *array; // = DAO_ARRAY
-		DaoList      *list; // = DAO_LIST
-		DaoMap       *map;	// = DAO_MAP
-		DaoTuple     *tuple; // = DAO_TUPLE
-		DaoClass     *klass; // = DAO_CLASS
-		DaoObject    *object; // = DAO_OBJECT
-		DaoRoutine	 *routine;
-		DaoNamespace *nspace;
-		DaoProcess   *process;
-	};
-	DaoStackFrame *frame;
-
-	DaoValueItem  *parent;
-	DaoDataWidget *dataWidget;
 };
 
 #endif

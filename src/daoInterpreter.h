@@ -17,21 +17,10 @@
 #ifndef _DAO_INTERPRETER_H_
 #define _DAO_INTERPRETER_H_
 
-#include"ui_daoMonitor.h"
-#include"ui_daoAbout.h"
-#include"ui_daoDataWidget.h"
-
-#include<QMainWindow>
 #include<QTime>
 #include<QTimer>
 #include<QLabel>
 #include<QStack>
-#include<QProgressBar>
-#include<QRegExp>
-#include<QScrollArea>
-#include<QTextBrowser>
-#include<QFileSystemWatcher>
-#include<QCheckBox>
 #include<QLocalServer>
 #include<QLocalSocket>
 #include<QMutex>
@@ -123,14 +112,9 @@ Q_OBJECT
 	DaoList  *valueStack;
 	DArray   *extraStack;
 
-	DaoValue *itemValues;
 	DString  *daoString;
 	DLong    *daoLong;
 	DArray   *tokens;
-	int itemCount;
-	int vmcEntry;
-	int vmcNewEntry;
-	int index;
 	int vmState;
 
 	QString StringAddress( void *p ){ return "0x"+QString::number( (size_t) p, 16 ); }
@@ -143,6 +127,7 @@ Q_OBJECT
 	void ViewTuple( DaoTuple *tuple );
 	void ViewRoutine( DaoRoutine *routine );
 	void ViewFunction( DaoFunction *function );
+	void ViewFunctree( DaoFunctree *functree );
 	void ViewClass( DaoClass *klass );
 	void ViewObject( DaoObject *object );
 	void ViewNamespace( DaoNamespace *nspace );
@@ -158,6 +143,7 @@ Q_OBJECT
 	void ViewMapData( DaoMap *map, DaoTuple *request );
 	void ViewRoutineData( DaoRoutine *routine, DaoTuple *request );
 	void ViewFunctionData( DaoFunction *function, DaoTuple *request );
+	void ViewFunctreeData( DaoFunctree *functree, DaoTuple *request );
 	void ViewClassData( DaoClass *klass, DaoTuple *request );
 	void ViewObjectData( DaoObject *object, DaoTuple *request );
 	void ViewNamespaceData( DaoNamespace *ns, DaoTuple *request );
@@ -177,8 +163,6 @@ public:
 
 	void SetPathWorking( const QString & path );
 
-	//void ViewValue( DaoDataWidget *dataView, DaoValueItem *it );
-	//void ReduceValueItems( QListWidgetItem *item );
 	void EraseDebuggingProcess();
 	void InitDataBrowser();
 	void SendDataInformation();
@@ -194,7 +178,6 @@ protected slots:
 	void slotServeData();
 	void slotStartExecution();
 	void slotStopExecution();
-	//void slotValueActivated(QListWidgetItem*);
 
 signals:
 

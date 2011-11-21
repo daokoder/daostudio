@@ -826,7 +826,7 @@
            <property name="widgetResizable">
             <bool>true</bool>
            </property>
-           <widget class="DaoDataWidget" name="wgtMonitor">
+           <widget class="DaoMonitor" name="wgtMonitor">
             <property name="geometry">
              <rect>
               <x>0</x>
@@ -1163,7 +1163,7 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>DaoDataWidget</class>
+   <class>DaoMonitor</class>
    <extends>QWidget</extends>
    <header>daoMonitor.h</header>
    <container>1</container>
