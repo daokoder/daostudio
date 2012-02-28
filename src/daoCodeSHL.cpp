@@ -968,10 +968,10 @@ void DaoCodeSHL::HighlightSearch( const QString & text )
 	if( pattern ){
 		QByteArray bytes = text.toUtf8();
 		DString_SetDataMBS( wcs, bytes.data(), bytes.size() );
-		size_t start = 0;
-		size_t end = wcs->size;
-		size_t p1 = start, p2 = end;
-		size_t i;
+		daoint start = 0;
+		daoint end = wcs->size;
+		daoint p1 = start, p2 = end;
+		daoint i;
 		while( DaoRegex_Match( pattern, wcs, & p1, & p2 ) ){
 			for(i=p1; i<=p2; i++){
 				QTextCharFormat fmt = format( i );
@@ -1111,7 +1111,7 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 		case DTOK_AMAND :
 			format = formatTypeStruct;
 			break;
-		case DTOK_ID_INITYPE :
+		case DTOK_ID_THTYPE :
 			format = formatInitype;
 			break;
 		case DTOK_ID_SYMBOL :
@@ -1164,10 +1164,10 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 	for(i=0; i<language->patterns.size(); i++){
 		DaoSyntaxPattern sp = language->patterns[i];
 		int pos, len, type;
-		size_t start = 0;
-		size_t end = wcs->size-1;
+		daoint start = 0;
+		daoint end = wcs->size-1;
 		while( DaoRegex_Match( sp.pattern, wcs, &start, &end ) ){
-			size_t s1 = 0, s2 = 0;
+			daoint s1 = 0, s2 = 0;
 			for(j=0; j<8*sizeof(sp.groups); j++){
 				if( not (sp.groups & (1<<j) ) ) continue;
 				if( DaoRegex_SubMatch( sp.pattern, j, &s1, &s2 ) ==0 ) continue;
@@ -1308,8 +1308,8 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 		case DTOK_DOT : case DTOK_ARROW : case DTOK_COLON2 :
 			format = formatSBracket;
 			break;
-		case DKEY_USE : case DKEY_LOAD : case DKEY_IMPORT : case DKEY_BIND :
-		case DKEY_REQUIRE : case DKEY_AS : case DKEY_SYNTAX : 
+		case DKEY_USE : case DKEY_LOAD : case DKEY_BIND :
+		case DKEY_AS : case DKEY_SYNTAX : 
 		case DKEY_AND : case DKEY_OR : case DKEY_NOT :
 		case DKEY_VIRTUAL :
 			format = formatStmtKey;
@@ -1339,7 +1339,7 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 		case DKEY_SELF :
 			format = formatStdobj;
 			break;
-		case DTOK_ID_INITYPE :
+		case DTOK_ID_THTYPE :
 			format = formatInitype;
 			break;
 		case DTOK_ID_SYMBOL :

@@ -122,8 +122,8 @@ static int DaoEditContinueData( QByteArray &data, QList<int> & lineMap, QStringL
 static void DaoResetExecution( DaoProcess *process, int line, int offset=0 )
 {
 	DaoRoutine *routine = process->activeRoutine;
-	DaoVmCodeX **annotCodes = routine->annotCodes->items.pVmc;
-	int i = 0, n = routine->annotCodes->size;
+	DaoVmCodeX **annotCodes = routine->body->annotCodes->items.pVmc;
+	int i = 0, n = routine->body->annotCodes->size;
 	while( i < n && annotCodes[i]->line < line ) ++i;
 	while( i < n && offset >0 && annotCodes[i]->line == line){
 		++i;
@@ -173,13 +173,13 @@ static void DaoConsDebug( DaoEventHandler *self, DaoProcess *process )
 {
 	self->interpreter->mutex.lock();
 
-	DaoVmCode *codes = process->activeRoutine->vmCodes->codes;
-	DaoVmCodeX **annots = process->activeRoutine->annotCodes->items.pVmc;
+	DaoVmCode *codes = process->activeRoutine->body->vmCodes->codes;
+	DaoVmCodeX **annots = process->activeRoutine->body->annotCodes->items.pVmc;
 	int oldline = annots[ process->activeCode - codes + 1]->line;
 	QFileInfo fi( process->activeRoutine->nameSpace->name->mbs );
 	QString name = fi.absoluteFilePath();
-	QByteArray start = QByteArray::number( process->activeRoutine->bodyStart+1 );
-	QByteArray end = QByteArray::number( process->activeRoutine->bodyEnd-1 );
+	QByteArray start = QByteArray::number( process->activeRoutine->body->codeStart+1 );
+	QByteArray end = QByteArray::number( process->activeRoutine->body->codeEnd-1 );
 	QByteArray next = QByteArray::number( oldline );
 	QByteArray send;
 	send.append( name );
@@ -279,13 +279,12 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 	handler.InvokeHost = DaoProcessMonitor;
 	handler.timer.start();
 
-	vmSpace = DaoInit();
+	vmSpace = DaoInit( NULL ); //XXX
 	vmSpace->options |= DAO_EXEC_IDE | DAO_EXEC_INTERUN;
 	vmSpace->mainNamespace->options |= DAO_EXEC_IDE | DAO_EXEC_INTERUN;
 	nameSpace = vmSpace->mainNamespace;
 	handler.process = DaoVmSpace_MainProcess( vmSpace );
 	DaoVmSpace_SetUserHandler( vmSpace, (DaoUserHandler*) & handler );
-	DString_SetMBS( vmSpace->fileName, "interactive codes" );
 	DString_SetMBS( vmSpace->mainNamespace->name, "interactive codes" );
 
 	DaoNamespace *ns = vmSpace->mainNamespace;
@@ -426,12 +425,18 @@ void DaoInterpreter::slotServeData()
 			ViewProcessStack( (DaoProcess*)value, request );
 		}
 		break;
+	case DAO_ROUTINE : 
+		if( value->xRoutine.overloads ){
+		ViewFunctreeData( (DaoRoutine*)value, request );
+		}else if( value->xRoutine.body ){
+			ViewRoutineData( (DaoRoutine*)value, request );
+		}else{
+			ViewFunctionData( (DaoRoutine*)value, request );
+		}
+		break;
 	case DAO_TUPLE : ViewTupleData( (DaoTuple*)value, request ); break;
 	case DAO_LIST : ViewListData( (DaoList*)value, request ); break;
 	case DAO_MAP : ViewMapData( (DaoMap*)value, request ); break;
-	case DAO_ROUTINE : ViewRoutineData( (DaoRoutine*)value, request ); break;
-	case DAO_FUNCTION : ViewFunctionData( (DaoFunction*)value, request ); break;
-	case DAO_FUNCTREE : ViewFunctreeData( (DaoFunctree*)value, request ); break;
 	case DAO_CLASS : ViewClassData( (DaoClass*)value, request ); break;
 	case DAO_OBJECT : ViewObjectData( (DaoObject*)value, request ); break;
 	case DAO_NAMESPACE : ViewNamespaceData( (DaoNamespace*)value, request ); break;
@@ -603,7 +608,7 @@ void DaoInterpreter::InitMessage( DaoValue *value )
 {
 	DaoList_PushFront( valueStack, value );
 	DArray_PushFront( extraStack, NULL );
-	messageTuple->items[INDEX_ADDR]->xInteger.value = (dint) value;
+	messageTuple->items[INDEX_ADDR]->xInteger.value = (daoint) value;
 	messageTuple->items[INDEX_TYPE]->xInteger.value = value->type;
 	DaoArray_ResizeVector( numArray, 0 );
 	DaoTuple_SetItem( messageTuple, (DaoValue*)numArray, INDEX_NUMBERS );
@@ -642,13 +647,19 @@ void DaoInterpreter::ViewValue( DaoValue *value )
 		DString_SetMBS( messageTuple->items[INDEX_INFO]->xString.data, info.toUtf8().data() );
 		DString_SetMBS( messageTuple->items[INDEX_VALUE]->xString.data, DString_GetMBS( daoString ) );
 		break;
+	case DAO_ROUTINE :
+		if( value->xRoutine.overloads ){
+			ViewFunctree( (DaoRoutine*)value );
+		}else if( value->xRoutine.body ){
+			ViewRoutine( (DaoRoutine*)value );
+		}else{
+			ViewFunction( (DaoRoutine*)value );
+		}
+		break;
 	case DAO_ARRAY : ViewArray( (DaoArray*)value ); break;
 	case DAO_TUPLE : ViewTuple( (DaoTuple*)value ); break;
 	case DAO_LIST : ViewList( (DaoList*)value ); break;
 	case DAO_MAP : ViewMap( (DaoMap*)value ); break;
-	case DAO_ROUTINE : ViewRoutine( (DaoRoutine*)value ); break;
-	case DAO_FUNCTION : ViewFunction( (DaoFunction*)value ); break;
-	case DAO_FUNCTREE : ViewFunctree( (DaoFunctree*)value ); break;
 	case DAO_CLASS : ViewClass( (DaoClass*)value ); break;
 	case DAO_OBJECT : ViewObject( (DaoObject*)value ); break;
 	case DAO_NAMESPACE : ViewNamespace( (DaoNamespace*)value ); break;
@@ -665,7 +676,7 @@ void DaoInterpreter::ViewArray( DaoArray *array )
 	DaoType *type = DaoNamespace_GetType( nameSpace, (DaoValue*)array );
 	QString itemName = "Array[" + StringAddress(  array ) + "]";
 	QString info = "# address:\n" + StringAddress( array ) + "\n# type:\n";
-	size_t i;
+	daoint i;
 
 	info += type ? type->name->mbs : "?";
 	info += "\n# elements:\n" + QString::number( array->size );
@@ -765,10 +776,10 @@ void DaoInterpreter::ViewTuple( DaoTuple *tuple )
 }
 void DaoInterpreter::ViewRoutine( DaoRoutine *routine )
 {
-	while( routine->revised ) routine = routine->revised;
+	while( routine->body->revised ) routine = routine->body->revised;
 	DMap *map = DMap_New(D_STRING,0);
-	DaoToken **tokens = routine->defLocals->items.pToken;
-	int i, n = routine->defLocals->size;
+	DaoToken **tokens = routine->body->defLocals->items.pToken;
+	int i, n = routine->body->defLocals->size;
 	for(i=0; i<n; i++) if( tokens[i]->type ==0 )
 		DMap_Insert( map, tokens[i]->string, (void*)(size_t)tokens[i]->index );
 
@@ -791,18 +802,18 @@ void DaoInterpreter::ViewRoutine( DaoRoutine *routine )
 		DaoList_PushBack( extraList, (DaoValue*)extraTuple );
 	}
 
-	MakeList( constList, routine->routConsts->items.pValue, routine->routConsts->size, NULL, map, 0 );
+	MakeList( constList, routine->routConsts->items.items.pValue, routine->routConsts->items.size, NULL, map, 0 );
 	ViewVmCodes( codeList, routine );
 	DMap_Delete( map );
 }
-void DaoInterpreter::ViewFunction( DaoFunction *function )
+void DaoInterpreter::ViewFunction( DaoRoutine *function )
 {
 }
-void DaoInterpreter::ViewFunctree( DaoFunctree *functree )
+void DaoInterpreter::ViewFunctree( DaoRoutine *functree )
 {
-	QString itemName = "Functree[" + QString( functree->name->mbs ) + "]";
+	QString itemName = "Functree[" + QString( functree->routName->mbs ) + "]";
 	QString info = "# address:\n" + StringAddress( functree );
-	info += "\n# number of overload:\n" + QString::number( functree->routines->size );
+	info += "\n# number of overload:\n" + QString::number( functree->overloads->routines->size );
 
 	InitMessage( (DaoValue*)functree );
 	DString_SetMBS( messageTuple->items[INDEX_NAME]->xString.data, itemName.toUtf8().data() );
@@ -811,13 +822,13 @@ void DaoInterpreter::ViewFunctree( DaoFunctree *functree )
 	extraTuple->items[1]->xString.data->size = 0;
 	extraTuple->items[2]->xString.data->size = 0;
 
-	for(size_t i=0; i<functree->routines->size; i++){
-		DRoutine *rout = functree->routines->items.pRout2[i];
+	for(size_t i=0; i<functree->overloads->routines->size; i++){
+		DaoRoutine *rout = functree->overloads->routines->items.pRoutine[i];
 		info = "";
-		if( rout->type == DAO_FUNCTION ){
-			info = "Function[";
-		}else{
+		if( rout->body ){
 			info = "Routine[";
+		}else{
+			info = "Function[";
 		}
 		info += StringAddress( rout ) + "]";
 		DString_SetMBS( extraTuple->items[0]->xString.data, info.toUtf8().data() );
@@ -917,6 +928,8 @@ void DaoInterpreter::ViewNamespace( DaoNamespace *nspace )
 	DString_SetMBS( messageTuple->items[INDEX_INFO]->xString.data, info.toUtf8().data() );
 
 	extraTuple->items[2]->xString.data->size = 0;
+#warning "===================="
+#if 0
 	for(i=0; i<nspace->nsLoaded->size; i++){
 		DaoNamespace *ns = nspace->nsLoaded->items.pNS[i];
 		QString itname = "Namespace[" + StringAddress(ns) + "]";
@@ -924,6 +937,7 @@ void DaoInterpreter::ViewNamespace( DaoNamespace *nspace )
 		DString_Assign( extraTuple->items[1]->xString.data, ns->name );
 		DaoList_PushBack( extraList, (DaoValue*)extraTuple );
 	}
+#endif
 
 	MakeList( constList, nspace->cstData->items.pValue, nspace->cstData->size,
 			NULL, nspace->lookupTable, DAO_GLOBAL_CONSTANT );
@@ -969,13 +983,8 @@ void DaoInterpreter::ViewProcess( DaoProcess *process )
 	QTableWidgetItem *it = NULL;
 	frame = process->topFrame;
 	for(i=0; frame && frame!=process->firstFrame; i++, frame=frame->prev){
-		if( frame->routine ){
-			DString_SetMBS( valueTuple->items[0]->xString.data, frame->routine->routName->mbs );
-			DString_SetMBS( valueTuple->items[1]->xString.data, frame->routine->routType->name->mbs );
-		}else{
-			DString_SetMBS( valueTuple->items[0]->xString.data, frame->function->routName->mbs );
-			DString_SetMBS( valueTuple->items[1]->xString.data, frame->function->routType->name->mbs );
-		}
+		DString_SetMBS( valueTuple->items[0]->xString.data, frame->routine->routName->mbs );
+		DString_SetMBS( valueTuple->items[1]->xString.data, frame->routine->routType->name->mbs );
 		DaoList_PushBack( constList, (DaoValue*)valueTuple );
 	}
 }
@@ -1004,7 +1013,7 @@ void DaoInterpreter::MakeList( DaoList *list, DaoValue **data, int size, DArray 
 			DString_SetMBS( valueTuple->items[0]->xString.data, idnames[i].toUtf8().data() );
 		}else if( val->type == DAO_CLASS ){
 			DString_SetMBS( valueTuple->items[0]->xString.data, val->xClass.className->mbs );
-		}else if( val->type == DAO_ROUTINE || val->type == DAO_FUNCTION ){
+		}else if( val->type == DAO_ROUTINE ){
 			DString_SetMBS( valueTuple->items[0]->xString.data, val->xRoutine.routName->mbs );
 		}
 		itp = type ? type->items.pType[i] : NULL;
@@ -1047,21 +1056,21 @@ void DaoInterpreter::ViewRoutineData( DaoRoutine *routine, DaoTuple *request )
 		case 1 : ViewValue( routine->routHost->aux ); break;
 		}
 	}else if( table == DATA_TABLE ){
-		ViewValue( routine->routConsts->items.pValue[row] );
+		ViewValue( routine->routConsts->items.items.pValue[row] );
 	}
 }
-void DaoInterpreter::ViewFunctionData( DaoFunction *function, DaoTuple *request )
+void DaoInterpreter::ViewFunctionData( DaoRoutine *function, DaoTuple *request )
 {
 	int table = request->items[1]->xInteger.value;
 	int row = request->items[2]->xInteger.value;
 	int col = request->items[3]->xInteger.value;
 }
-void DaoInterpreter::ViewFunctreeData( DaoFunctree *functree, DaoTuple *request )
+void DaoInterpreter::ViewFunctreeData( DaoRoutine *functree, DaoTuple *request )
 {
 	int table = request->items[1]->xInteger.value;
 	int row = request->items[2]->xInteger.value;
 	int col = request->items[3]->xInteger.value;
-	if( table == DATA_TABLE ) ViewValue( functree->routines->items.pValue[row] );
+	if( table == DATA_TABLE ) ViewValue( functree->overloads->routines->items.pValue[row] );
 }
 void DaoInterpreter::ViewClassData( DaoClass *klass, DaoTuple *request )
 {
@@ -1096,7 +1105,8 @@ void DaoInterpreter::ViewNamespaceData( DaoNamespace *nspace, DaoTuple *request 
 	int row = request->items[2]->xInteger.value;
 	int col = request->items[3]->xInteger.value;
 	if( table == INFO_TABLE ){
-		ViewValue( nspace->nsLoaded->items.pValue[row] );
+#warning"===================="
+		//ViewValue( nspace->nsLoaded->items.pValue[row] );
 	}else if( table == DATA_TABLE ){
 		ViewValue( nspace->cstData->items.pValue[row] );
 	}else if( table == CODE_TABLE ){
@@ -1123,18 +1133,10 @@ void DaoInterpreter::ViewStackData( DaoProcess *proc, DaoStackFrame *frame, DaoT
 	int col = request->items[3]->xInteger.value;
 	if( table == INFO_TABLE ){
 		DaoStackFrame *frame = (DaoStackFrame*)extraStack->items.pVoid[0];
-		if( frame->routine ){
-			switch( row ){
-			case 0 : ViewValue( (DaoValue*)frame->routine->nameSpace ); break;
-			case 1 : ViewValue( (DaoValue*)frame->routine ); break;
-			case 2 : ViewValue( (DaoValue*)frame->object ); break;
-			}
-		}else{
-			switch( row ){
-			case 0 : ViewValue( (DaoValue*)frame->function->nameSpace ); break;
-			case 1 : ViewValue( (DaoValue*)frame->function ); break;
-			case 2 : ViewValue( (DaoValue*)frame->object ); break;
-			}
+		switch( row ){
+		case 0 : ViewValue( (DaoValue*)frame->routine->nameSpace ); break;
+		case 1 : ViewValue( (DaoValue*)frame->routine ); break;
+		case 2 : ViewValue( (DaoValue*)frame->object ); break;
 		}
 	}else if( table == DATA_TABLE ){
 		ViewValue( proc->stackValues[ frame->stackBase + row ] );
@@ -1156,9 +1158,9 @@ QString DaoInterpreter::RoutineInfo( DaoRoutine *routine, void *address )
 	info += "\n# type:\n";
 	info += routine->routType->name->mbs;
 	info += "\n\n# instructions:\n";
-	info += QString::number(routine->vmCodes->size);
+	info += QString::number(routine->body->vmCodes->size);
 	info += "\n# variables:\n";
-	info += QString::number(routine->regCount);
+	info += QString::number(routine->body->regCount);
 	if( ns->file->mbs ){
 		info += "\n\n# path:\n\"" + QString( ns->path->mbs );
 		info += "\"\n# file:\n\"" + QString( ns->file->mbs ) + "\"";
@@ -1171,8 +1173,8 @@ void DaoInterpreter::ViewStackFrame( DaoStackFrame *frame, DaoProcess *process )
 
 	DaoRoutine *routine = frame->routine;
 	DMap *map = DMap_New(D_STRING,0);
-	DaoToken **tokens = routine->defLocals->items.pToken;
-	int i, n = routine->defLocals->size;
+	DaoToken **tokens = routine->body->defLocals->items.pToken;
+	int i, n = routine->body->defLocals->size;
 	for(i=0; i<n; i++) if( tokens[i]->type )
 		DMap_Insert( map, tokens[i]->string, (void*)(size_t)tokens[i]->index );
 
@@ -1181,7 +1183,7 @@ void DaoInterpreter::ViewStackFrame( DaoStackFrame *frame, DaoProcess *process )
 
 	InitMessage( (DaoValue*)process );
 	extraStack->items.pVoid[0] = frame;
-	messageTuple->items[INDEX_ADDR]->xInteger.value = (dint) frame;
+	messageTuple->items[INDEX_ADDR]->xInteger.value = (daoint) frame;
 	messageTuple->items[INDEX_TYPE]->xInteger.value = DAO_FRAME_ROUT;
 	messageTuple->items[INDEX_ENTRY]->xInteger.value = frame->entry;
 	DString_SetMBS( messageTuple->items[INDEX_NAME]->xString.data, itemName.toUtf8().data() );
@@ -1202,25 +1204,25 @@ void DaoInterpreter::ViewStackFrame( DaoStackFrame *frame, DaoProcess *process )
 		DaoList_PushBack( extraList, (DaoValue*)extraTuple );
 	}
 
-	if( routine->vmCodes->size ==0 ) return;
+	if( routine->body->vmCodes->size ==0 ) return;
 
-	MakeList( varList, process->stackValues + frame->stackBase, routine->regCount, 
-			routine->regType, map, 0 );
+	MakeList( varList, process->stackValues + frame->stackBase, routine->body->regCount, 
+			routine->body->regType, map, 0 );
 	ViewVmCodes( codeList, frame->routine );
 	DMap_Delete( map );
 }
 void DaoInterpreter::ViewVmCodes( DaoList *list, DaoRoutine *routine )
 {
-	int i, n = routine->vmCodes->size;
+	int i, n = routine->body->vmCodes->size;
 	for(i=0; i<n; i++){
-		DaoVmCode vmc0 = routine->vmCodes->codes[i];
-		DaoVmCodeX *vmc = routine->annotCodes->items.pVmc[i];
+		DaoVmCode vmc0 = routine->body->vmCodes->codes[i];
+		DaoVmCodeX *vmc = routine->body->annotCodes->items.pVmc[i];
 		codeTuple->items[0]->xInteger.value = vmc0.code;
 		codeTuple->items[1]->xInteger.value = vmc->a;
 		codeTuple->items[2]->xInteger.value = vmc->b;
 		codeTuple->items[3]->xInteger.value = vmc->c;
 		codeTuple->items[4]->xInteger.value = vmc->line;
-		DaoTokens_AnnotateCode( routine->source, *vmc, daoString, 32 );
+		DaoTokens_AnnotateCode( routine->body->source, *vmc, daoString, 32 );
 		DString_SetMBS( codeTuple->items[5]->xString.data, daoString->mbs );
 		DaoList_PushBack( codeList, (DaoValue*)codeTuple );
 	}

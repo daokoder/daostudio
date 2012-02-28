@@ -34,7 +34,6 @@ extern "C"{
 #include<dao.h>
 #include<daoGC.h>
 #include<daoArray.h>
-#include<daoContext.h>
 #include<daoProcess.h>
 #include<daoRoutine.h>
 #include<daoObject.h>

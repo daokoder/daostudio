@@ -53,7 +53,7 @@ Q_OBJECT
 	QLocalServer  monitorServer;
 	QLocalSocket *monitorSocket;
 
-	dint currentAddress;
+	daoint currentAddress;
 	int currentType;
 	int currentEntry;
 	int currentTop;

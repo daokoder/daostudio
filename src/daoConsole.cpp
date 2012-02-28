@@ -80,7 +80,7 @@ DaoConsole::DaoConsole( QWidget *parent ) : DaoTextEdit( parent, & wordList )
 			this, SLOT(slotProcessFinished(int,QProcess::ExitStatus)));
 	LoadCmdHistory();
 
-	SetVmSpace( DaoInit() );
+	SetVmSpace( DaoInit(NULL) ); //XXX
 
 	if( QFile::exists( DaoStudioSettings::socket_debug ) )
 		QFile::remove( DaoStudioSettings::socket_debug );

@@ -135,8 +135,9 @@ void DaoMonitor::slotUpdateMonitor()
 	case DAO_LIST : ViewList( tuple ); break;
 	case DAO_MAP : ViewMap( tuple ); break;
 	case DAO_ROUTINE : ViewRoutine( tuple ); break;
-	case DAO_FUNCTION : ViewFunction( tuple ); break;
-	case DAO_FUNCTREE : ViewFunctree( tuple ); break;
+#warning"==========================="
+	//case DAO_FUNCTION : ViewFunction( tuple ); break;
+	//case DAO_FUNCTREE : ViewFunctree( tuple ); break;
 	case DAO_CLASS   : ViewClass( tuple ); break;
 	case DAO_OBJECT   : ViewObject( tuple ); break;
 	case DAO_NAMESPACE : ViewNamespace( tuple ); break;
@@ -189,7 +190,7 @@ void DaoMonitor::ViewArray( DaoTuple *tuple )
 	row = -1;
 	col = 0;
 	for(i=0; i<array->size; i++){
-		size_t *dims = array->dims;
+		daoint *dims = array->dims;
 		int j, mod = i;
 		for(j=array->ndim-1; j >=0; j--){
 			int res = ( mod % dims[j] );
@@ -552,7 +553,7 @@ void DaoMonitor::FillCodes( QTableWidget *table, DaoList *list )
 	for(i=0; i<n; i++){
 		DaoTuple *itup = list->items.items.pTuple[i];
 		rowlabs<<QString::number(i);
-		table->setItem( i, 0, new QTableWidgetItem( getOpcodeName( itup->items[0]->xInteger.value ) ) );
+		table->setItem( i, 0, new QTableWidgetItem( DaoVmCode_GetOpcodeName( itup->items[0]->xInteger.value ) ) );
 		for(j=1; j<5; j++){
 			QString s = QString::number( itup->items[j]->xInteger.value );
 			table->setItem( i, j, new QTableWidgetItem( s ) );

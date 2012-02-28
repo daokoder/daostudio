@@ -114,7 +114,7 @@ int main( int argc, char *argv[] )
 			if( i < argc ) suffix = argv[i];
 		}
 	}
-	DaoInit();
+	DaoInit( argv[0] );
 	setlocale( LC_CTYPE, "" );
 	DaoStudioSettings::SetProgramPath( argv[0], suffix );
 	if( interpreter ) return InterpreterMain( argc, argv );

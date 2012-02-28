@@ -2,21 +2,23 @@
 # qmake (2.00)
 ######################################################################
 
-TEMPLATE = app
+#TEMPLATE = app
+
 #CONFIG += thread release
 CONFIG += thread debug
+
 #QT += webkit
 QT += network
+
 DEPENDPATH += . src
-INCLUDEPATH += . src dao/kernel
+INCLUDEPATH += . src dao/kernel dao/modules/auxlib
 
 DEFINES += DAO_WITH_MACRO
 DEFINES += DAO_WITH_THREAD
 DEFINES += DAO_WITH_NUMARRAY
-DEFINES += DAO_WITH_ASYNCLASS
+DEFINES += DAO_WITH_CONCURRENT
 DEFINES += DAO_WITH_DYNCLASS
 DEFINES += DAO_WITH_DECORATOR
-DEFINES += DAO_WITH_SERIALIZATION
 
 DESTDIR = .
 
@@ -28,34 +30,7 @@ HEADERS += src/daoConsole.h \
 		   src/daoDebugger.h \
 		   src/daoMonitor.h \
 		   src/daoStudio.h \
-		   src/daoStudioMain.h \
-		   dao/kernel/dao.h \
-		   dao/kernel/daoBase.h \
-		   dao/kernel/daoType.h \
-		   dao/kernel/daoStdtype.h \
-		   dao/kernel/daoNamespace.h \
-		   dao/kernel/daoGC.h \
-		   dao/kernel/daoNumtype.h \
-		   dao/kernel/daoClass.h \
-		   dao/kernel/daoLexer.h \
-		   dao/kernel/daoParser.h \
-		   dao/kernel/daoMacro.h \
-		   dao/kernel/daoVmcode.h \
-		   dao/kernel/daoRegex.h \
-		   dao/kernel/daoValue.h \
-		   dao/kernel/daoContext.h \
-		   dao/kernel/daoProcess.h \
-		   dao/kernel/daoStdlib.h \
-		   dao/kernel/daoArray.h \
-		   dao/kernel/daoMap.h \
-		   dao/kernel/daoConst.h \
-		   dao/kernel/daoRoutine.h \
-		   dao/kernel/daoObject.h \
-		   dao/kernel/daoThread.h \
-		   dao/kernel/daoSched.h \
-		   dao/kernel/daoStream.h \
-		   dao/kernel/daoString.h \
-		   dao/kernel/daoVmspace.h
+		   src/daoStudioMain.h
 
 SOURCES += src/daoConsole.cpp \
 		   src/daoEditor.cpp \
@@ -64,32 +39,7 @@ SOURCES += src/daoConsole.cpp \
 		   src/daoDebugger.cpp \
 		   src/daoMonitor.cpp \
 		   src/daoStudio.cpp \
-		   src/daoStudioMain.cpp \
-		   dao/kernel/daoType.c \
-		   dao/kernel/daoStdtype.c \
-		   dao/kernel/daoNamespace.c \
-		   dao/kernel/daoGC.c \
-		   dao/kernel/daoNumtype.c \
-		   dao/kernel/daoClass.c \
-		   dao/kernel/daoLexer.c \
-		   dao/kernel/daoParser.c \
-		   dao/kernel/daoMacro.c \
-		   dao/kernel/daoVmcode.c \
-		   dao/kernel/daoRegex.c \
-		   dao/kernel/daoValue.c \
-		   dao/kernel/daoContext.c \
-		   dao/kernel/daoProcess.c \
-		   dao/kernel/daoStdlib.c \
-		   dao/kernel/daoArray.c \
-		   dao/kernel/daoMap.c \
-		   dao/kernel/daoConst.c \
-		   dao/kernel/daoRoutine.c \
-		   dao/kernel/daoObject.c \
-		   dao/kernel/daoThread.c \
-		   dao/kernel/daoSched.c \
-		   dao/kernel/daoStream.c \
-		   dao/kernel/daoString.c \
-		   dao/kernel/daoVmspace.c
+		   src/daoStudioMain.cpp
 
 FORMS += src/daoStudio.ui \
 		 src/daoMonitor.ui \
@@ -100,6 +50,23 @@ FORMS += src/daoStudio.ui \
 
 RESOURCES += DaoStudio.qrc
 TRANSLATIONS = langs/daostudio_zh_cn.ts
+
+PREPROCESS_FILES = dummy.cpp
+
+makedao.name = Dao
+makedao.input = PREPROCESS_FILES
+makedao.output = dummy.o
+makedao.commands = make -f Makefile.dummy && cd dao && make lib
+makedao.clean_commands = cd dao && make clean
+#makedao.variable_out = SOURCES
+#makedao.depends = Makefile
+
+DEPENDPATH += dao
+DEPENDPATH += dao/modules/auxlib
+
+LIBS += -Ldao -Ldao/modules/auxlib -ldao -ldao_aux
+
+QMAKE_EXTRA_COMPILERS += makedao
 
 win32 {
 	RC_FILE = DaoStudio.rc
@@ -116,5 +83,8 @@ mac {
 	QMAKESPEC = macx-g++
 	DEFINES += UNIX MAC_OSX
 	#LIBS += -lz -lssl -lcrypto
+	QMAKE_LFLAGS += -Wl,-rpath,dao -Wl,-rpath,dao/modules/auxlib
+
+	QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
 }
 

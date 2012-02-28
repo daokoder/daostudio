@@ -49,9 +49,9 @@ void DaoDebugger::SetBreakPoints( DaoRoutine *routine )
 {
 	QFileInfo fi( routine->nameSpace->name->mbs );
 	QString name = fi.absoluteFilePath();
-	DaoVmCode  *codes = routine->vmCodes->codes;
-	DaoVmCodeX **annots = routine->annotCodes->items.pVmc;
-	int i, j, n = routine->vmCodes->size;
+	DaoVmCode  *codes = routine->body->vmCodes->codes;
+	DaoVmCodeX **annots = routine->body->annotCodes->items.pVmc;
+	int i, j, n = routine->body->vmCodes->size;
 
 	for(i=0; i<n; i++) if( codes[i].code == DVM_DEBUG ) codes[i].code = DVM_NOP;
 	if( not breakPoints.contains( name ) ) return;
@@ -72,8 +72,8 @@ void DaoDebugger::SetBreakPoints( DaoRoutine *routine )
 void DaoDebugger::ResetExecution( DaoProcess *process, int line, int offset )
 {
 	DaoRoutine *routine = process->activeRoutine;
-	DaoVmCodeX **annotCodes = routine->annotCodes->items.pVmc;
-	int i = 0, n = routine->annotCodes->size;
+	DaoVmCodeX **annotCodes = routine->body->annotCodes->items.pVmc;
+	int i = 0, n = routine->body->annotCodes->size;
 	while( i < n && annotCodes[i]->line < line ) ++i;
 	while( i < n && offset >0 && annotCodes[i]->line == line){
 		++i;
@@ -92,443 +92,46 @@ static QString NormalizeCodes( const QString & source, DArray *tokens )
 	}
 	return norm;
 }
-/* 0: ignore;
- * 1: register id;
- * 2: register count;
- * 3: index; XXX not considered yet
- */
-static short DaoVmCodeInfo[][5] =
-{
-	{ 0, 0, 0, DVM_NOP,  DVM_NOP } , 
-	{ 0, 0, 1, DVM_DATA, DVM_DATA } , 
-	{ 3, 0, 1, DVM_GETCL, DVM_GETCL } , 
-	{ 3, 0, 1, DVM_GETCK, DVM_GETCK } , 
-	{ 3, 0, 1, DVM_GETCG, DVM_GETCG } , 
-	{ 3, 3, 1, DVM_GETVH, DVM_GETVH } , 
-	{ 3, 3, 1, DVM_GETVL, DVM_GETVL } , 
-	{ 3, 3, 1, DVM_GETVO, DVM_GETVO } , 
-	{ 3, 3, 1, DVM_GETVK, DVM_GETVK } , 
-	{ 3, 3, 1, DVM_GETVG, DVM_GETVG } , 
-	{ 1, 1, 1, DVM_GETI,  DVM_GETI } ,  
-	{ 0, 2, 1, DVM_GETMI, DVM_GETMI } , 
-	{ 1, 0, 1, DVM_GETF,  DVM_GETF } ,  
-	{ 1, 0, 1, DVM_GETMF, DVM_GETMF } ,  
-	{ 1, 3, 3, DVM_SETVH, DVM_SETVH } , 
-	{ 1, 3, 3, DVM_SETVL, DVM_SETVL } , 
-	{ 1, 3, 3, DVM_SETVO, DVM_SETVO } , 
-	{ 1, 3, 3, DVM_SETVK, DVM_SETVK } , 
-	{ 1, 3, 3, DVM_SETVG, DVM_SETVG } , 
-	{ 1, 1, 1, DVM_SETI,  DVM_SETI } , 
-	{ 1, 1, 1, DVM_SETMI, DVM_SETMI } ,  // TODO
-	{ 1, 0, 1, DVM_SETF,  DVM_SETF } , 
-	{ 1, 0, 1, DVM_SETMF, DVM_SETMF } , 
-	{ 1, 0, 1, DVM_LOAD, DVM_LOAD } ,
-	{ 1, 0, 1, DVM_CAST, DVM_CAST } , 
-	{ 1, 0, 1, DVM_MOVE, DVM_MOVE } , 
-	{ 1, 0, 1, DVM_NOT,  DVM_NOT } ,  
-	{ 1, 0, 1, DVM_UNMS, DVM_UNMS } , 
-	{ 1, 0, 1, DVM_BITREV, DVM_BITREV } , 
-	{ 1, 1, 1, DVM_ADD, DVM_ADD } ,  
-	{ 1, 1, 1, DVM_SUB, DVM_SUB } ,  
-	{ 1, 1, 1, DVM_MUL, DVM_MUL } ,  
-	{ 1, 1, 1, DVM_DIV, DVM_DIV } ,  
-	{ 1, 1, 1, DVM_MOD, DVM_MOD } ,  
-	{ 1, 1, 1, DVM_POW, DVM_POW } ,  
-	{ 1, 1, 1, DVM_AND, DVM_AND } ,  
-	{ 1, 1, 1, DVM_OR, DVM_OR } ,   
-	{ 1, 1, 1, DVM_LT, DVM_LT } ,   
-	{ 1, 1, 1, DVM_LE, DVM_LE } ,   
-	{ 1, 1, 1, DVM_EQ, DVM_EQ } ,   
-	{ 1, 1, 1, DVM_NE, DVM_NE } ,   
-	{ 1, 1, 1, DVM_IN, DVM_IN } ,   
-	{ 1, 1, 1, DVM_BITAND, DVM_BITAND } , 
-	{ 1, 1, 1, DVM_BITOR,  DVM_BITOR } ,  
-	{ 1, 1, 1, DVM_BITXOR, DVM_BITXOR } ,  
-	{ 1, 1, 1, DVM_BITLFT, DVM_BITLFT } , 
-	{ 1, 1, 1, DVM_BITRIT, DVM_BITRIT } , 
-	{ 1, 1, 1, DVM_CHECK,  DVM_CHECK } , 
-	{ 1, 1, 1, DVM_NAMEVA,  DVM_NAMEVA } , 
-	{ 1, 1, 1, DVM_PAIR,  DVM_PAIR } , 
-	{ 0, 2, 1, DVM_TUPLE, DVM_TUPLE } , 
-	{ 0, 2, 1, DVM_LIST,  DVM_LIST } , 
-	{ 0, 2, 1, DVM_MAP,   DVM_MAP } , 
-	{ 0, 2, 1, DVM_HASH,  DVM_HASH } , 
-	{ 0, 2, 1, DVM_ARRAY, DVM_ARRAY } , 
-	{ 0, 2, 1, DVM_MATRIX, DVM_MATRIX } , 
-	{ 0, 2, 1, DVM_CURRY,  DVM_CURRY } , 
-	{ 0, 2, 1, DVM_MCURRY, DVM_MCURRY } , 
-	{ 0, 2, 1, DVM_ROUTINE, DVM_ROUTINE } , 
-	{ 0, 2, 1, DVM_CLASS, DVM_CLASS } , 
-	{ 0, 0, 0, DVM_GOTO,   DVM_GOTO } , 
-	{ 1, 0, 0, DVM_SWITCH, DVM_SWITCH } , 
-	{ 1, 0, 0, DVM_CASE, DVM_CASE } , 
-	{ 1, 0, 1, DVM_ITER, DVM_ITER } , 
-	{ 1, 0, 0, DVM_TEST, DVM_TEST } , 
-	{ 0, 1, 1, DVM_MATH, DVM_MATH } , 
-	{ 0, 2, 1, DVM_CALL,  DVM_CALL } , 
-	{ 0, 2, 1, DVM_MCALL, DVM_MCALL } , 
-	{ 0, 2, 0, DVM_CRRE,  DVM_CRRE } , 
-
-	{ 0, 0, 0, DVM_JITC,   DVM_JITC } , 
-	{ 0, 2, 0, DVM_RETURN, DVM_RETURN } , 
-	{ 0, 2, 0, DVM_YIELD,  DVM_YIELD } , 
-	{ 0, 0, 0, DVM_DEBUG,  DVM_DEBUG } , 
-	{ 0, 0, 0, DVM_SECT,   DVM_SECT } ,   
-
-	{ 0, 0, 1, DVM_DATA_I, DVM_DATA_I } ,
-	{ 0, 0, 1, DVM_DATA_F, DVM_DATA_F } ,
-	{ 0, 0, 1, DVM_DATA_D, DVM_DATA_D } ,
-	{ 1, 3, 3, DVM_GETCL_I, DVM_GETCL_I } , 
-	{ 1, 3, 3, DVM_GETCL_F, DVM_GETCL_F } , 
-	{ 1, 3, 3, DVM_GETCL_D, DVM_GETCL_D } , 
-	{ 1, 3, 3, DVM_GETCK_I, DVM_GETCK_I } , 
-	{ 1, 3, 3, DVM_GETCK_F, DVM_GETCK_F } , 
-	{ 1, 3, 3, DVM_GETCK_D, DVM_GETCK_D } , 
-	{ 1, 3, 3, DVM_GETCG_I, DVM_GETCG_I } , 
-	{ 1, 3, 3, DVM_GETCG_F, DVM_GETCG_F } , 
-	{ 1, 3, 3, DVM_GETCG_D, DVM_GETCG_D } , 
-
-	{ 1, 3, 3, DVM_GETVH_I, DVM_GETVH_I } , 
-	{ 1, 3, 3, DVM_GETVH_F, DVM_GETVH_F } , 
-	{ 1, 3, 3, DVM_GETVH_D, DVM_GETVH_D } , 
-	{ 1, 3, 3, DVM_GETVL_I, DVM_GETVL_I } , 
-	{ 1, 3, 3, DVM_GETVL_F, DVM_GETVL_F } , 
-	{ 1, 3, 3, DVM_GETVL_D, DVM_GETVL_D } , 
-	{ 1, 3, 3, DVM_GETVO_I, DVM_GETVO_I } , 
-	{ 1, 3, 3, DVM_GETVO_F, DVM_GETVO_F } , 
-	{ 1, 3, 3, DVM_GETVO_D, DVM_GETVO_D } , 
-	{ 1, 3, 3, DVM_GETVK_I, DVM_GETVK_I } , 
-	{ 1, 3, 3, DVM_GETVK_F, DVM_GETVK_F } , 
-	{ 1, 3, 3, DVM_GETVK_D, DVM_GETVK_D } , 
-	{ 1, 3, 3, DVM_GETVG_I, DVM_GETVG_I } , 
-	{ 1, 3, 3, DVM_GETVG_F, DVM_GETVG_F } , 
-	{ 1, 3, 3, DVM_GETVG_D, DVM_GETVG_D } , 
-
-	{ 3, 3, 1, DVM_SETVH, DVM_SETVH_II } , 
-	{ 3, 3, 1, DVM_SETVH, DVM_SETVH_IF } , 
-	{ 3, 3, 1, DVM_SETVH, DVM_SETVH_ID } , 
-	{ 3, 3, 1, DVM_SETVH, DVM_SETVH_FI } , 
-	{ 3, 3, 1, DVM_SETVH, DVM_SETVH_FF } , 
-	{ 3, 3, 1, DVM_SETVH, DVM_SETVH_FD } , 
-	{ 3, 3, 1, DVM_SETVH, DVM_SETVH_DI } , 
-	{ 3, 3, 1, DVM_SETVH, DVM_SETVH_DF } , 
-	{ 3, 3, 1, DVM_SETVH, DVM_SETVH_DD } , 
-
-	{ 3, 3, 1, DVM_SETVL, DVM_SETVL_II } , 
-	{ 3, 3, 1, DVM_SETVL, DVM_SETVL_IF } , 
-	{ 3, 3, 1, DVM_SETVL, DVM_SETVL_ID } , 
-	{ 3, 3, 1, DVM_SETVL, DVM_SETVL_FI } , 
-	{ 3, 3, 1, DVM_SETVL, DVM_SETVL_FF } , 
-	{ 3, 3, 1, DVM_SETVL, DVM_SETVL_FD } , 
-	{ 3, 3, 1, DVM_SETVL, DVM_SETVL_DI } , 
-	{ 3, 3, 1, DVM_SETVL, DVM_SETVL_DF } , 
-	{ 3, 3, 1, DVM_SETVL, DVM_SETVL_DD } , 
-
-	{ 3, 3, 1, DVM_SETVO, DVM_SETVO_II } , 
-	{ 3, 3, 1, DVM_SETVO, DVM_SETVO_IF } , 
-	{ 3, 3, 1, DVM_SETVO, DVM_SETVO_ID } , 
-	{ 3, 3, 1, DVM_SETVO, DVM_SETVO_FI } , 
-	{ 3, 3, 1, DVM_SETVO, DVM_SETVO_FF } , 
-	{ 3, 3, 1, DVM_SETVO, DVM_SETVO_FD } , 
-	{ 3, 3, 1, DVM_SETVO, DVM_SETVO_DI } , 
-	{ 3, 3, 1, DVM_SETVO, DVM_SETVO_DF } , 
-	{ 3, 3, 1, DVM_SETVO, DVM_SETVO_DD } , 
-
-	{ 3, 3, 1, DVM_SETVK, DVM_SETVK_II } , 
-	{ 3, 3, 1, DVM_SETVK, DVM_SETVK_IF } , 
-	{ 3, 3, 1, DVM_SETVK, DVM_SETVK_ID } , 
-	{ 3, 3, 1, DVM_SETVK, DVM_SETVK_FI } , 
-	{ 3, 3, 1, DVM_SETVK, DVM_SETVK_FF } , 
-	{ 3, 3, 1, DVM_SETVK, DVM_SETVK_FD } , 
-	{ 3, 3, 1, DVM_SETVK, DVM_SETVK_DI } , 
-	{ 3, 3, 1, DVM_SETVK, DVM_SETVK_DF } , 
-	{ 3, 3, 1, DVM_SETVK, DVM_SETVK_DD } , 
-
-	{ 3, 3, 1, DVM_SETVG, DVM_SETVG_II } , 
-	{ 3, 3, 1, DVM_SETVG, DVM_SETVG_IF } , 
-	{ 3, 3, 1, DVM_SETVG, DVM_SETVG_ID } , 
-	{ 3, 3, 1, DVM_SETVG, DVM_SETVG_FI } , 
-	{ 3, 3, 1, DVM_SETVG, DVM_SETVG_FF } , 
-	{ 3, 3, 1, DVM_SETVG, DVM_SETVG_FD } , 
-	{ 3, 3, 1, DVM_SETVG, DVM_SETVG_DI } , 
-	{ 3, 3, 1, DVM_SETVG, DVM_SETVG_DF } , 
-	{ 3, 3, 1, DVM_SETVG, DVM_SETVG_DD } , 
-
-	{ 1, 0, 1, DVM_MOVE, DVM_MOVE_II } ,
-	{ 1, 0, 1, DVM_MOVE, DVM_MOVE_IF } ,
-	{ 1, 0, 1, DVM_MOVE, DVM_MOVE_ID } ,
-	{ 1, 0, 1, DVM_MOVE, DVM_MOVE_FI } ,
-	{ 1, 0, 1, DVM_MOVE, DVM_MOVE_FF } ,
-	{ 1, 0, 1, DVM_MOVE, DVM_MOVE_FD } ,
-	{ 1, 0, 1, DVM_MOVE, DVM_MOVE_DI } ,
-	{ 1, 0, 1, DVM_MOVE, DVM_MOVE_DF } ,
-	{ 1, 0, 1, DVM_MOVE, DVM_MOVE_DD } ,
-	{ 1, 0, 1, DVM_MOVE, DVM_MOVE_CC } , 
-	{ 1, 0, 1, DVM_MOVE, DVM_MOVE_SS } , 
-	{ 1, 0, 1, DVM_MOVE, DVM_MOVE_PP } , 
-	{ 1, 0, 1, DVM_NOT, DVM_NOT_I } ,
-	{ 1, 0, 1, DVM_NOT, DVM_NOT_F } ,
-	{ 1, 0, 1, DVM_NOT, DVM_NOT_D } ,
-	{ 1, 0, 1, DVM_UNMS, DVM_UNMS_I } ,
-	{ 1, 0, 1, DVM_UNMS, DVM_UNMS_F } ,
-	{ 1, 0, 1, DVM_UNMS, DVM_UNMS_D } ,
-	{ 1, 0, 1, DVM_BITREV, DVM_BITREV_I } ,
-	{ 1, 0, 1, DVM_BITREV, DVM_BITREV_F } ,
-	{ 1, 0, 1, DVM_BITREV, DVM_BITREV_D } ,
-	{ 1, 0, 1, DVM_UNMS,   DVM_UNMS_C } ,
-
-	{ 1, 1, 1, DVM_ADD, DVM_ADD_III } ,
-	{ 1, 1, 1, DVM_SUB, DVM_SUB_III } ,
-	{ 1, 1, 1, DVM_MUL, DVM_MUL_III } ,
-	{ 1, 1, 1, DVM_DIV, DVM_DIV_III } ,
-	{ 1, 1, 1, DVM_MOD, DVM_MOD_III } ,
-	{ 1, 1, 1, DVM_POW, DVM_POW_III } ,
-	{ 1, 1, 1, DVM_AND, DVM_AND_III } ,
-	{ 1, 1, 1, DVM_OR, DVM_OR_III } ,
-	{ 1, 1, 1, DVM_LT, DVM_LT_III } ,
-	{ 1, 1, 1, DVM_LE, DVM_LE_III } ,
-	{ 1, 1, 1, DVM_EQ, DVM_EQ_III } ,
-	{ 1, 1, 1, DVM_NE, DVM_NE_III } ,
-	{ 1, 1, 1, DVM_BITAND, DVM_BITAND_III } ,
-	{ 1, 1, 1, DVM_BITOR,  DVM_BITOR_III } ,
-	{ 1, 1, 1, DVM_BITXOR, DVM_BITXOR_III } ,
-	{ 1, 1, 1, DVM_BITLFT, DVM_BITLFT_III } ,
-	{ 1, 1, 1, DVM_BITRIT, DVM_BITRIT_III } ,
-
-	{ 1, 1, 1, DVM_ADD, DVM_ADD_FFF } ,
-	{ 1, 1, 1, DVM_SUB, DVM_SUB_FFF } ,
-	{ 1, 1, 1, DVM_MUL, DVM_MUL_FFF } ,
-	{ 1, 1, 1, DVM_DIV, DVM_DIV_FFF } ,
-	{ 1, 1, 1, DVM_MOD, DVM_MOD_FFF } ,
-	{ 1, 1, 1, DVM_POW, DVM_POW_FFF } ,
-	{ 1, 1, 1, DVM_AND, DVM_AND_FFF } ,
-	{ 1, 1, 1, DVM_OR, DVM_OR_FFF } ,
-	{ 1, 1, 1, DVM_LT, DVM_LT_FFF } ,
-	{ 1, 1, 1, DVM_LE, DVM_LE_FFF } ,
-	{ 1, 1, 1, DVM_EQ, DVM_EQ_FFF } ,
-	{ 1, 1, 1, DVM_NE, DVM_NE_FFF } ,
-	{ 1, 1, 1, DVM_BITAND, DVM_BITAND_FFF } ,
-	{ 1, 1, 1, DVM_BITOR,  DVM_BITOR_FFF } ,
-	{ 1, 1, 1, DVM_BITXOR, DVM_BITXOR_FFF } ,
-	{ 1, 1, 1, DVM_BITLFT, DVM_BITLFT_FFF } ,
-	{ 1, 1, 1, DVM_BITRIT, DVM_BITRIT_FFF } ,
-
-	{ 1, 1, 1, DVM_ADD, DVM_ADD_DDD } ,
-	{ 1, 1, 1, DVM_SUB, DVM_SUB_DDD } ,
-	{ 1, 1, 1, DVM_MUL, DVM_MUL_DDD } ,
-	{ 1, 1, 1, DVM_DIV, DVM_DIV_DDD } ,
-	{ 1, 1, 1, DVM_MOD, DVM_MOD_DDD } ,
-	{ 1, 1, 1, DVM_POW, DVM_POW_DDD } ,
-	{ 1, 1, 1, DVM_AND, DVM_AND_DDD } ,
-	{ 1, 1, 1, DVM_OR, DVM_OR_DDD } ,
-	{ 1, 1, 1, DVM_LT, DVM_LT_DDD } ,
-	{ 1, 1, 1, DVM_LE, DVM_LE_DDD } ,
-	{ 1, 1, 1, DVM_EQ, DVM_EQ_DDD } ,
-	{ 1, 1, 1, DVM_NE, DVM_NE_DDD } ,
-	{ 1, 1, 1, DVM_BITAND, DVM_BITAND_DDD } ,
-	{ 1, 1, 1, DVM_BITOR,  DVM_BITOR_DDD } ,
-	{ 1, 1, 1, DVM_BITXOR, DVM_BITXOR_DDD } ,
-	{ 1, 1, 1, DVM_BITLFT, DVM_BITLFT_DDD } ,
-	{ 1, 1, 1, DVM_BITRIT, DVM_BITRIT_DDD } ,
-
-	{ 1, 1, 1, DVM_ADD, DVM_ADD_FNN } ,
-	{ 1, 1, 1, DVM_SUB, DVM_SUB_FNN } ,
-	{ 1, 1, 1, DVM_MUL, DVM_MUL_FNN } ,
-	{ 1, 1, 1, DVM_DIV, DVM_DIV_FNN } ,
-	{ 1, 1, 1, DVM_MOD, DVM_MOD_FNN } ,
-	{ 1, 1, 1, DVM_POW, DVM_POW_FNN } ,
-	{ 1, 1, 1, DVM_AND, DVM_AND_FNN } ,
-	{ 1, 1, 1, DVM_OR, DVM_OR_FNN } ,
-	{ 1, 1, 1, DVM_LT, DVM_LT_FNN } ,
-	{ 1, 1, 1, DVM_LE, DVM_LE_FNN } ,
-	{ 1, 1, 1, DVM_EQ, DVM_EQ_FNN } ,
-	{ 1, 1, 1, DVM_NE, DVM_NE_FNN } ,
-	{ 1, 1, 1, DVM_BITLFT, DVM_BITLFT_FNN } ,
-	{ 1, 1, 1, DVM_BITRIT, DVM_BITRIT_FNN } ,
-
-	{ 1, 1, 1, DVM_ADD, DVM_ADD_DNN } ,
-	{ 1, 1, 1, DVM_SUB, DVM_SUB_DNN } ,
-	{ 1, 1, 1, DVM_MUL, DVM_MUL_DNN } ,
-	{ 1, 1, 1, DVM_DIV, DVM_DIV_DNN } ,
-	{ 1, 1, 1, DVM_MOD, DVM_MOD_DNN } ,
-	{ 1, 1, 1, DVM_POW, DVM_POW_DNN } ,
-	{ 1, 1, 1, DVM_AND, DVM_AND_DNN } ,
-	{ 1, 1, 1, DVM_OR, DVM_OR_DNN } ,
-	{ 1, 1, 1, DVM_LT, DVM_LT_DNN } ,
-	{ 1, 1, 1, DVM_LE, DVM_LE_DNN } ,
-	{ 1, 1, 1, DVM_EQ, DVM_EQ_DNN } ,
-	{ 1, 1, 1, DVM_NE, DVM_NE_DNN } ,
-	{ 1, 1, 1, DVM_BITLFT, DVM_BITLFT_DNN } ,
-	{ 1, 1, 1, DVM_BITRIT, DVM_BITRIT_DNN } ,
-
-	{ 1, 1, 1, DVM_ADD, DVM_ADD_SS } , 
-	{ 1, 1, 1, DVM_LT,  DVM_LT_SS } ,
-	{ 1, 1, 1, DVM_LE,  DVM_LE_SS } ,
-	{ 1, 1, 1, DVM_EQ,  DVM_EQ_SS } ,
-	{ 1, 1, 1, DVM_NE,  DVM_NE_SS } ,
-
-	{ 1, 1, 1, DVM_GETI, DVM_GETI_LI } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_LI } , 
-	{ 1, 1, 1, DVM_GETI, DVM_GETI_SI } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_SII } , 
-	{ 1, 1, 1, DVM_GETI, DVM_GETI_LII } , 
-	{ 1, 1, 1, DVM_GETI, DVM_GETI_LFI } , 
-	{ 1, 1, 1, DVM_GETI, DVM_GETI_LDI } , 
-	{ 1, 1, 1, DVM_GETI, DVM_GETI_LSI } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_LIII } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_LIIF } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_LIID } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_LFII } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_LFIF } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_LFID } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_LDII } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_LDIF } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_LDID } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_LSIS } , 
-	{ 1, 1, 1, DVM_GETI, DVM_GETI_AII } , 
-	{ 1, 1, 1, DVM_GETI, DVM_GETI_AFI } , 
-	{ 1, 1, 1, DVM_GETI, DVM_GETI_ADI } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_AIII } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_AIIF } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_AIID } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_AFII } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_AFIF } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_AFID } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_ADII } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_ADIF } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_ADID } , 
-
-	{ 1, 1, 1, DVM_GETI, DVM_GETI_TI } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_TI } , 
-
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_T } ,
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_TI } , 
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_TF } , 
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_TD } , 
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_TS } , 
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_T } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_TII } , 
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_TIF } , 
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_TID } , 
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_TFI } , 
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_TFF } , 
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_TFD } , 
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_TDI } , 
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_TDF } , 
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_TDD } , 
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_TSS } , 
-
-	{ 1, 1, 1, DVM_ADD, DVM_ADD_CC } ,
-	{ 1, 1, 1, DVM_SUB, DVM_SUB_CC } ,
-	{ 1, 1, 1, DVM_MUL, DVM_MUL_CC } ,
-	{ 1, 1, 1, DVM_DIV, DVM_DIV_CC } ,
-	{ 1, 1, 1, DVM_GETI, DVM_GETI_ACI } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_ACI } , 
-
-	{ 1, 1, 1, DVM_GETI, DVM_GETI_AM } , 
-	{ 1, 1, 1, DVM_SETI, DVM_SETI_AM } , 
-
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_KC } , 
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_KG } , 
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_OC } , 
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_OG } , 
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_OV } , 
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_KG } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_OG } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_OV } ,
-
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_KCI } , 
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_KGI } ,
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_OCI } , 
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_OGI } ,
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_OVI } ,
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_KCF } , 
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_KGF } ,
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_OCF } , 
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_OGF } ,
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_OVF } ,
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_KCD } , 
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_KGD } ,
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_OCD } , 
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_OGD } ,
-	{ 1, 0, 1, DVM_GETF, DVM_GETF_OVD } ,
-
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_KGII } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_OGII } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_OVII } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_KGIF } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_OGIF } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_OVIF } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_KGID } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_OGID } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_OVID } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_KGFI } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_OGFI } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_OVFI } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_KGFF } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_OGFF } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_OVFF } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_KGFD } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_OGFD } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_OVFD } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_KGDI } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_OGDI } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_OVDI } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_KGDF } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_OGDF } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_OVDF } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_KGDD } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_OGDD } ,
-	{ 1, 0, 1, DVM_SETF, DVM_SETF_OVDD } ,
-
-	{ 1, 0, 0, DVM_TEST, DVM_TEST_I } ,
-	{ 1, 0, 0, DVM_TEST, DVM_TEST_F } ,
-	{ 1, 0, 0, DVM_TEST, DVM_TEST_D } ,
-
-	{ 1, 0, 0, DVM_GOTO, DVM_SAFE_GOTO }, 
-
-	{ 0, 0, 0, DVM_NULL, DVM_NULL }
-};
-static int DaoVmCode_Info( DaoVmCode vmc, QList<int> & regids )
-{
-	short *info = DaoVmCodeInfo[ vmc.code ];
-	int code = info[3];
-	if( info[0] == 1 ) regids.append( vmc.a );
-	if( info[1] == 1 ){
-		regids.append( vmc.b );
-	}else if( info[1] == 2 ){
-		int i, n = 0;
-		switch( code ){
-		case DVM_TUPLE : case DVM_LIST : case DVM_MAP : 
-		case DVM_ARRAY : case DVM_RETURN : 
-		case DVM_YIELD  : n = vmc.b; break;
-		case DVM_MATRIX : n = (0xff & vmc.b) * ((0xff00 & vmc.b)>>8); break;
-		case DVM_CURRY : case DVM_MCURRY : 
-		case DVM_CALL : case DVM_MCALL : n = vmc.b + 1; break;
-		case DVM_ROUTINE : case DVM_CRRE : break;
-		}
-		for(i=0; i<n; i++) regids.append( vmc.a + i );
-	}
-	if( info[2] == 1 ) regids.append( vmc.c );
-	return code;
-}
 static int DaoVmCode_Similarity( const QMap<int,int> & regmap, DaoVmCode x, DaoVmCode y )
 {
-	QList<int> xreg, yreg;
-	int xcode = DaoVmCode_Info( x, xreg );
-	int ycode = DaoVmCode_Info( y, yreg );
-	if( xcode != ycode ) return -100; // high penalty;
-	if( xreg.size() != yreg.size() ) return -100;
-
-	int i, n = xreg.size();
-	int notmatched = 0;
 	QMap<int,int>::const_iterator it, end = regmap.end();
-	for(i=0; i<n; i++){
-		it = regmap.find( xreg[i] );
-		if( it != end && it.value() != yreg[i] ) ++notmatched;
+	int i, errors = 0, sim = 10 * (1 + (x.code == y.code) );
+	int xcode = DaoVmCode_GetOpcodeBase( x.code );
+	int ycode = DaoVmCode_GetOpcodeBase( y.code );
+	DaoCnode xnode, ynode;
+
+	memset( & xnode, 0, sizeof(DaoCnode) );
+	memset( & ynode, 0, sizeof(DaoCnode) );
+	DaoCnode_InitOperands( & xnode, & x );
+	DaoCnode_InitOperands( & ynode, & y );
+	if( xcode != ycode || xnode.type != ynode.type ) return -100; // high penalty;
+	switch( xnode.type ){
+	case DAO_OP_NONE : 
+		break;
+	case DAO_OP_SINGLE :
+		if( (it = regmap.find( xnode.first )) != end && it.value() != ynode.first ) errors += 1;
+		break;
+	case DAO_OP_PAIR :
+		if( (it = regmap.find( xnode.first )) != end && it.value() != ynode.first ) errors += 1;
+		if( (it = regmap.find( xnode.second )) != end && it.value() != ynode.second ) errors += 1;
+		break;
+	case DAO_OP_TRIPLE :
+		if( (it = regmap.find( xnode.first )) != end && it.value() != ynode.first ) errors += 1;
+		if( (it = regmap.find( xnode.second )) != end && it.value() != ynode.second ) errors += 1;
+		if( (it = regmap.find( xnode.third )) != end && it.value() != ynode.third ) errors += 1;
+		break;
+	case DAO_OP_RANGE :
+	case DAO_OP_RANGE2 :
+		for(i=xnode.first; i<=xnode.second; i++){
+			it = regmap.find( i );
+			if( it != end && it.value() != (ynode.first + i - xnode.first) ) errors += 1;
+		}
+		if( xnode.type == DAO_OP_RANGE2 ){
+			if( (it = regmap.find( xnode.third )) != end && it.value() != ynode.third ) errors += 1;
+		}
+		break;
 	}
-	int sim = 10 * (1 + (x.code == y.code) );
-	return sim - notmatched;
+	return sim - errors;
 }
 void DaoDebugger::Similarity( QList<DaoVmCode> & x, QList<DaoVmCode> & y )
 {
@@ -568,6 +171,7 @@ void DaoDebugger::Matching( QList<DaoVmCode> & x, QList<DaoVmCode> & y )
 	for(i=0; i<y.size(); i++) DaoVmCode_Print( y[i], NULL );
 #endif
 	for(i=0; i<n; i++){
+		DaoCnode xnode, ynode;
 		int a1 = align1[i];
 		int a2 = align2[i];
 #if 0
@@ -575,15 +179,37 @@ void DaoDebugger::Matching( QList<DaoVmCode> & x, QList<DaoVmCode> & y )
 		if( a1 >=0 ) DaoVmCode_Print( x[a1], NULL );
 		if( a2 >=0 ) DaoVmCode_Print( y[a2], NULL );
 #endif
-		if( a1 >=0 && a2 >=0 ){
-			QList<int> xreg, yreg;
-			DaoVmCode_Info( x[a1], xreg );
-			DaoVmCode_Info( y[a2], yreg );
-			m = xreg.size();
-			for(j=0; j<m; j++){
-				k = xreg[j];
-				if( regmap.find( k ) == regmap.end() ) regmap[k] = yreg[j];
+		if( a1 < 0 || a2 < 0 ) continue;
+
+		memset( & xnode, 0, sizeof(DaoCnode) );
+		memset( & ynode, 0, sizeof(DaoCnode) );
+		DaoCnode_InitOperands( & xnode, & x[a1] );
+		DaoCnode_InitOperands( & ynode, & y[a2] );
+
+		switch( xnode.type ){
+		case DAO_OP_NONE : 
+			break;
+		case DAO_OP_SINGLE :
+			if( regmap.find( xnode.first ) == regmap.end() ) regmap[ xnode.first ] = ynode.first;
+			break;
+		case DAO_OP_PAIR :
+			if( regmap.find( xnode.first ) == regmap.end() ) regmap[ xnode.first ] = ynode.first;
+			if( regmap.find( xnode.second ) == regmap.end() ) regmap[ xnode.second ] = ynode.second;
+			break;
+		case DAO_OP_TRIPLE :
+			if( regmap.find( xnode.first ) == regmap.end() ) regmap[ xnode.first ] = ynode.first;
+			if( regmap.find( xnode.second ) == regmap.end() ) regmap[ xnode.second ] = ynode.second;
+			if( regmap.find( xnode.third ) == regmap.end() ) regmap[ xnode.third ] = ynode.third;
+			break;
+		case DAO_OP_RANGE :
+		case DAO_OP_RANGE2 :
+			for(i=xnode.first; i<=xnode.second; i++){
+				if( regmap.find( i ) == regmap.end() ) regmap[i] = ynode.first + i - xnode.first;
 			}
+			if( xnode.type == DAO_OP_RANGE2 ){
+				if( regmap.find( xnode.third ) == regmap.end() ) regmap[ xnode.third ] = ynode.third;
+			}
+			break;
 		}
 	}
 }
@@ -608,17 +234,17 @@ static void DaoNS_UpdateLineInfo( DaoNamespace *ns, int start, int diff )
 	size_t i, j, n;
 	if( diff ==0 ) return;
 	for(i=0; i<ns->definedRoutines->size; i++){
-		DaoRoutine *rout = ns->definedRoutines->items.pRout[i];
+		DaoRoutine *rout = ns->definedRoutines->items.pRoutine[i];
 		if( rout->nameSpace != ns ) continue;
-		while( rout->revised ) rout = rout->revised;
-		if( rout->bodyStart <= start ) continue;
-		rout->bodyStart += diff;
-		rout->bodyEnd += diff;
-		n = rout->annotCodes->size;
-		DaoVmCodeX **annots = rout->annotCodes->items.pVmc;
+		while( rout->body->revised ) rout = rout->body->revised;
+		if( rout->body->codeStart <= start ) continue;
+		rout->body->codeStart += diff;
+		rout->body->codeEnd += diff;
+		n = rout->body->annotCodes->size;
+		DaoVmCodeX **annots = rout->body->annotCodes->items.pVmc;
 		for(j=0; j<n; j++) annots[j]->line += diff;
-		DaoToken **tokens = rout->defLocals->items.pToken;
-		n = rout->defLocals->size;
+		DaoToken **tokens = rout->body->defLocals->items.pToken;
+		n = rout->body->defLocals->size;
 		for(j=0; j<n; j++) tokens[j]->line += diff;
 	}
 }
@@ -644,47 +270,47 @@ bool DaoDebugger::EditContinue ( DaoProcess *process, int newEntryLine, QList<in
 	}
 	QString codes = newCodes.join( "\n" );
 	DaoParser *parser = DaoParser_New();
-	DaoRoutine *routine = DaoRoutine_New();
+	DaoRoutine *routine = DaoRoutine_New( oldrout->nameSpace, oldrout->routHost, 1 );
 	routine->routType = oldrout->routType;
+	routine->parCount = oldrout->parCount;
+	routine->attribs = oldrout->attribs;
+	routine->defLine = oldrout->defLine;
 	parser->routine = routine;
 	parser->nameSpace = routine->nameSpace = oldrout->nameSpace;
 	parser->vmSpace = oldrout->nameSpace->vmSpace;
 	DString_Assign( parser->fileName, oldrout->nameSpace->name );
 	DString_Assign( parser->routName, oldrout->routName );
-	routine->defLine = oldrout->defLine;
-	routine->bodyStart = oldrout->bodyStart;
-	routine->bodyEnd = oldrout->bodyStart + newCodes.size() + 1;
-	routine->attribs = oldrout->attribs;
-	routine->parCount = oldrout->parCount;
+	routine->body->codeStart = oldrout->body->codeStart;
+	routine->body->codeEnd = oldrout->body->codeStart + newCodes.size() + 1;
 	parser->regCount = routine->parCount;
 	parser->levelBase = oldrout->defLine != 0;
 	bool res = DaoParser_LexCode( parser, codes.toLocal8Bit().data(), 1 );
 	for(i=0; i<(int)parser->tokens->size; i++){
-		parser->tokens->items.pToken[i]->line += routine->bodyStart;
+		parser->tokens->items.pToken[i]->line += routine->body->codeStart;
 	}
-	for(i=0; i<(int)oldrout->defLocals->size; i++){
-		DaoToken *tok = oldrout->defLocals->items.pToken[i];
+	for(i=0; i<(int)oldrout->body->defLocals->size; i++){
+		DaoToken *tok = oldrout->body->defLocals->items.pToken[i];
 		if( tok->index >= oldrout->parCount || tok->type ==0 ) break;
 		MAP_Insert( DArray_Top( parser->localVarMap ), tok->string, i );
-		DArray_Append( routine->defLocals, tok );
+		DArray_Append( routine->body->defLocals, tok );
 	}
 	res = res && DaoParser_ParseRoutine( parser );
-	routine->parser = NULL;
+	routine->body->parser = NULL;
 	DaoParser_Delete( parser );
 	if( res == false ){
 		DaoRoutine_Delete( routine );
 		return false;
 	}
-	if( (process->stackSize - process->stackTop) < (routine->regCount + DAO_MAX_PARAM) ){
-		DaoProcess_PushFrame( process, routine->regCount );
+	if( (process->stackSize - process->stackTop) < (routine->body->regCount + DAO_MAX_PARAM) ){
+		DaoProcess_PushFrame( process, routine->body->regCount );
 		DaoProcess_PopFrame( process );
 	}
-	DaoType **regTypes = routine->regType->items.pType;
+	DaoType **regTypes = routine->body->regType->items.pType;
 	DaoValue **newValues = process->activeValues;
-	DaoValue **oldValues = (DaoValue**)calloc( oldrout->regCount, sizeof(DaoValue*) );
+	DaoValue **oldValues = (DaoValue**)calloc( oldrout->body->regCount, sizeof(DaoValue*) );
 
-	memcpy( oldValues, newValues, oldrout->regCount * sizeof(DaoValue*) );
-	memset( newValues, 0, oldrout->regCount * sizeof(DaoValue*) );
+	memcpy( oldValues, newValues, oldrout->body->regCount * sizeof(DaoValue*) );
+	memset( newValues, 0, oldrout->body->regCount * sizeof(DaoValue*) );
 	DaoProcess_InitTopFrame( process, routine, process->activeObject );
 
 #if 0
@@ -696,19 +322,19 @@ bool DaoDebugger::EditContinue ( DaoProcess *process, int newEntryLine, QList<in
 	regmap.clear();
 	for(i=0; i<oldrout->parCount; i++) regmap[i] = i;
 
-	DaoVmCode   *oldVMC = oldrout->vmCodes->codes;
-	DaoVmCode   *newVMC = routine->vmCodes->codes;
-	DaoVmCodeX **oldAnnot = oldrout->annotCodes->items.pVmc;
-	DaoVmCodeX **newAnnot = routine->annotCodes->items.pVmc;
-	int M = oldrout->vmCodes->size;
-	int N = routine->vmCodes->size;
+	DaoVmCode   *oldVMC = oldrout->body->vmCodes->codes;
+	DaoVmCode   *newVMC = routine->body->vmCodes->codes;
+	DaoVmCodeX **oldAnnot = oldrout->body->annotCodes->items.pVmc;
+	DaoVmCodeX **newAnnot = routine->body->annotCodes->items.pVmc;
+	int M = oldrout->body->vmCodes->size;
+	int N = routine->body->vmCodes->size;
 	j = k = 0;
 	for(i=0; i<lineMap.size(); i++){
 		QList<DaoVmCode> oldLineCodes;
 		QList<DaoVmCode> newLineCodes;
 		if( lineMap[i] <0 ) continue;
-		int old = lineMap[i] + oldrout->bodyStart + 1;
-		int niu = i + routine->bodyStart + 1;
+		int old = lineMap[i] + oldrout->body->codeStart + 1;
+		int niu = i + routine->body->codeStart + 1;
 		//printf( "%3i  %3i: %3i  %3i;  %3i  %3i\n", j, k, i, niu, lineMap[i], old );
 		while( j<M && oldAnnot[j]->line < old ) ++j;
 		while( k<N && newAnnot[k]->line < niu ) ++k;
@@ -731,15 +357,15 @@ bool DaoDebugger::EditContinue ( DaoProcess *process, int newEntryLine, QList<in
 
 	int offset = 0;
 	if( newEntryLine <0 ){
-		DaoVmCodeX **annotCodes = oldrout->annotCodes->items.pVmc;
+		DaoVmCodeX **annotCodes = oldrout->body->annotCodes->items.pVmc;
 		int entry = (process->activeCode - process->topFrame->codes) + 1;
-		int entryline = oldrout->annotCodes->items.pVmc[entry]->line;
+		int entryline = oldrout->body->annotCodes->items.pVmc[entry]->line;
 		/* if the entry line is NOT modified, use it */
-		entryline -= oldrout->bodyStart + 1;
+		entryline -= oldrout->body->codeStart + 1;
 		for(i=0; i<lineMap.size(); i++) if( lineMap[i] == entryline ) break;
 		int newEntryLine = i < lineMap.size() ? i : -1;
 		if( newEntryLine >=0 ){
-			entryline += oldrout->bodyStart + 1;
+			entryline += oldrout->body->codeStart + 1;
 			while( (--entry) >=0 && annotCodes[entry]->line == entryline ) offset ++;
 		}
 		/* if the entry line IS modified, set the entry line to the first modified line */
@@ -748,19 +374,19 @@ bool DaoDebugger::EditContinue ( DaoProcess *process, int newEntryLine, QList<in
 			newEntryLine = i;
 		}
 		/* if the entry line is manually set: */
-		newEntryLine += routine->bodyStart + 1;
+		newEntryLine += routine->body->codeStart + 1;
 	}
 
 	GC_ShiftRC( routine, oldrout );
 	GC_IncRC( routine );
-	oldrout->revised = routine;
+	oldrout->body->revised = routine;
 	process->activeRoutine = routine;
 	process->activeTypes = regTypes;
-	process->topFrame->codes = routine->vmCodes->codes;
+	process->topFrame->codes = routine->body->vmCodes->codes;
 
 	ResetExecution( process, newEntryLine, offset );
 
 	i = newCodes.size() - routCodes.size();
-	DaoNS_UpdateLineInfo( routine->nameSpace, routine->bodyStart, i );
+	DaoNS_UpdateLineInfo( routine->nameSpace, routine->body->codeStart, i );
 	return true;
 }
