@@ -38,8 +38,7 @@ Q_OBJECT
 	DaoCodeSHL *hlDataInfo;
 	DaoCodeSHL *hlDataValue;
 
-	DaoNamespace *mainNamespace;
-	DaoNamespace *nameSpace;
+	DaoVmSpace *vmspace;
 
 	DaoValue      *currentValue;
 	DaoStackFrame *currentFrame;
@@ -75,7 +74,7 @@ Q_OBJECT
 	DaoMonitor( QWidget *parent = NULL );
 	~DaoMonitor();
 
-	void SetNamespace( DaoNamespace *ns ){ mainNamespace = ns; }
+	void SetVmSpace( DaoVmSpace *vms ){ vmspace = vms; }
 
 	void ClearDataStack();
 	void ViewArray( DaoTuple *tuple );

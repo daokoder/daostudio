@@ -126,7 +126,7 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	wgtConsole->studio = this;
 	wgtConsole->SetModeSelector( wgtConsoleMode );
 	wgtMonitor->studio = this;
-	wgtMonitor->SetNamespace( vmSpace->mainNamespace );
+	wgtMonitor->SetVmSpace( vmSpace );
 	
 	//QPalette p = palette();
 	//p.setColor( QPalette::Text, QColor( 255, 255, 0, 200) );

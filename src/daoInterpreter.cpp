@@ -394,9 +394,12 @@ void DaoInterpreter::slotServeData()
 		dataSocket->disconnectFromServer();
 		return;
 	}
+	if( vmSpace == NULL ) return;
 	DaoValue *value = NULL;
+	DaoNamespace *nspace = vmSpace->mainNamespace;
+	DaoProcess *process = vmSpace->mainProcess;
 	DString_SetDataMBS( daoString, data.data(), data.size() );
-	if( DaoValue_Deserialize( & value, daoString, vmSpace->mainNamespace, NULL ) == 0 ) return;
+	if( DaoValue_Deserialize( & value, daoString, nspace, process ) == 0 ) return;
 
 	DaoTuple *request = (DaoTuple*) value;
 	if( request->items[1]->xInteger.value == DATA_STACK ){
@@ -582,7 +585,10 @@ void DaoInterpreter::SendDataInformation()
 		fflush( stdout );
 		return;
 	}
-	if( DaoValue_Serialize( (DaoValue*) messageTuple, daoString, vmSpace->mainNamespace, NULL )){
+	if( vmSpace == NULL ) return;
+	DaoNamespace *nspace = vmSpace->mainNamespace;
+	DaoProcess *process = vmSpace->mainProcess;
+	if( DaoValue_Serialize( (DaoValue*) messageTuple, daoString, nspace, process )){
 		//printf( "%s\n", daoString->mbs ); fflush(stdout);
 		monitorSocket.write( daoString->mbs );
 		monitorSocket.flush();
@@ -851,8 +857,8 @@ void DaoInterpreter::ViewClass( DaoClass *klass )
 
 	data = "# address:\n" + StringAddress( klass );
 	data += "\n# type\n" + QString( klass->clsType->name->mbs );
-	data += "\n# constants\n" + QString::number( klass->cstData->size );
-	data += "\n# globals\n" + QString::number( klass->glbData->size );
+	data += "\n# constants\n" + QString::number( klass->constants->size );
+	data += "\n# globals\n" + QString::number( klass->variables->size );
 	data += "\n# variables\n" + QString::number( klass->objDataName->size );
 	if( klass->superClass->size ) data += "\n# parent(s)\n";
 
@@ -865,13 +871,13 @@ void DaoInterpreter::ViewClass( DaoClass *klass )
 	}
 	DString_SetMBS( messageTuple->items[INDEX_INFO]->xString.data, data.toUtf8().data() );
 
-	MakeList( constList, klass->cstData->items.pValue,
-			klass->cstData->size, NULL, klass->lookupTable, DAO_CLASS_CONSTANT );
-	MakeList( varList, klass->glbData->items.pValue, klass->glbData->size, 
-			klass->glbDataType, klass->lookupTable, DAO_CLASS_VARIABLE );
+	MakeList( constList, klass->constants->items.pValue,
+			klass->constants->size, NULL, klass->lookupTable, DAO_CLASS_CONSTANT );
+	MakeList( varList, klass->variables->items.pValue, klass->variables->size, 
+			NULL, klass->lookupTable, DAO_CLASS_VARIABLE );
 #if 0
-	for(i=0; i<klass->cstData->size; i++){
-		DaoValue *val = klass->cstData->items.pValue[i];
+	for(i=0; i<klass->constants->size; i++){
+		DaoValue *val = klass->constants->items.pValue[i];
 		//XXX if( val.t != DAO_ROUTINE || val.v.routine->tidHost != DAO_CLASS ) continue;
 		//XXX if( val.v.routine->routHost->aux.v.klass == klass )
 		//XXX	wgtDataTable->item(i,0)->setBackground( QColor(200,250,200) );
@@ -916,9 +922,9 @@ void DaoInterpreter::ViewNamespace( DaoNamespace *nspace )
 	QString info, itemName = "Namespace[" + StringAddress( nspace ) + "]";
 	info += "# address:\n" + StringAddress( nspace );
 	info += "\n# constants:\n";
-	info += QString::number( nspace->cstData->size );
+	info += QString::number( nspace->constants->size );
 	info += "\n# variables:\n";
-	info += QString::number( nspace->varData->size );
+	info += QString::number( nspace->variables->size );
 	if( nspace->file->mbs ){
 		info += "\n\n# path:\n\"" + QString( nspace->path->mbs );
 		info += "\"\n# file:\n\"" + QString( nspace->file->mbs ) + "\"";
@@ -928,25 +934,22 @@ void DaoInterpreter::ViewNamespace( DaoNamespace *nspace )
 	DString_SetMBS( messageTuple->items[INDEX_INFO]->xString.data, info.toUtf8().data() );
 
 	extraTuple->items[2]->xString.data->size = 0;
-#warning "===================="
-#if 0
-	for(i=0; i<nspace->nsLoaded->size; i++){
-		DaoNamespace *ns = nspace->nsLoaded->items.pNS[i];
+	for(i=0; i<nspace->namespaces->size; i++){
+		DaoNamespace *ns = nspace->namespaces->items.pNS[i];
 		QString itname = "Namespace[" + StringAddress(ns) + "]";
 		DString_SetMBS( extraTuple->items[0]->xString.data, itname.toUtf8().data() );
 		DString_Assign( extraTuple->items[1]->xString.data, ns->name );
 		DaoList_PushBack( extraList, (DaoValue*)extraTuple );
 	}
-#endif
 
-	MakeList( constList, nspace->cstData->items.pValue, nspace->cstData->size,
+	MakeList( constList, nspace->constants->items.pValue, nspace->constants->size,
 			NULL, nspace->lookupTable, DAO_GLOBAL_CONSTANT );
-	MakeList( varList, nspace->varData->items.pValue, nspace->varData->size,
-			nspace->varType, nspace->lookupTable, DAO_GLOBAL_VARIABLE );
+	MakeList( varList, nspace->variables->items.pValue, nspace->variables->size,
+			NULL, nspace->lookupTable, DAO_GLOBAL_VARIABLE );
 
 #if 0
-	for(i=0; i<nspace->cstData->size; i++){
-		DaoValue *val = nspace->cstData->items.pValue[i];
+	for(i=0; i<nspace->constants->size; i++){
+		DaoValue *val = nspace->constants->items.pValue[i];
 		it = wgtDataTable->item(i,0);
 		if( it == NULL ) continue;
 		if( val->type == DAO_CLASS && val->xClass.classRoutine->nameSpace == nspace )
@@ -1004,6 +1007,7 @@ void DaoInterpreter::MakeList( DaoList *list, DaoValue **data, int size, DArray 
 	DaoList_Clear( list );
 	for(int i=0; i<size; i++){
 		DaoValue *val = data[i];
+		if( val->type == DAO_CONSTANT || val->type == DAO_VARIABLE ) val = val->xConst.value;
 		valueTuple->items[0]->xString.data->size = 0;
 		valueTuple->items[1]->xString.data->size = 0;
 		valueTuple->items[2]->xString.data->size = 0;
@@ -1017,6 +1021,7 @@ void DaoInterpreter::MakeList( DaoList *list, DaoValue **data, int size, DArray 
 			DString_SetMBS( valueTuple->items[0]->xString.data, val->xRoutine.routName->mbs );
 		}
 		itp = type ? type->items.pType[i] : NULL;
+		if( data[i]->type == DAO_VARIABLE ) itp = data[i]->xVar.dtype;
 		if( itp == NULL ) itp = DaoNamespace_GetType( vmSpace->mainNamespace, val );
 		if( itp ) DString_SetMBS( valueTuple->items[1]->xString.data, itp->name->mbs );
 		DString *daoString = valueTuple->items[2]->xString.data;
@@ -1080,9 +1085,9 @@ void DaoInterpreter::ViewClassData( DaoClass *klass, DaoTuple *request )
 	if( table == INFO_TABLE ){
 		ViewValue( klass->superClass->items.pValue[row] );
 	}else if( table == DATA_TABLE ){
-		ViewValue( klass->cstData->items.pValue[row] );
+		ViewValue( klass->constants->items.pValue[row] );
 	}else if( table == CODE_TABLE ){
-		ViewValue( klass->glbData->items.pValue[row] );
+		ViewValue( klass->variables->items.pValue[row] );
 	}
 }
 void DaoInterpreter::ViewObjectData( DaoObject *object, DaoTuple *request )
@@ -1105,12 +1110,11 @@ void DaoInterpreter::ViewNamespaceData( DaoNamespace *nspace, DaoTuple *request 
 	int row = request->items[2]->xInteger.value;
 	int col = request->items[3]->xInteger.value;
 	if( table == INFO_TABLE ){
-#warning"===================="
-		//ViewValue( nspace->nsLoaded->items.pValue[row] );
+		ViewValue( nspace->namespaces->items.pValue[row] );
 	}else if( table == DATA_TABLE ){
-		ViewValue( nspace->cstData->items.pValue[row] );
+		ViewValue( nspace->constants->items.pValue[row] );
 	}else if( table == CODE_TABLE ){
-		ViewValue( nspace->varData->items.pValue[row] );
+		ViewValue( nspace->variables->items.pValue[row] );
 	}
 }
 void DaoInterpreter::ViewProcessStack( DaoProcess *process, DaoTuple *request )

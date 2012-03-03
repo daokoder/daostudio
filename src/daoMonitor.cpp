@@ -37,6 +37,7 @@ DaoMonitor::DaoMonitor( QWidget *parent ) : QWidget( parent )
 	hlDataInfo->SetState(DAO_HLSTATE_NORMAL);
 	hlDataValue->SetState(DAO_HLSTATE_NORMAL);
 
+	vmspace = NULL;
 	currentValue = NULL;
 	currentFrame = NULL;
 	currentAddress = 0;
@@ -100,13 +101,17 @@ void DaoMonitor::slotUpdateMonitor()
 {
 	monitorSocket = monitorServer.nextPendingConnection();
 	if( monitorSocket->waitForReadyRead(1000) == false ) return;
+	if( vmspace == NULL ) return;
+
+	DaoNamespace *nspace = vmspace->mainNamespace;
+	DaoProcess *process = vmspace->mainProcess;
 	QByteArray info = monitorSocket->readAll();
 	DaoValue *value = NULL;
 	DString_SetDataMBS( daoString, info.data(), info.size() );
-	if( DaoValue_Deserialize( & value, daoString, mainNamespace, NULL ) == 0 ) return;
+	if( DaoValue_Deserialize( & value, daoString, nspace, process ) == 0 ) return;
 
 	if( requestTuple == NULL ){
-		DaoType *type = DaoParser_ParseTypeName( DATA_REQUEST_TYPE, mainNamespace, NULL );
+		DaoType *type = DaoParser_ParseTypeName( DATA_REQUEST_TYPE, nspace, NULL );
 		requestTuple = DaoTuple_Create( type, 1 );
 	}
 
@@ -575,7 +580,10 @@ void DaoMonitor::SendDataRequest()
 		fflush( stdout );
 		return;
 	}
-	if( DaoValue_Serialize( (DaoValue*) requestTuple, daoString, mainNamespace, NULL )){
+	if( vmspace == NULL ) return;
+	DaoNamespace *nspace = vmspace->mainNamespace;
+	DaoProcess *process = vmspace->mainProcess;
+	if( DaoValue_Serialize( (DaoValue*) requestTuple, daoString, nspace, process )){
 		dataSocket.write( daoString->mbs );
 		dataSocket.flush();
 		dataSocket.disconnectFromServer();
