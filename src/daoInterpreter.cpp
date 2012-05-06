@@ -134,7 +134,7 @@ static void DaoResetExecution( DaoProcess *process, int line, int offset=0 )
 	//DaoVmCodeX_Print( *annotCodes[i], NULL );
 	//printf( "entry: %s\n", annotCodes[i]->annot->mbs->data );
 }
-static void DaoStdioRead( DaoEventHandler *self, DString *buf, int count )
+static void DaoStdioRead( DaoConsoleStream *self, DString *buf, int count )
 {
 	self->interpreter->mutex.lock();
 	fflush( stdout );
@@ -157,10 +157,12 @@ static void DaoStdioRead( DaoEventHandler *self, DString *buf, int count )
 	DString_SetDataMBS( buf, data.data(), data.size() );
 	self->interpreter->mutex.unlock();
 }
-static void DaoStdioWrite( DaoEventHandler *self, DString *buf )
+static void DaoStdioWrite( DaoConsoleStream *self, DString *buf )
 {
 #if 0
 	FILE *fout = fopen( "output.txt", "a+" );
+	time_t t = time(NULL);
+	fprintf( fout, "%s: ", ctime( & t ) );
 	fprintf( fout, "%s\n", DString_GetMBS( buf ) );
 	fclose( fout );
 #endif
@@ -267,11 +269,18 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 	dataSocket = NULL;
 	scriptSocket = NULL;
 
+	stdioStream.stdRead = DaoStdioRead;
+	stdioStream.stdWrite = DaoStdioWrite;
+	stdioStream.stdFlush = NULL;
+	stdioStream.SetColor = NULL;
+	stdioStream.interpreter = this;
+	errorStream.stdRead = DaoStdioRead;
+	errorStream.stdWrite = DaoStdioWrite;
+	errorStream.stdFlush = NULL;
+	errorStream.SetColor = NULL;
+	errorStream.interpreter = this;
 	handler.time = 0;
 	handler.interpreter = this;
-	handler.stdRead = DaoStdioRead;
-	handler.stdWrite = DaoStdioWrite;
-	handler.stdFlush = NULL;
 	handler.debug = DaoConsDebug;
 	handler.breaks = DaoSetBreaks;
 	handler.Called = NULL;
@@ -284,18 +293,20 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 	vmSpace->mainNamespace->options |= DAO_EXEC_IDE | DAO_EXEC_INTERUN;
 	nameSpace = vmSpace->mainNamespace;
 	handler.process = DaoVmSpace_MainProcess( vmSpace );
+	DaoVmSpace_SetUserStdio( vmSpace, (DaoUserStream*) & stdioStream );
+	DaoVmSpace_SetUserStdError( vmSpace, (DaoUserStream*) & errorStream );
 	DaoVmSpace_SetUserHandler( vmSpace, (DaoUserHandler*) & handler );
-	DString_SetMBS( vmSpace->mainNamespace->name, "interactive codes" );
 
 	DaoNamespace *ns = vmSpace->mainNamespace;
+	DString_SetMBS( ns->name, "interactive codes" );
 	codeType = DaoParser_ParseTypeName( CODE_ITEM_TYPE, ns, NULL );
 	valueType = DaoParser_ParseTypeName( VALUE_ITEM_TYPE, ns, NULL );
 	extraType = DaoParser_ParseTypeName( EXTRA_ITEM_TYPE, ns, NULL );
 	messageType = DaoParser_ParseTypeName( VALUE_INFO_TYPE, ns, NULL );
-	codeTuple = DaoTuple_Create( codeType, 1 );
-	valueTuple = DaoTuple_Create( valueType, 1 );
-	extraTuple = DaoTuple_Create( extraType, 1 );
-	messageTuple = DaoTuple_Create( messageType, 1 );
+	codeTuple = DaoTuple_Create( codeType, 0, 1 );
+	valueTuple = DaoTuple_Create( valueType, 0, 1 );
+	extraTuple = DaoTuple_Create( extraType, 0, 1 );
+	messageTuple = DaoTuple_Create( messageType, 0, 1 );
 	numArray = DaoArray_New( DAO_INTEGER );
 	extraList = DaoList_New();
 	constList = DaoList_New();
@@ -365,8 +376,8 @@ void DaoInterpreter::slotReadStdOut()
 		for(i=0; i<n; i++) printf( "%c", data[i] );
 		fflush( stdout );
 #endif
-		handler.socket2.write( output.data(), output.size() );
-		handler.socket2.flush();
+		stdioStream.socket2.write( output.data(), output.size() );
+		stdioStream.socket2.flush();
 	}
 	shell->setReadChannel( QProcess::StandardError );
 	while( not shell->atEnd() ){
@@ -377,8 +388,8 @@ void DaoInterpreter::slotReadStdOut()
 		for(i=0; i<n; i++) printf( "%c", data[i] );
 		fflush( stdout );
 #endif
-		handler.socket2.write( output.data(), output.size() );
-		handler.socket2.flush();
+		errorStream.socket2.write( output.data(), output.size() );
+		errorStream.socket2.flush();
 	}
 }
 void DaoInterpreter::slotShellFinished(int, QProcess::ExitStatus)
@@ -468,13 +479,21 @@ void DaoInterpreter::slotStartExecution()
 		scriptSocket->disconnectFromServer();
 		return;
 	}
-	handler.socket2.connectToServer( DaoStudioSettings::socket_stdout );
-	if( handler.socket2.waitForConnected( 1000 ) ==0 ){
+	stdioStream.socket2.connectToServer( DaoStudioSettings::socket_stdout );
+	if( stdioStream.socket2.waitForConnected( 1000 ) ==0 ){
 		printf( "cannot connect to console stdout\n" );
 		fflush( stdout );
 		scriptSocket->disconnectFromServer();
 		return;
 	}
+	errorStream.socket2.connectToServer( DaoStudioSettings::socket_stderr );
+	if( errorStream.socket2.waitForConnected( 1000 ) ==0 ){
+		printf( "cannot connect to console stderr\n" );
+		fflush( stderr );
+		scriptSocket->disconnectFromServer();
+		return;
+	}
+
 
 	if( info )
 		vmSpace->options |= DAO_EXEC_DEBUG;
@@ -486,7 +505,7 @@ void DaoInterpreter::slotStartExecution()
 	DaoNamespace *ns = DaoVmSpace_MainNamespace( vmSpace );
 	ns->options |= DAO_EXEC_IDE | DAO_NS_AUTO_GLOBAL;
 
-	connect( & handler.socket2, SIGNAL( disconnected() ), this, SLOT( slotStopExecution() ) );
+	connect( & stdioStream.socket2, SIGNAL( disconnected() ), this, SLOT( slotStopExecution() ) );
 
 	vmp->stopit = 0;
 	handler.process = vmp;
@@ -526,8 +545,10 @@ void DaoInterpreter::slotStartExecution()
 		DString_Delete( mbs );
 	}
 	fflush( stdout );
-	handler.socket2.flush();
-	handler.socket2.disconnectFromServer();
+	stdioStream.socket2.flush();
+	stdioStream.socket2.disconnectFromServer();
+	errorStream.socket2.flush();
+	errorStream.socket2.disconnectFromServer();
 
 	QLocalSocket socket;
 	socket.connectToServer( DaoStudioSettings::socket_logger );

@@ -92,6 +92,7 @@ class DaoConsole : public DaoTextEdit
 	QLocalServer  debugServer;
 	QLocalServer  stdinServer;
 	QLocalServer  stdoutServer;
+	QLocalServer  stderrServer;
 	QLocalServer  loggerServer;
 
 	DArray  *tokens;
@@ -148,6 +149,7 @@ protected slots:
 	void slotSocketDebug();
 	void slotSocketStdin();
 	void slotSocketStdout();
+	void slotSocketStderr();
 	void slotSocketLogger();
 	void slotReadStdOut();
 	void slotReadStdError();

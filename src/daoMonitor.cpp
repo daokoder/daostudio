@@ -112,7 +112,7 @@ void DaoMonitor::slotUpdateMonitor()
 
 	if( requestTuple == NULL ){
 		DaoType *type = DaoParser_ParseTypeName( DATA_REQUEST_TYPE, nspace, NULL );
-		requestTuple = DaoTuple_Create( type, 1 );
+		requestTuple = DaoTuple_Create( type, 0, 1 );
 	}
 
 	DaoTuple *tuple = (DaoTuple*) value;

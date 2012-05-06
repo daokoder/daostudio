@@ -97,6 +97,11 @@ DaoConsole::DaoConsole( QWidget *parent ) : DaoTextEdit( parent, & wordList )
 	stdoutServer.listen( DaoStudioSettings::socket_stdout );
 	connect( & stdoutServer, SIGNAL(newConnection()), this, SLOT(slotSocketStdout()));
 
+	if( QFile::exists( DaoStudioSettings::socket_stderr ) )
+		QFile::remove( DaoStudioSettings::socket_stderr );
+	stderrServer.listen( DaoStudioSettings::socket_stderr );
+	connect( & stderrServer, SIGNAL(newConnection()), this, SLOT(slotSocketStderr()));
+
 	if( QFile::exists( DaoStudioSettings::socket_logger ) )
 		QFile::remove( DaoStudioSettings::socket_logger );
 	loggerServer.listen( DaoStudioSettings::socket_logger );
@@ -766,15 +771,22 @@ void DaoConsole::slotSocketStdin()
 void DaoConsole::slotSocketStdout()
 {
 	//slotPrintOutput( "connect socket\n" );
-	//printf( "connect socket\n" );
 	stdoutSocket = stdoutServer.nextPendingConnection();
 	connect( stdoutSocket, SIGNAL(readyRead()), this, SLOT(slotStdoutFromSocket()) );
 	connect( stdoutSocket, SIGNAL(disconnected()), this, SLOT(slotScriptFinished()) );
+	//printf( "connect stdout socket %p\n", stdoutSocket );
+}
+void DaoConsole::slotSocketStderr()
+{
+	//slotPrintOutput( "connect socket\n" );
+	stdoutSocket = stderrServer.nextPendingConnection();
+	connect( stdoutSocket, SIGNAL(readyRead()), this, SLOT(slotStdoutFromSocket()) );
+	//printf( "connect stderr socket %p\n", stdoutSocket );
 }
 void DaoConsole::slotStdoutFromSocket()
 {
 	//slotPrintOutput( "read socket\n" );
-	//printf( "socket\n" );
+	//printf( "socket %p\n", stdoutSocket );
 	if( stdoutSocket == NULL ) return;
 	QByteArray output = stdoutSocket->readAll();
 	QString text = QString::fromUtf8( output.data(), output.size() );

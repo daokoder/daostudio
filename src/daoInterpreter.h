@@ -51,11 +51,23 @@ class DaoTimer : public QThread
 
 extern "C"{
 
+struct DaoConsoleStream
+{
+	DaoStream *stream;
+	void (*stdRead)( DaoConsoleStream *self, DString *buf, int count );
+	void (*stdWrite)( DaoConsoleStream *self, DString *str );
+	void (*stdFlush)( DaoConsoleStream *self );
+	void (*SetColor)( DaoConsoleStream *self, const char *fgcolor, const char *bgcolor );
+	DaoInterpreter	*interpreter;
+	DaoProcess   *process;
+	QLocalSocket  socket;
+	QLocalSocket  socket2;
+	DaoDebugger	  debugger;
+	DaoTimer      timer;
+	unsigned int  time;
+};
 struct DaoEventHandler
 {
-	void (*stdRead)( DaoEventHandler *self, DString *buf, int count );
-	void (*stdWrite)( DaoEventHandler *self, DString *str );
-	void (*stdFlush)( DaoEventHandler *self );
 	void (*debug)( DaoEventHandler *self, DaoProcess *process );
 	void (*breaks)( DaoEventHandler *self, DaoRoutine *breaks );
 	void (*Called)( DaoEventHandler *self, DaoRoutine *caller, DaoRoutine *callee );
@@ -64,7 +76,6 @@ struct DaoEventHandler
 	DaoInterpreter	*interpreter;
 	DaoProcess   *process;
 	QLocalSocket  socket;
-	QLocalSocket  socket2;
 	DaoDebugger	  debugger;
 	DaoTimer      timer;
 	unsigned int  time;
@@ -87,6 +98,8 @@ Q_OBJECT
 	QString  pathWorking;
 	QString  pathImage;
 
+	DaoConsoleStream stdioStream;
+	DaoConsoleStream errorStream;
 	DaoEventHandler	handler;
 	QLocalServer  dataServer;
 	QLocalServer  scriptServer;
