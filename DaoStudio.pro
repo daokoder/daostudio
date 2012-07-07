@@ -11,7 +11,7 @@ CONFIG += thread debug
 QT += network
 
 DEPENDPATH += . src
-INCLUDEPATH += . src dao/kernel dao/modules/auxlib
+INCLUDEPATH += . src dao/kernel dao/modules/serializer
 
 DEFINES += DAO_WITH_MACRO
 DEFINES += DAO_WITH_THREAD
@@ -62,9 +62,9 @@ makedao.clean_commands = cd dao && make clean
 #makedao.depends = Makefile
 
 DEPENDPATH += dao
-DEPENDPATH += dao/modules/auxlib
+DEPENDPATH += dao/modules/serializer
 
-LIBS += -Ldao -Ldao/modules/auxlib -ldao -ldao_aux
+LIBS += -Ldao -Ldao/modules/serializer -ldao -ldao_serializer
 
 QMAKE_EXTRA_COMPILERS += makedao
 
@@ -83,7 +83,7 @@ mac {
 	QMAKESPEC = macx-g++
 	DEFINES += UNIX MAC_OSX
 	#LIBS += -lz -lssl -lcrypto
-	QMAKE_LFLAGS += -Wl,-rpath,dao -Wl,-rpath,dao/modules/auxlib
+	QMAKE_LFLAGS += -Wl,-rpath,dao -Wl,-rpath,dao/modules/serializer
 
 	QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
 }

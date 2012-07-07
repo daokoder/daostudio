@@ -1308,7 +1308,7 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 		case DTOK_DOT : case DTOK_ARROW : case DTOK_COLON2 :
 			format = formatSBracket;
 			break;
-		case DKEY_USE : case DKEY_LOAD : case DKEY_BIND :
+		case DKEY_USE : case DKEY_LOAD :
 		case DKEY_AS : case DKEY_SYNTAX : 
 		case DKEY_AND : case DKEY_OR : case DKEY_NOT :
 		case DKEY_VIRTUAL :

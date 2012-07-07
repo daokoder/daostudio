@@ -540,7 +540,7 @@ void DaoInterpreter::slotStartExecution()
 	}else{
 		DString *mbs = DString_New(1);
 		DString_AppendDataMBS( mbs, script.data(), script.size() );
-		res = (int) DaoProcess_Eval( vmp, ns, mbs, 1 );
+		res = (int) DaoProcess_Eval( vmp, ns, mbs->mbs, 1 );
 		DaoCallServer_Join();
 		DString_Delete( mbs );
 	}
