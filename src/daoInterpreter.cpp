@@ -254,12 +254,6 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 	program = DaoStudioSettings::program;
 	programPath = DaoStudioSettings::program_path;
 
-	QCommonStyle style;
-	QIcon book( QPixmap( ":/images/book.png" ) );
-	QIcon dao( QPixmap( ":/images/dao.png" ) );
-	QIcon daomonitor( QPixmap( ":/images/daomonitor.png" ) );
-	QApplication::setWindowIcon( daomonitor );
-
 	vmState = DAOCON_READY;
 	debugProcess = NULL;
 	daoString = DString_New(1);
@@ -935,7 +929,7 @@ void DaoInterpreter::ViewObject( DaoObject *object )
 	}
 
 	MakeList( varList, object->objValues, klass->objDataName->size,
-			klass->objDataType, klass->lookupTable, DAO_OBJECT_VARIABLE );
+			klass->instvars, klass->lookupTable, DAO_OBJECT_VARIABLE );
 }
 void DaoInterpreter::ViewNamespace( DaoNamespace *nspace )
 {
@@ -1042,6 +1036,7 @@ void DaoInterpreter::MakeList( DaoList *list, DaoValue **data, int size, DArray 
 			DString_SetMBS( valueTuple->items[0]->xString.data, val->xRoutine.routName->mbs );
 		}
 		itp = type ? type->items.pType[i] : NULL;
+		if( itp->type == DAO_VARIABLE ) itp = type->items.pVar[i]->dtype;
 		if( data[i]->type == DAO_VARIABLE ) itp = data[i]->xVar.dtype;
 		if( itp == NULL ) itp = DaoNamespace_GetType( vmSpace->mainNamespace, val );
 		if( itp ) DString_SetMBS( valueTuple->items[1]->xString.data, itp->name->mbs );

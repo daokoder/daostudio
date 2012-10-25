@@ -295,7 +295,6 @@ bool DaoDebugger::EditContinue ( DaoProcess *process, int newEntryLine, QList<in
 		DArray_Append( routine->body->defLocals, tok );
 	}
 	res = res && DaoParser_ParseRoutine( parser );
-	routine->body->parser = NULL;
 	DaoParser_Delete( parser );
 	if( res == false ){
 		DaoRoutine_Delete( routine );
