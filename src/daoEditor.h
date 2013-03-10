@@ -86,7 +86,7 @@ struct DaoWordTree
 
 class DaoWordList
 {
-	DArray  *tokens;
+	DaoLexer  *lexer;
 	DaoWordNode wordTree;
 	QMap<QString,int>  wordList;
 	int numComplete;
@@ -94,7 +94,7 @@ class DaoWordList
 
 	public:
 	DaoWordList( int n=3, int m=4 );
-	~DaoWordList(){ DArray_Delete( tokens ); }
+	~DaoWordList(){ DaoLexer_Delete( lexer ); }
 
 	void Extract( const QString & source );
 	void AddWord( const QString & word );
@@ -214,7 +214,7 @@ class DaoTextEdit : public QPlainTextEdit
 		QString keys;
 		QString digits;
 
-		DArray  *tokens;
+		DaoLexer  *lexer;
 		DString *mbs;
 		DString *wcs;
 

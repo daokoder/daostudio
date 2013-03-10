@@ -43,9 +43,9 @@ Q_OBJECT
 	DaoValue      *currentValue;
 	DaoStackFrame *currentFrame;
 
-	DaoTuple *requestTuple;
+	DaoTuple  *requestTuple;
 
-	DArray	*tokens;
+	DaoLexer  *lexer;
 	DString *daoString;
 	DLong	*daoLong;
 

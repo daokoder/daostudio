@@ -175,7 +175,7 @@ static void DaoConsDebug( DaoEventHandler *self, DaoProcess *process )
 {
 	self->interpreter->mutex.lock();
 
-	DaoVmCode *codes = process->activeRoutine->body->vmCodes->codes;
+	DaoVmCode *codes = process->activeRoutine->body->vmCodes->pod.codes;
 	DaoVmCodeX **annots = process->activeRoutine->body->annotCodes->items.pVmc;
 	int oldline = annots[ process->activeCode - codes + 1]->line;
 	QFileInfo fi( process->activeRoutine->nameSpace->name->mbs );
@@ -802,7 +802,7 @@ void DaoInterpreter::ViewRoutine( DaoRoutine *routine )
 	DaoToken **tokens = routine->body->defLocals->items.pToken;
 	int i, n = routine->body->defLocals->size;
 	for(i=0; i<n; i++) if( tokens[i]->type ==0 )
-		DMap_Insert( map, tokens[i]->string, (void*)(size_t)tokens[i]->index );
+		DMap_Insert( map, & tokens[i]->string, (void*)(size_t)tokens[i]->index );
 
 	QString itemName = "Routine[" + QString( routine->routName->mbs ) + "]";
 	QString info = RoutineInfo( routine, routine );
@@ -1036,7 +1036,7 @@ void DaoInterpreter::MakeList( DaoList *list, DaoValue **data, int size, DArray 
 			DString_SetMBS( valueTuple->items[0]->xString.data, val->xRoutine.routName->mbs );
 		}
 		itp = type ? type->items.pType[i] : NULL;
-		if( itp->type == DAO_VARIABLE ) itp = type->items.pVar[i]->dtype;
+		if( itp && type && itp->type == DAO_VARIABLE ) itp = type->items.pVar[i]->dtype;
 		if( data[i]->type == DAO_VARIABLE ) itp = data[i]->xVar.dtype;
 		if( itp == NULL ) itp = DaoNamespace_GetType( vmSpace->mainNamespace, val );
 		if( itp ) DString_SetMBS( valueTuple->items[1]->xString.data, itp->name->mbs );
@@ -1196,7 +1196,7 @@ void DaoInterpreter::ViewStackFrame( DaoStackFrame *frame, DaoProcess *process )
 	DaoToken **tokens = routine->body->defLocals->items.pToken;
 	int i, n = routine->body->defLocals->size;
 	for(i=0; i<n; i++) if( tokens[i]->type )
-		DMap_Insert( map, tokens[i]->string, (void*)(size_t)tokens[i]->index );
+		DMap_Insert( map, & tokens[i]->string, (void*)(size_t)tokens[i]->index );
 
 	QString info = RoutineInfo( routine, frame );
 	QString itemName = "StackFrame[" + StringAddress( frame ) + "]";
@@ -1235,14 +1235,14 @@ void DaoInterpreter::ViewVmCodes( DaoList *list, DaoRoutine *routine )
 {
 	int i, n = routine->body->vmCodes->size;
 	for(i=0; i<n; i++){
-		DaoVmCode vmc0 = routine->body->vmCodes->codes[i];
+		DaoVmCode vmc0 = routine->body->vmCodes->pod.codes[i];
 		DaoVmCodeX *vmc = routine->body->annotCodes->items.pVmc[i];
 		codeTuple->items[0]->xInteger.value = vmc0.code;
 		codeTuple->items[1]->xInteger.value = vmc->a;
 		codeTuple->items[2]->xInteger.value = vmc->b;
 		codeTuple->items[3]->xInteger.value = vmc->c;
 		codeTuple->items[4]->xInteger.value = vmc->line;
-		DaoTokens_AnnotateCode( routine->body->source, *vmc, daoString, 32 );
+		DaoLexer_AnnotateCode( routine->body->source, *vmc, daoString, 32 );
 		DString_SetMBS( codeTuple->items[5]->xString.data, daoString->mbs );
 		DaoList_PushBack( codeList, (DaoValue*)codeTuple );
 	}

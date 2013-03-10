@@ -95,7 +95,7 @@ class DaoConsole : public DaoTextEdit
 	QLocalServer  stderrServer;
 	QLocalServer  loggerServer;
 
-	DArray  *tokens;
+	DaoLexer  *lexer;
 
 	QList<int> promptBlocks;
 

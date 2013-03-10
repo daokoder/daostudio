@@ -144,7 +144,7 @@ const char* const DaoKeyWords[] =
 };
 DaoWordList::DaoWordList( int n, int m )
 {
-	tokens = DArray_New( D_TOKEN );
+	lexer = DaoLexer_New();
 	numComplete = n;
 	minLength = m;
 	int i = 0;
@@ -157,36 +157,36 @@ DaoWordList::DaoWordList( int n, int m )
 void DaoWordList::Extract( const QString & source )
 {
 	size_t i, j;
-	DaoToken_Tokenize( tokens, source.toLocal8Bit().data(), 0, 0, 0 );
-	for(i=0; i<tokens->size; i++){
-		DaoToken *tk = tokens->items.pToken[i];
-		if( tk->type == DTOK_IDENTIFIER ) AddWord( tk->string->mbs );
+	DaoLexer_Tokenize( lexer, source.toLocal8Bit().data(), 0 );
+	for(i=0; i<lexer->tokens->size; i++){
+		DaoToken *tk = lexer->tokens->items.pToken[i];
+		if( tk->type == DTOK_IDENTIFIER ) AddWord( tk->string.mbs );
 	}
 	return;
-	for(i=0; i+1<tokens->size; i++){
-		DaoToken *tk = tokens->items.pToken[i];
+	for(i=0; i+1<lexer->tokens->size; i++){
+		DaoToken *tk = lexer->tokens->items.pToken[i];
 		switch( tk->name ){
 		case DKEY_SUB :
 		case DKEY_ENUM :
 		case DKEY_CLASS :
 		case DKEY_ROUTINE :
 		case DKEY_FUNCTION :
-			AddWord( tokens->items.pToken[i+1]->string->mbs );
+			AddWord( lexer->tokens->items.pToken[i+1]->string.mbs );
 			break;
 		case DKEY_VAR :
 		case DKEY_CONST :
 		case DKEY_STATIC :
 		case DKEY_GLOBAL :
-			if( i+2 >= tokens->size ) break;
+			if( i+2 >= lexer->tokens->size ) break;
 			for(j=1; j<=2; j++){
-				tk = tokens->items.pToken[i+j];
+				tk = lexer->tokens->items.pToken[i+j];
 				if( tk->type == DTOK_IDENTIFIER && tk->name <= DAO_NOKEY1 )
-					AddWord( tk->string->mbs );
+					AddWord( tk->string.mbs );
 			}
 			break;
 		case DTOK_DOT :
-			tk = tokens->items.pToken[i+1];
-			if( tk->type == DTOK_IDENTIFIER ) AddWord( tk->string->mbs );
+			tk = lexer->tokens->items.pToken[i+1];
+			if( tk->type == DTOK_IDENTIFIER ) AddWord( tk->string.mbs );
 			break;
 		default : break;
 		}
@@ -819,13 +819,13 @@ DaoTextEdit::DaoTextEdit( QWidget *parent, DaoWordList *wlist ) :
 
 	mbs = DString_New(1);
 	wcs = DString_New(0);
-	tokens = DArray_New( D_TOKEN );
+	lexer = DaoLexer_New();
 }
 DaoTextEdit::~DaoTextEdit()
 {
 	DString_Delete( mbs );
 	DString_Delete( wcs );
-	DArray_Delete( tokens );
+	DaoLexer_Delete( lexer );
 }
 void DaoTextEdit::Undo()
 {
@@ -980,17 +980,17 @@ void DaoTextEdit::SetTabVisibility( int vid )
 void DaoTextEdit::ExtractWords()
 {
 	QString source = toPlainText();
-	DArray *tokens = codehl.tokens;
+	DaoLexer *lexer = codehl.lexer;
 	size_t i, j;
 	if( codehl.language ){
-		codehl.language->Tokenize( tokens, source.toLocal8Bit().data() );
+		codehl.language->Tokenize( lexer, source.toLocal8Bit().data() );
 	}else{
-		DaoToken_Tokenize( tokens, source.toLocal8Bit().data(), 0, 0, 0 );
+		DaoLexer_Tokenize( lexer, source.toLocal8Bit().data(), 0 );
 	}
-	for(i=0; i<tokens->size; i++){
-		DaoToken *tk = tokens->items.pToken[i];
-		if( tk->type == DTOK_IDENTIFIER and tk->string->size >=5 ){
-			wordList->AddWord( tk->string->mbs );
+	for(i=0; i<lexer->tokens->size; i++){
+		DaoToken *tk = lexer->tokens->items.pToken[i];
+		if( tk->type == DTOK_IDENTIFIER and tk->string.size >=5 ){
+			wordList->AddWord( tk->string.mbs );
 		}
 	}
 }
@@ -2069,7 +2069,7 @@ static QString DaoToken_MakeShortCodes( DArray *tokens )
 			codes += ' ';
 			break;
 		default:
-			codes += token->string->mbs;
+			codes += token->string.mbs;
 			break;
 		}
 	}
@@ -2138,8 +2138,9 @@ void DaoTextEdit::IndentLine( QTextCursor cursor, bool indent )
 	}
 	DaoBasicSyntax *language = codehl.language;
 	if( language == NULL ) language = DaoBasicSyntax::dao;
-	language->Tokenize( tokens, reference_line.toUtf8().data() );
+	language->Tokenize( lexer, reference_line.toUtf8().data() );
 
+	DArray *tokens = lexer->tokens;
 	QString reference_indent;
 	bool begin = true;
 	int i;
@@ -2148,7 +2149,7 @@ void DaoTextEdit::IndentLine( QTextCursor cursor, bool indent )
 		switch( token->type ){
 		case DTOK_BLANK : 
 		case DTOK_TAB:
-			if( begin ) reference_indent += token->string->mbs;
+			if( begin ) reference_indent += token->string.mbs;
 			break;
 		default :
 			begin = false;
@@ -2156,15 +2157,15 @@ void DaoTextEdit::IndentLine( QTextCursor cursor, bool indent )
 		}
 	}
 
-	language->Tokenize( tokens, previous_lines.toUtf8().data() );
+	language->Tokenize( lexer, previous_lines.toUtf8().data() );
 	QString previous_indent;
 	begin = true;
-	for(i=0; i<tokens->size; i++){
-		DaoToken *token = tokens->items.pToken[i];
+	for(i=0; i<lexer->tokens->size; i++){
+		DaoToken *token = lexer->tokens->items.pToken[i];
 		switch( token->type ){
 		case DTOK_BLANK : 
 		case DTOK_TAB:
-			if( begin ) previous_indent += token->string->mbs;
+			if( begin ) previous_indent += token->string.mbs;
 			break;
 		default :
 			begin = false;
@@ -2185,7 +2186,7 @@ void DaoTextEdit::IndentLine( QTextCursor cursor, bool indent )
 
 	QString old_indent;
 	int close_brace = 0;
-	language->Tokenize( tokens, current_block.text().toUtf8().data() );
+	language->Tokenize( lexer, current_block.text().toUtf8().data() );
 	cb = 0;
 	begin = true;
 	for(i=0; i<tokens->size; i++){
@@ -2193,7 +2194,7 @@ void DaoTextEdit::IndentLine( QTextCursor cursor, bool indent )
 		switch( token->type ){
 		case DTOK_BLANK : 
 		case DTOK_TAB:
-			if( begin ) old_indent += token->string->mbs;
+			if( begin ) old_indent += token->string.mbs;
 			break;
 		case DTOK_LCB :
 			begin = false;
@@ -2280,11 +2281,11 @@ void DaoTextEdit::IndentLine( QTextCursor cursor, bool indent )
 		cursor.insertText( new_indent );
 	}
 
-	language->Tokenize( tokens, joint_lines.toUtf8().data() );
+	language->Tokenize( lexer, joint_lines.toUtf8().data() );
 	b = cb = sb = 0;
 	for(i=0; i<tokens->size; i++){
 		DaoToken *token = tokens->items.pToken[i];
-		//printf( "%3i:  %3i  %s\n", i, token->type, token->string->mbs );
+		//printf( "%3i:  %3i  %s\n", i, token->type, token->string.mbs );
 		switch( token->type ){
 		case DTOK_LB  : b  += 1; break;
 		case DTOK_RB  : b  -= 1; break;
@@ -2911,12 +2912,12 @@ void DaoEditor::slotBoundEditor()
 	if( ud ) setReadOnly( ud->state == CLS_READONLY );
 	if( not isReadOnly() && wgtWords->IsTip() ) wgtWords->hide();
 }
-static QString NormalizeCodes( const QString & source, DArray *tokens )
+QString NormalizeCodes( const QString & source, DaoLexer *lexer )
 {
 	QString norm;
-	DaoToken_Tokenize( tokens, source.toLocal8Bit().data(), 0, 0, 0 );
-	for(size_t i=0; i<tokens->size; i++){
-		norm += tokens->items.pToken[i]->string->mbs;
+	DaoLexer_Tokenize( lexer, source.toLocal8Bit().data(), 0 );
+	for(size_t i=0; i<lexer->tokens->size; i++){
+		norm += lexer->tokens->items.pToken[i]->string.mbs;
 		norm += '\n';
 	}
 	return norm;
@@ -2954,17 +2955,17 @@ bool DaoEditor::EditContinue2()
 	}
 	//for(i=0; i<lineMap.size(); i++) printf( "%3i  %3i\n", i, lineMap[i] );
 	if( routCodes.size() == newCodes.size() ){
-		DArray *tokens = DArray_New(D_TOKEN);
+		DaoLexer *lexer = DaoLexer_New();
 		bool eq = true;
 		for(i=0; i<routCodes.size(); i++){
-			QString s1 = NormalizeCodes( routCodes[i], tokens );
-			QString s2 = NormalizeCodes( newCodes[i], tokens );
+			QString s1 = NormalizeCodes( routCodes[i], lexer );
+			QString s2 = NormalizeCodes( newCodes[i], lexer );
 			if( s1 != s2 ){
 				eq = false;
 				break;
 			}
 		}
-		DArray_Delete( tokens );
+		DaoLexer_Delete( lexer );
 		if( eq ) return false;
 	}
 	//printf( "=======%s\n", newCodes.join("\n").toLocal8Bit().data() );

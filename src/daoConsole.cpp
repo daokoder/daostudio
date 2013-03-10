@@ -44,7 +44,7 @@ DaoConsole::DaoConsole( QWidget *parent ) : DaoTextEdit( parent, & wordList )
 
 	setWordWrapMode( QTextOption::WrapAnywhere );
 
-	tokens = DArray_New( D_TOKEN );
+	lexer = DaoLexer_New();
 	outputBound = cursorBound = 0;
 	state = 0;
 	count = 0;
@@ -111,7 +111,7 @@ DaoConsole::~DaoConsole()
 {
 	//disconnect( &scriptSocket, SIGNAL( disconnected() ), this, SLOT( slotScriptFinished2() ) );
 	SaveCmdHistory();
-	DArray_Delete( tokens );
+	DaoLexer_Delete( lexer );
 }
 void DaoConsole::SetVmSpace( DaoVmSpace *vms )
 {
@@ -317,10 +317,10 @@ void DaoConsole::keyPressEvent ( QKeyEvent * event )
 				PrintPrompt();
 				break;
 			}
-			DaoToken_Tokenize( tokens, src.toLocal8Bit().data(), 0, 1, 1 );
+			DaoLexer_Tokenize( lexer, src.toLocal8Bit().data(), DAO_LEX_COMMENT|DAO_LEX_SPACE );
 			bcount = sbcount = cbcount = 0;
-			for(size_t i=0; i<tokens->size; i++){
-				DaoToken *tk = tokens->items.pToken[i];
+			for(size_t i=0; i<lexer->tokens->size; i++){
+				DaoToken *tk = lexer->tokens->items.pToken[i];
 				switch( tk->type ){
 				case DTOK_LB : bcount --; break;
 				case DTOK_RB : bcount ++; break;
@@ -330,7 +330,7 @@ void DaoConsole::keyPressEvent ( QKeyEvent * event )
 				case DTOK_RSB : sbcount ++; break;
 				default : break;
 				}
-				if( tk->type == DTOK_IDENTIFIER ) wordList.AddWord( tk->string->mbs );
+				if( tk->type == DTOK_IDENTIFIER ) wordList.AddWord( tk->string.mbs );
 			}
 			if( bcount <0 || sbcount <0 || cbcount <0 ){
 				if( not vim ) DaoTextEdit::keyPressEvent( event );

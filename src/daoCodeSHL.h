@@ -166,7 +166,7 @@ struct DaoBasicSyntax
 	bool caseInsensitive;
 	bool isLatex;
 
-	DArray *tokens;
+	DaoLexer *lexer;
 
 	DaoRegex *func_regex;
 	DaoRegex *class_regex;
@@ -206,7 +206,7 @@ struct DaoBasicSyntax
 	void AddMoreIndentPattern2( const char *pat );
 
 	/* Note: the token field "name" will not be valid! */
-	int Tokenize( DArray *tokens, const char *source );
+	int Tokenize( DaoLexer *lexer, const char *source );
 };
 struct DaoLanguages
 {
@@ -261,8 +261,7 @@ class DaoCodeSHL : public QSyntaxHighlighter
 	short tabVisibility;
 	short fontSize;
 	int textSkip;
-	DArray  *tokens;
-	DArray  *toks;
+	DaoLexer *lexer;
 	DString *mbs;
 	DString *wcs;
 	QString cmt;
@@ -294,7 +293,7 @@ class DaoCodeSHL : public QSyntaxHighlighter
 	static QMap<QString,DaoBasicSyntax*> languages;
 
 	//protected:
-	void SetIndentationData( DaoCodeLineData *ud, DArray *tokens );
+	void SetIndentationData( DaoCodeLineData *ud, DaoLexer *lexer );
 	void HighlightSearch( const QString & text );
 	void HighlightNormal( const QString & text );
 	void highlightBlock( const QString & text );

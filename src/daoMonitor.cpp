@@ -47,7 +47,7 @@ DaoMonitor::DaoMonitor( QWidget *parent ) : QWidget( parent )
 
 	requestTuple = NULL;
 
-	tokens = DArray_New( D_TOKEN );
+	lexer = DaoLexer_New();
 	daoString = DString_New(1);
 	daoLong = DLong_New();
 
@@ -71,7 +71,7 @@ DaoMonitor::DaoMonitor( QWidget *parent ) : QWidget( parent )
 }
 DaoMonitor::~DaoMonitor()
 {
-	DArray_Delete( tokens );
+	DaoLexer_Delete( lexer );
 	DString_Delete( daoString );
 	DLong_Delete( daoLong );
 	delete hlDataInfo;
@@ -710,7 +710,8 @@ void DaoMonitor::slotUpdateValue()
 	QByteArray text = wgtDataValue->toPlainText().toUtf8();
 	bool ok = true;
 	if( value->type && (value->type <= DAO_DOUBLE || value->type == DAO_LONG) ){
-		DaoToken_Tokenize( tokens, text.data(), 0, 1, 0 );
+		DArray *tokens = lexer->tokens;
+		DaoLexer_Tokenize( lexer, text.data(), DAO_LEX_COMMENT );
 		if( tokens->size ) tok = tokens->items.pToken[0];
 		if( tokens->size !=1 || tok->type <DTOK_DIGITS_HEX || tok->type >DTOK_NUMBER_SCI ){
 			QMessageBox::warning( this, tr("DaoStudio"),
@@ -749,7 +750,9 @@ void DaoMonitor::slotElementChanged(int row, int col)
 	DaoToken *tok = NULL;
 	DaoArray *array = (DaoArray*) currentValue;
 	QByteArray text = wgtDataTable->item(row,col)->text().toLocal8Bit();
-	DaoToken_Tokenize( tokens, text.data(), 0, 1, 0 );
+	DArray *tokens = lexer->tokens;
+
+	DaoLexer_Tokenize( lexer, text.data(), DAO_LEX_COMMENT );
 	if( array->etype >= DAO_INTEGER && array->etype <= DAO_DOUBLE ){
 		if( tokens->size ) tok = tokens->items.pToken[0];
 		if( tokens->size !=1 || tok->type <DTOK_DIGITS_HEX || tok->type >DTOK_NUMBER_SCI ){

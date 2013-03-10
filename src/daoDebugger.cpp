@@ -49,7 +49,7 @@ void DaoDebugger::SetBreakPoints( DaoRoutine *routine )
 {
 	QFileInfo fi( routine->nameSpace->name->mbs );
 	QString name = fi.absoluteFilePath();
-	DaoVmCode  *codes = routine->body->vmCodes->codes;
+	DaoVmCode  *codes = routine->body->vmCodes->pod.codes;
 	DaoVmCodeX **annots = routine->body->annotCodes->items.pVmc;
 	int i, j, n = routine->body->vmCodes->size;
 
@@ -82,16 +82,7 @@ void DaoDebugger::ResetExecution( DaoProcess *process, int line, int offset )
 	process->status = DAO_VMPROC_STACKED;
 	process->topFrame->entry = i;
 }
-static QString NormalizeCodes( const QString & source, DArray *tokens )
-{
-	QString norm;
-	DaoToken_Tokenize( tokens, source.toLocal8Bit().data(), 0, 0, 0 );
-	for(size_t i=0; i<tokens->size; i++){
-		norm += tokens->items.pToken[i]->string->mbs;
-		norm += '\n';
-	}
-	return norm;
-}
+QString NormalizeCodes( const QString & source, DaoLexer *lexer );
 static int DaoVmCode_Similarity( const QMap<int,int> & regmap, DaoVmCode x, DaoVmCode y )
 {
 	QMap<int,int>::const_iterator it, end = regmap.end();
@@ -255,17 +246,17 @@ bool DaoDebugger::EditContinue ( DaoProcess *process, int newEntryLine, QList<in
 	//printf( "=======%s\n", routCodes.join("\n").toLocal8Bit().data() );
 	//printf( "=======%s\n", newCodes.join("\n").toLocal8Bit().data() );
 	if( routCodes.size() == newCodes.size() ){
-		DArray *tokens = DArray_New(D_TOKEN);
+		DaoLexer *lexer = DaoLexer_New();
 		bool eq = true;
 		for(i=0; i<routCodes.size(); i++){
-			QString s1 = NormalizeCodes( routCodes[i], tokens );
-			QString s2 = NormalizeCodes( newCodes[i], tokens );
+			QString s1 = NormalizeCodes( routCodes[i], lexer );
+			QString s2 = NormalizeCodes( newCodes[i], lexer );
 			if( s1 != s2 ){
 				eq = false;
 				break;
 			}
 		}
-		DArray_Delete( tokens );
+		DaoLexer_Delete( lexer );
 		if( eq ) return true;
 	}
 	QString codes = newCodes.join( "\n" );
@@ -291,7 +282,7 @@ bool DaoDebugger::EditContinue ( DaoProcess *process, int newEntryLine, QList<in
 	for(i=0; i<(int)oldrout->body->defLocals->size; i++){
 		DaoToken *tok = oldrout->body->defLocals->items.pToken[i];
 		if( tok->index >= oldrout->parCount || tok->type ==0 ) break;
-		MAP_Insert( DArray_Top( parser->localVarMap ), tok->string, i );
+		MAP_Insert( DArray_Top( parser->localVarMap ), & tok->string, i );
 		DArray_Append( routine->body->defLocals, tok );
 	}
 	res = res && DaoParser_ParseRoutine( parser );
@@ -321,8 +312,8 @@ bool DaoDebugger::EditContinue ( DaoProcess *process, int newEntryLine, QList<in
 	regmap.clear();
 	for(i=0; i<oldrout->parCount; i++) regmap[i] = i;
 
-	DaoVmCode   *oldVMC = oldrout->body->vmCodes->codes;
-	DaoVmCode   *newVMC = routine->body->vmCodes->codes;
+	DaoVmCode   *oldVMC = oldrout->body->vmCodes->pod.codes;
+	DaoVmCode   *newVMC = routine->body->vmCodes->pod.codes;
 	DaoVmCodeX **oldAnnot = oldrout->body->annotCodes->items.pVmc;
 	DaoVmCodeX **newAnnot = routine->body->annotCodes->items.pVmc;
 	int M = oldrout->body->vmCodes->size;
@@ -381,7 +372,7 @@ bool DaoDebugger::EditContinue ( DaoProcess *process, int newEntryLine, QList<in
 	oldrout->body->revised = routine;
 	process->activeRoutine = routine;
 	process->activeTypes = regTypes;
-	process->topFrame->codes = routine->body->vmCodes->codes;
+	process->topFrame->codes = routine->body->vmCodes->pod.codes;
 
 	ResetExecution( process, newEntryLine, offset );
 
