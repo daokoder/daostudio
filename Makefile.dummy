@@ -1,3 +1,0 @@
-
-all:
-	$(CXX) -c dummy.cpp -o dummy.o

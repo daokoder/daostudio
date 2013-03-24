@@ -1,0 +1,21 @@
+DaoStudio
+
+An Integrate Development Environment for Dao.
+
+
+================================================================
+
+DaoStudio requires Dao and Qt4 to build.
+
+To build, Dao should be presented as a subdirectory "dao" under
+the root directory of DaoStudio. Then the following command can
+be used to build DaoStudio:
+
+$ make PLATFORM
+
+where PLATFORM can be one of the followings:
+
+* linux
+* macosx
+* freebsd
+* mingw

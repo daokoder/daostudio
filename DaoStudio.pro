@@ -51,24 +51,14 @@ FORMS += src/daoStudio.ui \
 RESOURCES += DaoStudio.qrc
 TRANSLATIONS = langs/daostudio_zh_cn.ts
 
-PREPROCESS_FILES = dummy.cpp
-
-makedao.name = Dao
-makedao.input = PREPROCESS_FILES
-makedao.output = dummy.o
-makedao.commands = make -f Makefile.dummy && cd dao && make lib
-makedao.clean_commands = cd dao && make clean
-#makedao.variable_out = SOURCES
-#makedao.depends = Makefile
-
 DEPENDPATH += dao
 DEPENDPATH += dao/modules/serializer
 
 LIBS += -Ldao -Ldao/modules/serializer -ldao -ldao_serializer
 
-QMAKE_EXTRA_COMPILERS += makedao
 
 win32 {
+	POST_TARGETDEPS += dao/dao.dll dao/modules/serializer/dao_serializer.dll
 	RC_FILE = DaoStudio.rc
 	DEFINES += WIN32
 	#LIBS += -lwinmm -lwsock32
@@ -79,6 +69,7 @@ unix {
 	#QMAKE_LFLAGS += -Xlinker -rpath -Xlinker .
 }
 mac {
+	POST_TARGETDEPS += dao/libdao.dylib dao/modules/serializer/libdao_serializer.dylib
 	ICON = icons/daostudio.icns
 	QMAKESPEC = macx-g++
 	DEFINES += UNIX MAC_OSX
@@ -86,5 +77,7 @@ mac {
 	QMAKE_LFLAGS += -Wl,-rpath,dao -Wl,-rpath,dao/modules/serializer
 
 	QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
+} else:unix{
+	POST_TARGETDEPS += dao/libdao.so dao/modules/serializer/libdao_serializer.so
 }
 

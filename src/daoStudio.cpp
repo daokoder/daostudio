@@ -351,7 +351,7 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 			command += " --socket-suffix " + DaoStudioSettings::socket_suffix;
 		
 		monitor->start( command, QIODevice::ReadWrite | QIODevice::Unbuffered );
-		monitor->waitForStarted(100);
+		monitor->waitForStarted(500);
 	}else{
 		slotWriteLog( tr("connected to running") + " DaoMonitor" );
 	}
