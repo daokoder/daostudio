@@ -1,3 +1,5 @@
+cp -r dao/doc/html/en doc/html/
+cp -r doc daostudio.app/Contents/Resources
 cp dao/libdao.dylib daostudio.app/Contents/Frameworks/
 cp dao/modules/serializer/libdao_serializer.dylib daostudio.app/Contents/Frameworks/
 

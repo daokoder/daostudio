@@ -115,8 +115,8 @@ DaoConsole::~DaoConsole()
 }
 void DaoConsole::SetVmSpace( DaoVmSpace *vms )
 {
-	vms->options |= DAO_EXEC_IDE | DAO_EXEC_INTERUN;
-	vms->mainNamespace->options |= DAO_EXEC_IDE | DAO_NS_AUTO_GLOBAL;
+	vms->options |= DAO_OPTION_IDE | DAO_OPTION_INTERUN;
+	vms->mainNamespace->options |= DAO_OPTION_IDE | DAO_NS_AUTO_GLOBAL;
 	vmSpace = vms;
 }
 void DaoConsole::LoadCmdHistory()

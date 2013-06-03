@@ -2053,7 +2053,6 @@ static QString DaoToken_MakeShortCodes( DArray *tokens )
 		case DTOK_WCS_OPEN :
 			codes += "'";
 			break;
-		case DTOK_DIGITS_HEX :
 		case DTOK_DIGITS_DEC :
 		case DTOK_NUMBER_HEX :
 		case DTOK_NUMBER_DEC :

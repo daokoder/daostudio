@@ -129,7 +129,7 @@ static void DaoResetExecution( DaoProcess *process, int line, int offset=0 )
 		++i;
 		--offset;
 	}
-	process->status = DAO_VMPROC_STACKED;
+	process->status = DAO_PROCESS_STACKED;
 	process->topFrame->entry = i;
 	//DaoVmCodeX_Print( *annotCodes[i], NULL );
 	//printf( "entry: %s\n", annotCodes[i]->annot->mbs->data );
@@ -175,7 +175,7 @@ static void DaoConsDebug( DaoEventHandler *self, DaoProcess *process )
 {
 	self->interpreter->mutex.lock();
 
-	DaoVmCode *codes = process->activeRoutine->body->vmCodes->pod.codes;
+	DaoVmCode *codes = process->activeRoutine->body->vmCodes->data.codes;
 	DaoVmCodeX **annots = process->activeRoutine->body->annotCodes->items.pVmc;
 	int oldline = annots[ process->activeCode - codes + 1]->line;
 	QFileInfo fi( process->activeRoutine->nameSpace->name->mbs );
@@ -283,8 +283,8 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 	handler.timer.start();
 
 	vmSpace = DaoInit( NULL ); //XXX
-	vmSpace->options |= DAO_EXEC_IDE | DAO_EXEC_INTERUN;
-	vmSpace->mainNamespace->options |= DAO_EXEC_IDE | DAO_EXEC_INTERUN;
+	vmSpace->options |= DAO_OPTION_IDE | DAO_OPTION_INTERUN;
+	vmSpace->mainNamespace->options |= DAO_OPTION_IDE | DAO_OPTION_INTERUN;
 	nameSpace = vmSpace->mainNamespace;
 	handler.process = DaoVmSpace_MainProcess( vmSpace );
 	DaoVmSpace_SetUserStdio( vmSpace, (DaoUserStream*) & stdioStream );
@@ -490,14 +490,14 @@ void DaoInterpreter::slotStartExecution()
 
 
 	if( info )
-		vmSpace->options |= DAO_EXEC_DEBUG;
+		vmSpace->options |= DAO_OPTION_DEBUG;
 	else
-		vmSpace->options &= ~DAO_EXEC_DEBUG;
+		vmSpace->options &= ~DAO_OPTION_DEBUG;
 
 	vmState = DAOCON_RUN;
 	DaoProcess *vmp = DaoVmSpace_MainProcess( vmSpace );
 	DaoNamespace *ns = DaoVmSpace_MainNamespace( vmSpace );
-	ns->options |= DAO_EXEC_IDE | DAO_NS_AUTO_GLOBAL;
+	ns->options |= DAO_OPTION_IDE | DAO_NS_AUTO_GLOBAL;
 
 	connect( & stdioStream.socket2, SIGNAL( disconnected() ), this, SLOT( slotStopExecution() ) );
 
@@ -534,7 +534,7 @@ void DaoInterpreter::slotStartExecution()
 	}else{
 		DString *mbs = DString_New(1);
 		DString_AppendDataMBS( mbs, script.data(), script.size() );
-		res = (int) DaoProcess_Eval( vmp, ns, mbs->mbs, 1 );
+		res = (int) DaoProcess_Eval( vmp, ns, mbs->mbs );
 		DaoCallServer_Join();
 		DString_Delete( mbs );
 	}
@@ -1165,7 +1165,7 @@ void DaoInterpreter::ViewStackData( DaoProcess *proc, DaoStackFrame *frame, DaoT
 		if( row >= frame->entry ) return;
 		while( frame != proc->topFrame ) DaoProcess_PopFrame( proc );
 		proc->topFrame->entry = row;
-		proc->status = DAO_VMPROC_STACKED;
+		proc->status = DAO_PROCESS_STACKED;
 	}
 }
 QString DaoInterpreter::RoutineInfo( DaoRoutine *routine, void *address )
@@ -1235,7 +1235,7 @@ void DaoInterpreter::ViewVmCodes( DaoList *list, DaoRoutine *routine )
 {
 	int i, n = routine->body->vmCodes->size;
 	for(i=0; i<n; i++){
-		DaoVmCode vmc0 = routine->body->vmCodes->pod.codes[i];
+		DaoVmCode vmc0 = routine->body->vmCodes->data.codes[i];
 		DaoVmCodeX *vmc = routine->body->annotCodes->items.pVmc[i];
 		codeTuple->items[0]->xInteger.value = vmc0.code;
 		codeTuple->items[1]->xInteger.value = vmc->a;

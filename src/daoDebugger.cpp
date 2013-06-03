@@ -49,7 +49,7 @@ void DaoDebugger::SetBreakPoints( DaoRoutine *routine )
 {
 	QFileInfo fi( routine->nameSpace->name->mbs );
 	QString name = fi.absoluteFilePath();
-	DaoVmCode  *codes = routine->body->vmCodes->pod.codes;
+	DaoVmCode  *codes = routine->body->vmCodes->data.codes;
 	DaoVmCodeX **annots = routine->body->annotCodes->items.pVmc;
 	int i, j, n = routine->body->vmCodes->size;
 
@@ -79,7 +79,7 @@ void DaoDebugger::ResetExecution( DaoProcess *process, int line, int offset )
 		++i;
 		--offset;
 	}
-	process->status = DAO_VMPROC_STACKED;
+	process->status = DAO_PROCESS_STACKED;
 	process->topFrame->entry = i;
 }
 QString NormalizeCodes( const QString & source, DaoLexer *lexer );
@@ -282,7 +282,7 @@ bool DaoDebugger::EditContinue ( DaoProcess *process, int newEntryLine, QList<in
 	for(i=0; i<(int)oldrout->body->defLocals->size; i++){
 		DaoToken *tok = oldrout->body->defLocals->items.pToken[i];
 		if( tok->index >= oldrout->parCount || tok->type ==0 ) break;
-		MAP_Insert( DArray_Top( parser->localVarMap ), & tok->string, i );
+		MAP_Insert( DArray_Top( parser->localDataMaps ), & tok->string, i );
 		DArray_Append( routine->body->defLocals, tok );
 	}
 	res = res && DaoParser_ParseRoutine( parser );
@@ -312,8 +312,8 @@ bool DaoDebugger::EditContinue ( DaoProcess *process, int newEntryLine, QList<in
 	regmap.clear();
 	for(i=0; i<oldrout->parCount; i++) regmap[i] = i;
 
-	DaoVmCode   *oldVMC = oldrout->body->vmCodes->pod.codes;
-	DaoVmCode   *newVMC = routine->body->vmCodes->pod.codes;
+	DaoVmCode   *oldVMC = oldrout->body->vmCodes->data.codes;
+	DaoVmCode   *newVMC = routine->body->vmCodes->data.codes;
 	DaoVmCodeX **oldAnnot = oldrout->body->annotCodes->items.pVmc;
 	DaoVmCodeX **newAnnot = routine->body->annotCodes->items.pVmc;
 	int M = oldrout->body->vmCodes->size;
@@ -372,7 +372,7 @@ bool DaoDebugger::EditContinue ( DaoProcess *process, int newEntryLine, QList<in
 	oldrout->body->revised = routine;
 	process->activeRoutine = routine;
 	process->activeTypes = regTypes;
-	process->topFrame->codes = routine->body->vmCodes->pod.codes;
+	process->topFrame->codes = routine->body->vmCodes->data.codes;
 
 	ResetExecution( process, newEntryLine, offset );
 

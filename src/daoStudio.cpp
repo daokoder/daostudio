@@ -74,6 +74,11 @@ DaoDocViewer::DaoDocViewer( QWidget *parent, const QString & path )
 	viewport()->setStyleSheet( "font-size: 14pt;" );
 	setHtml( "" );
 	SetPath( path + "/doc/html/" );
+
+	QString lang = DaoStudioSettings::locale.indexOf( "zh" ) == 0 ? "zh" : "en";
+	if( QFile::exists( lang + "/index.html" ) == 0 ) lang = "en";
+
+	SetPath( path + "/doc/html/" + lang + "/" );
 }
 QVariant DaoTextBrowser::loadResource ( int type, const QUrl & url )
 {
@@ -147,7 +152,11 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	connect( wgtMonitorArea->verticalScrollBar(), SIGNAL(sliderPressed()),
 			this, SLOT(slotMaxMonitor()) );
 
+#ifdef MAC_OSX
+	docViewer = new DaoDocViewer(wgtEditorTabs, programPath + "/../Resources/");
+#else
 	docViewer = new DaoDocViewer(wgtEditorTabs, programPath);
+#endif
 	docViewer->setSearchPaths( QStringList( programPath + "/doc/html/" ) );
 	docViewer->studio = this;
 	docViewer->tabWidget = wgtEditorTabs;
@@ -155,11 +164,10 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	wgtEditorTabs->setTabsClosable(1);
 	wgtEditorTabs->setFixedHeight( 200 );
 	wgtEditorTabs->setUsesScrollButtons( true );
-	QString docs = "daostudio_docs";
-	if( locale.indexOf( "zh" ) ==0 ) docs += "_zh_cn";
-	docViewer->setSource( QUrl( docs + ".html" ) );
 	delete wgtEditorTabs->widget(0);
 	delete wgtEditorTabs->widget(0);
+
+	docViewer->setSource( QUrl( "index.html" ) );
 	
 	wgtEditorTabs->setMinimumHeight( 80 );
 	wgtEditorTabs->setMaximumHeight( 5000 );
@@ -297,7 +305,11 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	SetPathBrowsing( "." );
 	DaoVmSpace_AddPath( vmSpace, programPath.toLocal8Bit().data() );
 	
-	QDir dir( programPath + "/doc/html/", "*.html" );
+#ifdef MAC_OSX
+	QDir dir( programPath + "/../Resources/doc/html/en/", "*.html" );
+#else
+	QDir dir( programPath + "/doc/html/en/", "*.html" );
+#endif
 	QIcon fico = style.standardIcon( QStyle::SP_FileIcon );
 	dir.setSorting( QDir::Name );
 	QFileInfoList list = dir.entryInfoList();
@@ -1078,9 +1090,8 @@ void DaoStudio::slotTips()
 }
 void DaoStudio::slotDocs()
 {
-	QString docs = "daostudio_docs";
-	if( locale.indexOf( "zh" ) ==0 ) docs += "_zh_cn";
-	docViewer->setSource( QUrl( docs + ".html" ) );
+	docViewer->setSource( QUrl( "index.html" ) );
+
 	slotMaxEditor();
 	wgtEditorTabs->setCurrentIndex(ID_DOCVIEW);
 }

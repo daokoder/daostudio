@@ -1080,8 +1080,8 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 			break;
 		case DTOK_MBS : case DTOK_WCS :
 		case DTOK_MBS_OPEN : case DTOK_WCS_OPEN :
-		case DTOK_DIGITS_HEX : case DTOK_DIGITS_DEC :
-		case DTOK_NUMBER_HEX : case DTOK_NUMBER_DEC : case DTOK_NUMBER_SCI :
+		case DTOK_DIGITS_DEC : case DTOK_NUMBER_HEX :
+		case DTOK_NUMBER_DEC : case DTOK_NUMBER_SCI :
 			format = formatConstant;
 			break;
 		case DTOK_CMT_OPEN : case DTOK_COMMENT :
@@ -1284,8 +1284,8 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 			break;
 		case DTOK_MBS : case DTOK_WCS :
 		case DTOK_MBS_OPEN : case DTOK_WCS_OPEN :
-		case DTOK_DIGITS_HEX : case DTOK_DIGITS_DEC :
-		case DTOK_NUMBER_HEX : case DTOK_NUMBER_DEC : case DTOK_NUMBER_SCI :
+		case DTOK_DIGITS_DEC : case DTOK_NUMBER_HEX :
+		case DTOK_NUMBER_DEC : case DTOK_NUMBER_SCI :
 			format = formatConstant;
 			break;
 		case DTOK_CMT_OPEN : case DTOK_COMMENT :
@@ -1317,7 +1317,6 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 		case DKEY_WHILE : case DKEY_DO :
 		case DKEY_FOR : case DKEY_IN :
 		case DKEY_SKIP : case DKEY_BREAK : case DKEY_CONTINUE :
-		case DKEY_TRY : case DKEY_RETRY : case DKEY_RAISE :
 		case DKEY_RETURN : case DKEY_YIELD :
 		case DKEY_SWITCH : case DKEY_CASE : case DKEY_DEFAULT :
 			format = formatStmtKey;

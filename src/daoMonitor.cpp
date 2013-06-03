@@ -713,7 +713,7 @@ void DaoMonitor::slotUpdateValue()
 		DArray *tokens = lexer->tokens;
 		DaoLexer_Tokenize( lexer, text.data(), DAO_LEX_COMMENT );
 		if( tokens->size ) tok = tokens->items.pToken[0];
-		if( tokens->size !=1 || tok->type <DTOK_DIGITS_HEX || tok->type >DTOK_NUMBER_SCI ){
+		if( tokens->size !=1 || tok->type <DTOK_DIGITS_DEC|| tok->type >DTOK_NUMBER_SCI ){
 			QMessageBox::warning( this, tr("DaoStudio"),
 					tr("Invalid value for the data type!"), QMessageBox::Cancel );
 			return;
@@ -755,7 +755,7 @@ void DaoMonitor::slotElementChanged(int row, int col)
 	DaoLexer_Tokenize( lexer, text.data(), DAO_LEX_COMMENT );
 	if( array->etype >= DAO_INTEGER && array->etype <= DAO_DOUBLE ){
 		if( tokens->size ) tok = tokens->items.pToken[0];
-		if( tokens->size !=1 || tok->type <DTOK_DIGITS_HEX || tok->type >DTOK_NUMBER_SCI ){
+		if( tokens->size !=1 || tok->type <DTOK_DIGITS_DEC || tok->type >DTOK_NUMBER_SCI ){
 			QMessageBox::warning( this, tr("DaoStudio"),
 					tr("Invalid value for the data type!"), QMessageBox::Cancel );
 			return;
