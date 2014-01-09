@@ -1,18 +1,18 @@
-//=============================================================================
 /*
-	This file is a part of Dao Studio
-	Copyright (C) 2009-2011, Fu Limin
-	Email: limin.fu@yahoo.com, phoolimin@gmail.com
-
-	Dao Studio is free software; you can redistribute it and/or modify it under the terms
-	of the GNU General Public License as published by the Free Software Foundation;
-	either version 2 of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful, but WITHOUT ANY
-	WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
-	PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// Dao Studio
+// http://daovm.net
+//
+// Copyright (C) 2009-2014, Limin Fu
+// All rights reserved.
+//
+// Dao Studio is free software; you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation; either version 2 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 */
-//=============================================================================
 
 #ifndef _DAO_INTERPRETER_H_
 #define _DAO_INTERPRETER_H_
@@ -62,7 +62,7 @@ struct DaoConsoleStream
 	DaoProcess   *process;
 	QLocalSocket  socket;
 	QLocalSocket  socket2;
-	DaoDebugger	  debugger;
+	DaoxDebugger  debugger;
 	DaoTimer      timer;
 	unsigned int  time;
 };
@@ -70,13 +70,10 @@ struct DaoEventHandler
 {
 	void (*debug)( DaoEventHandler *self, DaoProcess *process );
 	void (*breaks)( DaoEventHandler *self, DaoRoutine *breaks );
-	void (*Called)( DaoEventHandler *self, DaoRoutine *caller, DaoRoutine *callee );
-	void (*Returned)( DaoEventHandler *self, DaoRoutine *caller, DaoRoutine *callee );
-	void (*InvokeHost)( DaoEventHandler *self, DaoProcess *process );
 	DaoInterpreter	*interpreter;
 	DaoProcess   *process;
 	QLocalSocket  socket;
-	DaoDebugger	  debugger;
+	DaoxDebugger  debugger;
 	DaoTimer      timer;
 	unsigned int  time;
 };

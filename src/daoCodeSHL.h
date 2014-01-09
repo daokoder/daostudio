@@ -1,18 +1,18 @@
-//=============================================================================
 /*
-   This file is a part of Dao Studio
-   Copyright (C) 2009-2011, Fu Limin
-Email: limin.fu@yahoo.com, phoolimin@gmail.com
-
-Dao Studio is free software; you can redistribute it and/or modify it under the terms
-of the GNU General Public License as published by the Free Software Foundation;
-either version 2 of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
- */
-//=============================================================================
+// Dao Studio
+// http://daovm.net
+//
+// Copyright (C) 2009-2014, Limin Fu
+// All rights reserved.
+//
+// Dao Studio is free software; you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation; either version 2 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+*/
 
 #ifndef _DAO_CODESHL_H_
 #define _DAO_CODESHL_H_
@@ -44,7 +44,7 @@ extern "C"{
 #include<daoValue.h>
 #include<daoMap.h>
 #include<daoRegex.h>
-#include<daoSched.h>
+#include<daoTasklet.h>
 #include<dao_serializer.h>
 }
 

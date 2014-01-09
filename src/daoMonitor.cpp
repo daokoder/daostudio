@@ -1,18 +1,18 @@
-//=============================================================================
 /*
-   This file is a part of Dao Studio
-   Copyright (C) 2009-2011, Fu Limin
-Email: limin.fu@yahoo.com, phoolimin@gmail.com
-
-Dao Studio is free software; you can redistribute it and/or modify it under the terms
-of the GNU General Public License as published by the Free Software Foundation;
-either version 2 of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
- */
-//=============================================================================
+// Dao Studio
+// http://daovm.net
+//
+// Copyright (C) 2009-2014, Limin Fu
+// All rights reserved.
+//
+// Dao Studio is free software; you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation; either version 2 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+*/
 
 #include<QtGui>
 #include<cmath>
@@ -67,7 +67,7 @@ DaoMonitor::DaoMonitor( QWidget *parent ) : QWidget( parent )
 	if( QFile::exists( DaoStudioSettings::socket_monitor ) )
 		QFile::remove( DaoStudioSettings::socket_monitor );
 	monitorServer.listen( DaoStudioSettings::socket_monitor );
-	connect( & monitorServer, SIGNAL(newConnection()), this, SLOT(slotUpdateMonitor()));
+	connect( & monitorServer, SIGNAL(newConnection()), this, SLOT(slotAcceptConnection()));
 }
 DaoMonitor::~DaoMonitor()
 {
@@ -97,17 +97,26 @@ void DaoMonitor::focusInEvent ( QFocusEvent * event )
 {
 	emit signalFocusIn();
 }
-void DaoMonitor::slotUpdateMonitor()
+void DaoMonitor::slotAcceptConnection()
 {
 	monitorSocket = monitorServer.nextPendingConnection();
-	if( monitorSocket->waitForReadyRead(1000) == false ) return;
 	if( vmspace == NULL ) return;
 
+	connect( monitorSocket, SIGNAL(readyRead()), this, SLOT(slotReadData()));
+	connect( monitorSocket, SIGNAL(disconnected()), this, SLOT(slotUpdateMonitor()));
+
+	DString_Reset( daoString, 0 );
+}
+void DaoMonitor::slotReadData()
+{
+	QByteArray info = monitorSocket->readAll();
+	DString_AppendDataMBS( daoString, info.data(), info.size() );
+}
+void DaoMonitor::slotUpdateMonitor()
+{
+	DaoValue *value = NULL;
 	DaoNamespace *nspace = vmspace->mainNamespace;
 	DaoProcess *process = vmspace->mainProcess;
-	QByteArray info = monitorSocket->readAll();
-	DaoValue *value = NULL;
-	DString_SetDataMBS( daoString, info.data(), info.size() );
 	if( DaoValue_Deserialize( & value, daoString, nspace, process ) == 0 ) return;
 
 	if( requestTuple == NULL ){

@@ -1,18 +1,18 @@
-//=============================================================================
 /*
-   This file is a part of Dao Studio
-   Copyright (C) 2009-2011, Fu Limin
-Email: limin.fu@yahoo.com, phoolimin@gmail.com
-
-Dao Studio is free software; you can redistribute it and/or modify it under the terms
-of the GNU General Public License as published by the Free Software Foundation;
-either version 2 of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
- */
-//=============================================================================
+// Dao Studio
+// http://daovm.net
+//
+// Copyright (C) 2009-2014, Limin Fu
+// All rights reserved.
+//
+// Dao Studio is free software; you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation; either version 2 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+*/
 
 #include<QFile>
 #include<QFileInfo>
@@ -48,15 +48,10 @@ const char* const DaoKeyWords[] =
 {
 	//	"use",
 	"load",
-	"import",
-	"require",
 	//	"by",
 	//	"as",
 	"syntax",
-	"typedef",
-	"final",
 	"class",
-	"sub",
 	"routine",
 	"function",
 	"self",
@@ -73,18 +68,16 @@ const char* const DaoKeyWords[] =
 	"list",
 	//	"any",
 	//	"pair",
-	"curry",
 	"stream",
-	"buffer",
 	//	"io",
 	//	"std",
 	"math",
-	"reflect",
 	"coroutine",
-	"network",
 	//	"mpi",
+	"channel",
+	"future",
 	"thread",
-	"mtlib",
+	//"mtlib",
 	"mutex",
 	"condition",
 	"semaphore",
@@ -113,23 +106,15 @@ const char* const DaoKeyWords[] =
 	"private",
 	"protected",
 	"public",
-	"virtual",
 	//	"try",
-	"retry",
-	"rescue",
-	"raise",
-	"async",
-	"hurry",
-	"join",
 
 	"fold",
-	"unfold",
 	"reduce",
 	"select",
 	"index",
 	"count",
 	"each",
-	"repeat",
+	"iterate",
 	"sort",
 	"apply",
 
@@ -166,11 +151,9 @@ void DaoWordList::Extract( const QString & source )
 	for(i=0; i+1<lexer->tokens->size; i++){
 		DaoToken *tk = lexer->tokens->items.pToken[i];
 		switch( tk->name ){
-		case DKEY_SUB :
 		case DKEY_ENUM :
 		case DKEY_CLASS :
 		case DKEY_ROUTINE :
-		case DKEY_FUNCTION :
 			AddWord( lexer->tokens->items.pToken[i+1]->string.mbs );
 			break;
 		case DKEY_VAR :

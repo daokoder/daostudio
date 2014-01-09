@@ -1,18 +1,18 @@
-//=============================================================================
 /*
-   This file is a part of Dao Studio
-   Copyright (C) 2009-2011, Fu Limin
-Email: limin.fu@yahoo.com, phoolimin@gmail.com
-
-Dao Studio is free software; you can redistribute it and/or modify it under the terms
-of the GNU General Public License as published by the Free Software Foundation;
-either version 2 of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
- */
-//=============================================================================
+// Dao Studio
+// http://daovm.net
+//
+// Copyright (C) 2009-2014, Limin Fu
+// All rights reserved.
+//
+// Dao Studio is free software; you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation; either version 2 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+*/
 
 #include<QtCore>
 #include<QtGui>
@@ -21,14 +21,14 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #include"daoDebugger.h"
 #include<daoStudioMain.h>
 
-DaoDebugger::DaoDebugger()
+DaoxDebugger::DaoxDebugger()
 {
 	if( QFile::exists( DaoStudioSettings::socket_breakpoints ) )
 		QFile::remove( DaoStudioSettings::socket_breakpoints );
 	server.listen( DaoStudioSettings::socket_breakpoints );
 	connect( & server, SIGNAL(newConnection()), this, SLOT(slotSetBreakPoint()));
 }
-void DaoDebugger::slotSetBreakPoint()
+void DaoxDebugger::slotSetBreakPoint()
 {
 	QLocalSocket *socket = server.nextPendingConnection();
 	socket->waitForReadyRead();
@@ -45,7 +45,7 @@ void DaoDebugger::slotSetBreakPoint()
 	}
 }
 
-void DaoDebugger::SetBreakPoints( DaoRoutine *routine )
+void DaoxDebugger::SetBreakPoints( DaoRoutine *routine )
 {
 	QFileInfo fi( routine->nameSpace->name->mbs );
 	QString name = fi.absoluteFilePath();
@@ -69,7 +69,7 @@ void DaoDebugger::SetBreakPoints( DaoRoutine *routine )
 		}
 	}
 }
-void DaoDebugger::ResetExecution( DaoProcess *process, int line, int offset )
+void DaoxDebugger::ResetExecution( DaoProcess *process, int line, int offset )
 {
 	DaoRoutine *routine = process->activeRoutine;
 	DaoVmCodeX **annotCodes = routine->body->annotCodes->items.pVmc;
@@ -124,7 +124,7 @@ static int DaoVmCode_Similarity( const QMap<int,int> & regmap, DaoVmCode x, DaoV
 	}
 	return sim - errors;
 }
-void DaoDebugger::Similarity( QList<DaoVmCode> & x, QList<DaoVmCode> & y )
+void DaoxDebugger::Similarity( QList<DaoVmCode> & x, QList<DaoVmCode> & y )
 {
 	int m = x.size() + 1;
 	int n = y.size() + 1;
@@ -149,7 +149,7 @@ void DaoDebugger::Similarity( QList<DaoVmCode> & x, QList<DaoVmCode> & y )
 		//printf( "\n" );
 	}
 }
-void DaoDebugger::Matching( QList<DaoVmCode> & x, QList<DaoVmCode> & y )
+void DaoxDebugger::Matching( QList<DaoVmCode> & x, QList<DaoVmCode> & y )
 {
 	align1.clear();
 	align2.clear();
@@ -204,7 +204,7 @@ void DaoDebugger::Matching( QList<DaoVmCode> & x, QList<DaoVmCode> & y )
 		}
 	}
 }
-void DaoDebugger::Matching( int i, int j )
+void DaoxDebugger::Matching( int i, int j )
 {
 	if( i >0 && codesim[i][j] == codesim[i-1][j] ){
 		Matching( i-1, j );
@@ -239,7 +239,7 @@ static void DaoNS_UpdateLineInfo( DaoNamespace *ns, int start, int diff )
 		for(j=0; j<n; j++) tokens[j]->line += diff;
 	}
 }
-bool DaoDebugger::EditContinue ( DaoProcess *process, int newEntryLine, QList<int> & lineMap, QStringList & newCodes, QStringList & routCodes )
+bool DaoxDebugger::EditContinue ( DaoProcess *process, int newEntryLine, QList<int> & lineMap, QStringList & newCodes, QStringList & routCodes )
 {
 	DaoRoutine *oldrout = process->activeRoutine;
 	int i, j, k, dest = 0;

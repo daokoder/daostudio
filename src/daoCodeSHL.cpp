@@ -1,18 +1,18 @@
-//=============================================================================
 /*
-   This file is a part of Dao Studio
-   Copyright (C) 2009-2011, Fu Limin
-Email: limin.fu@yahoo.com, phoolimin@gmail.com
-
-Dao Studio is free software; you can redistribute it and/or modify it under the terms
-of the GNU General Public License as published by the Free Software Foundation;
-either version 2 of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
- */
-//=============================================================================
+// Dao Studio
+// http://daovm.net
+//
+// Copyright (C) 2009-2014, Limin Fu
+// All rights reserved.
+//
+// Dao Studio is free software; you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation; either version 2 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+*/
 
 #include<QFile>
 #include<QFileInfo>
@@ -1306,7 +1306,6 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 		case DKEY_USE : case DKEY_LOAD :
 		case DKEY_AS : case DKEY_SYNTAX : 
 		case DKEY_AND : case DKEY_OR : case DKEY_NOT :
-		case DKEY_VIRTUAL :
 			format = formatStmtKey;
 			break;
 		case DKEY_VAR : case DKEY_CONST : case DKEY_STATIC : case DKEY_GLOBAL :
@@ -1316,7 +1315,7 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 		case DKEY_IF : case DKEY_ELSE :
 		case DKEY_WHILE : case DKEY_DO :
 		case DKEY_FOR : case DKEY_IN :
-		case DKEY_SKIP : case DKEY_BREAK : case DKEY_CONTINUE :
+		case DKEY_SKIP : case DKEY_BREAK :
 		case DKEY_RETURN : case DKEY_YIELD :
 		case DKEY_SWITCH : case DKEY_CASE : case DKEY_DEFAULT :
 			format = formatStmtKey;
@@ -1326,7 +1325,7 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 		case DKEY_FLOAT : case DKEY_DOUBLE :
 		case DKEY_STRING : case DKEY_COMPLEX :
 		case DKEY_LIST : case DKEY_MAP : case DKEY_TUPLE : case DKEY_ARRAY :
-		case DKEY_CLASS : case DKEY_FUNCTION : case DKEY_ROUTINE : case DKEY_SUB :
+		case DKEY_CLASS : case DKEY_ROUTINE :
 		case DKEY_OPERATOR :
 			format = formatTypeStruct;
 			break;

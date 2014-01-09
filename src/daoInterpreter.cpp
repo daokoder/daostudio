@@ -1,18 +1,18 @@
-//=============================================================================
 /*
-   This file is a part of Dao Studio
-   Copyright (C) 2009-2011, Fu Limin
-Email: limin.fu@yahoo.com, phoolimin@gmail.com
-
-Dao Studio is free software; you can redistribute it and/or modify it under the terms
-of the GNU General Public License as published by the Free Software Foundation;
-either version 2 of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
- */
-//=============================================================================
+// Dao Studio
+// http://daovm.net
+//
+// Copyright (C) 2009-2014, Limin Fu
+// All rights reserved.
+//
+// Dao Studio is free software; you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation; either version 2 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+*/
 
 #include<QtGui>
 #include<cmath>
@@ -212,7 +212,7 @@ static void DaoConsDebug( DaoEventHandler *self, DaoProcess *process )
 	//}
 	//printf( "all:\n%s\n", QString(data).toUtf8().data() );
 
-	DaoDebugger & debugger = self->debugger;
+	DaoxDebugger & debugger = self->debugger;
 	QList<int> lineMap;
 	QStringList newCodes, routCodes;
 	DaoRoutine *old = process->activeRoutine;
@@ -277,9 +277,9 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 	handler.interpreter = this;
 	handler.debug = DaoConsDebug;
 	handler.breaks = DaoSetBreaks;
-	handler.Called = NULL;
-	handler.Returned = NULL;
-	handler.InvokeHost = DaoProcessMonitor;
+	//handler.Called = NULL;
+	//handler.Returned = NULL;
+	//handler.InvokeHost = DaoProcessMonitor;
 	handler.timer.start();
 
 	vmSpace = DaoInit( NULL ); //XXX
@@ -289,7 +289,7 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 	handler.process = DaoVmSpace_MainProcess( vmSpace );
 	DaoVmSpace_SetUserStdio( vmSpace, (DaoUserStream*) & stdioStream );
 	DaoVmSpace_SetUserStdError( vmSpace, (DaoUserStream*) & errorStream );
-	DaoVmSpace_SetUserHandler( vmSpace, (DaoUserHandler*) & handler );
+	DaoVmSpace_SetUserDebugger( vmSpace, (DaoDebugger*) & handler );
 
 	DaoNamespace *ns = vmSpace->mainNamespace;
 	DString_SetMBS( ns->name, "interactive codes" );
@@ -319,7 +319,18 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 	DaoTuple_SetItem( messageTuple, (DaoValue*)codeList, INDEX_CODES );
 
 	SetPathWorking( "." );
+#ifdef MAC_OSX
+	DString *base = DString_New(1);
+	DString *mod = DString_New(1);
+	DString_SetMBS( base, programPath.toLocal8Bit().data() );
+	DString_SetMBS( mod, "../Frameworks/lib/dao/modules/" );
+	Dao_MakePath( base, mod );
+	DaoVmSpace_AddPath( vmSpace, mod->mbs );
+	DString_Delete( base );
+	DString_Delete( mod );
+#else
 	DaoVmSpace_AddPath( vmSpace, programPath.toLocal8Bit().data() );
+#endif
 
 	if( QFile::exists( DaoStudioSettings::socket_data ) )
 		QFile::remove( DaoStudioSettings::socket_data );
@@ -862,7 +873,6 @@ void DaoInterpreter::ViewClass( DaoClass *klass )
 	size_t i;
 	QString itemName = "Class[" + QString( klass->className->mbs ) + "]";
 	QString info, data;
-	DaoClass *sup;
 
 	InitMessage( (DaoValue*)klass );
 	DString_SetMBS( messageTuple->items[INDEX_NAME]->xString.data, itemName.toUtf8().data() );
@@ -875,12 +885,14 @@ void DaoInterpreter::ViewClass( DaoClass *klass )
 	data += "\n# constants\n" + QString::number( klass->constants->size );
 	data += "\n# globals\n" + QString::number( klass->variables->size );
 	data += "\n# variables\n" + QString::number( klass->objDataName->size );
-	if( klass->superClass->size ) data += "\n# parent(s)\n";
-
-	for(i=0; i<klass->superClass->size; i++){
-		sup = klass->superClass->items.pClass[i];
-		info = "Class[" + StringAddress( sup ) + "]";
-		data += sup->className->mbs + QString("\n");
+	if( klass->parent ){
+		data += "\n# parent\n";
+		info = "Class[" + StringAddress( klass->parent ) + "]";
+		if( klass->parent->type == DAO_CLASS ){
+			data += klass->parent->xClass.className->mbs + QString("\n");
+		}else{
+			data += klass->parent->xCtype.ctype->name->mbs + QString("\n");
+		}
 		DString_SetMBS( extraTuple->items[0]->xString.data, info.toUtf8().data() );
 		DaoList_PushBack( extraList, (DaoValue*)extraTuple );
 	}
@@ -909,8 +921,7 @@ void DaoInterpreter::ViewObject( DaoObject *object )
 	data = "# address:\n" + StringAddress( object );
 	data += "\n# type\n" + QString( klass->className->mbs );
 	data += "\n# variables\n" + QString::number( klass->objDataName->size );
-	if( klass->superClass->size )
-		data += "\n# parent(s)\n" + QString::number( klass->superClass->size );
+	if( klass->parent ) data += "\n# parent(s)\n1";
 
 	InitMessage( (DaoValue*)object );
 	DString_SetMBS( messageTuple->items[INDEX_NAME]->xString.data, itemName.toUtf8().data() );
@@ -922,8 +933,8 @@ void DaoInterpreter::ViewObject( DaoObject *object )
 	info = "Class[" + StringAddress( klass ) + "]";
 	DString_SetMBS( extraTuple->items[0]->xString.data, info.toUtf8().data() );
 	DaoList_PushBack( extraList, (DaoValue*)extraTuple );
-	for(i=0; i<klass->superClass->size; i++){
-		info = "Object[" + StringAddress( object->parents[i] ) + "]";
+	if( object->parent ){
+		info = "Object[" + StringAddress( object->parent ) + "]";
 		DString_SetMBS( extraTuple->items[0]->xString.data, info.toUtf8().data() );
 		DaoList_PushBack( extraList, (DaoValue*)extraTuple );
 	}
@@ -1099,7 +1110,8 @@ void DaoInterpreter::ViewClassData( DaoClass *klass, DaoTuple *request )
 	int row = request->items[2]->xInteger.value;
 	int col = request->items[3]->xInteger.value;
 	if( table == INFO_TABLE ){
-		ViewValue( klass->superClass->items.pValue[row] );
+		//ViewValue( klass->superClass->items.pValue[row] );
+#warning "klass->superClass->items.pValue[row]"
 	}else if( table == DATA_TABLE ){
 		ViewValue( klass->constants->items.pValue[row] );
 	}else if( table == CODE_TABLE ){
@@ -1114,7 +1126,8 @@ void DaoInterpreter::ViewObjectData( DaoObject *object, DaoTuple *request )
 	if( table == INFO_TABLE ){
 		switch( row ){
 		case 0 : ViewValue( (DaoValue*)object->defClass ); break;
-		default : ViewValue( object->parents[row-1] ); break;
+		//default : ViewValue( object->parents[row-1] ); break;
+#warning "object->parents[row-1]"
 		}
 	}else if( table == DATA_TABLE ){
 		ViewValue( object->objValues[row] );

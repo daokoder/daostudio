@@ -1,18 +1,18 @@
-//=============================================================================
 /*
-This file is a part of Dao Studio
-Copyright (C) 2009-2011, Fu Limin
-Email: limin.fu@yahoo.com, phoolimin@gmail.com
-
-Dao Studio is free software; you can redistribute it and/or modify it under the terms
-of the GNU General Public License as published by the Free Software Foundation;
-either version 2 of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
- */
-//=============================================================================
+// Dao Studio
+// http://daovm.net
+//
+// Copyright (C) 2009-2014, Limin Fu
+// All rights reserved.
+//
+// Dao Studio is free software; you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation; either version 2 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+*/
 
 #include<QtGui>
 #include<cmath>
@@ -71,7 +71,7 @@ void DaoTextBrowser::keyPressEvent ( QKeyEvent * event )
 DaoDocViewer::DaoDocViewer( QWidget *parent, const QString & path ) 
 : DaoTextBrowser( parent )
 {
-	viewport()->setStyleSheet( "font-size: 14pt;" );
+	//viewport()->setStyleSheet( "font-family: courier; font-size: 20pt;" );
 	setHtml( "" );
 	SetPath( path + "/doc/html/" );
 
@@ -604,6 +604,8 @@ void DaoStudio::slotFontSize( int size )
 		editor->SetFontSize( size + 10 );
 	}
 	wgtConsole->SetFontSize( size + 10 );
+
+	docViewer->setFont( DaoStudioSettings::codeFont );
 }
 void DaoStudio::slotFontFamily( const QFont & font )
 {
@@ -615,6 +617,8 @@ void DaoStudio::slotFontFamily( const QFont & font )
 		editor->SetFontFamily( family );
 	}
 	wgtConsole->SetFontFamily( family );
+
+	docViewer->setFont( DaoStudioSettings::codeFont );
 }
 void DaoStudio::slotEditorColor( int scheme )
 {
