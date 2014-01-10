@@ -11,7 +11,7 @@ CONFIG += thread debug
 QT += network
 
 DEPENDPATH += . src
-INCLUDEPATH += . src dao/kernel dao/modules/serializer
+INCLUDEPATH += . src dao/kernel dao/modules/serializer dao/modules/profiler
 
 DEFINES += DAO_WITH_MACRO
 DEFINES += DAO_WITH_THREAD
@@ -51,14 +51,17 @@ FORMS += src/daoStudio.ui \
 RESOURCES += DaoStudio.qrc
 TRANSLATIONS = langs/daostudio_zh_cn.ts
 
-DEPENDPATH += dao
-DEPENDPATH += dao/modules/serializer
+DEPENDPATH += build
+DEPENDPATH += build/modules/serializer
+DEPENDPATH += build/modules/profiler
 
-LIBS += -Ldao -Ldao/modules/serializer -ldao -ldao_serializer
+LIBS += -Lbuild -Lbuild/modules/serializer -Lbuild/modules/profiler
+LIBS += -ldao -ldao_serializer -ldao_profiler
 
 
 win32 {
-	POST_TARGETDEPS += dao/dao.dll dao/modules/serializer/dao_serializer.dll
+	POST_TARGETDEPS += build/dao.dll build/modules/serializer/dao_serializer.dll
+	POST_TARGETDEPS += build/modules/profiler/dao_profiler.dll
 	RC_FILE = DaoStudio.rc
 	DEFINES += WIN32
 	#LIBS += -lwinmm -lwsock32
@@ -69,15 +72,18 @@ unix {
 	#QMAKE_LFLAGS += -Xlinker -rpath -Xlinker .
 }
 mac {
-	POST_TARGETDEPS += dao/libdao.dylib dao/modules/serializer/libdao_serializer.dylib
+	POST_TARGETDEPS += build/libdao.dylib build/modules/serializer/libdao_serializer.dylib
+	POST_TARGETDEPS += build/modules/profiler/libdao_profiler.dylib
 	ICON = icons/daostudio.icns
 	QMAKESPEC = macx-g++
 	DEFINES += UNIX MAC_OSX
 	#LIBS += -lz -lssl -lcrypto
-	QMAKE_LFLAGS += -Wl,-rpath,dao -Wl,-rpath,dao/modules/serializer
+	QMAKE_LFLAGS += -Wl,-rpath,dao -Wl,-rpath,build/modules/serializer
+	QMAKE_LFLAGS += -Wl,-rpath,build/modules/profiler
 
 	QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
 } else:unix{
-	POST_TARGETDEPS += dao/libdao.so dao/modules/serializer/libdao_serializer.so
+	POST_TARGETDEPS += build/libdao.so build/modules/serializer/libdao_serializer.so
+	POST_TARGETDEPS += build/modules/profiler/libdao_profiler.so
 }
 

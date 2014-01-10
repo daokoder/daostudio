@@ -1189,6 +1189,7 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 	DaoCodeLineData *ud = (DaoCodeLineData*) currentBlockUserData();
 	//if( ud and ud->rehighlight == false ) return;
 
+	if( language == (DaoBasicSyntax*)1 ) return;
 	if( language and language != DaoBasicSyntax::dao ){
 		HighlightNormal( text );
 		HighlightSearch( text );
@@ -1304,7 +1305,7 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 			format = formatSBracket;
 			break;
 		case DKEY_USE : case DKEY_LOAD :
-		case DKEY_AS : case DKEY_SYNTAX : 
+		case DKEY_AS : case DKEY_SYNTAX : case DKEY_DEFER :
 		case DKEY_AND : case DKEY_OR : case DKEY_NOT :
 			format = formatStmtKey;
 			break;

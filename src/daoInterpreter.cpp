@@ -171,6 +171,15 @@ static void DaoStdioWrite( DaoConsoleStream *self, DString *buf )
 	self->socket2.flush();
 	self->interpreter->mutex.unlock();
 }
+static void DaoSudio_SetColor( DaoConsoleStream *self, const char *fgcolor, const char *bgcolor )
+{
+	char buf[32];
+	int n = sprintf( buf, "\1%s:%s\2", fgcolor?fgcolor:"", bgcolor?bgcolor:"" );
+	self->interpreter->mutex.lock();
+	self->socket2.write( buf, n );
+	self->socket2.flush();
+	self->interpreter->mutex.unlock();
+}
 static void DaoConsDebug( DaoEventHandler *self, DaoProcess *process )
 {
 	self->interpreter->mutex.lock();
@@ -266,12 +275,12 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 	stdioStream.stdRead = DaoStdioRead;
 	stdioStream.stdWrite = DaoStdioWrite;
 	stdioStream.stdFlush = NULL;
-	stdioStream.SetColor = NULL;
+	stdioStream.SetColor = DaoSudio_SetColor;
 	stdioStream.interpreter = this;
 	errorStream.stdRead = DaoStdioRead;
 	errorStream.stdWrite = DaoStdioWrite;
 	errorStream.stdFlush = NULL;
-	errorStream.SetColor = NULL;
+	errorStream.SetColor = DaoSudio_SetColor;
 	errorStream.interpreter = this;
 	handler.time = 0;
 	handler.interpreter = this;
@@ -287,9 +296,11 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 	vmSpace->mainNamespace->options |= DAO_OPTION_IDE | DAO_OPTION_INTERUN;
 	nameSpace = vmSpace->mainNamespace;
 	handler.process = DaoVmSpace_MainProcess( vmSpace );
+	profiler = DaoxProfiler_New();
 	DaoVmSpace_SetUserStdio( vmSpace, (DaoUserStream*) & stdioStream );
 	DaoVmSpace_SetUserStdError( vmSpace, (DaoUserStream*) & errorStream );
 	DaoVmSpace_SetUserDebugger( vmSpace, (DaoDebugger*) & handler );
+	DaoVmSpace_SetUserProfiler( vmSpace, (DaoProfiler*) profiler );
 
 	DaoNamespace *ns = vmSpace->mainNamespace;
 	DString_SetMBS( ns->name, "interactive codes" );
@@ -361,6 +372,7 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 
 DaoInterpreter::~DaoInterpreter()
 {
+	DaoxProfiler_Delete( profiler );
 	shell->close();
 }
 
@@ -548,6 +560,10 @@ void DaoInterpreter::slotStartExecution()
 		res = (int) DaoProcess_Eval( vmp, ns, mbs->mbs );
 		DaoCallServer_Join();
 		DString_Delete( mbs );
+
+		DaoProfiler *profiler = vmSpace->profiler;
+		if( profiler->Report ) profiler->Report( profiler, vmSpace->stdioStream );
+		if( profiler->Reset ) profiler->Reset( profiler );
 	}
 	fflush( stdout );
 	stdioStream.socket2.flush();

@@ -46,6 +46,7 @@ extern "C"{
 #include<daoRegex.h>
 #include<daoTasklet.h>
 #include<dao_serializer.h>
+#include<dao_profiler.h>
 }
 
 #include"daoStudioMain.h"

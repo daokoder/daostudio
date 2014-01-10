@@ -25,6 +25,21 @@
 QStringList DaoConsole::oldComdHist;
 bool DaoConsole::appendToFile = 0;
 
+const char* const dao_color_names[8]
+= { "black", "red", "green", "yellow", "blue", "magenta", "cyan", "white" };
+
+const QColor dao_colors[8] = 
+{
+	Qt::black ,
+	Qt::red ,
+	Qt::green ,
+	Qt::yellow ,
+	Qt::blue ,
+	Qt::magenta ,
+	Qt::cyan ,
+	Qt::white
+};
+
 DaoConsole::DaoConsole( QWidget *parent ) : DaoTextEdit( parent, & wordList )
 {
 	rgxDaoFile.setPattern( "^\\s*\\\\\\s*\\w+\\.dao\\b" );
@@ -32,6 +47,8 @@ DaoConsole::DaoConsole( QWidget *parent ) : DaoTextEdit( parent, & wordList )
 	rgxPrintRes.setPattern( "^\\s*=" );
 	rgxShellCmd.setPattern( "^\\s*\\\\" );
 	rgxHttpURL.setPattern( "^\\s*http(s?)://\\w+\\.\\w+" );
+
+	ResetDaoColors(0);
 
 	debugSocket = NULL;
 	stdinSocket = NULL;
@@ -186,9 +203,59 @@ void DaoConsole::ClearCommand()
 	cursor = textCursor();
 	cursor.removeSelectedText();
 }
+void DaoConsole::ResetDaoColors( int scheme )
+{
+	int i, j;
+	QColor fcolor = Qt::black;
+	QColor bcolor = Qt::white;
+	QTextCharFormat charFormat;
+
+	switch( scheme ){
+	case 0 :
+		bcolor = Qt::white;
+		break;
+	case 1 :
+		bcolor = QColor( "#DDDDDD" );
+		break;
+	case 2 :
+		fcolor = Qt::white;
+		bcolor = QColor( "#222222" );
+		break;
+	default :
+		fcolor = Qt::white;
+		bcolor = QColor( "#000000" );
+		break;
+	}
+
+	charFormat.setForeground( fcolor );
+	charFormat.setBackground( bcolor );
+	charFormats[ ":" ] = charFormat;
+
+	for(i=0; i<8; ++i){
+		QString name1 = dao_color_names[i];
+		QString name2 = ":";
+		name1 += ":";
+		name2 += dao_color_names[i];
+		charFormat.setForeground( dao_colors[i] );
+		charFormat.setBackground( bcolor );
+		charFormats[ name1 ] = charFormat;
+		charFormat.setForeground( fcolor );
+		charFormat.setBackground( dao_colors[i] );
+		charFormats[ name2 ] = charFormat;
+		charFormat.setForeground( dao_colors[i] );
+		for(j=0; j<8; ++j){
+			QString name = dao_color_names[i];
+			name += ":";
+			name += dao_color_names[j];
+			charFormat.setBackground( dao_colors[j] );
+			charFormats[ name ] = charFormat;
+		}
+	}
+}
 void DaoConsole::SetColorScheme( int scheme )
 {
 	DaoTextEdit::SetColorScheme( scheme );
+	ResetDaoColors( scheme );
 	QString src = toPlainText().mid( cursorBound );
 	ClearCommand();
 	insertPlainText( src );
@@ -654,6 +721,9 @@ void DaoConsole::slotPrintOutput( const QString & output )
 				QString name = part.left( k );
 				if( codehl.languages.contains( name ) ){
 					codehl.language = codehl.languages[ name ];
+				}else if( name.indexOf( ':' ) >= 0 && charFormats.contains( name ) ){
+					codehl.language = (DaoBasicSyntax*) 1;
+					setCurrentCharFormat( charFormats[ name ] );
 				}else{
 					codehl.language = NULL;
 					if( name.size() ) insertPlainText( '\1' + name + '\2' );

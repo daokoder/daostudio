@@ -98,6 +98,7 @@ class DaoConsole : public DaoTextEdit
 	DaoLexer  *lexer;
 
 	QList<int> promptBlocks;
+	QMap<QString,QTextCharFormat> charFormats;
 
 	static bool appendToFile;
 	static QStringList oldComdHist;
@@ -111,6 +112,7 @@ class DaoConsole : public DaoTextEdit
 	DaoConsole( QWidget *parent=NULL );
 	~DaoConsole();
 
+	void ResetDaoColors( int scheme );
 	void SetColorScheme( int scheme );
 	void PrintPrompt();
 	void SetVmSpace( DaoVmSpace *vms );

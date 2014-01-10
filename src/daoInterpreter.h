@@ -95,6 +95,7 @@ Q_OBJECT
 	QString  pathWorking;
 	QString  pathImage;
 
+	DaoxProfiler *profiler;
 	DaoConsoleStream stdioStream;
 	DaoConsoleStream errorStream;
 	DaoEventHandler	handler;
