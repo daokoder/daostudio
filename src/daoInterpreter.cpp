@@ -298,9 +298,9 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 	handler.process = DaoVmSpace_MainProcess( vmSpace );
 	profiler = DaoxProfiler_New();
 	DaoVmSpace_SetUserStdio( vmSpace, (DaoUserStream*) & stdioStream );
-	DaoVmSpace_SetUserStdError( vmSpace, (DaoUserStream*) & errorStream );
+	//DaoVmSpace_SetUserStdError( vmSpace, (DaoUserStream*) & errorStream );
+	DaoVmSpace_SetUserStdError( vmSpace, (DaoUserStream*) & stdioStream );
 	DaoVmSpace_SetUserDebugger( vmSpace, (DaoDebugger*) & handler );
-	DaoVmSpace_SetUserProfiler( vmSpace, (DaoProfiler*) profiler );
 
 	DaoNamespace *ns = vmSpace->mainNamespace;
 	DString_SetMBS( ns->name, "interactive codes" );
@@ -405,8 +405,13 @@ void DaoInterpreter::slotReadStdOut()
 		for(i=0; i<n; i++) printf( "%c", data[i] );
 		fflush( stdout );
 #endif
+#if 0
 		errorStream.socket2.write( output.data(), output.size() );
 		errorStream.socket2.flush();
+#else
+		stdioStream.socket2.write( output.data(), output.size() );
+		stdioStream.socket2.flush();
+#endif
 	}
 }
 void DaoInterpreter::slotShellFinished(int, QProcess::ExitStatus)
@@ -495,6 +500,11 @@ void DaoInterpreter::slotStartExecution()
 		QDir::setCurrent( QString::fromUtf8( script.data(), script.size() ) );
 		scriptSocket->disconnectFromServer();
 		return;
+	}else if( info == DAO_PROFILER_SWITCH ){
+		char checked = script[0];
+		DaoVmSpace_SetUserProfiler( vmSpace, checked ? (DaoProfiler*) profiler : NULL );
+		scriptSocket->disconnectFromServer();
+		return;
 	}
 	stdioStream.socket2.connectToServer( DaoStudioSettings::socket_stdout );
 	if( stdioStream.socket2.waitForConnected( 1000 ) ==0 ){
@@ -503,6 +513,7 @@ void DaoInterpreter::slotStartExecution()
 		scriptSocket->disconnectFromServer();
 		return;
 	}
+#if 0
 	errorStream.socket2.connectToServer( DaoStudioSettings::socket_stderr );
 	if( errorStream.socket2.waitForConnected( 1000 ) ==0 ){
 		printf( "cannot connect to console stderr\n" );
@@ -510,6 +521,7 @@ void DaoInterpreter::slotStartExecution()
 		scriptSocket->disconnectFromServer();
 		return;
 	}
+#endif
 
 
 	if( info )
@@ -562,14 +574,18 @@ void DaoInterpreter::slotStartExecution()
 		DString_Delete( mbs );
 
 		DaoProfiler *profiler = vmSpace->profiler;
-		if( profiler->Report ) profiler->Report( profiler, vmSpace->stdioStream );
-		if( profiler->Reset ) profiler->Reset( profiler );
+		if( profiler ){
+			if( profiler->Report ) profiler->Report( profiler, vmSpace->stdioStream );
+			if( profiler->Reset ) profiler->Reset( profiler );
+		}
 	}
 	fflush( stdout );
 	stdioStream.socket2.flush();
 	stdioStream.socket2.disconnectFromServer();
+#if 0
 	errorStream.socket2.flush();
 	errorStream.socket2.disconnectFromServer();
+#endif
 
 	QLocalSocket socket;
 	socket.connectToServer( DaoStudioSettings::socket_logger );

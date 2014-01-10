@@ -78,7 +78,7 @@ mac {
 	QMAKESPEC = macx-g++
 	DEFINES += UNIX MAC_OSX
 	#LIBS += -lz -lssl -lcrypto
-	QMAKE_LFLAGS += -Wl,-rpath,dao -Wl,-rpath,build/modules/serializer
+	QMAKE_LFLAGS += -Wl,-rpath,build -Wl,-rpath,build/modules/serializer
 	QMAKE_LFLAGS += -Wl,-rpath,build/modules/profiler
 
 	QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5

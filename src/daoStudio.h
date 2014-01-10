@@ -179,6 +179,7 @@ protected:
 	void slotStart();
 	void slotDebug();
 	void slotStop();
+	void slotProfiler(bool);
 	void slotMSplit(bool);
 	void slotFontSize(int);
 	void slotFileSuffix(int);

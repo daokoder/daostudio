@@ -277,6 +277,7 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	connect( actionPaste, SIGNAL(triggered()), this, SLOT(slotPaste()) );
 	connect( actionStart, SIGNAL(triggered()), this, SLOT(slotStart()) );
 	connect( actionDebug, SIGNAL(triggered()), this, SLOT(slotDebug()) );
+	connect( actionProfiler, SIGNAL(triggered(bool)), this, SLOT(slotProfiler(bool)) );
 	connect( actionStop, SIGNAL(triggered()), this, SLOT(slotStop()) );
 	connect( actionMSplit, SIGNAL(triggered(bool)), this, SLOT(slotMSplit(bool)) );
 	connect( actionFind, SIGNAL(triggered()), this, SLOT(slotFind()) );
@@ -1029,6 +1030,16 @@ void DaoStudio::slotDebug()
 	slotWriteLog( tr("start to debug script file") + " \"" + script + "\"" );
 	script.replace( " ", "\\\\ " );
 	wgtConsole->LoadScript( script, true );
+}
+void DaoStudio::slotProfiler( bool checked )
+{
+	socket.connectToServer( DaoStudioSettings::socket_script );
+	if( socket.waitForConnected( 500 ) ){
+		socket.putChar( DAO_PROFILER_SWITCH );
+		socket.putChar( checked );
+		socket.flush();
+		socket.waitForDisconnected();
+	}
 }
 void DaoStudio::slotStop()
 {

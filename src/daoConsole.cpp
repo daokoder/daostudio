@@ -847,6 +847,7 @@ void DaoConsole::slotSocketStdout()
 }
 void DaoConsole::slotSocketStderr()
 {
+	return;
 	//slotPrintOutput( "connect socket\n" );
 	stdoutSocket = stderrServer.nextPendingConnection();
 	connect( stdoutSocket, SIGNAL(readyRead()), this, SLOT(slotStdoutFromSocket()) );
