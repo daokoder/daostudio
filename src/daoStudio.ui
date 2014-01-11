@@ -308,8 +308,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>344</width>
-          <height>510</height>
+          <width>100</width>
+          <height>88</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -376,8 +376,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>344</width>
-          <height>510</height>
+          <width>100</width>
+          <height>377</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -1142,7 +1142,7 @@
   </action>
   <action name="actionRestartMonitor">
    <property name="text">
-    <string>Restart Program Monitor</string>
+    <string>Restart Dao Virtual Machine</string>
    </property>
   </action>
   <action name="actionHelpVIM">

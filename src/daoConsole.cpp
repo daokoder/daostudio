@@ -698,7 +698,7 @@ void DaoConsole::slotPrintOutput( const QString & output )
 {
 	QScrollBar *bar = verticalScrollBar();
 	int i, k, sp = bar->sliderPosition();
-	bool scroll = sp+1 == bar->maximum();
+	bool scroll = sp+1 >= bar->maximum();
 	//printf( "%i %s\n\n\n", output.size(), output.toLocal8Bit().data() );
 	//printf( "======= %i %i\n\n\n", shellTop, output.indexOf( "Processes" ) );
 	if( shellTop ){

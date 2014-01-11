@@ -565,21 +565,22 @@ void DaoStudio::RestartMonitor()
 	connect( monitor, SIGNAL(finished(int, QProcess::ExitStatus)),
 		this, SLOT(slotRestartMonitor(int, QProcess::ExitStatus)));
 	SendPathWorking();
-	slotWriteLog( tr("restart Dao Program Monitor") );
+	slotWriteLog( tr("Restart Dao Virtual Machine") );
 	wgtConsole->SetState( DAOCON_READY );
+	wgtMonitor->Reset();
 }
 void DaoStudio::slotRestartMonitor2()
 {
-	slotWriteLog( tr("Dao Program Monitor exited for unknown reason") );
+	slotWriteLog( tr("Dao Virtual Machine exited for unknown reason") );
 	RestartMonitor();
 }
 void DaoStudio::slotRestartMonitor( int code, QProcess::ExitStatus status )
 {
 	QString log;
 	if( status == QProcess::CrashExit ){
-		log = tr("Dao Program Monitor crashed unexpectly");
+		log = tr("Dao Virtual Machine crashed unexpectly");
 	}else{
-		log = tr("Dao Program Monitor exited with code");
+		log = tr("Dao Virtual Machine exited with code");
 		log += " " + QString::number( code );
 	}
 	slotWriteLog( log );
@@ -920,10 +921,10 @@ void DaoStudio::slotReplace()
 void DaoStudio::slotRestartMonitor()
 {
 	QMessageBox mbox( this );
-	mbox.setWindowTitle( tr("DaoStudio: Restart Dao Program Monitor") );
-	mbox.setText( tr( "The Dao Program Monitor is about to be restarted:") + "\n"
+	mbox.setWindowTitle( tr("DaoStudio: Restart Dao Virtual Machine") );
+	mbox.setText( tr( "The Dao Virtual Machine is about to restart:") + "\n"
 		//      + tr("Choose \"Restore\" to restore data in the workspace;") + "\n"
-		+ tr("Choose \"Restart\" to start a new workspace;") + "\n"
+		+ tr("Choose \"Restart\" to start a new virtual machine;") + "\n"
 		+ tr("Choose \"Abort\" to abort this operation.") );
 	//  QAbstractButton *bt1 = mbox.addButton( tr("Restore"), QMessageBox::AcceptRole );
 	QAbstractButton *bt2 = mbox.addButton( tr("Restart"), QMessageBox::DestructiveRole );

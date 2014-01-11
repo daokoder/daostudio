@@ -57,12 +57,9 @@ DaoMonitor::DaoMonitor( QWidget *parent ) : QWidget( parent )
 			this, SLOT(slotInfoTableClicked(int, int) ) );
 	connect( wgtExtraTable, SIGNAL(cellDoubleClicked(int,int)), 
 			this, SLOT(slotExtraTableClicked(int, int) ) );
-	connect( wgtDataTable, SIGNAL(cellChanged(int,int)), 
-			this, SLOT(slotElementChanged(int, int) ) );
 
 	connect( wgtDataList, SIGNAL(itemDoubleClicked(QListWidgetItem*)), 
 			this, SLOT(slotValueActivated(QListWidgetItem*)) );
-	connect( btnUpdateValue, SIGNAL(clicked()), this, SLOT(slotUpdateValue()));
 
 	if( QFile::exists( DaoStudioSettings::socket_monitor ) )
 		QFile::remove( DaoStudioSettings::socket_monitor );
@@ -112,6 +109,13 @@ void DaoMonitor::slotReadData()
 	QByteArray info = monitorSocket->readAll();
 	DString_AppendDataMBS( daoString, info.data(), info.size() );
 }
+void DaoMonitor::Reset()
+{
+	wgtDataList->clear();
+	wgtDataInfo->clear();
+	wgtDataValue->clear();
+	EnableNoneTable();
+}
 void DaoMonitor::slotUpdateMonitor()
 {
 	DaoValue *value = NULL;
@@ -132,6 +136,7 @@ void DaoMonitor::slotUpdateMonitor()
 		return;
 	}
 #endif
+	int subtype = tuple->items[INDEX_SUBTYPE]->xInteger.value;
 	currentType = tuple->items[INDEX_TYPE]->xInteger.value;
 	currentEntry = tuple->items[INDEX_ENTRY]->xInteger.value;
 	currentTop = tuple->items[INDEX_TOP]->xInteger.value;
@@ -139,6 +144,7 @@ void DaoMonitor::slotUpdateMonitor()
 
 	QListWidgetItem *it = new QListWidgetItem( tuple->items[INDEX_NAME]->xString.data->mbs );
 	wgtDataList->insertItem( 0, it );
+	wgtDataList->setCurrentItem( it );
 
 	wgtDataInfo->setPlainText( tuple->items[INDEX_INFO]->xString.data->mbs );
 	wgtDataValue->setPlainText( tuple->items[INDEX_VALUE]->xString.data->mbs );
@@ -148,10 +154,13 @@ void DaoMonitor::slotUpdateMonitor()
 	case DAO_TUPLE : ViewTuple( tuple ); break;
 	case DAO_LIST : ViewList( tuple ); break;
 	case DAO_MAP : ViewMap( tuple ); break;
-	case DAO_ROUTINE : ViewRoutine( tuple ); break;
-#warning"==========================="
-	//case DAO_FUNCTION : ViewFunction( tuple ); break;
-	//case DAO_FUNCTREE : ViewFunctree( tuple ); break;
+	case DAO_ROUTINE :
+				   switch( subtype ){
+				   case DAO_ROUTINE: ViewRoutine( tuple ); break;
+				   case DAO_CFUNCTION : ViewFunction( tuple ); break;
+				   case DAO_ROUTINES : ViewRoutines( tuple ); break;
+				   }
+				   break;
 	case DAO_CLASS   : ViewClass( tuple ); break;
 	case DAO_OBJECT   : ViewObject( tuple ); break;
 	case DAO_NAMESPACE : ViewNamespace( tuple ); break;
@@ -164,6 +173,8 @@ void DaoMonitor::slotUpdateMonitor()
 }
 void DaoMonitor::slotValueActivated( QListWidgetItem *item )
 {
+	if( wgtDataList->row( item ) == 0 ) return;
+
 	DString_SetMBS( requestTuple->items[0]->xString.data, item->text().toUtf8().data() );
 	requestTuple->items[1]->xInteger.value = DATA_STACK;
 	requestTuple->items[2]->xInteger.value = wgtDataList->row( item );
@@ -175,7 +186,6 @@ void DaoMonitor::slotValueActivated( QListWidgetItem *item )
 }
 void DaoMonitor::ClearDataStack()
 {
-	printf( "wgtDataList = %p\n", wgtDataList );
 	for(int i=0; i<wgtDataList->count(); i++){
 		QListWidgetItem *it = wgtDataList->item(i);
 		if( it->text() == "Process[Debugging]" ){
@@ -198,7 +208,7 @@ void DaoMonitor::ViewArray( DaoTuple *tuple )
 	wgtDataTable->setRowCount( array->size / n );
 	wgtDataTable->setColumnCount( n );
 	for(i=0; i<n; i++) wgtDataTable->setColumnWidth( i, 80 );
-	wgtDataTable->setEditTriggers( QAbstractItemView::DoubleClicked );
+	//wgtDataTable->setEditTriggers( QAbstractItemView::DoubleClicked );
 
 	tmp.resize( array->ndim );
 	row = -1;
@@ -349,8 +359,9 @@ void DaoMonitor::ViewRoutine( DaoTuple *tuple )
 }
 void DaoMonitor::ViewFunction( DaoTuple *tuple )
 {
+	EnableNoneTable(); // XXX
 }
-void DaoMonitor::ViewFunctree( DaoTuple *tuple )
+void DaoMonitor::ViewRoutines( DaoTuple *tuple )
 {
 	DArray *extras = & tuple->items[INDEX_EXTRAS]->xList.items;
 	size_t i, j;
@@ -381,7 +392,7 @@ void DaoMonitor::ViewClass( DaoTuple *tuple )
 	wgtInfoTable->setHorizontalHeaderLabels( QStringList( tr("Data") ) );
 	for(i=0; i<extras->size; i++){
 		DaoTuple *itup = extras->items.pTuple[i];
-		rowlabs<<tr("Parent Class")+QString::number(i+1);
+		rowlabs<<tr("Parent/Mixin")+QString::number(i+1);
 		for(j=0; j<1; j++){
 			wgtInfoTable->setItem( i, j, new QTableWidgetItem( itup->items[j]->xString.data->mbs ) );
 		}
@@ -390,18 +401,10 @@ void DaoMonitor::ViewClass( DaoTuple *tuple )
 	rowlabs.clear();
 
 	wgtDataTableGroup->setTitle( tr("Constants") );
-	wgtExtraTableGroup->setTitle( tr("Global Variables") );
+	wgtExtraTableGroup->setTitle( tr("Static Variables") );
 
 	FillTable( wgtDataTable, (DaoList*)tuple->items[INDEX_CONSTS] );
 	FillTable( wgtExtraTable, (DaoList*)tuple->items[INDEX_VARS] );
-#if 0
-	for(i=0; i<klass->cstData->size; i++){
-		DaoValue *val = klass->cstData->items.pValue[i];
-		//XXX if( val.t != DAO_ROUTINE || val.v.routine->tidHost != DAO_CLASS ) continue;
-		//XXX if( val.v.routine->routHost->aux.v.klass == klass )
-		//XXX	wgtDataTable->item(i,0)->setBackground( QColor(200,250,200) );
-	}
-#endif
 }
 void DaoMonitor::ViewObject( DaoTuple *tuple )
 {
@@ -663,7 +666,6 @@ void DaoMonitor::EnableOneTable( DaoValue *p )
 	wgtDataTable->clear();
 	wgtExtraTable->clear();
 	wgtDataTableGroup->show();
-	wgtDataTableGroup->show();
 	wgtInfoTableGroup->hide();
 	wgtExtraTableGroup->hide();
 	QList<int> sizes;
@@ -677,7 +679,6 @@ void DaoMonitor::EnableTwoTable( DaoValue *p )
 	wgtDataValue->clear();
 	wgtDataTable->clear();
 	wgtExtraTable->clear();
-	wgtDataTableGroup->show();
 	wgtDataTableGroup->show();
 	wgtInfoTableGroup->hide();
 	wgtExtraTableGroup->show();
@@ -697,7 +698,6 @@ void DaoMonitor::EnableThreeTable( DaoValue *p )
 	wgtExtraTable->clear();
 	//wgtValuePanel->hide();
 	wgtDataTableGroup->show();
-	wgtDataTableGroup->show();
 	wgtInfoTableGroup->show();
 	wgtExtraTableGroup->show();
 	wgtDataTable->setEditTriggers( QAbstractItemView::NoEditTriggers );
@@ -707,82 +707,5 @@ void DaoMonitor::EnableThreeTable( DaoValue *p )
 	int w = width()/8;
 	sizes<<w+w<<3*w<<3*w;
 	dataSplitter->setSizes( sizes );
-}
-extern "C"{
-//DaoValue* DaoParseNumber( DaoToken *tok, DLong *bigint, DaoComplex *buffer );
-}
-void DaoMonitor::slotUpdateValue()
-{
-	if( currentValue ==NULL ) return;
-	DaoToken *tok = NULL;
-	DaoValue *number, *value = currentValue;
-	QByteArray text = wgtDataValue->toPlainText().toUtf8();
-	bool ok = true;
-	if( value->type && (value->type <= DAO_DOUBLE || value->type == DAO_LONG) ){
-		DArray *tokens = lexer->tokens;
-		DaoLexer_Tokenize( lexer, text.data(), DAO_LEX_COMMENT );
-		if( tokens->size ) tok = tokens->items.pToken[0];
-		if( tokens->size !=1 || tok->type <DTOK_DIGITS_DEC|| tok->type >DTOK_NUMBER_SCI ){
-			QMessageBox::warning( this, tr("DaoStudio"),
-					tr("Invalid value for the data type!"), QMessageBox::Cancel );
-			return;
-		}
-		//XXX number = DaoParseNumber( tok, daoLong );
-	}
-#if 0
-	switch( value->type ){
-	case DAO_INTEGER : value->xInteger.value = DaoValue_GetInteger( number ); break;
-	case DAO_FLOAT   : value->xFloat.value = DaoValue_GetFloat( number ); break;
-	case DAO_DOUBLE  : value->xDouble.value = DaoValue_GetDouble( number ); break;
-	case DAO_COMPLEX :
-					  break;
-	case DAO_STRING :
-					  DString_SetDataMBS( value->xString.data, text.data(), text.size() );
-					  break;
-	case DAO_LONG :
-					  break;
-	default : break;
-	}
-	if( ok ){
-		ViewValue( currentValue );
-	}else{
-		QMessageBox::warning( this, tr("DaoStudio"),
-				tr("Invalid value for the data type!"), QMessageBox::Cancel );
-	}
-#endif
-}
-void DaoMonitor::slotElementChanged(int row, int col)
-{
-	if( currentValue == NULL || currentValue->type != DAO_ARRAY ) return;
-	int id = row * wgtDataTable->columnCount() + col;
-	DaoValue *number;
-	DaoToken *tok = NULL;
-	DaoArray *array = (DaoArray*) currentValue;
-	QByteArray text = wgtDataTable->item(row,col)->text().toLocal8Bit();
-	DArray *tokens = lexer->tokens;
-
-	DaoLexer_Tokenize( lexer, text.data(), DAO_LEX_COMMENT );
-	if( array->etype >= DAO_INTEGER && array->etype <= DAO_DOUBLE ){
-		if( tokens->size ) tok = tokens->items.pToken[0];
-		if( tokens->size !=1 || tok->type <DTOK_DIGITS_DEC || tok->type >DTOK_NUMBER_SCI ){
-			QMessageBox::warning( this, tr("DaoStudio"),
-					tr("Invalid value for the data type!"), QMessageBox::Cancel );
-			return;
-		}
-		//XXX number = DaoParseNumber( tok, daoLong );
-	}
-	switch( array->etype ){
-	case DAO_INTEGER :
-		array->data.i[id] = DaoValue_GetInteger( number );
-		break;
-	case DAO_FLOAT :
-		array->data.f[id] = DaoValue_GetFloat( number );
-		break;
-	case DAO_DOUBLE :
-		array->data.d[id] = DaoValue_GetDouble( number );
-		break;
-	case DAO_COMPLEX : // TODO
-		break;
-	}
 }
 

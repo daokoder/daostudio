@@ -76,6 +76,7 @@ Q_OBJECT
 
 	void SetVmSpace( DaoVmSpace *vms ){ vmspace = vms; }
 
+	void Reset();
 	void ClearDataStack();
 	void ViewArray( DaoTuple *tuple );
 	void ViewList( DaoTuple *tuple );
@@ -83,7 +84,7 @@ Q_OBJECT
 	void ViewTuple( DaoTuple *tuple );
 	void ViewRoutine( DaoTuple *tuple );
 	void ViewFunction( DaoTuple *tuple );
-	void ViewFunctree( DaoTuple *tuple );
+	void ViewRoutines( DaoTuple *tuple );
 	void ViewClass( DaoTuple *tuple );
 	void ViewObject( DaoTuple *tuple );
 	void ViewNamespace( DaoTuple *tuple );
@@ -98,8 +99,6 @@ protected slots:
 	void slotDataTableClicked(int, int);
 	void slotInfoTableClicked(int, int);
 	void slotExtraTableClicked(int, int);
-	void slotElementChanged(int, int);
-	void slotUpdateValue();
 
 	void slotAcceptConnection();
 	void slotReadData();

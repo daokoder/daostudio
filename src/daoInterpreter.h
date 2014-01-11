@@ -138,7 +138,7 @@ Q_OBJECT
 	void ViewTuple( DaoTuple *tuple );
 	void ViewRoutine( DaoRoutine *routine );
 	void ViewFunction( DaoRoutine *function );
-	void ViewFunctree( DaoRoutine *functree );
+	void ViewRoutines( DaoRoutine *routines );
 	void ViewClass( DaoClass *klass );
 	void ViewObject( DaoObject *object );
 	void ViewNamespace( DaoNamespace *nspace );
@@ -154,7 +154,7 @@ Q_OBJECT
 	void ViewMapData( DaoMap *map, DaoTuple *request );
 	void ViewRoutineData( DaoRoutine *routine, DaoTuple *request );
 	void ViewFunctionData( DaoRoutine *function, DaoTuple *request );
-	void ViewFunctreeData( DaoRoutine *functree, DaoTuple *request );
+	void ViewRoutinesData( DaoRoutine *routines, DaoTuple *request );
 	void ViewClassData( DaoClass *klass, DaoTuple *request );
 	void ViewObjectData( DaoObject *object, DaoTuple *request );
 	void ViewNamespaceData( DaoNamespace *ns, DaoTuple *request );

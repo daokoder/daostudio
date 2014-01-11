@@ -34,7 +34,7 @@
         </size>
        </property>
        <property name="title">
-        <string>Data List</string>
+        <string>Value View Stack</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <property name="margin">
@@ -53,7 +53,7 @@
         </size>
        </property>
        <property name="title">
-        <string>Data Information</string>
+        <string>Value Information</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <property name="margin">
@@ -179,6 +179,9 @@
            <height>0</height>
           </size>
          </property>
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
          <property name="rowCount">
           <number>5</number>
          </property>
@@ -200,50 +203,20 @@
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="widget_4" native="true">
+    <widget class="QGroupBox" name="groupBox_4">
      <property name="maximumSize">
       <size>
        <width>16777215</width>
        <height>60</height>
       </size>
      </property>
+     <property name="title">
+      <string>Value Data</string>
+     </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="margin">
        <number>2</number>
       </property>
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout_5">
-        <property name="sizeConstraint">
-         <enum>QLayout::SetMinimumSize</enum>
-        </property>
-        <item>
-         <widget class="QLabel" name="label_7">
-          <property name="maximumSize">
-           <size>
-            <width>100</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Data Value:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btnUpdateValue">
-          <property name="maximumSize">
-           <size>
-            <width>100</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Update</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
       <item>
        <widget class="QTextEdit" name="wgtDataValue">
         <property name="sizePolicy">
@@ -263,6 +236,9 @@
           <width>16777215</width>
           <height>60</height>
          </size>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

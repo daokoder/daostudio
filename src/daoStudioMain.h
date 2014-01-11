@@ -27,7 +27,7 @@
 #define EXTRA_ITEM_TYPE  "tuple<string,string,string>"
 
 #define VALUE_INFO_TYPE \
-"tuple<init:int,type:int,address:int,name:string,info:string,value:string," \
+"tuple<init:int,type:int,subtype:int,address:int,name:string,info:string,value:string," \
 "numbers:array<int>|array<float>|array<float>|array<double>|array<complex>," \
 "extras:list<tuple<string,string,string>>," \
 "consts:list<tuple<name:string,type:string,value:string>>," \
@@ -37,17 +37,18 @@
 
 #define INDEX_INIT    0
 #define INDEX_TYPE    1
-#define INDEX_ADDR    2
-#define INDEX_NAME    3
-#define INDEX_INFO    4
-#define INDEX_VALUE   5
-#define INDEX_NUMBERS 6
-#define INDEX_EXTRAS  7
-#define INDEX_CONSTS  8
-#define INDEX_VARS    9
-#define INDEX_CODES  10
-#define INDEX_ENTRY  11
-#define INDEX_TOP    12
+#define INDEX_SUBTYPE 2
+#define INDEX_ADDR    3
+#define INDEX_NAME    4
+#define INDEX_INFO    5
+#define INDEX_VALUE   6
+#define INDEX_NUMBERS 7
+#define INDEX_EXTRAS  8
+#define INDEX_CONSTS  9
+#define INDEX_VARS   10
+#define INDEX_CODES  11
+#define INDEX_ENTRY  12
+#define INDEX_TOP    13
 
 #define DATA_REQUEST_TYPE "tuple<object:string,table:int,row:int,column:int>"
 #define DATA_STACK 0
