@@ -751,12 +751,10 @@ void DaoConsole::slotReadStdOut()
 {
 	//QMessageBox::about( this, "test", "test" );
 
-#if 0
+#if 1
 	QByteArray output = monitor->readAllStandardOutput();
 	QString text = QString::fromUtf8( output.data(), output.size() );
-	slotPrintOutput( text );
-	output = monitor->readAllStandardError();
-	text = QString::fromUtf8( output.data(), output.size() );
+	//printf( "error=%i\n", monitor->error() );
 	slotPrintOutput( text );
 #elif 0
 	QByteArray output;
@@ -820,9 +818,18 @@ void DaoConsole::slotReadStdError()
 void DaoConsole::slotScriptFinished()
 {
 	slotStdoutFromSocket();
-	monitor->waitForReadyRead( TIME_YIELD + 20 );
-	slotReadStdOut();
-	slotReadStdError();
+
+	// Do not call the following, otherwise the stdout cannot be read after a timeout!
+	//monitor->waitForReadyRead( TIME_YIELD + 20 );
+
+	// Wait sometime for the stdout of "monitor", to make sure
+	// the command prompt is displayed after the outputs.
+	QTime dieTime= QTime::currentTime().addMSecs(100);
+	while( QTime::currentTime() < dieTime )
+		QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
+
+	while( monitor->bytesAvailable() ) slotReadStdOut();
+	//slotReadStdError();
 	shellTop = false;
 	PrintPrompt();
 	studio->SetState( DAOCON_READY );

@@ -90,6 +90,10 @@ static void DaoStdioWrite( DaoConsoleStream *self, DString *buf )
 	fprintf( fout, "%s\n", DString_GetMBS( buf ) );
 	fclose( fout );
 #endif
+	DaoFile_WriteString( stdout, buf );
+	fflush( stdout );
+	fflush( stderr );
+	return;
 	self->interpreter->mutex.lock();
 	self->socket2.write( DString_GetMBS( buf ), DString_Size( buf ) );
 	self->socket2.flush();

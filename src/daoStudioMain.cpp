@@ -112,6 +112,7 @@ int main( int argc, char *argv[] )
 			monitor = true;
 		}else if( strcmp( argv[i], "--interpreter" ) ==0 ){
 			interpreter = true;
+			setvbuf(stdout, NULL, _IONBF, 0);
 		}else if( strcmp( argv[i], "--socket-suffix" ) ==0 ){
 			i += 1;
 			if( i < argc ) suffix = argv[i];
