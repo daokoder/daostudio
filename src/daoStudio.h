@@ -182,6 +182,7 @@ protected:
 	void slotStart();
 	void slotDebug();
 	void slotStop();
+	void slotCompile();
 	void slotDebugger(bool);
 	void slotProfiler(bool);
 	void slotMSplit(bool);

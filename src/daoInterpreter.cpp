@@ -198,10 +198,19 @@ static void DaoProcessMonitor( DaoVmDebugger *self, DaoProcess *process )
 DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 {
 	int i;
+	DString *base = DString_New(1);
+	DString *mod = DString_New(1);
 
 	locale = DaoStudioSettings::locale;
 	program = DaoStudioSettings::program;
 	programPath = DaoStudioSettings::program_path;
+	daoBinPath = programPath;
+#ifdef MAC_OSX
+	DString_SetMBS( base, programPath.toLocal8Bit().data() );
+	DString_SetMBS( mod, "../Frameworks/bin/" );
+	Dao_MakePath( base, mod );
+	daoBinPath = QString::fromUtf8( mod->mbs, mod->size );
+#endif
 
 	vmState = DAOCON_READY;
 	debugProcess = NULL;
@@ -276,14 +285,10 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 
 	SetPathWorking( "." );
 #ifdef MAC_OSX
-	DString *base = DString_New(1);
-	DString *mod = DString_New(1);
 	DString_SetMBS( base, programPath.toLocal8Bit().data() );
 	DString_SetMBS( mod, "../Frameworks/lib/dao/modules/" );
 	Dao_MakePath( base, mod );
 	DaoVmSpace_AddPath( vmSpace, mod->mbs );
-	DString_Delete( base );
-	DString_Delete( mod );
 #else
 	DaoVmSpace_AddPath( vmSpace, programPath.toLocal8Bit().data() );
 #endif
@@ -313,6 +318,9 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 	//	this, SLOT(slotReadStdOut()));
 	connect( shell, SIGNAL(finished(int, QProcess::ExitStatus)),
 			this, SLOT(slotShellFinished(int, QProcess::ExitStatus)));
+
+	DString_Delete( base );
+	DString_Delete( mod );
 }
 
 DaoInterpreter::~DaoInterpreter()
@@ -379,6 +387,7 @@ void DaoInterpreter::slotServeData()
 	DString_SetDataMBS( daoString, data.data(), data.size() );
 	if( DaoValue_Deserialize( & value, daoString, nspace, process ) == 0 ) return;
 
+	//printf( "__LINE__ %i: %i %i\n", __LINE__, DaoList_Size( valueStack ), extraStack->size );
 	DaoTuple *request = (DaoTuple*) value;
 	if( request->items[1]->xInteger.value == DATA_STACK ){
 		int erase = request->items[2]->xInteger.value;
@@ -409,10 +418,8 @@ void DaoInterpreter::slotServeData()
 	case DAO_ROUTINE : 
 		if( value->xRoutine.overloads ){
 			ViewRoutinesData( (DaoRoutine*)value, request );
-		}else if( value->xRoutine.body ){
-			ViewRoutineData( (DaoRoutine*)value, request );
 		}else{
-			ViewFunctionData( (DaoRoutine*)value, request );
+			ViewRoutineData( (DaoRoutine*)value, request );
 		}
 		break;
 	case DAO_TUPLE : ViewTupleData( (DaoTuple*)value, request ); break;
@@ -505,7 +512,17 @@ void DaoInterpreter::slotStartExecution()
 	time.start();
 	int res = 0;
 	if( script[0] == '\\' ){
-		shell->start( script.mid(1).data(), QIODevice::ReadWrite | QIODevice::Unbuffered );
+		QString command = script.mid(1);
+		bool daobin = command.indexOf( "dao " ) == 0;
+		daobin |= command.indexOf( "daomake " ) == 0;
+		daobin |= command.indexOf( "daotest " ) == 0;
+		daobin |= command.indexOf( "clangdao " ) == 0;
+		daobin |= command.indexOf( "dao\t" ) == 0;
+		daobin |= command.indexOf( "daomake\t" ) == 0;
+		daobin |= command.indexOf( "daotest\t" ) == 0;
+		daobin |= command.indexOf( "clangdao\t" ) == 0;
+		if( daobin ) command = daoBinPath + command;
+		shell->start( command, QIODevice::ReadWrite | QIODevice::Unbuffered );
 		/* BUG
 		   while( not shell->waitForFinished( 100 ) ){
 		   QApplication::processEvents( QEventLoop::AllEvents, 100 );
@@ -518,7 +535,7 @@ void DaoInterpreter::slotStartExecution()
 			//shell->waitForReadyRead( 100 );
 			//DaoProcessMonitor( & guiDebugger );
 			//QApplication::processEvents( QEventLoop::WaitForMoreEvents, 100 );
-			Sleeper::Sleep( 10000 );
+			//Sleeper::Sleep( 10000 );
 			QApplication::processEvents( QEventLoop::AllEvents, 20 );
 			if( vmSpace->stopit ){
 				shell->kill();
@@ -689,10 +706,8 @@ void DaoInterpreter::ViewValue( DaoValue *value )
 	case DAO_ROUTINE :
 		if( value->xRoutine.overloads ){
 			ViewRoutines( (DaoRoutine*)value );
-		}else if( value->xRoutine.body ){
-			ViewRoutine( (DaoRoutine*)value );
 		}else{
-			ViewFunction( (DaoRoutine*)value );
+			ViewRoutine( (DaoRoutine*)value );
 		}
 		break;
 	case DAO_ARRAY : ViewArray( (DaoArray*)value ); break;
@@ -815,12 +830,15 @@ void DaoInterpreter::ViewTuple( DaoTuple *tuple )
 }
 void DaoInterpreter::ViewRoutine( DaoRoutine *routine )
 {
-	while( routine->body->revised ) routine = routine->body->revised;
 	DMap *map = DMap_New(D_STRING,0);
-	DaoToken **tokens = routine->body->defLocals->items.pToken;
-	int i, n = routine->body->defLocals->size;
-	for(i=0; i<n; i++) if( tokens[i]->type ==0 )
-		DMap_Insert( map, & tokens[i]->string, (void*)(size_t)tokens[i]->index );
+
+	if( routine->body ){
+		while( routine->body->revised ) routine = routine->body->revised;
+		DaoToken **tokens = routine->body->defLocals->items.pToken;
+		int i, n = routine->body->defLocals->size;
+		for(i=0; i<n; i++) if( tokens[i]->type ==0 )
+			DMap_Insert( map, & tokens[i]->string, (void*)(size_t)tokens[i]->index );
+	}
 
 	QString itemName = "Routine[" + QString( routine->routName->mbs ) + "]";
 	QString info = RoutineInfo( routine, routine );
@@ -842,11 +860,8 @@ void DaoInterpreter::ViewRoutine( DaoRoutine *routine )
 	}
 
 	MakeList( constList, routine->routConsts->items.items.pValue, routine->routConsts->items.size, NULL, map, 0 );
-	ViewVmCodes( codeList, routine );
+	if( routine->body ) ViewVmCodes( codeList, routine );
 	DMap_Delete( map );
-}
-void DaoInterpreter::ViewFunction( DaoRoutine *function )
-{
 }
 void DaoInterpreter::ViewRoutines( DaoRoutine *routines )
 {
@@ -1094,12 +1109,6 @@ void DaoInterpreter::ViewRoutineData( DaoRoutine *routine, DaoTuple *request )
 		ViewValue( routine->routConsts->items.items.pValue[row] );
 	}
 }
-void DaoInterpreter::ViewFunctionData( DaoRoutine *function, DaoTuple *request )
-{
-	int table = request->items[1]->xInteger.value;
-	int row = request->items[2]->xInteger.value;
-	int col = request->items[3]->xInteger.value;
-}
 void DaoInterpreter::ViewRoutinesData( DaoRoutine *routines, DaoTuple *request )
 {
 	int table = request->items[1]->xInteger.value;
@@ -1194,10 +1203,12 @@ QString DaoInterpreter::RoutineInfo( DaoRoutine *routine, void *address )
 	info += routine->routName->mbs;
 	info += "\n# type:\n";
 	info += routine->routType->name->mbs;
-	info += "\n\n# instructions:\n";
-	info += QString::number(routine->body->vmCodes->size);
-	info += "\n# variables:\n";
-	info += QString::number(routine->body->regCount);
+	if( routine->body ){
+		info += "\n\n# instructions:\n";
+		info += QString::number(routine->body->vmCodes->size);
+		info += "\n# variables:\n";
+		info += QString::number(routine->body->regCount);
+	}
 	if( ns->file->mbs ){
 		info += "\n\n# path:\n\"" + QString( ns->path->mbs );
 		info += "\"\n# file:\n\"" + QString( ns->file->mbs ) + "\"";

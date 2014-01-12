@@ -283,6 +283,7 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	connect( actionCut, SIGNAL(triggered()), this, SLOT(slotCut()) );
 	connect( actionPaste, SIGNAL(triggered()), this, SLOT(slotPaste()) );
 	connect( actionStart, SIGNAL(triggered()), this, SLOT(slotStart()) );
+	connect( actionCompile, SIGNAL(triggered()), this, SLOT(slotCompile()) );
 	connect( actionDebugger, SIGNAL(triggered(bool)), this, SLOT(slotDebugger(bool)) );
 	connect( actionProfiler, SIGNAL(triggered(bool)), this, SLOT(slotProfiler(bool)) );
 	connect( actionStop, SIGNAL(triggered()), this, SLOT(slotStop()) );
@@ -343,8 +344,8 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	bool add_suffix = false;
 	if( socket.waitForConnected( 100 ) ){
 		int ret = QMessageBox::warning(this, tr("DaoStudio"),
-			tr("DaoMonitor is running. Use it?\n\n"
-			"Warning: if you use the running DaoMonitor, "
+			tr("DaoMonitor is running. Use it?") + "\n\n" +
+			tr("Warning: if you use the running DaoMonitor, "
 			"its standard output will not be available in DaoStudio!"),
 			QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 		newStart = (ret == QMessageBox::No);
@@ -524,7 +525,7 @@ void DaoStudio::closeEvent ( QCloseEvent *e )
 {
 	if( vmState != DAOCON_READY ){
 		int ret = QMessageBox::warning(this, tr("DaoStudio"),
-			tr("The execution is not done yet.\nQuit anyway?"),
+			tr("The execution is not done yet.") + "\n" + tr("Quit anyway?"),
 			QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 		if( ret == QMessageBox::No ){
 			e->ignore();
@@ -1016,6 +1017,20 @@ void DaoStudio::slotMaxConsole( int )
 	QList<int> sizes;
 	sizes<<80<<80<<(h-160);
 	splitter->setSizes( sizes );
+}
+void DaoStudio::slotCompile()
+{
+	int id = wgtEditorTabs->currentIndex();
+	//wgtFrameList->clear();
+	if( id < ID_EDITOR ) return;
+	DaoEditor *editor = (DaoEditor*) wgtEditorTabs->widget( id );
+	QString script = wgtEditorTabs->tabToolTip( id );
+	if( script.right( 4 ) != ".dao" ) return;
+	if( editor->TextChanged() ) slotSave();
+	slotMaxConsole();
+	slotWriteLog( tr("compile script file") + " \"" + script + "\"" );
+	script.replace( " ", "\\\\ " );
+	wgtConsole->InsertScript( "\\dao -c " + script + "\n" );
 }
 void DaoStudio::slotStart()
 {

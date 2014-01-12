@@ -80,8 +80,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>359</width>
-          <height>510</height>
+          <width>100</width>
+          <height>249</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -308,8 +308,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>359</width>
-          <height>510</height>
+          <width>100</width>
+          <height>88</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -1002,6 +1002,7 @@
     </property>
     <addaction name="actionStart"/>
     <addaction name="actionStop"/>
+    <addaction name="actionCompile"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -1240,6 +1241,14 @@
    </property>
    <property name="toolTip">
     <string>Activate/Deactivate Profiler</string>
+   </property>
+  </action>
+  <action name="actionCompile">
+   <property name="text">
+    <string>Compile</string>
+   </property>
+   <property name="toolTip">
+    <string>Compile to Bytecode File</string>
    </property>
   </action>
  </widget>

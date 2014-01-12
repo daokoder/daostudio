@@ -156,8 +156,8 @@ void DaoMonitor::slotUpdateMonitor()
 	case DAO_MAP : ViewMap( tuple ); break;
 	case DAO_ROUTINE :
 				   switch( subtype ){
+				   case DAO_CFUNCTION : 
 				   case DAO_ROUTINE: ViewRoutine( tuple ); break;
-				   case DAO_CFUNCTION : ViewFunction( tuple ); break;
 				   case DAO_ROUTINES : ViewRoutines( tuple ); break;
 				   }
 				   break;
@@ -180,8 +180,8 @@ void DaoMonitor::slotValueActivated( QListWidgetItem *item )
 	requestTuple->items[2]->xInteger.value = wgtDataList->row( item );
 	requestTuple->items[3]->xInteger.value = 0;
 
-	int keep = wgtDataList->count() - wgtDataList->row( item ) - 1;
-	while( wgtDataList->count() > keep ) delete wgtDataList->takeItem(0);
+	while( wgtDataList->item(0) != item ) delete wgtDataList->takeItem(0);
+	delete item;
 	SendDataRequest();
 }
 void DaoMonitor::ClearDataStack()
@@ -334,6 +334,7 @@ void DaoMonitor::ViewMap( DaoTuple *tuple )
 void DaoMonitor::ViewRoutine( DaoTuple *tuple )
 {
 	DArray *extras = & tuple->items[INDEX_EXTRAS]->xList.items;
+	int subtype = tuple->items[INDEX_SUBTYPE]->xInteger.value;
 	size_t i, j;
 
 	EnableThreeTable( NULL );
@@ -355,11 +356,7 @@ void DaoMonitor::ViewRoutine( DaoTuple *tuple )
 		}
 	}
 	FillTable( wgtDataTable, (DaoList*)tuple->items[INDEX_CONSTS] );
-	FillCodes( wgtExtraTable, (DaoList*)tuple->items[INDEX_CODES] );
-}
-void DaoMonitor::ViewFunction( DaoTuple *tuple )
-{
-	EnableNoneTable(); // XXX
+	if( subtype == DAO_ROUTINE ) FillCodes( wgtExtraTable, (DaoList*)tuple->items[INDEX_CODES] );
 }
 void DaoMonitor::ViewRoutines( DaoTuple *tuple )
 {

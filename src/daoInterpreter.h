@@ -88,6 +88,7 @@ Q_OBJECT
 	QString	locale;
 	QString	program;
 	QString	programPath;
+	QString daoBinPath;
 
 	QProcess *shell;
 
@@ -139,7 +140,6 @@ Q_OBJECT
 	void ViewMap( DaoMap *map );
 	void ViewTuple( DaoTuple *tuple );
 	void ViewRoutine( DaoRoutine *routine );
-	void ViewFunction( DaoRoutine *function );
 	void ViewRoutines( DaoRoutine *routines );
 	void ViewClass( DaoClass *klass );
 	void ViewObject( DaoObject *object );
@@ -155,7 +155,6 @@ Q_OBJECT
 	void ViewListData( DaoList *list, DaoTuple *request );
 	void ViewMapData( DaoMap *map, DaoTuple *request );
 	void ViewRoutineData( DaoRoutine *routine, DaoTuple *request );
-	void ViewFunctionData( DaoRoutine *function, DaoTuple *request );
 	void ViewRoutinesData( DaoRoutine *routines, DaoTuple *request );
 	void ViewClassData( DaoClass *klass, DaoTuple *request );
 	void ViewObjectData( DaoObject *object, DaoTuple *request );

@@ -83,7 +83,6 @@ Q_OBJECT
 	void ViewMap( DaoTuple *tuple );
 	void ViewTuple( DaoTuple *tuple );
 	void ViewRoutine( DaoTuple *tuple );
-	void ViewFunction( DaoTuple *tuple );
 	void ViewRoutines( DaoTuple *tuple );
 	void ViewClass( DaoTuple *tuple );
 	void ViewObject( DaoTuple *tuple );

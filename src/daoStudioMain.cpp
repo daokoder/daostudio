@@ -130,9 +130,15 @@ int main( int argc, char *argv[] )
 	DaoLanguages languages;
 
 	QFileInfo finfo( argv[0] ); 
+	QString langPath = finfo.absolutePath();
+#ifdef MAC_OSX
+	langPath += "/../Resources";
+#endif
+	langPath += "/langs";
+
 	QTranslator translator;
 	QString locale = QLocale::system().name();
-	translator.load( finfo.absolutePath() + QString("/langs/daostudio_") + locale);
+	translator.load( langPath + QString("/daostudio_") + locale);
 	app.installTranslator(&translator);
 
 	DaoStudioSettings::codeFont.setWeight( 400 );
