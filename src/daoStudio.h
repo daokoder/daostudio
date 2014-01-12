@@ -179,6 +179,7 @@ protected:
 	void slotStart();
 	void slotDebug();
 	void slotStop();
+	void slotDebugger(bool);
 	void slotProfiler(bool);
 	void slotMSplit(bool);
 	void slotFontSize(int);
@@ -187,6 +188,8 @@ protected:
 	void slotEditorColor(int);
 	void slotConsoleColor(int);
 	void slotTabVisibility(int);
+	void slotSwitchDebugger(int);
+	void slotSwitchProfiler(int);
 	void slotTimeOut();
 	void slotHelpVIM();
 	

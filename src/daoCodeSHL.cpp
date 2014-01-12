@@ -368,6 +368,7 @@ const char *pat_lua_method =
 
 DaoBasicSyntax* DaoBasicSyntax::dao = NULL;
 DaoBasicSyntax* DaoBasicSyntax::python = NULL;
+DaoBasicSyntax* DaoBasicSyntax::console = NULL;
 
 DaoLanguages::DaoLanguages()
 {
@@ -750,6 +751,9 @@ DaoLanguages::DaoLanguages()
 	pld->AddKeywordConstant( "default" );
 	pld->AddKeywordConstant( "stdout" );
 	pld->AddKeywordConstant( "stderr" );
+
+	DaoBasicSyntax *con = new DaoBasicSyntax( "console" );
+	DaoBasicSyntax::console = con;
 }
 
 QMap<QString,DaoBasicSyntax*> DaoCodeSHL::languages;
@@ -1189,7 +1193,7 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 	DaoCodeLineData *ud = (DaoCodeLineData*) currentBlockUserData();
 	//if( ud and ud->rehighlight == false ) return;
 
-	if( language == (DaoBasicSyntax*)1 ) return;
+	if( language == DaoBasicSyntax::console ) return;
 	if( language and language != DaoBasicSyntax::dao ){
 		HighlightNormal( text );
 		HighlightSearch( text );

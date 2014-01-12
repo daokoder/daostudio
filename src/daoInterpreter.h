@@ -62,18 +62,18 @@ struct DaoConsoleStream
 	DaoProcess   *process;
 	QLocalSocket  socket;
 	QLocalSocket  socket2;
-	DaoxDebugger  debugger;
+	DaoxDebugger *debugger;
 	DaoTimer      timer;
 	unsigned int  time;
 };
-struct DaoEventHandler
+struct DaoVmDebugger
 {
-	void (*debug)( DaoEventHandler *self, DaoProcess *process );
-	void (*breaks)( DaoEventHandler *self, DaoRoutine *breaks );
+	void (*debug)( DaoVmDebugger *self, DaoProcess *process, DaoStream *stream );
+	void (*breaks)( DaoVmDebugger *self, DaoRoutine *breaks );
 	DaoInterpreter	*interpreter;
 	DaoProcess   *process;
 	QLocalSocket  socket;
-	DaoxDebugger  debugger;
+	DaoxDebugger *debugger;
 	DaoTimer      timer;
 	unsigned int  time;
 };
@@ -95,10 +95,12 @@ Q_OBJECT
 	QString  pathWorking;
 	QString  pathImage;
 
+	DaoxDebugger   debugger;
+	DaoVmDebugger  guiDebugger;
+	DaoVmDebugger  cmdDebugger;
 	DaoxProfiler *profiler;
 	DaoConsoleStream stdioStream;
 	DaoConsoleStream errorStream;
-	DaoEventHandler	handler;
 	QLocalServer  dataServer;
 	QLocalServer  scriptServer;
 	QLocalSocket *dataSocket;

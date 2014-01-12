@@ -204,6 +204,13 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	//wgtConsoleMode->addItem( tr("Emacs") );
 	wgtTabVisibility->setCurrentIndex(1);
 
+	wgtDebuggerList->addItem( tr("Console Debugger") );
+	wgtDebuggerList->addItem( tr("Graphical Debugger") );
+	wgtProfilerList->addItem( tr("Console Profiler") );
+	wgtDebuggerList->setCurrentIndex(1);
+	connect( wgtDebuggerList, SIGNAL(currentIndexChanged(int)), this, SLOT(slotSwitchDebugger(int)) );
+	connect( wgtProfilerList, SIGNAL(currentIndexChanged(int)), this, SLOT(slotSwitchProfiler(int)) );
+
 	fileFilters << ( tr("All Files") + " (*)" );
 	fileFilters << ( tr("Dao Files") + " (*.dao)" );
 	fileFilters << ( tr("C/C++ Header Files") + " (*.h *.hpp *.hxx)" );
@@ -276,7 +283,7 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	connect( actionCut, SIGNAL(triggered()), this, SLOT(slotCut()) );
 	connect( actionPaste, SIGNAL(triggered()), this, SLOT(slotPaste()) );
 	connect( actionStart, SIGNAL(triggered()), this, SLOT(slotStart()) );
-	connect( actionDebug, SIGNAL(triggered()), this, SLOT(slotDebug()) );
+	connect( actionDebugger, SIGNAL(triggered(bool)), this, SLOT(slotDebugger(bool)) );
 	connect( actionProfiler, SIGNAL(triggered(bool)), this, SLOT(slotProfiler(bool)) );
 	connect( actionStop, SIGNAL(triggered()), this, SLOT(slotStop()) );
 	connect( actionMSplit, SIGNAL(triggered(bool)), this, SLOT(slotMSplit(bool)) );
@@ -470,6 +477,13 @@ void DaoStudio::slotSetPathWorking()
 	if( pathWorking == pathBrowsing ) return;
 	pathWorking = pathBrowsing;
 	wgtPathWorking->setText( pathWorking );
+
+	QString script = pathWorking;
+	script.replace( " ", "\\\\ " );
+	script = "std.path( '" + script + "', $set );\n";
+	wgtConsole->setFocus();
+	wgtConsole->ensureCursorVisible();
+	wgtConsole->InsertScript( script );
 	SendPathWorking();
 	DaoVmSpace_SetPath( vmSpace, pathWorking.toLocal8Bit().data() );
 	slotWriteLog( tr("change the working path to") + " \"" + pathWorking + "\"" );
@@ -993,6 +1007,19 @@ void DaoStudio::slotMaxConsole( int )
 }
 void DaoStudio::slotStart()
 {
+	if( wgtConsole->debugSocket ){
+		wgtConsole->Resume();
+		return;
+	}
+	if( vmState == DAOCON_DEBUG ){
+		wgtConsole->Resume();
+		return;
+	}
+	if( actionDebugger->isChecked() ){
+		slotDebug();
+		return;
+	}
+
 	int id = wgtEditorTabs->currentIndex();
 	//wgtFrameList->clear();
 	if( id < ID_EDITOR ) return;
@@ -1032,6 +1059,16 @@ void DaoStudio::slotDebug()
 	script.replace( " ", "\\\\ " );
 	wgtConsole->LoadScript( script, true );
 }
+void DaoStudio::slotDebugger( bool checked )
+{
+	socket.connectToServer( DaoStudioSettings::socket_script );
+	if( socket.waitForConnected( 500 ) ){
+		socket.putChar( DAO_DEBUGGER_SWITCH );
+		socket.putChar( checked ? wgtDebuggerList->currentIndex() + 1 : 0 );
+		socket.flush();
+		socket.waitForDisconnected();
+	}
+}
 void DaoStudio::slotProfiler( bool checked )
 {
 	socket.connectToServer( DaoStudioSettings::socket_script );
@@ -1041,6 +1078,16 @@ void DaoStudio::slotProfiler( bool checked )
 		socket.flush();
 		socket.waitForDisconnected();
 	}
+}
+void DaoStudio::slotSwitchDebugger(int)
+{
+	if( actionDebugger->isChecked() == false ) return;
+	slotDebugger( true );
+}
+void DaoStudio::slotSwitchProfiler(int)
+{
+	if( actionProfiler->isChecked() == false ) return;
+	slotProfiler( true );
 }
 void DaoStudio::slotStop()
 {
@@ -1061,20 +1108,20 @@ void DaoStudio::SetState( int state )
 	case DAOCON_READY :
 		actionState->setIcon( QPixmap( ":/images/greenball.png" ) );
 		actionStart->setDisabled( false );
-		actionDebug->setDisabled( false );
+		actionDebugger->setDisabled( false );
 		btSetPath->setDisabled( false );
 		break;
 	case DAOCON_RUN :
 		slotWriteLog( tr("execution started successfully") );
 		actionState->setIcon( QPixmap( ":/images/redball.png" ) );
 		actionStart->setDisabled( true );
-		actionDebug->setDisabled( true );
+		actionDebugger->setDisabled( true );
 		break;
 	case DAOCON_DEBUG :
 		slotWriteLog( tr("pause for debugging") );
 		actionState->setIcon( QPixmap( ":/images/violaball.png" ) );
-		actionStart->setDisabled( true );
-		actionDebug->setDisabled( false );
+		actionStart->setDisabled( false );
+		actionDebugger->setDisabled( false );
 		break;
 	default :
 		slotWriteLog( tr("pause for standard input") );
@@ -1176,6 +1223,11 @@ void DaoStudio::LoadSettings()
 	id = wgtFontFamily->findText( family );
 	if( id >=0 ) wgtFontFamily->setCurrentIndex( id );
 	if( size >= 10 ) wgtFontSize->setCurrentIndex( size - 10 );
+
+	int debugger = settings.value( "Tools/Debugger" ).toInt();
+	int profiler = settings.value( "Tools/Profiler" ).toInt();
+	wgtDebuggerList->setCurrentIndex( debugger );
+	wgtProfilerList->setCurrentIndex( profiler );
 }
 void DaoStudio::SaveSettings()
 {
@@ -1184,6 +1236,8 @@ void DaoStudio::SaveSettings()
 	int modeConsole = wgtConsoleMode->currentIndex();
 	int csEditor = wgtEditorColor->currentIndex();
 	int csConsole = wgtConsoleColor->currentIndex();
+	int debugger = wgtDebuggerList->currentIndex();
+	int profiler = wgtProfilerList->currentIndex();
 	settings.setValue( "Path/Working", pathWorking );
 	settings.setValue( "Path/Browsing", pathBrowsing );
 	settings.setValue( "File/Filters", wgtFileSuffix->currentText() );
@@ -1194,6 +1248,8 @@ void DaoStudio::SaveSettings()
 	settings.setValue( "Editor/TabVisibility", wgtTabVisibility->currentIndex() );
 	settings.setValue( "Font/Family", wgtFontFamily->currentText() );
 	settings.setValue( "Font/Size", wgtFontSize->currentIndex() + 10 );
+	settings.setValue( "Tools/Debugger", debugger );
+	settings.setValue( "Tools/Profiler", profiler );
 	
 	QStringList histSearch = DaoCommandEdit::searchHistory;
 	QStringList histCommand = DaoCommandEdit::commandHistory;

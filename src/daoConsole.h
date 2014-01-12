@@ -119,6 +119,7 @@ class DaoConsole : public DaoTextEdit
 	void SetState( int state ){ this->state = state; }
 	void RunScript( const QString & src, bool debug=false );
 	void LoadScript( const QString & file, bool debug=false );
+	void InsertScript( const QString & code );
 	void Resume();
 	void Stop();
 	void Quit();

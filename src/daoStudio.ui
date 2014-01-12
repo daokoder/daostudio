@@ -73,7 +73,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="pageSourceFile">
         <property name="geometry">
@@ -308,8 +308,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>100</width>
-          <height>88</height>
+          <width>344</width>
+          <height>510</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -376,8 +376,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>100</width>
-          <height>377</height>
+          <width>344</width>
+          <height>510</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -731,6 +731,79 @@
           </widget>
          </item>
          <item>
+          <widget class="QGroupBox" name="groupBox_6">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="title">
+            <string>Tools</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_3">
+            <item row="0" column="1">
+             <widget class="QComboBox" name="wgtDebuggerList">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>100</width>
+                <height>0</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_5">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Debugger:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_6">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Profiler:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QComboBox" name="wgtProfilerList">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>100</width>
+                <height>0</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
           <spacer name="verticalSpacer">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
@@ -929,7 +1002,7 @@
     </property>
     <addaction name="actionStart"/>
     <addaction name="actionStop"/>
-    <addaction name="actionDebug"/>
+    <addaction name="actionDebugger"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -970,7 +1043,7 @@
    <addaction name="actionPaste"/>
    <addaction name="separator"/>
    <addaction name="actionStart"/>
-   <addaction name="actionDebug"/>
+   <addaction name="actionDebugger"/>
    <addaction name="actionProfiler"/>
    <addaction name="actionStop"/>
    <addaction name="actionState"/>
@@ -1072,7 +1145,7 @@
      <normaloff>:/images/start.png</normaloff>:/images/start.png</iconset>
    </property>
    <property name="text">
-    <string>Start</string>
+    <string>Start/Resume</string>
    </property>
   </action>
   <action name="actionStop">
@@ -1113,16 +1186,19 @@
     <string>State</string>
    </property>
   </action>
-  <action name="actionDebug">
+  <action name="actionDebugger">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../daostudio.qrc">
      <normaloff>:/images/debug.png</normaloff>:/images/debug.png</iconset>
    </property>
    <property name="text">
-    <string>Start/Resume Debugging</string>
+    <string>Debugger</string>
    </property>
    <property name="toolTip">
-    <string>Start/Resume Debugging</string>
+    <string>Activate/Deactivate Debugger</string>
    </property>
   </action>
   <action name="actionTips">

@@ -22,6 +22,10 @@
 #include<daoDebugger.h>
 #include<daoInterpreter.h>
 
+extern "C"{
+extern void DaoDebugger_Debug( DaoDebugger *self, DaoProcess *proc, DaoStream *stream );
+}
+typedef void (*DaoVmDebugger_Debug)( DaoVmDebugger *self, DaoProcess *process, DaoStream *stream );
 
 static int DaoEditContinueData( QByteArray &data, QList<int> & lineMap, QStringList & newCodes, QStringList & routCodes )
 {
@@ -75,6 +79,10 @@ static void DaoStdioRead( DaoConsoleStream *self, DString *buf, int count )
 		QCoreApplication::processEvents( QEventLoop::AllEvents, 1000 );
 		fflush( stdout );
 	}
+	if( self->interpreter->vmSpace->stopit ){
+		self->interpreter->mutex.unlock();
+		return;
+	}
 	self->socket.waitForReadyRead();
 	data += self->socket.readAll();
 	//QString s = QString::fromUtf8( data.data(), data.size() );
@@ -108,7 +116,7 @@ static void DaoSudio_SetColor( DaoConsoleStream *self, const char *fgcolor, cons
 	self->socket2.flush();
 	self->interpreter->mutex.unlock();
 }
-static void DaoConsDebug( DaoEventHandler *self, DaoProcess *process )
+static void DaoConsDebug( DaoVmDebugger *self, DaoProcess *process, DaoStream *stream )
 {
 	self->interpreter->mutex.lock();
 
@@ -138,7 +146,7 @@ static void DaoConsDebug( DaoEventHandler *self, DaoProcess *process )
 	self->interpreter->debugProcess = process;
 	self->interpreter->InitDataBrowser();
 	while( self->interpreter->waiting ){
-		QCoreApplication::processEvents( QEventLoop::AllEvents, 1000 );
+		QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
 		fflush( stdout );
 	}
 	//while( self->socket.state() != QLocalSocket::UnconnectedState ){
@@ -149,7 +157,7 @@ static void DaoConsDebug( DaoEventHandler *self, DaoProcess *process )
 	//}
 	//printf( "all:\n%s\n", QString(data).toUtf8().data() );
 
-	DaoxDebugger & debugger = self->debugger;
+	DaoxDebugger *debugger = self->debugger;
 	QList<int> lineMap;
 	QStringList newCodes, routCodes;
 	DaoRoutine *old = process->activeRoutine;
@@ -157,7 +165,7 @@ static void DaoConsDebug( DaoEventHandler *self, DaoProcess *process )
 	//printf( "all:\n%s\n", QString(data).toUtf8().data() );
 	//printf( "new:\n%s\n", newCodes.join("\n").toUtf8().data() );
 	//printf( "old:\n%s\n", routCodes.join("\n").toUtf8().data() );
-	if( debugger.EditContinue( process, entry, lineMap, newCodes, routCodes ) ){
+	if( debugger->EditContinue( process, entry, lineMap, newCodes, routCodes ) ){
 		if( old == process->activeRoutine && entry != oldline )
 			DaoResetExecution( process, entry );
 	}
@@ -166,11 +174,11 @@ static void DaoConsDebug( DaoEventHandler *self, DaoProcess *process )
 
 	self->interpreter->mutex.unlock();
 }
-static void DaoSetBreaks( DaoEventHandler *self, DaoRoutine *routine )
+static void DaoSetBreaks( DaoVmDebugger *self, DaoRoutine *routine )
 {
-	self->debugger.SetBreakPoints( routine );
+	self->debugger->SetBreakPoints( routine );
 }
-static void DaoProcessMonitor( DaoEventHandler *self, DaoProcess *process )
+static void DaoProcessMonitor( DaoVmDebugger *self, DaoProcess *process )
 {
 	if( self->timer.time > self->time ){
 		//printf( "time: %i  %i\n", self->timer.time, self->time );
@@ -210,25 +218,30 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 	errorStream.stdFlush = NULL;
 	errorStream.SetColor = DaoSudio_SetColor;
 	errorStream.interpreter = this;
-	handler.time = 0;
-	handler.interpreter = this;
-	handler.debug = DaoConsDebug;
-	handler.breaks = DaoSetBreaks;
-	//handler.Called = NULL;
-	//handler.Returned = NULL;
-	//handler.InvokeHost = DaoProcessMonitor;
-	handler.timer.start();
+	guiDebugger.time = 0;
+	guiDebugger.debugger = & this->debugger;
+	guiDebugger.interpreter = this;
+	guiDebugger.debug = DaoConsDebug;
+	guiDebugger.breaks = DaoSetBreaks;
+	guiDebugger.timer.start();
+	cmdDebugger.time = 0;
+	cmdDebugger.debugger = & this->debugger;
+	cmdDebugger.interpreter = this;
+	cmdDebugger.debug = (DaoVmDebugger_Debug) DaoDebugger_Debug;
+	cmdDebugger.breaks = DaoSetBreaks;
+	cmdDebugger.timer.start();
 
 	vmSpace = DaoInit( NULL ); //XXX
 	vmSpace->options |= DAO_OPTION_IDE | DAO_OPTION_INTERUN;
 	vmSpace->mainNamespace->options |= DAO_OPTION_IDE | DAO_OPTION_INTERUN;
 	nameSpace = vmSpace->mainNamespace;
-	handler.process = DaoVmSpace_MainProcess( vmSpace );
+	guiDebugger.process = DaoVmSpace_MainProcess( vmSpace );
+	cmdDebugger.process = DaoVmSpace_MainProcess( vmSpace );
 	profiler = DaoxProfiler_New();
 	DaoVmSpace_SetUserStdio( vmSpace, (DaoUserStream*) & stdioStream );
 	//DaoVmSpace_SetUserStdError( vmSpace, (DaoUserStream*) & errorStream );
 	DaoVmSpace_SetUserStdError( vmSpace, (DaoUserStream*) & stdioStream );
-	DaoVmSpace_SetUserDebugger( vmSpace, (DaoDebugger*) & handler );
+	//DaoVmSpace_SetUserDebugger( vmSpace, (DaoDebugger*) & guiDebugger );
 
 	DaoNamespace *ns = vmSpace->mainNamespace;
 	DString_SetMBS( ns->name, "interactive codes" );
@@ -425,8 +438,23 @@ void DaoInterpreter::slotStartExecution()
 	char info = script[0];
 	script.remove(0,1);
 	if( info == DAO_SET_PATH ){
-		DaoVmSpace_SetPath( vmSpace, script.data() );
+		//DaoVmSpace_SetPath( vmSpace, script.data() );
 		QDir::setCurrent( QString::fromUtf8( script.data(), script.size() ) );
+		scriptSocket->disconnectFromServer();
+		return;
+	}else if( info == DAO_DEBUGGER_SWITCH ){
+		char id = script[0];
+		switch( id ){
+		case 0 :
+			DaoVmSpace_SetUserDebugger( vmSpace, NULL );
+			break;
+		case 1 :
+			DaoVmSpace_SetUserDebugger( vmSpace, (DaoDebugger*) & cmdDebugger );
+			break;
+		case 2 :
+			DaoVmSpace_SetUserDebugger( vmSpace, (DaoDebugger*) & guiDebugger );
+			break;
+		}
 		scriptSocket->disconnectFromServer();
 		return;
 	}else if( info == DAO_PROFILER_SWITCH ){
@@ -453,7 +481,7 @@ void DaoInterpreter::slotStartExecution()
 #endif
 
 
-	if( info )
+	if( vmSpace->debugger )
 		vmSpace->options |= DAO_OPTION_DEBUG;
 	else
 		vmSpace->options &= ~DAO_OPTION_DEBUG;
@@ -467,7 +495,8 @@ void DaoInterpreter::slotStartExecution()
 	connect( & stdioStream.socket2, SIGNAL(disconnected()), this, SLOT(slotExitWaiting()) );
 
 	vmSpace->stopit = 0;
-	handler.process = vmp;
+	guiDebugger.process = vmp;
+	cmdDebugger.process = vmp;
 	QTime time;
 	time.start();
 	int res = 0;
@@ -483,7 +512,7 @@ void DaoInterpreter::slotStartExecution()
 			//usleep( 100 );
 			//waitForReadyRead
 			//shell->waitForReadyRead( 100 );
-			//DaoProcessMonitor( & handler );
+			//DaoProcessMonitor( & guiDebugger );
 			//QApplication::processEvents( QEventLoop::WaitForMoreEvents, 100 );
 			Sleeper::Sleep( 10000 );
 			QApplication::processEvents( QEventLoop::AllEvents, 20 );

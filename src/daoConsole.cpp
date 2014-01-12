@@ -652,12 +652,21 @@ void DaoConsole::RunScript( const QString & src, bool debug )
 	state = DAOCON_RUN;
 	studio->SetState( DAOCON_RUN );
 	//printf( "socket: %i  %s\n", socket.isValid(), src.toUtf8().data() );
+	debug = false;
 	scriptSocket.putChar( debug ? DAO_DEBUG_SCRIPT : DAO_RUN_SCRIPT );
 	scriptSocket.write( src.toUtf8().data() );
 	scriptSocket.flush();
 	scriptSocket.disconnectFromServer();
 	studio->ResetTimer();
 	clearScreenBound = textCursor().position();
+}
+void DaoConsole::InsertScript( const QString & code )
+{
+	AppendCmdHistory( code.trimmed() );
+	ClearCommand();
+	insertPlainText( code );
+	codehl.SetState(0);
+	RunScript( code );
 }
 void DaoConsole::LoadScript( const QString & file, bool debug )
 {
@@ -719,11 +728,11 @@ void DaoConsole::slotPrintOutput( const QString & output )
 			k = part.indexOf( '\2' );
 			if( k >=0 && k < 16 ){
 				QString name = part.left( k );
-				if( codehl.languages.contains( name ) ){
-					codehl.language = codehl.languages[ name ];
-				}else if( name.indexOf( ':' ) >= 0 && charFormats.contains( name ) ){
-					codehl.language = (DaoBasicSyntax*) 1;
+				if( name.indexOf( ':' ) >= 0 && charFormats.contains( name ) ){
+					codehl.language = DaoBasicSyntax::console;
 					setCurrentCharFormat( charFormats[ name ] );
+				}else if( codehl.languages.contains( name ) ){
+					codehl.language = codehl.languages[ name ];
 				}else{
 					codehl.language = NULL;
 					if( name.size() ) insertPlainText( '\1' + name + '\2' );
@@ -917,7 +926,6 @@ void DaoConsole::slotSocketDebug()
 	int start = data[1].toInt();
 	int end = data[2].toInt();
 	int entry = data[3].toInt();
-	//printf( "debug: %s\n", name.toUtf8().data() );
 	editor = NULL;
 	int i, n = tabWidget->count();
 	for(i=ID_EDITOR; i<n; i++){
@@ -926,6 +934,7 @@ void DaoConsole::slotSocketDebug()
 			break;
 		}
 	}
+	if( editor == NULL ) return;
 	editor->SetEditLines( start, end );
 	editor->SetExePoint( entry );
 }

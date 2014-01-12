@@ -51,7 +51,7 @@ class DaoxDebugger : public QObject
 
 	QMap<QString,QMap<int,int> > breakPoints;
 
-	QLocalServer server;
+	QLocalServer  server;
 
 	public:
 	DaoxDebugger();

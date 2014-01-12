@@ -180,6 +180,7 @@ struct DaoBasicSyntax
 	
 	static DaoBasicSyntax *dao;
 	static DaoBasicSyntax *python;
+	static DaoBasicSyntax *console;
 
 	DaoBasicSyntax( const QString & lang );
 	~DaoBasicSyntax();
