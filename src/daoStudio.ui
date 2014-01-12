@@ -80,7 +80,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>344</width>
+          <width>359</width>
           <height>510</height>
          </rect>
         </property>
@@ -308,7 +308,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>344</width>
+          <width>359</width>
           <height>510</height>
          </rect>
         </property>
@@ -376,7 +376,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>344</width>
+          <width>359</width>
           <height>510</height>
          </rect>
         </property>
@@ -904,7 +904,7 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>723</width>
+              <width>708</width>
               <height>400</height>
              </rect>
             </property>
@@ -1002,13 +1002,14 @@
     </property>
     <addaction name="actionStart"/>
     <addaction name="actionStop"/>
-    <addaction name="actionDebugger"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
      <string>Tools</string>
     </property>
     <addaction name="actionRestartMonitor"/>
+    <addaction name="actionDebugger"/>
+    <addaction name="actionProfiler"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -1229,6 +1230,10 @@
   <action name="actionProfiler">
    <property name="checkable">
     <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../daostudio.qrc">
+     <normaloff>:/images/profiler.png</normaloff>:/images/profiler.png</iconset>
    </property>
    <property name="text">
     <string>Profiler</string>

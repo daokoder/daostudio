@@ -111,6 +111,10 @@ static void DaoSudio_SetColor( DaoConsoleStream *self, const char *fgcolor, cons
 {
 	char buf[32];
 	int n = sprintf( buf, "\1%s:%s\2", fgcolor?fgcolor:"", bgcolor?bgcolor:"" );
+	printf( "%s", buf );
+	fflush( stdout );
+	fflush( stderr );
+	return;
 	self->interpreter->mutex.lock();
 	self->socket2.write( buf, n );
 	self->socket2.flush();
@@ -526,11 +530,23 @@ void DaoInterpreter::slotStartExecution()
 		//printf( "stop: %i, status: %i, code: %i, error: %i\n", 
 		//	vmSpace->stopit, res, shell->exitCode(), shell->error() );
 	}else{
+		DString *pathWorking = vmSpace->pathWorking;
+		QString oldPath = QString::fromUtf8( pathWorking->mbs, pathWorking->size );
 		DString *mbs = DString_New(1);
 		DString_AppendDataMBS( mbs, script.data(), script.size() );
 		res = (int) DaoProcess_Eval( vmp, ns, mbs->mbs );
 		DaoCallServer_Join();
 		DString_Delete( mbs );
+
+		QString newPath = QString::fromUtf8( pathWorking->mbs, pathWorking->size );
+		if( newPath != oldPath ){
+			QLocalSocket socket;
+			socket.connectToServer( DaoStudioSettings::socket_path );
+			socket.waitForConnected( 1000 );
+			socket.write( newPath.toUtf8() );
+			socket.flush();
+			socket.disconnectFromServer();
+		}
 
 		DaoProfiler *profiler = vmSpace->profiler;
 		if( profiler ){

@@ -87,6 +87,7 @@ public:
 	static QString socket_logger;
 	static QString socket_debug;
 	static QString socket_breakpoints;
+	static QString socket_path;
 
 	static QLocalSocket  monitor_socket;
 

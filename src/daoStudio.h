@@ -108,6 +108,8 @@ class DaoStudio : public QMainWindow, private Ui::DaoStudio
 	
 	int vmState;
 	int configured;
+
+	QLocalServer  pathServer;
 	
 	QFileSystemWatcher watcher;
 	
@@ -147,6 +149,7 @@ protected:
 	void slotWriteLog( const QString & );
 	void slotSetPathWorking();
 	void slotSetPathBrowsing();
+	void slotSetPathWorking2();
 	void slotMaxEditor( int id = 0 );
 	void slotMaxMonitor( int id = 0 );
 	void slotMaxConsole( int id = 0 );

@@ -392,6 +392,11 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	
 	connect( &timer, SIGNAL(timeout()), this, SLOT(slotTimeOut()));
 	timer.start( 97 );
+
+	if( QFile::exists( DaoStudioSettings::socket_path ) )
+		QFile::remove( DaoStudioSettings::socket_path );
+	pathServer.listen( DaoStudioSettings::socket_path );
+	connect( & pathServer, SIGNAL(newConnection()), this, SLOT(slotSetPathWorking2()));
 }
 
 DaoStudio::~DaoStudio()
@@ -493,6 +498,13 @@ void DaoStudio::slotSetPathWorking()
 		pathUsage[pathWorking] = 1;
 		wgtPathList->addItem( pathWorking );
 	}
+}
+void DaoStudio::slotSetPathWorking2()
+{
+	QLocalSocket *socket = pathServer.nextPendingConnection();
+	socket->waitForReadyRead();
+	QByteArray output = socket->readAll();
+	SetPathWorking( output );
 }
 void DaoStudio::slotSetPathBrowsing()
 {
@@ -736,7 +748,7 @@ void DaoStudio::slotTextChanged( bool changed )
 }
 void DaoStudio::slotNew()
 {
-	NewEditor( "#new", "New file" );
+	NewEditor( "#NewFile", "New File" );
 	slotWriteLog( tr("create new source file") );
 }
 void DaoStudio::slotOpen()

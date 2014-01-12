@@ -37,6 +37,7 @@ QString DaoStudioSettings::socket_stderr;
 QString DaoStudioSettings::socket_logger;
 QString DaoStudioSettings::socket_debug;
 QString DaoStudioSettings::socket_breakpoints;
+QString DaoStudioSettings::socket_path;
 
 void DaoStudioSettings::SetProgramPath( const char *cmd, const char *suffix )
 {
@@ -68,6 +69,7 @@ void DaoStudioSettings::SetProgramPath( const char *cmd, const char *suffix )
 	socket_logger = path + ".daostudio.socket.logger" + socket_suffix;
 	socket_debug = path + ".daostudio.socket.debug" + socket_suffix;
 	socket_breakpoints = path + ".daostudio.socket.breakpoints" + socket_suffix;
+	socket_path = path + ".daostudio.socket.path" + socket_suffix;
 }
 void DaoStudioSettings::AppendSuffix( const QString & suffix )
 {
@@ -81,6 +83,7 @@ void DaoStudioSettings::AppendSuffix( const QString & suffix )
 	socket_logger += suffix;
 	socket_debug += suffix;
 	socket_breakpoints += suffix;
+	socket_path += suffix;
 }
 
 int StudioMain( QApplication & app, int argc, char *argv[] )
