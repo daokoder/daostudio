@@ -73,15 +73,15 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="pageSourceFile">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>100</width>
-          <height>249</height>
+          <width>359</width>
+          <height>510</height>
          </rect>
         </property>
         <property name="sizePolicy">

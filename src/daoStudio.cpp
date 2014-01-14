@@ -490,7 +490,7 @@ void DaoStudio::slotSetPathWorking()
 	wgtConsole->setFocus();
 	wgtConsole->ensureCursorVisible();
 	wgtConsole->InsertScript( script );
-	SendPathWorking();
+	//SendPathWorking();
 	DaoVmSpace_SetPath( vmSpace, pathWorking.toLocal8Bit().data() );
 	slotWriteLog( tr("change the working path to") + " \"" + pathWorking + "\"" );
 	if( pathUsage.contains( pathWorking ) ){

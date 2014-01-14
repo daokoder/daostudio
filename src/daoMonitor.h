@@ -47,8 +47,10 @@ Q_OBJECT
 
 	DaoLexer  *lexer;
 	DString *daoString;
+	DString *daoString2;
 	DLong	*daoLong;
 
+	QByteArray    updateData;
 	QLocalServer  monitorServer;
 	QLocalSocket *monitorSocket;
 
@@ -101,7 +103,7 @@ protected slots:
 
 	void slotAcceptConnection();
 	void slotReadData();
-	void slotUpdateMonitor();
+	void slotUpdateMonitor( const QByteArray & serial );
 	void slotValueActivated(QListWidgetItem*);
 
 signals:

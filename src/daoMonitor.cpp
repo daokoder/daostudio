@@ -49,6 +49,7 @@ DaoMonitor::DaoMonitor( QWidget *parent ) : QWidget( parent )
 
 	lexer = DaoLexer_New();
 	daoString = DString_New(1);
+	daoString2 = DString_New(1);
 	daoLong = DLong_New();
 
 	connect( wgtDataTable, SIGNAL(cellDoubleClicked(int,int)), 
@@ -70,6 +71,7 @@ DaoMonitor::~DaoMonitor()
 {
 	DaoLexer_Delete( lexer );
 	DString_Delete( daoString );
+	DString_Delete( daoString2 );
 	DLong_Delete( daoLong );
 	delete hlDataInfo;
 	delete hlDataValue;
@@ -99,15 +101,21 @@ void DaoMonitor::slotAcceptConnection()
 	monitorSocket = monitorServer.nextPendingConnection();
 	if( vmspace == NULL ) return;
 
+	updateData.clear();
 	connect( monitorSocket, SIGNAL(readyRead()), this, SLOT(slotReadData()));
-	connect( monitorSocket, SIGNAL(disconnected()), this, SLOT(slotUpdateMonitor()));
-
-	DString_Reset( daoString, 0 );
 }
 void DaoMonitor::slotReadData()
 {
 	QByteArray info = monitorSocket->readAll();
-	DString_AppendDataMBS( daoString, info.data(), info.size() );
+	updateData += info;
+
+	int index = updateData.indexOf( '\0' );
+	while( index >= 0 ){
+		QByteArray request = updateData.mid( 0, index );
+		slotUpdateMonitor( request );
+		updateData.remove( 0, index + 1 );
+		index = updateData.indexOf( '\0' );
+	}
 }
 void DaoMonitor::Reset()
 {
@@ -116,12 +124,14 @@ void DaoMonitor::Reset()
 	wgtDataValue->clear();
 	EnableNoneTable();
 }
-void DaoMonitor::slotUpdateMonitor()
+void DaoMonitor::slotUpdateMonitor( const QByteArray & serial )
 {
 	DaoValue *value = NULL;
 	DaoNamespace *nspace = vmspace->mainNamespace;
 	DaoProcess *process = vmspace->mainProcess;
-	if( DaoValue_Deserialize( & value, daoString, nspace, process ) == 0 ) return;
+	DString_Reset( daoString2, 0 );
+	DString_AppendDataMBS( daoString2, serial.data(), serial.size() );
+	if( DaoValue_Deserialize( & value, daoString2, nspace, process ) == 0 ) return;
 
 	if( requestTuple == NULL ){
 		DaoType *type = DaoParser_ParseTypeName( DATA_REQUEST_TYPE, nspace, NULL );
@@ -174,6 +184,11 @@ void DaoMonitor::slotUpdateMonitor()
 void DaoMonitor::slotValueActivated( QListWidgetItem *item )
 {
 	if( wgtDataList->row( item ) == 0 ) return;
+	if( studio->GetState() == DAOCON_DEBUG ){
+		if( wgtDataList->row( item ) >= wgtDataList->count() - 2 ){
+			item = wgtDataList->item( wgtDataList->count() - 2 );
+		}
+	}
 
 	DString_SetMBS( requestTuple->items[0]->xString.data, item->text().toUtf8().data() );
 	requestTuple->items[1]->xInteger.value = DATA_STACK;

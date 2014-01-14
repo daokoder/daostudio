@@ -93,6 +93,7 @@ class DaoConsole : public DaoTextEdit
 	QLocalServer  stdinServer;
 	QLocalServer  stdoutServer;
 	QLocalServer  stderrServer;
+	QLocalServer  executionServer;
 	QLocalServer  loggerServer;
 
 	DaoLexer  *lexer;
@@ -153,6 +154,7 @@ protected slots:
 	void slotSocketStdin();
 	void slotSocketStdout();
 	void slotSocketStderr();
+	void slotSocketExecution();
 	void slotSocketLogger();
 	void slotReadStdOut();
 	void slotReadStdError();

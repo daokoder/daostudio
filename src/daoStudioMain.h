@@ -84,6 +84,7 @@ public:
 	static QString socket_stdin;
 	static QString socket_stdout;
 	static QString socket_stderr;
+	static QString socket_execution;
 	static QString socket_logger;
 	static QString socket_debug;
 	static QString socket_breakpoints;

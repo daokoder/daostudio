@@ -33,6 +33,12 @@
          <height>0</height>
         </size>
        </property>
+       <property name="maximumSize">
+        <size>
+         <width>500</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="title">
         <string>Value View Stack</string>
        </property>
@@ -50,6 +56,12 @@
         <size>
          <width>0</width>
          <height>50</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>500</width>
+         <height>16777215</height>
         </size>
        </property>
        <property name="title">
@@ -88,6 +100,12 @@
         <size>
          <width>0</width>
          <height>50</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>500</width>
+         <height>16777215</height>
         </size>
        </property>
        <property name="title">
@@ -207,7 +225,7 @@
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>60</height>
+       <height>100</height>
       </size>
      </property>
      <property name="title">
@@ -234,7 +252,7 @@
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>60</height>
+          <height>100</height>
          </size>
         </property>
         <property name="readOnly">

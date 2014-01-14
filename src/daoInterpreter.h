@@ -63,8 +63,6 @@ struct DaoConsoleStream
 	QLocalSocket  socket;
 	QLocalSocket  socket2;
 	DaoxDebugger *debugger;
-	DaoTimer      timer;
-	unsigned int  time;
 };
 struct DaoVmDebugger
 {
@@ -74,6 +72,12 @@ struct DaoVmDebugger
 	DaoProcess   *process;
 	QLocalSocket  socket;
 	DaoxDebugger *debugger;
+};
+
+struct DaoVmUserHandler
+{
+	void (*InvokeHost)( DaoVmUserHandler *self, DaoProcess *process );
+	DaoProcess   *process;
 	DaoTimer      timer;
 	unsigned int  time;
 };
@@ -99,6 +103,7 @@ Q_OBJECT
 	DaoxDebugger   debugger;
 	DaoVmDebugger  guiDebugger;
 	DaoVmDebugger  cmdDebugger;
+	DaoVmUserHandler handler;
 	DaoxProfiler *profiler;
 	DaoConsoleStream stdioStream;
 	DaoConsoleStream errorStream;

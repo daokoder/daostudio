@@ -13,7 +13,7 @@ $(PLATS) :
 	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile $@
 	$(DAOMAKE) mkdir2 build
 	cd build && ../$(DAOMAKE) --mode $(MODE) --platform $@ --suffix .daomake  ../dao
-	$(MAKE) -f Makefile.daomake
+	cd build && $(MAKE) -f Makefile.daomake
 	qmake -o Makefile.qmake DaoStudio.pro
 	$(MAKE) -f Makefile.qmake
 	cd build && $(MAKE) -f Makefile.daomake install

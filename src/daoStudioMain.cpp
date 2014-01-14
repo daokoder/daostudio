@@ -34,6 +34,7 @@ QString DaoStudioSettings::socket_script;
 QString DaoStudioSettings::socket_stdin;
 QString DaoStudioSettings::socket_stdout;
 QString DaoStudioSettings::socket_stderr;
+QString DaoStudioSettings::socket_execution;
 QString DaoStudioSettings::socket_logger;
 QString DaoStudioSettings::socket_debug;
 QString DaoStudioSettings::socket_breakpoints;
@@ -66,6 +67,7 @@ void DaoStudioSettings::SetProgramPath( const char *cmd, const char *suffix )
 	socket_stdin = path + ".daostudio.socket.stdin" + socket_suffix;
 	socket_stdout = path + ".daostudio.socket.stdout" + socket_suffix;
 	socket_stderr = path + ".daostudio.socket.stderr" + socket_suffix;
+	socket_execution = path + ".daostudio.socket.execution" + socket_suffix;
 	socket_logger = path + ".daostudio.socket.logger" + socket_suffix;
 	socket_debug = path + ".daostudio.socket.debug" + socket_suffix;
 	socket_breakpoints = path + ".daostudio.socket.breakpoints" + socket_suffix;
@@ -80,12 +82,12 @@ void DaoStudioSettings::AppendSuffix( const QString & suffix )
 	socket_stdin += suffix;
 	socket_stdout += suffix;
 	socket_stderr += suffix;
+	socket_execution += suffix;
 	socket_logger += suffix;
 	socket_debug += suffix;
 	socket_breakpoints += suffix;
 	socket_path += suffix;
 }
-
 int StudioMain( QApplication & app, int argc, char *argv[] )
 {
 	DaoStudio studio( argv[0] );
