@@ -143,7 +143,7 @@ int main( int argc, char *argv[] )
 	translator.load( langPath + QString("/daostudio_") + locale);
 	app.installTranslator(&translator);
 
-	DaoStudioSettings::codeFont.setWeight( 400 );
+	DaoStudioSettings::codeFont.setWeight( 60 );
 	DaoStudioSettings::codeFont.setFamily( "Courier 10 Pitch" );
 	DaoStudioSettings::codeFont.setPointSize( 16 );
 	QFontInfo fi( DaoStudioSettings::codeFont );

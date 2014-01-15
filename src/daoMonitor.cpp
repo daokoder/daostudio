@@ -106,6 +106,7 @@ void DaoMonitor::slotAcceptConnection()
 }
 void DaoMonitor::slotReadData()
 {
+	//printf( "DaoMonitor::slotReadData()\n" );
 	QByteArray info = monitorSocket->readAll();
 	updateData += info;
 
@@ -126,6 +127,7 @@ void DaoMonitor::Reset()
 }
 void DaoMonitor::slotUpdateMonitor( const QByteArray & serial )
 {
+	//printf( "DaoMonitor::slotUpdateMonitor()\n" );
 	DaoValue *value = NULL;
 	DaoNamespace *nspace = vmspace->mainNamespace;
 	DaoProcess *process = vmspace->mainProcess;

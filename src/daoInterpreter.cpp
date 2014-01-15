@@ -209,6 +209,11 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 	DString_SetMBS( mod, "../Frameworks/bin/" );
 	Dao_MakePath( base, mod );
 	daoBinPath = QString::fromUtf8( mod->mbs, mod->size );
+#elif defined(WIN32)
+	DString_SetMBS( base, programPath.toLocal8Bit().data() );
+	DString_SetMBS( mod, "./bin/" );
+	Dao_MakePath( base, mod );
+	daoBinPath = QString::fromUtf8( mod->mbs, mod->size );
 #endif
 
 	vmState = DAOCON_READY;
@@ -243,7 +248,7 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 	cmdDebugger.debug = (DaoVmDebugger_Debug) DaoDebugger_Debug;
 	cmdDebugger.breaks = DaoSetBreaks;
 
-	vmSpace = DaoInit( NULL ); //XXX
+	vmSpace = DaoInit( cmd );
 	vmSpace->options |= DAO_OPTION_IDE | DAO_OPTION_INTERUN;
 	vmSpace->mainNamespace->options |= DAO_OPTION_IDE | DAO_OPTION_INTERUN;
 	nameSpace = vmSpace->mainNamespace;
@@ -320,10 +325,18 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 
 	DString_Delete( base );
 	DString_Delete( mod );
+
+	monitorSocket.connectToServer( DaoStudioSettings::socket_monitor );
+	if( monitorSocket.waitForConnected( 1000 ) ==0 ){
+		printf( "cannot connect to the virtual machine monitor\n" );
+		fflush( stdout );
+		return;
+	}
 }
 
 DaoInterpreter::~DaoInterpreter()
 {
+	monitorSocket.disconnectFromServer();
 	DaoxProfiler_Delete( profiler );
 	shell->close();
 }
@@ -466,11 +479,13 @@ void DaoInterpreter::slotStartExecution()
 		scriptSocket->disconnectFromServer();
 		return;
 	}
-	monitorSocket.connectToServer( DaoStudioSettings::socket_monitor );
-	if( monitorSocket.waitForConnected( 1000 ) ==0 ){
-		printf( "cannot connect to the virtual machine monitor\n" );
-		fflush( stdout );
-		return;
+	if( not monitorSocket.isValid() ){
+		monitorSocket.connectToServer( DaoStudioSettings::socket_monitor );
+		if( monitorSocket.waitForConnected( 1000 ) ==0 ){
+			printf( "cannot connect to the virtual machine monitor\n" );
+			fflush( stdout );
+			return;
+		}
 	}
 #if 0
 	errorStream.socket2.connectToServer( DaoStudioSettings::socket_stderr );
@@ -598,8 +613,6 @@ void DaoInterpreter::slotStartExecution()
 	//connect( &scriptServer, SIGNAL(newConnection()), this, SLOT(slotStartExecution()));
 	vmState = DAOCON_READY;
 
-	monitorSocket.disconnectFromServer();
-
 #if 0
 	FILE *fout = fopen( "debug.txt", "a+" );
 	fprintf( fout, "%s\n", buf );
@@ -632,7 +645,7 @@ void DaoInterpreter::SendDataInformation()
 	DaoNamespace *nspace = vmSpace->mainNamespace;
 	DaoProcess *process = vmSpace->mainProcess;
 	if( DaoValue_Serialize( (DaoValue*) messageTuple, daoString, nspace, process )){
-		//printf( "%s\n", daoString->mbs ); fflush(stdout);
+		//printf( "%s\n\n", daoString->mbs ); fflush(stdout);
 		monitorSocket.write( daoString->mbs );
 		monitorSocket.putChar( '\0' );
 		monitorSocket.flush();
