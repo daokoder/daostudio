@@ -143,6 +143,8 @@ static void DaoConsDebug( DaoVmDebugger *self, DaoProcess *process, DaoStream *s
 	self->socket.connectToServer( DaoStudioSettings::socket_debug );
 	self->socket.write( send );
 	self->socket.flush();
+	/* Maybe necessary on Windows: */
+	self->socket.waitForBytesWritten( 1000 );
 	QObject::connect( & self->socket, SIGNAL(disconnected()),
 			self->interpreter, SLOT(slotExitWaiting()) );
 	QByteArray data;
@@ -568,6 +570,8 @@ void DaoInterpreter::slotStartExecution()
 			socket.waitForConnected( 1000 );
 			socket.write( newPath.toUtf8() );
 			socket.flush();
+			/* Maybe necessary on Windows: */
+			socket.waitForBytesWritten( 1000 );
 			socket.disconnectFromServer();
 		}
 
@@ -603,6 +607,8 @@ void DaoInterpreter::slotStartExecution()
 	status += QString::fromUtf8( buf, strlen( buf ) );
 	socket.write( status.toUtf8() );
 	socket.flush();
+	/* Maybe necessary on Windows: */
+	socket.waitForBytesWritten( 1000 );
 	socket.disconnectFromServer();
 	//XXX ReduceValueItems( wgtDataList->item( wgtDataList->count()-1 ) );
 	EraseDebuggingProcess();

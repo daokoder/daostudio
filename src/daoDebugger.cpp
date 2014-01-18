@@ -31,8 +31,16 @@ DaoxDebugger::DaoxDebugger()
 void DaoxDebugger::slotSetBreakPoint()
 {
 	QLocalSocket *socket = server.nextPendingConnection();
-	socket->waitForReadyRead();
-	QList<QByteArray> data = socket->readAll().split( '\0' );
+	QByteArray sdata;
+	QTime dieTime= QTime::currentTime().addMSecs(1000);
+	while( socket->isValid() && sdata.count( '\0' ) < 2 ){
+		if( QTime::currentTime() > dieTime ) break;
+		socket->waitForReadyRead();
+		sdata += socket->readAll();
+	}
+	QList<QByteArray> data = sdata.split( '\0' );
+	if( data.size() < 3 ) return;
+
 	QString name = data[0];
 	int set = data[1].toInt();
 	int line = data[2].toInt();

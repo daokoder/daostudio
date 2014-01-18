@@ -154,6 +154,8 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 
 #ifdef MAC_OSX
 	docViewer = new DaoDocViewer(wgtEditorTabs, programPath + "/../Resources/");
+#elif defined(WIN32)
+	docViewer = new DaoDocViewer(wgtEditorTabs, programPath + "/shared/dao/");
 #else
 	docViewer = new DaoDocViewer(wgtEditorTabs, programPath);
 #endif
@@ -560,14 +562,6 @@ void DaoStudio::slotTimeOut()
 	min -= hr * 60;
 	sprintf( buf, "%02i:%02i:%02i.%03i", hr, min, sec, ms );
 	if( vmState != DAOCON_READY ) labTimer->setText( buf );
-	if( configured ==0 ){
-		socket.connectToServer( DaoStudioSettings::socket_script );
-		if( socket.waitForConnected( 100 ) ){
-			socket.disconnectFromServer();
-			LoadSettings();
-			configured = 1;
-		}
-	}
 }
 void DaoStudio::RestartMonitor()
 {
@@ -1203,6 +1197,9 @@ void DaoStudio::LoadSettings()
 	int i, id, size;
 	QSettings settings( "daovm.net", "DaoStudio" );
 	settings.sync();
+
+	if( configured ) return;
+	configured = 1;
 	
 	QStringList histSearch = settings.value( "History/Search" ).toStringList();
 	QStringList histCommand = settings.value( "History/Command" ).toStringList();

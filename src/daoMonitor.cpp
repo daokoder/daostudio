@@ -101,6 +101,7 @@ void DaoMonitor::slotAcceptConnection()
 	monitorSocket = monitorServer.nextPendingConnection();
 	if( vmspace == NULL ) return;
 
+	studio->LoadSettings();
 	updateData.clear();
 	connect( monitorSocket, SIGNAL(readyRead()), this, SLOT(slotReadData()));
 }
@@ -606,14 +607,19 @@ void DaoMonitor::SendDataRequest()
 		fflush( stdout );
 		return;
 	}
-	if( vmspace == NULL ) return;
+	if( vmspace == NULL ){
+		dataSocket.disconnectFromServer();
+		return;
+	}
 	DaoNamespace *nspace = vmspace->mainNamespace;
 	DaoProcess *process = vmspace->mainProcess;
 	if( DaoValue_Serialize( (DaoValue*) requestTuple, daoString, nspace, process )){
 		dataSocket.write( daoString->mbs );
 		dataSocket.flush();
-		dataSocket.disconnectFromServer();
+		/* Necessary on Windows: */
+		dataSocket.waitForBytesWritten( 1000 );
 	}
+	dataSocket.disconnectFromServer();
 }
 void DaoMonitor::slotDataTableClicked(int row, int col)
 {

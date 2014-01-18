@@ -131,8 +131,7 @@ DaoConsole::DaoConsole( QWidget *parent ) : DaoTextEdit( parent, & wordList )
 }
 DaoConsole::~DaoConsole()
 {
-	if( scriptSocket.isValid() )
-		disconnect( &scriptSocket, SIGNAL( disconnected() ), this, SLOT( slotScriptFinished() ) );
+	disconnect( &scriptSocket, SIGNAL( disconnected() ), this, SLOT( slotScriptFinished() ) );
 	SaveCmdHistory();
 	DaoLexer_Delete( lexer );
 }
@@ -328,6 +327,8 @@ void DaoConsole::keyPressEvent ( QKeyEvent * event )
 			txt.replace( QChar( 0x2029 ), '\n' );
 			if( stdinSocket ){
 				stdinSocket->write( txt.toUtf8() );
+				/* Maybe necessary on Windows: */
+				stdinSocket->waitForBytesWritten( 1000 );
 				stdinSocket->disconnectFromServer();
 				stdinSocket = NULL;
 			}
@@ -355,6 +356,8 @@ void DaoConsole::keyPressEvent ( QKeyEvent * event )
 				moveCursor( QTextCursor::End );
 				if( data.size() >= stdinCount && stdinSocket ){
 					stdinSocket->write( data );
+					/* Maybe necessary on Windows: */
+					stdinSocket->waitForBytesWritten( 1000 );
 					stdinSocket->disconnectFromServer();
 					stdinSocket = NULL;
 				}
@@ -670,6 +673,8 @@ void DaoConsole::RunScript( const QString & src, bool debug )
 	scriptSocket.putChar( debug ? DAO_DEBUG_SCRIPT : DAO_RUN_SCRIPT );
 	scriptSocket.write( src.toUtf8().data() );
 	scriptSocket.flush();
+	/* Maybe necessary on Windows: */
+	scriptSocket.waitForBytesWritten( 1000 );
 	scriptSocket.disconnectFromServer();
 	studio->ResetTimer();
 	clearScreenBound = textCursor().position();
@@ -936,16 +941,25 @@ void DaoConsole::slotSocketDebug()
 	//slotPrintOutput( info + " ...\n" );
 	//emit signalStateChanged( DAOCON_DEBUG, 0 );
 
+	editor = NULL;
 	state = DAOCON_DEBUG;
 	studio->SetState( DAOCON_DEBUG );
 	debugSocket = debugServer.nextPendingConnection();
-	debugSocket->waitForReadyRead();
-	QList<QByteArray> data = debugSocket->readAll().split( '\0' );
+
+	QByteArray sdata;
+	QTime dieTime= QTime::currentTime().addMSecs(1000);
+	while( debugSocket->isValid() && sdata.count( '\0' ) < 3 ){
+		if( QTime::currentTime() > dieTime ) break;
+		debugSocket->waitForReadyRead();
+		sdata += debugSocket->readAll();
+	}
+	QList<QByteArray> data = sdata.split( '\0' );
+	if( data.size() < 4 ) return;
+
 	QString name = data[0];
 	int start = data[1].toInt();
 	int end = data[2].toInt();
 	int entry = data[3].toInt();
-	editor = NULL;
 	int i, n = tabWidget->count();
 	for(i=ID_EDITOR; i<n; i++){
 		if( tabWidget->tabToolTip(i) == name ){
@@ -981,6 +995,8 @@ void DaoConsole::Resume()
 		}
 		debugSocket->write( data );
 		debugSocket->flush();
+		/* Maybe necessary on Windows: */
+		debugSocket->waitForBytesWritten( 1000 );
 	}
 	debugSocket->disconnectFromServer();
 	debugSocket = NULL;

@@ -2611,8 +2611,10 @@ void DaoEditor::MarkLine( int y )
 			data += '\0' + QByteArray::number( blockNumber + 1 );
 			socket.write( data );
 			socket.flush();
-			socket.disconnectFromServer();
+			/* Necessary on Windows: */
+			socket.waitForBytesWritten( 1000 );
 		}
+		socket.disconnectFromServer();
 	}else if( act ){
 		blockEntry = block;
 	}
