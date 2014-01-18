@@ -27,7 +27,6 @@
 #include<QAction>
 #include<QFileSystemWatcher>
 
-#define DAO_DIRECT_API
 
 extern "C"{ 
 #include<dao.h>

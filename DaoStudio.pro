@@ -4,8 +4,8 @@
 
 #TEMPLATE = app
 
-#CONFIG += thread release
-CONFIG += thread debug
+CONFIG += thread release
+#CONFIG += thread debug
 
 #QT += webkit
 QT += network
