@@ -153,7 +153,7 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 			this, SLOT(slotMaxMonitor()) );
 
 #ifdef MAC_OSX
-	docViewer = new DaoDocViewer(wgtEditorTabs, programPath + "/../Resources/");
+	docViewer = new DaoDocViewer(wgtEditorTabs, programPath + "/../Frameworks/shared/dao/");
 #elif defined(WIN32)
 	docViewer = new DaoDocViewer(wgtEditorTabs, programPath + "/shared/dao/");
 #else
@@ -317,7 +317,9 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	DaoVmSpace_AddPath( vmSpace, programPath.toLocal8Bit().data() );
 	
 #ifdef MAC_OSX
-	QDir dir( programPath + "/../Resources/doc/html/en/", "*.html" );
+	QDir dir( programPath + "/../Frameworks/shared/dao/doc/html/en/", "*.html" );
+#elif defined(WIN32)
+	QDir dir( programPath + "/shared/dao/doc/html/en/", "*.html" );
 #else
 	QDir dir( programPath + "/doc/html/en/", "*.html" );
 #endif
@@ -405,7 +407,7 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 DaoStudio::~DaoStudio()
 {
 	SaveSettings();
-	if( vmState != DAOCON_READY ) wgtConsole->Stop();
+	if( vmState != DAOCON_READY ) wgtConsole->Quit();
 	disconnect( monitor, SIGNAL(finished(int, QProcess::ExitStatus)),
 		this, SLOT(slotRestartMonitor(int, QProcess::ExitStatus)));
 	monitor->close();
@@ -542,7 +544,6 @@ void DaoStudio::closeEvent ( QCloseEvent *e )
 		e->ignore();
 		return;
 	}
-	wgtConsole->Stop();
 	wgtConsole->Quit();
 	slotWriteLog( tr("quit Dao Studio") ); // TODO: write log to file
 	disconnect( monitor, SIGNAL(finished(int, QProcess::ExitStatus)),

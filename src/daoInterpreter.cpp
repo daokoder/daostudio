@@ -65,17 +65,21 @@ static void DaoResetExecution( DaoProcess *process, int line, int offset=0 )
 }
 static void DaoStdioRead( DaoConsoleStream *self, DString *buf, int count )
 {
-	self->interpreter->mutex.lock();
 	fflush( stdout );
+	self->interpreter->mutex.lock();
+	self->interpreter->waiting = true;
 	self->socket2.flush();
 	self->socket.connectToServer( DaoStudioSettings::socket_stdin );
-	self->socket.write( QByteArray::number( count ) );
-	self->socket.flush();
+	self->socket.waitForConnected( 1000 );
 	QObject::connect( & self->socket, SIGNAL(disconnected()),
 			self->interpreter, SLOT(slotExitWaiting()) );
+	self->socket.write( QByteArray::number( count ) );
+	self->socket.flush();
+	self->socket.waitForBytesWritten( 1000 );
 	QByteArray data;
-	self->interpreter->waiting = true;
 	while( self->interpreter->waiting && self->interpreter->vmSpace->stopit == 0 ){
+		self->socket.waitForReadyRead( 100 );
+		data += self->socket.readAll();
 		QCoreApplication::processEvents( QEventLoop::AllEvents, 1000 );
 		fflush( stdout );
 	}
@@ -83,8 +87,10 @@ static void DaoStdioRead( DaoConsoleStream *self, DString *buf, int count )
 		self->interpreter->mutex.unlock();
 		return;
 	}
-	self->socket.waitForReadyRead();
-	data += self->socket.readAll();
+	if( self->socket.state() == QLocalSocket::ConnectedState ){
+		self->socket.waitForReadyRead( 1000 );
+		data += self->socket.readAll();
+	}
 	//QString s = QString::fromUtf8( data.data(), data.size() );
 	DString_SetDataMBS( buf, data.data(), data.size() );
 	self->interpreter->mutex.unlock();
@@ -141,23 +147,28 @@ static void DaoConsDebug( DaoVmDebugger *self, DaoProcess *process, DaoStream *s
 	printf( "%s\n", info.toUtf8().data() );
 	fflush( stdout );
 	self->socket.connectToServer( DaoStudioSettings::socket_debug );
+	self->socket.waitForConnected( 1000 );
+	QObject::connect( & self->socket, SIGNAL(disconnected()),
+			self->interpreter, SLOT(slotExitWaiting()) );
 	self->socket.write( send );
 	self->socket.flush();
 	/* Maybe necessary on Windows: */
 	self->socket.waitForBytesWritten( 1000 );
-	QObject::connect( & self->socket, SIGNAL(disconnected()),
-			self->interpreter, SLOT(slotExitWaiting()) );
 	QByteArray data;
 	self->interpreter->waiting = true;
 	self->interpreter->debugProcess = process;
 	self->interpreter->InitDataBrowser();
-	while( self->interpreter->waiting ){
+	while( self->interpreter->waiting && self->interpreter->vmSpace->stopit == 0 ){
+		self->socket.waitForReadyRead( 100 );
+		data += self->socket.readAll();
 		QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
 		fflush( stdout );
 	}
 	//while( self->socket.state() != QLocalSocket::UnconnectedState ){
-	self->socket.waitForReadyRead();
-	data += self->socket.readAll();
+	if( self->socket.state() == QLocalSocket::ConnectedState ){
+		self->socket.waitForReadyRead( 1000 );
+		data += self->socket.readAll();
+	}
 	//self->socket.waitForReadyRead();
 	//data += self->socket.readAll();
 	//}

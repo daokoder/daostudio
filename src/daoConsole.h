@@ -132,6 +132,7 @@ class DaoConsole : public DaoTextEdit
 	QLocalSocket *stdinSocket;
 	QLocalSocket *stdoutSocket;
 	QLocalSocket *loggerSocket;
+	QLocalSocket *executeSocket;
 	QLocalSocket  scriptSocket;
 	QProcess	 *monitor;
 

@@ -1,5 +1,5 @@
-cp -r dao/doc/html/en doc/html/
-cp -r doc DaoStudio.app/Contents/Resources
+#cp -r dao/doc/html/en doc/html/
+#cp -r doc DaoStudio.app/Contents/Resources
 mkdir DaoStudio.app/Contents/Resources/langs
 cp langs/*.qm DaoStudio.app/Contents/Resources/langs
 #mkdir DaoStudio.app/Contents/Frameworks

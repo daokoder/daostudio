@@ -54,6 +54,7 @@ DaoConsole::DaoConsole( QWidget *parent ) : DaoTextEdit( parent, & wordList )
 	stdinSocket = NULL;
 	stdoutSocket = NULL;
 	loggerSocket = NULL;
+	executeSocket = NULL;
 
 	editor = NULL;
 	shellTop = false;
@@ -131,7 +132,6 @@ DaoConsole::DaoConsole( QWidget *parent ) : DaoTextEdit( parent, & wordList )
 }
 DaoConsole::~DaoConsole()
 {
-	disconnect( &scriptSocket, SIGNAL( disconnected() ), this, SLOT( slotScriptFinished() ) );
 	SaveCmdHistory();
 	DaoLexer_Delete( lexer );
 }
@@ -330,6 +330,8 @@ void DaoConsole::keyPressEvent ( QKeyEvent * event )
 				/* Maybe necessary on Windows: */
 				stdinSocket->waitForBytesWritten( 1000 );
 				stdinSocket->disconnectFromServer();
+				/* Necessary on Windows: */
+				stdinSocket->waitForDisconnected(1000);
 				stdinSocket = NULL;
 			}
 			return;
@@ -344,6 +346,7 @@ void DaoConsole::keyPressEvent ( QKeyEvent * event )
 		if( codehl.toktype >= DTOK_CMT_OPEN && codehl.toktype <= DTOK_WCS_OPEN ){
 			DaoTextEdit::keyPressEvent( event );
 		}else if( state == DAOCON_STDIN ){
+			//QMessageBox::about( this, "", QString::number( stdinCount ) + " " + QString::number((size_t)stdinSocket) );
 			if( stdinCount >=0 ){
 				QTextCursor cursor = textCursor();
 				cursor.setPosition( outputBound );
@@ -359,6 +362,8 @@ void DaoConsole::keyPressEvent ( QKeyEvent * event )
 					/* Maybe necessary on Windows: */
 					stdinSocket->waitForBytesWritten( 1000 );
 					stdinSocket->disconnectFromServer();
+					/* Necessary on Windows: */
+					stdinSocket->waitForDisconnected(1000);
 					stdinSocket = NULL;
 				}
 			}
@@ -845,6 +850,7 @@ void DaoConsole::slotReadStdError()
 }
 void DaoConsole::slotScriptFinished()
 {
+	executeSocket = NULL;
 	slotStdoutFromSocket();
 
 	// Do not call the following, otherwise the stdout cannot be read after a timeout!
@@ -890,8 +896,8 @@ void DaoConsole::slotSocketStderr()
 }
 void DaoConsole::slotSocketExecution()
 {
-	QLocalSocket *socket = executionServer.nextPendingConnection();
-	connect( socket, SIGNAL(disconnected()), this, SLOT(slotScriptFinished()) );
+	executeSocket = executionServer.nextPendingConnection();
+	connect( executeSocket, SIGNAL(disconnected()), this, SLOT(slotScriptFinished()) );
 }
 void DaoConsole::slotStdoutFromSocket()
 {
@@ -1014,6 +1020,11 @@ void DaoConsole::Stop()
 }
 void DaoConsole::Quit()
 {
+	if( executeSocket ){
+		disconnect( executeSocket, SIGNAL( disconnected() ), this, SLOT( slotScriptFinished() ) );
+		executeSocket = NULL;
+	}
+	if( scriptSocket.isValid() ) scriptSocket.disconnectFromServer();
 	Stop();
 }
 void DaoConsole::slotProcessFinished( int code, QProcess::ExitStatus status )
