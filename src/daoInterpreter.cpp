@@ -232,7 +232,6 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 	vmState = DAOCON_READY;
 	debugProcess = NULL;
 	daoString = DString_New(1);
-	daoLong = DLong_New();
 	tokens = DArray_New( D_TOKEN );
 
 	dataSocket = NULL;
@@ -721,7 +720,6 @@ void DaoInterpreter::ViewValue( DaoValue *value )
 	case DAO_FLOAT :
 	case DAO_DOUBLE :
 	case DAO_COMPLEX :
-	case DAO_LONG :
 	case DAO_STRING :
 		InitMessage( value );
 		DaoValue_GetString( value, daoString );
@@ -790,7 +788,7 @@ void DaoInterpreter::ViewList( DaoList *list )
 
 	if( type && type->nested->size ){
 		itp = type->nested->items.pType[0];
-		if( itp->tid >= DAO_INTEGER && itp->tid <= DAO_LONG ){
+		if( itp->tid >= DAO_INTEGER && itp->tid <= DAO_COMPLEX ){
 			type = itp;
 			sametype = true;
 		}

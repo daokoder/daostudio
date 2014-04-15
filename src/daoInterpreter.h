@@ -132,7 +132,6 @@ Q_OBJECT
 	DArray   *extraStack;
 
 	DString  *daoString;
-	DLong    *daoLong;
 	DArray   *tokens;
 	int vmState;
 

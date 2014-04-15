@@ -50,7 +50,6 @@ DaoMonitor::DaoMonitor( QWidget *parent ) : QWidget( parent )
 	lexer = DaoLexer_New();
 	daoString = DString_New(1);
 	daoString2 = DString_New(1);
-	daoLong = DLong_New();
 
 	connect( wgtDataTable, SIGNAL(cellDoubleClicked(int,int)), 
 			this, SLOT(slotDataTableClicked(int, int) ) );
@@ -72,7 +71,6 @@ DaoMonitor::~DaoMonitor()
 	DaoLexer_Delete( lexer );
 	DString_Delete( daoString );
 	DString_Delete( daoString2 );
-	DLong_Delete( daoLong );
 	delete hlDataInfo;
 	delete hlDataValue;
 }

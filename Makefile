@@ -11,10 +11,13 @@ WIN_INSTALL_DIR = DaoStudio
 WIN_INSTALL = --option-INSTALL-PATH ../$(WIN_INSTALL_DIR)
 MAC_INSTALL = --option-INSTALL-PATH ../DaoStudio.app/Contents/Frameworks
 
+all:
+	@echo "Please choose a platform!"
+
 $(PLATS) :
 	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile $@
 	$(DAOMAKE) mkdir2 build
-	cd build && ../$(DAOMAKE) --mode $(MODE) --platform $@ --suffix .daomake  ../dao
+	cd build && ../$(DAOMAKE) --mode $(MODE) --suffix .daomake  ../dao
 	cd build && $(MAKE) -f Makefile.daomake
 	qmake -o Makefile.qmake DaoStudio.pro
 	$(MAKE) -f Makefile.qmake
@@ -22,7 +25,7 @@ $(PLATS) :
 macosx :
 	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile $@
 	$(DAOMAKE) mkdir2 build
-	cd build && ../$(DAOMAKE) --mode $(MODE) --platform $@ --suffix .daomake $(MAC_INSTALL) ../dao
+	cd build && ../$(DAOMAKE) --mode $(MODE) --suffix .daomake $(MAC_INSTALL) ../dao
 	cd build && $(MAKE) -f Makefile.daomake
 	qmake -spec macx-g++ -o Makefile.qmake DaoStudio.pro
 	$(MAKE) -f Makefile.qmake

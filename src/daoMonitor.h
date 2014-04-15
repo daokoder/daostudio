@@ -48,7 +48,6 @@ Q_OBJECT
 	DaoLexer  *lexer;
 	DString *daoString;
 	DString *daoString2;
-	DLong	*daoLong;
 
 	QByteArray    updateData;
 	QLocalServer  monitorServer;
