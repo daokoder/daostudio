@@ -419,7 +419,7 @@ void DaoConsole::keyPressEvent ( QKeyEvent * event )
 				case DTOK_RSB : sbcount ++; break;
 				default : break;
 				}
-				if( tk->type == DTOK_IDENTIFIER ) wordList.AddWord( tk->string.mbs );
+				if( tk->type == DTOK_IDENTIFIER ) wordList.AddWord( tk->string.chars );
 			}
 			if( bcount <0 || sbcount <0 || cbcount <0 ){
 				if( not vim ) DaoTextEdit::keyPressEvent( event );

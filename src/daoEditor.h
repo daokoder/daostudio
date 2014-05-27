@@ -218,8 +218,7 @@ class DaoTextEdit : public QPlainTextEdit
 		QString digits;
 
 		DaoLexer  *lexer;
-		DString *mbs;
-		DString *wcs;
+		DString *daostring;
 
 		bool  showCursor;
 		short tabWidth;

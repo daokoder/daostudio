@@ -145,7 +145,7 @@ void DaoWordList::Extract( const QString & source )
 	DaoLexer_Tokenize( lexer, source.toLocal8Bit().data(), 0 );
 	for(i=0; i<lexer->tokens->size; i++){
 		DaoToken *tk = lexer->tokens->items.pToken[i];
-		if( tk->type == DTOK_IDENTIFIER ) AddWord( tk->string.mbs );
+		if( tk->type == DTOK_IDENTIFIER ) AddWord( tk->string.chars );
 	}
 	return;
 	for(i=0; i+1<lexer->tokens->size; i++){
@@ -154,22 +154,22 @@ void DaoWordList::Extract( const QString & source )
 		case DKEY_ENUM :
 		case DKEY_CLASS :
 		case DKEY_ROUTINE :
-			AddWord( lexer->tokens->items.pToken[i+1]->string.mbs );
+			AddWord( lexer->tokens->items.pToken[i+1]->string.chars );
 			break;
 		case DKEY_VAR :
+		case DKEY_INVAR :
 		case DKEY_CONST :
 		case DKEY_STATIC :
-		case DKEY_GLOBAL :
 			if( i+2 >= lexer->tokens->size ) break;
 			for(j=1; j<=2; j++){
 				tk = lexer->tokens->items.pToken[i+j];
 				if( tk->type == DTOK_IDENTIFIER && tk->name <= DAO_NOKEY1 )
-					AddWord( tk->string.mbs );
+					AddWord( tk->string.chars );
 			}
 			break;
 		case DTOK_DOT :
 			tk = lexer->tokens->items.pToken[i+1];
-			if( tk->type == DTOK_IDENTIFIER ) AddWord( tk->string.mbs );
+			if( tk->type == DTOK_IDENTIFIER ) AddWord( tk->string.chars );
 			break;
 		default : break;
 		}
@@ -800,14 +800,12 @@ DaoTextEdit::DaoTextEdit( QWidget *parent, DaoWordList *wlist ) :
 	connect( &timer, SIGNAL(timeout()), this, SLOT(slotBlink()));
 	timer.start( 700 );
 
-	mbs = DString_New(1);
-	wcs = DString_New(0);
+	daostring = DString_New();
 	lexer = DaoLexer_New();
 }
 DaoTextEdit::~DaoTextEdit()
 {
-	DString_Delete( mbs );
-	DString_Delete( wcs );
+	DString_Delete( daostring );
 	DaoLexer_Delete( lexer );
 }
 void DaoTextEdit::Undo()
@@ -973,7 +971,7 @@ void DaoTextEdit::ExtractWords()
 	for(i=0; i<lexer->tokens->size; i++){
 		DaoToken *tk = lexer->tokens->items.pToken[i];
 		if( tk->type == DTOK_IDENTIFIER and tk->string.size >=5 ){
-			wordList->AddWord( tk->string.mbs );
+			wordList->AddWord( tk->string.chars );
 		}
 	}
 }
@@ -989,10 +987,10 @@ void DaoTextEdit::slotSearchOrReplace()
 	if( prompt == "/" ){
 		if( not patterns.contains( command ) ){
 			QByteArray bytes = command.toUtf8();
-			DString *wcs = DString_New(0);
-			DString_SetDataMBS( wcs, bytes.data(), bytes.size() );
-			patterns[ command ] = DaoRegex_New( wcs );
-			DString_Delete( wcs );
+			DString *daostring = DString_New();
+			DString_SetBytes( daostring, bytes.data(), bytes.size() );
+			patterns[ command ] = DaoRegex_New( daostring );
+			DString_Delete( daostring );
 		}
 		DaoRegex *newpat = patterns[ command ];
 		DaoRegex *oldpat = codehl.SetPattern( newpat );
@@ -1005,59 +1003,59 @@ void DaoTextEdit::slotSearchOrReplace()
 	cmdPrompt->HideMessage();
 	QTextCursor cursor = textCursor();
 	QByteArray bytes = command.toUtf8();
-	DString_SetDataMBS( wcs, bytes.data(), bytes.size() );
-	int i=0, n=wcs->size;
+	DString_SetBytes( daostring, bytes.data(), bytes.size() );
+	int i=0, n=daostring->size;
 	int start = cursor.blockNumber() + 1;
 	int end = start;
 	int num = 0;
 	int pm = 0;
 	if( n == 0 ) return;
-	if( wcs->wcs[0] == L'.' ){
+	if( daostring->chars[0] == '.' ){
 		start = cursor.blockNumber() + 1;
 		end = start;
 		i += 1;
-	}else if( wcs->wcs[0] == L'$' ){
+	}else if( daostring->chars[0] == '$' ){
 		start = end = blockCount();
 		i += 1;
-	}else if( wcs->wcs[0] == L'%' ){
+	}else if( daostring->chars[0] == '%' ){
 		start = 1;
 		end = blockCount();
 		i += 1;
-		if( wcs->wcs[i] == L',' ){
+		if( daostring->chars[i] == ',' ){
 			cmdPrompt->ShowMessage( tr("Unexpected comma") );
 			return;
 		}
-	}else if( iswdigit( wcs->wcs[0] ) ){
+	}else if( isdigit( daostring->chars[0] ) ){
 		start = 0;
-		while( iswdigit( wcs->wcs[i] ) ){
-			start = start*10 + (wcs->wcs[i] - L'0');
+		while( isdigit( daostring->chars[i] ) ){
+			start = start*10 + (daostring->chars[i] - '0');
 			i += 1;
 		}
 		end = start;
 	}
-	if( wcs->wcs[i] == L',' ){
+	if( daostring->chars[i] == ',' ){
 		i += 1;
-		if( wcs->wcs[i] == L'.' ){
+		if( daostring->chars[i] == '.' ){
 			end = cursor.blockNumber() + 1;
 			i += 1;
-		}else if( wcs->wcs[i] == L'$' ){
+		}else if( daostring->chars[i] == '$' ){
 			end = blockCount();
 			i += 1;
 		}else{
-			if( wcs->wcs[i] == L'+' ){
+			if( daostring->chars[i] == '+' ){
 				pm = 1;
 				i += 1;
-			}else if( wcs->wcs[i] == L'-' ){
+			}else if( daostring->chars[i] == '-' ){
 				pm = -1;
 				i += 1;
 			}
-			if( not iswdigit( wcs->wcs[i] ) ){
+			if( not iswdigit( daostring->chars[i] ) ){
 				cmdPrompt->ShowMessage( tr("Invalid format") );
 				return;
 			}
 			num = 0;
-			while( iswdigit( wcs->wcs[i] ) ){
-				num = num*10 + (wcs->wcs[i] - L'0');
+			while( iswdigit( daostring->chars[i] ) ){
+				num = num*10 + (daostring->chars[i] - '0');
 				i += 1;
 			}
 			end = num;
@@ -1081,7 +1079,7 @@ void DaoTextEdit::slotSearchOrReplace()
 	cursor = QTextCursor( block );
 	//cursor.movePosition( QTextCursor::Start );
 	//cursor.movePosition( QTextCursor::NextBlock, QTextCursor::MoveAnchor, start-1 );
-	if( start == end and i == wcs->size ){
+	if( start == end and i == daostring->size ){
 		setTextCursor( cursor );
 		ensureCursorVisible();
 		cmdPrompt->EnsureVisible();
@@ -1114,21 +1112,21 @@ void DaoTextEdit::slotSearchOrReplace()
 	start = start2;
 	end = end2;
 	QString rest;
-	if( i+1 < wcs->size ) rest = QString::fromWCharArray( wcs->wcs+i+1, wcs->size-i-1 );
-	if( wcs->wcs[i] == L'q' ){
+	if( i+1 < daostring->size ) rest = QString::fromLocal8Bit( daostring->chars+i+1, daostring->size-i-1 );
+	if( daostring->chars[i] == 'q' ){
 		setUndoRedoEnabled( false );
 		setUndoRedoEnabled( true );
 		cmdPrompt->hide();
 		setFocus();
-	}else if( wcs->wcs[i] == L'w' ){
+	}else if( daostring->chars[i] == 'w' ){
 		studio->slotSave();
-		if( wcs->wcs[i+1] == L'q' ){
+		if( daostring->chars[i+1] == 'q' ){
 			setUndoRedoEnabled( false );
 			setUndoRedoEnabled( true );
 		}
 		cmdPrompt->hide();
 		setFocus();
-	}else if( wcs->wcs[i] == L'd' ){
+	}else if( daostring->chars[i] == 'd' ){
 		cursor.setPosition( pstart );
 		cursor.setPosition( pend, QTextCursor::KeepAnchor );
 		if( not cursor.atEnd() ){
@@ -1141,9 +1139,9 @@ void DaoTextEdit::slotSearchOrReplace()
 		buffer = cursor.selectedText();
 		cursor.removeSelectedText();
 		setTextCursor( cursor );
-		if( i+1 < wcs->size )
+		if( i+1 < daostring->size )
 			cmdPrompt->AddMessage( tr("Unexpected: ") + rest );
-	}else if( wcs->wcs[i] == L'y' ){
+	}else if( daostring->chars[i] == 'y' ){
 		cursor.setPosition( pstart );
 		cursor.setPosition( pend, QTextCursor::KeepAnchor );
 		if( not cursor.atEnd() ){
@@ -1155,19 +1153,19 @@ void DaoTextEdit::slotSearchOrReplace()
 		buftype = BUF_BLOCKS;
 		buffer = cursor.selectedText();
 		setTextCursor( cursor );
-		if( i+1 < wcs->size )
+		if( i+1 < daostring->size )
 			cmdPrompt->AddMessage( tr("Unexpected: ") + rest );
-	}else if( wcs->wcs[i] == L's' ){
-		int slash = DString_FindWChar( wcs, L'/', i+2 );
-		if( i+1 >= wcs->size || wcs->wcs[i+1] != L'/' || slash == MAXSIZE ){
+	}else if( daostring->chars[i] == 's' ){
+		int slash = DString_FindChar( daostring, '/', i+2 );
+		if( i+1 >= daostring->size || daostring->chars[i+1] != '/' || slash == DAO_NULLPOS ){
 			cmdPrompt->AddMessage( tr("need Dao regular expression") );
 			return;
 		}
 		int offset = i + 2;
-		DString *s = DString_New(0);
+		DString *s = DString_New();
 		DaoRegex *pat = NULL;
-		while( slash != MAXSIZE ){
-			DString_SetDataWCS( s, wcs->wcs+offset, slash-offset );
+		while( slash != DAO_NULLPOS ){
+			DString_SetBytes( s, daostring->chars+offset, slash-offset );
 			pat = DaoRegex_New( s );
 			bool valid = true;
 			for( i=0; i<pat->count; i++ ){
@@ -1187,44 +1185,44 @@ void DaoTextEdit::slotSearchOrReplace()
 				}
 			}
 			if( valid ) break;
-			slash = DString_FindWChar( wcs, L'/', slash + 1 );
+			slash = DString_FindChar( daostring, '/', slash + 1 );
 		}
 		if( pat == NULL ){
 			DString_Delete( s );
 			cmdPrompt->AddMessage( tr("need valid Dao regular expression") );
 			return;
 		}
-		QString rs = QString::fromWCharArray( s->wcs, s->size );
+		QString rs = QString::fromLocal8Bit( s->chars, s->size );
 		patterns[ rs ] = pat;
-		int size = wcs->size;
+		int size = daostring->size;
 		int index = 1;
 		cmdPrompt->AppendSearchHistory( rs );
 		if( size > slash+2 ){
-			if( wcs->wcs[size-1] == L'g' and wcs->wcs[size-2] == L'/' ){
+			if( daostring->chars[size-1] == 'g' and daostring->chars[size-2] == '/' ){
 				size -= 1;
 				index = 0;
 			}
 		}
-		if( size > slash+1 and wcs->wcs[size-1] == L'/' ) size -= 1;
-		DString_SetDataWCS( s, wcs->wcs+slash+1, size - slash - 1 );
-		DString *source = DString_New(0);
+		if( size > slash+1 and daostring->chars[size-1] == '/' ) size -= 1;
+		DString_SetBytes( s, daostring->chars+slash+1, size - slash - 1 );
+		DString *source = DString_New();
 
 		int k=0;
 		for(i=0; i<s->size; i++, k++){
-			if( s->wcs[i] != L'\\' ){
-				s->wcs[k] = s->wcs[i];
+			if( s->chars[i] != '\\' ){
+				s->chars[k] = s->chars[i];
 				continue;
 			}
 			if( i+1 >= s->size ) break;
-			switch( s->wcs[i+1] ){
-			case L't' : s->wcs[k] = L'\t'; break;
-			case L'n' : s->wcs[k] = L'\n'; break;
-			case L'r' : s->wcs[k] = L'\r'; break;
-			default : s->wcs[k] = s->wcs[i+1]; break;
+			switch( s->chars[i+1] ){
+			case 't' : s->chars[k] = '\t'; break;
+			case 'n' : s->chars[k] = '\n'; break;
+			case 'r' : s->chars[k] = '\r'; break;
+			default : s->chars[k] = s->chars[i+1]; break;
 			}
 			i += 1;
 		}
-		s->wcs[k] = L'\0';
+		s->chars[k] = '\0';
 		s->size = k;
 
 		QTextBlock block = document()->findBlockByNumber( start-1 );
@@ -1236,20 +1234,20 @@ void DaoTextEdit::slotSearchOrReplace()
 			QTextCursor c( block );
 			c.movePosition( QTextCursor::EndOfBlock, QTextCursor::KeepAnchor );
 			QByteArray bytes = c.selectedText().toUtf8();
-			DString_SetDataMBS( source, bytes.data(), bytes.size() );
+			DString_SetBytes( source, bytes.data(), bytes.size() );
 			int count = DaoRegex_Change( pat, source, s, index );
 			if( count ==0 ) continue;
-			QString rpl = QString::fromWCharArray( source->wcs, source->size );
+			QString rpl = QString::fromLocal8Bit( source->chars, source->size );
 			c.insertText( rpl );
 		}
 		DaoRegex *oldpat = codehl.SetPattern( pat );
 		if( pat != oldpat ) RedoHighlight();
 		DString_Delete( source );
 		DString_Delete( s );
-		//cmdPrompt->AddMessage( QString::fromWCharArray( s->wcs, s->size ) );
+		//cmdPrompt->AddMessage( QString::fromLocal8Bit( s->chars, s->size ) );
 	}else{
 		cmdPrompt->AddMessage( tr("Invalid operaion") 
-				+ " \"" + wcs->wcs[i] + "\"" );
+				+ " \"" + daostring->chars[i] + "\"" );
 	}
 	QClipboard *clipboard = QApplication::clipboard();
 	clipboard->setText(buffer);
@@ -1646,10 +1644,10 @@ void DaoTextEdit::VimModeCommenting( int dir, int n, bool remove )
 	QString close = "#}";
 	QString cmt = "#";
 	if( codehl.language and codehl.language->cmtLine1 )
-		cmt = codehl.language->cmtLine1->mbs;
+		cmt = codehl.language->cmtLine1->chars;
 	if( codehl.language and codehl.language->cmtOpen1 ){
-		open = codehl.language->cmtOpen1->mbs;
-		close = codehl.language->cmtClose1->mbs;
+		open = codehl.language->cmtOpen1->chars;
+		close = codehl.language->cmtClose1->chars;
 	}
 
 	QTextCursor cursor = textCursor();
@@ -2051,7 +2049,7 @@ static QString DaoToken_MakeShortCodes( DArray *tokens )
 			codes += ' ';
 			break;
 		default:
-			codes += token->string.mbs;
+			codes += token->string.chars;
 			break;
 		}
 	}
@@ -2129,9 +2127,9 @@ void DaoTextEdit::IndentLine( QTextCursor cursor, bool indent )
 	for(i=0; i<tokens->size; i++){
 		DaoToken *token = tokens->items.pToken[i];
 		switch( token->type ){
-		case DTOK_BLANK : 
+		case DTOK_SPACE : 
 		case DTOK_TAB:
-			if( begin ) reference_indent += token->string.mbs;
+			if( begin ) reference_indent += token->string.chars;
 			break;
 		default :
 			begin = false;
@@ -2145,9 +2143,9 @@ void DaoTextEdit::IndentLine( QTextCursor cursor, bool indent )
 	for(i=0; i<lexer->tokens->size; i++){
 		DaoToken *token = lexer->tokens->items.pToken[i];
 		switch( token->type ){
-		case DTOK_BLANK : 
+		case DTOK_SPACE : 
 		case DTOK_TAB:
-			if( begin ) previous_indent += token->string.mbs;
+			if( begin ) previous_indent += token->string.chars;
 			break;
 		default :
 			begin = false;
@@ -2174,9 +2172,9 @@ void DaoTextEdit::IndentLine( QTextCursor cursor, bool indent )
 	for(i=0; i<tokens->size; i++){
 		DaoToken *token = tokens->items.pToken[i];
 		switch( token->type ){
-		case DTOK_BLANK : 
+		case DTOK_SPACE : 
 		case DTOK_TAB:
-			if( begin ) old_indent += token->string.mbs;
+			if( begin ) old_indent += token->string.chars;
 			break;
 		case DTOK_LCB :
 			begin = false;
@@ -2222,7 +2220,7 @@ void DaoTextEdit::IndentLine( QTextCursor cursor, bool indent )
 	}else{
 		// indent normally:
 		new_indent = reference_indent;
-		DString_SetMBS( mbs, previous_codes.toUtf8().data() );
+		DString_SetChars( daostring, previous_codes.toUtf8().data() );
 		if( language->IndentMore( previous_codes ) ){
 			new_indent = previous_indent;
 			open_brace += 1;
@@ -2231,7 +2229,7 @@ void DaoTextEdit::IndentLine( QTextCursor cursor, bool indent )
 			new_indent = previous_indent;
 			open_brace += 1;
 		}
-		DString_SetMBS( mbs, current_codes.toUtf8().data() );
+		DString_SetChars( daostring, current_codes.toUtf8().data() );
 		if( language->IndentNone( current_codes ) ){
 			new_indent = "";
 			open_brace = close_brace = 0;
@@ -2267,7 +2265,7 @@ void DaoTextEdit::IndentLine( QTextCursor cursor, bool indent )
 	b = cb = sb = 0;
 	for(i=0; i<tokens->size; i++){
 		DaoToken *token = tokens->items.pToken[i];
-		//printf( "%3i:  %3i  %s\n", i, token->type, token->string.mbs );
+		//printf( "%3i:  %3i  %s\n", i, token->type, token->string.chars );
 		switch( token->type ){
 		case DTOK_LB  : b  += 1; break;
 		case DTOK_RB  : b  -= 1; break;
@@ -2901,7 +2899,7 @@ QString NormalizeCodes( const QString & source, DaoLexer *lexer )
 	QString norm;
 	DaoLexer_Tokenize( lexer, source.toLocal8Bit().data(), 0 );
 	for(size_t i=0; i<lexer->tokens->size; i++){
-		norm += lexer->tokens->items.pToken[i]->string.mbs;
+		norm += lexer->tokens->items.pToken[i]->string.chars;
 		norm += '\n';
 	}
 	return norm;

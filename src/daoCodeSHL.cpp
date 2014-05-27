@@ -47,13 +47,12 @@ enum
 DaoBasicSyntax::DaoBasicSyntax( const QString & lang )
 {
 	language = lang;
-	keyStruct = DHash_New(D_STRING,0);
-	keyStorage = DHash_New(D_STRING,0);
-	keyStatement = DHash_New(D_STRING,0);
-	keyConstant = DHash_New(D_STRING,0);
-	keyOthers = DHash_New(D_STRING,0);
-	mbs = DString_New(1);
-	wcs = DString_New(0);
+	keyStruct = DHash_New(DAO_DATA_STRING,0);
+	keyStorage = DHash_New(DAO_DATA_STRING,0);
+	keyStatement = DHash_New(DAO_DATA_STRING,0);
+	keyConstant = DHash_New(DAO_DATA_STRING,0);
+	keyOthers = DHash_New(DAO_DATA_STRING,0);
+	daostring = DString_New();
 	cmtLine1 = NULL;
 	cmtLine2 = NULL;
 	cmtOpen1 = NULL;
@@ -70,8 +69,7 @@ DaoBasicSyntax::DaoBasicSyntax( const QString & lang )
 	caseInsensitive = false;
 	isLatex = false;
 	lexer = DaoLexer_New();
-	DString_SetSharing( mbs, 0 );
-	DString_SetSharing( wcs, 0 );
+	DString_SetSharing( daostring, 0 );
 }
 DaoBasicSyntax::~DaoBasicSyntax()
 {
@@ -81,8 +79,7 @@ DaoBasicSyntax::~DaoBasicSyntax()
 	DMap_Delete( keyStatement );
 	DMap_Delete( keyConstant );
 	DMap_Delete( keyOthers );
-	DString_Delete( mbs );
-	DString_Delete( wcs );
+	DString_Delete( daostring );
 	if( cmtLine1 ) DString_Delete( cmtLine1 );
 	if( cmtLine2 ) DString_Delete( cmtLine2 );
 	if( cmtOpen1 ) DString_Delete( cmtOpen1 );
@@ -95,101 +92,100 @@ DaoBasicSyntax::~DaoBasicSyntax()
 
 void DaoBasicSyntax::AddKeywordStruct( const char *keyword )
 {
-	DString_SetMBS( mbs, keyword );
-	DMap_Insert( keyStruct, mbs, 0 );
+	DString_SetChars( daostring, keyword );
+	DMap_Insert( keyStruct, daostring, 0 );
 }
 void DaoBasicSyntax::AddKeywordStorage( const char *keyword )
 {
-	DString_SetMBS( mbs, keyword );
-	DMap_Insert( keyStorage, mbs, 0 );
+	DString_SetChars( daostring, keyword );
+	DMap_Insert( keyStorage, daostring, 0 );
 }
 void DaoBasicSyntax::AddKeywordStatement( const char *keyword )
 {
-	DString_SetMBS( mbs, keyword );
-	DMap_Insert( keyStatement, mbs, 0 );
+	DString_SetChars( daostring, keyword );
+	DMap_Insert( keyStatement, daostring, 0 );
 }
 void DaoBasicSyntax::AddKeywordConstant( const char *keyword )
 {
-	DString_SetMBS( mbs, keyword );
-	DMap_Insert( keyConstant, mbs, 0 );
+	DString_SetChars( daostring, keyword );
+	DMap_Insert( keyConstant, daostring, 0 );
 }
 void DaoBasicSyntax::AddKeywordOthers( const char *keyword )
 {
-	DString_SetMBS( mbs, keyword );
-	DMap_Insert( keyOthers, mbs, 0 );
+	DString_SetChars( daostring, keyword );
+	DMap_Insert( keyOthers, daostring, 0 );
 }
 void DaoBasicSyntax::AddSingleLineComment( const char *tok )
 {
 	if( strcmp( tok, "#" ) ==0 ) hasDaoLineComment = true;
-	DString_SetMBS( mbs, tok );
+	DString_SetChars( daostring, tok );
 	if( cmtLine1 == NULL ){
-		cmtLine1 = DString_Copy( mbs );
+		cmtLine1 = DString_Copy( daostring );
 	}else if( cmtLine2 == NULL ){
-		cmtLine2 = DString_Copy( mbs );
+		cmtLine2 = DString_Copy( daostring );
 	}
 }
 void DaoBasicSyntax::AddMultiLineComment( const char *open, const char *close )
 {
-	if( strcmp( open, "#{" ) ==0 and strcmp( close, "#}" ) ==0 )
-		hasDaoBlockComment = true;
-	DString_SetMBS( mbs, open );
+	if( strcmp( open, "#{" ) ==0 and strcmp( close, "#}" ) ==0 ) hasDaoBlockComment = true;
+	DString_SetChars( daostring, open );
 	if( cmtOpen1 == NULL ){
-		cmtOpen1 = DString_Copy( mbs );
-		DString_SetMBS( mbs, close );
-		cmtClose1 = DString_Copy( mbs );
+		cmtOpen1 = DString_Copy( daostring );
+		DString_SetChars( daostring, close );
+		cmtClose1 = DString_Copy( daostring );
 	}else if( cmtOpen2 == NULL ){
-		cmtOpen2 = DString_Copy( mbs );
-		DString_SetMBS( mbs, close );
-		cmtClose2 = DString_Copy( mbs );
+		cmtOpen2 = DString_Copy( daostring );
+		DString_SetChars( daostring, close );
+		cmtClose2 = DString_Copy( daostring );
 	}
 }
 void DaoBasicSyntax::AddPattern( const char *pat, int group, int color )
 {
 	DaoSyntaxPattern sp = { NULL, group, color };
-	DString_SetMBS( wcs, pat );
-	sp.pattern = DaoRegex_New( wcs );
+	DString_SetChars( daostring, pat );
+	sp.pattern = DaoRegex_New( daostring );
 	patterns.append( sp );
 }
 void DaoBasicSyntax::SetClassPattern( const char *pat )
 {
 	if( class_regex ) free( class_regex );
-	DString_SetMBS( wcs, pat );
-	class_regex = DaoRegex_New( wcs );
+	DString_SetChars( daostring, pat );
+	class_regex = DaoRegex_New( daostring );
 }
 void DaoBasicSyntax::SetMethodPattern( const char *pat )
 {
 	if( func_regex ) free( func_regex );
-	DString_SetMBS( wcs, pat );
-	func_regex = DaoRegex_New( wcs );
+	DString_SetChars( daostring, pat );
+	func_regex = DaoRegex_New( daostring );
 }
 void DaoBasicSyntax::AddNoneIndentPattern( const char *pat )
 {
-	DString mbs = DString_WrapMBS( pat );
+	DString mbs = DString_WrapChars( pat );
 	DaoRegex *noneIndent = DaoRegex_New( & mbs );
 	noneIndents.append( noneIndent );
 }
 void DaoBasicSyntax::AddLessIndentPattern( const char *pat )
 {
-	DString mbs = DString_WrapMBS( pat );
+	DString mbs = DString_WrapChars( pat );
 	DaoRegex *lessIndent = DaoRegex_New( & mbs );
 	lessIndents.append( lessIndent );
 }
 void DaoBasicSyntax::AddMoreIndentPattern( const char *pat )
 {
-	DString mbs = DString_WrapMBS( pat );
+	DString mbs = DString_WrapChars( pat );
 	DaoRegex *moreIndent = DaoRegex_New( & mbs );
 	moreIndents.append( moreIndent );
 }
 void DaoBasicSyntax::AddMoreIndentPattern2( const char *pat )
 {
-	DString mbs = DString_WrapMBS( pat );
+	DString mbs = DString_WrapChars( pat );
 	DaoRegex *moreIndent = DaoRegex_New( & mbs );
 	moreIndents2.append( moreIndent );
 }
 bool DaoBasicSyntax::IndentNone( const QString & codes )
 {
 	int i;
-	DString mbs = DString_WrapMBS( codes.toUtf8().data() );
+	DString mbs = DString_WrapChars( codes.toUtf8().data() );
 	for(i=0; i<noneIndents.size(); i++){
 		if( DaoRegex_Match( noneIndents[i], & mbs, NULL, NULL ) ) return true;
 	}
@@ -198,7 +194,7 @@ bool DaoBasicSyntax::IndentNone( const QString & codes )
 bool DaoBasicSyntax::IndentLess( const QString & codes )
 {
 	int i;
-	DString mbs = DString_WrapMBS( codes.toUtf8().data() );
+	DString mbs = DString_WrapChars( codes.toUtf8().data() );
 	for(i=0; i<lessIndents.size(); i++){
 		if( DaoRegex_Match( lessIndents[i], & mbs, NULL, NULL ) ) return true;
 	}
@@ -207,7 +203,7 @@ bool DaoBasicSyntax::IndentLess( const QString & codes )
 bool DaoBasicSyntax::IndentMore( const QString & codes )
 {
 	int i;
-	DString mbs = DString_WrapMBS( codes.toUtf8().data() );
+	DString mbs = DString_WrapChars( codes.toUtf8().data() );
 	for(i=0; i<moreIndents.size(); i++){
 		if( DaoRegex_Match( moreIndents[i], & mbs, NULL, NULL ) ) return true;
 	}
@@ -216,7 +212,7 @@ bool DaoBasicSyntax::IndentMore( const QString & codes )
 bool DaoBasicSyntax::IndentMore2( const QString & codes )
 {
 	int i;
-	DString mbs = DString_WrapMBS( codes.toUtf8().data() );
+	DString mbs = DString_WrapChars( codes.toUtf8().data() );
 	for(i=0; i<moreIndents2.size(); i++){
 		if( DaoRegex_Match( moreIndents2[i], & mbs, NULL, NULL ) ) return true;
 	}
@@ -235,7 +231,7 @@ int DaoBasicSyntax::Tokenize( DaoLexer *lexer, const char *source )
 
 	//printf( "==============\n%s\n\n\n", src );
 	DaoLexer_Reset( lexer );
-	DString ds = DString_WrapMBS( src );
+	DString ds = DString_WrapChars( src );
 
 	while( n ){
 		//printf( "%5i:  %s\n\n\n\n", n, src );
@@ -244,15 +240,15 @@ int DaoBasicSyntax::Tokenize( DaoLexer *lexer, const char *source )
 			printf( "%5i:  %s\n\n\n\n", n, src );
 			break;
 		}
-		ds.mbs = (char*)src;
+		ds.chars = (char*)src;
 		ds.size = n;
 		one->type = one->name = DTOK_COMMENT;
 		one->string.size = 0;
 		cmtype = 0;
-		if( LC1 and strncmp( src, cmtLine1->mbs, LC1 ) ==0 ) cmtype = 1;
-		if( LC2 and strncmp( src, cmtLine2->mbs, LC2 ) ==0 ) cmtype = 2;
-		if( BC1 and strncmp( src, cmtOpen1->mbs, BC1 ) ==0 ) cmtype = 3;
-		if( BC2 and strncmp( src, cmtOpen2->mbs, BC2 ) ==0 ) cmtype = 4;
+		if( LC1 and strncmp( src, cmtLine1->chars, LC1 ) ==0 ) cmtype = 1;
+		if( LC2 and strncmp( src, cmtLine2->chars, LC2 ) ==0 ) cmtype = 2;
+		if( BC1 and strncmp( src, cmtOpen1->chars, BC1 ) ==0 ) cmtype = 3;
+		if( BC2 and strncmp( src, cmtOpen2->chars, BC2 ) ==0 ) cmtype = 4;
 		if( cmtype ==1 or cmtype ==2 ){
 			while( n ){
 				DString_AppendChar( & one->string, *src );
@@ -262,23 +258,23 @@ int DaoBasicSyntax::Tokenize( DaoLexer *lexer, const char *source )
 			}
 		}else if( cmtype ==3 ){
 			k = DString_Find( & ds, cmtClose1, cmtOpen1->size );
-			if( k == MAXSIZE ){
+			if( k == DAO_NULLPOS ){
 				DString_Assign( & one->string, & ds );
 				one->type = one->name = DTOK_CMT_OPEN;
 			}else{
 				k += cmtClose1->size;
-				DString_SetDataMBS( & one->string, ds.mbs, k );
+				DString_SetBytes( & one->string, ds.chars, k );
 				src += k;
 				n -= k;
 			}
 		}else if( cmtype ==4 ){
 			k = DString_Find( & ds, cmtClose2, cmtOpen2->size );
-			if( k == MAXSIZE ){
+			if( k == DAO_NULLPOS ){
 				DString_Assign( & one->string, & ds );
 				one->type = one->name = DTOK_CMT_OPEN;
 			}else{
 				k += cmtClose2->size;
-				DString_SetDataMBS( & one->string, ds.mbs, k );
+				DString_SetBytes( & one->string, ds.chars, k );
 				src += k;
 				n -= k;
 			}
@@ -299,7 +295,7 @@ int DaoBasicSyntax::Tokenize( DaoLexer *lexer, const char *source )
 				n -= 2;
 				DaoLexer_AppendToken( lexer, one );
 				one->type = DTOK_LCB;
-				DString_SetMBS( & one->string, "{" );
+				DString_SetChars( & one->string, "{" );
 				DaoLexer_AppendToken( lexer, one );
 				continue;
 			}else if( not hasDaoLineComment ){
@@ -313,7 +309,7 @@ int DaoBasicSyntax::Tokenize( DaoLexer *lexer, const char *source )
 		if( shortQuotation && (*src == '\'' || *src == '\"') ){
 			one->type = DaoToken_Check( src, n, & k );
 			if( k < 16 && (one->type == DTOK_MBS || one->type == DTOK_WCS) ){
-				DString_SetDataMBS( & one->string, src, k );
+				DString_SetBytes( & one->string, src, k );
 				DaoLexer_AppendToken( lexer, one );
 				src += k;
 				n -= k;
@@ -338,7 +334,7 @@ int DaoBasicSyntax::Tokenize( DaoLexer *lexer, const char *source )
 		}
 		one->type = DaoToken_Check( src, n, & k );
 		//printf( "n = %i,  %i,  %i=======%s\n", n, k, one->type, src );
-		DString_SetDataMBS( & one->string, src, k );
+		DString_SetBytes( & one->string, src, k );
 		DaoLexer_AppendToken( lexer, one );
 		if( n < k ){
 			printf( "n = %i,  %i,  %i=======%s\n", n, k, one->type, src );
@@ -809,8 +805,7 @@ DaoCodeSHL::DaoCodeSHL( QTextDocument * parent ) : QSyntaxHighlighter( parent )
 	textSkip = 0;
 	pattern = NULL;
 	language = NULL;
-	mbs = DString_New(1);
-	wcs = DString_New(0);
+	daostring = DString_New();
 	lexer = DaoLexer_New();
 	SetColorScheme( 0 );
 	setCurrentBlockState(0);
@@ -818,8 +813,7 @@ DaoCodeSHL::DaoCodeSHL( QTextDocument * parent ) : QSyntaxHighlighter( parent )
 DaoCodeSHL::~DaoCodeSHL()
 {
 	DaoLexer_Delete( lexer );
-	DString_Delete( mbs );
-	DString_Delete( wcs );
+	DString_Delete( daostring );
 }
 void DaoCodeSHL::SetFontSize( int size )
 {
@@ -964,12 +958,12 @@ void DaoCodeSHL::HighlightSearch( const QString & text )
 {
 	if( pattern ){
 		QByteArray bytes = text.toUtf8();
-		DString_SetDataMBS( wcs, bytes.data(), bytes.size() );
+		DString_SetBytes( daostring, bytes.data(), bytes.size() );
 		daoint start = 0;
-		daoint end = wcs->size;
+		daoint end = daostring->size;
 		daoint p1 = start, p2 = end;
 		daoint i;
-		while( DaoRegex_Match( pattern, wcs, & p1, & p2 ) ){
+		while( DaoRegex_Match( pattern, daostring, & p1, & p2 ) ){
 			for(i=p1; i<=p2; i++){
 				QTextCharFormat fmt = format( i );
 				QColor fore = fmt.foreground().color();
@@ -1001,9 +995,9 @@ void DaoCodeSHL::SetIndentationData( DaoCodeLineData *ud, DaoLexer *lexer )
 	for(i=0; i<lexer->tokens->size; i++){
 		DaoToken *tk = lexer->tokens->items.pToken[i];
 		if( leading ){
-			ud->leadSpaces += (tk->type == DTOK_BLANK);
+			ud->leadSpaces += (tk->type == DTOK_SPACE);
 			ud->leadTabs += (tk->type == DTOK_TAB);
-			leading = (tk->type == DTOK_BLANK or tk->type == DTOK_TAB);
+			leading = (tk->type == DTOK_SPACE or tk->type == DTOK_TAB);
 			if( leading == false and tk->type != DTOK_NEWLN ){
 				ud->firstToken = tk->type;
 				break;
@@ -1029,8 +1023,8 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 	switch( previousBlockState() ){
 	case DAO_HLSTATE_MBS : src = "'"; break;
 	case DAO_HLSTATE_WCS : src = "\""; break;
-	case DAO_HLSTATE_CMT_OPEN1 : src = language->cmtOpen1->mbs; break;
-	case DAO_HLSTATE_CMT_OPEN2 : src = language->cmtOpen2->mbs; break;
+	case DAO_HLSTATE_CMT_OPEN1 : src = language->cmtOpen1->chars; break;
+	case DAO_HLSTATE_CMT_OPEN2 : src = language->cmtOpen2->chars; break;
 	}
 	offset = src.size();
 	src += text;
@@ -1053,11 +1047,10 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 	bool def_method = ud->def_method;
 	ud->def_class = ud->def_method = false;
 	if( tokens->size and tokens->items.pToken[0]->type == DTOK_IDENTIFIER ){
-		DString_Resize( wcs, src.size() );
-		src.toWCharArray( wcs->wcs );
-		if( language->func_regex && DaoRegex_Match( language->func_regex, wcs, NULL, NULL ) )
+		DString_SetChars( daostring, src.toLocal8Bit().data() );
+		if( language->func_regex && DaoRegex_Match( language->func_regex, daostring, NULL, NULL ) )
 			ud->def_method = true;
-		if( language->class_regex && DaoRegex_Match( language->class_regex, wcs, NULL, NULL ) )
+		if( language->class_regex && DaoRegex_Match( language->class_regex, daostring, NULL, NULL ) )
 			ud->def_class = true;
 	}
 
@@ -1072,13 +1065,13 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 	for(i=0; i<tokens->size; i++){
 		DaoToken *tk = tokens->items.pToken[i];
 		DaoTokenFormat format;
-		//printf( "%3i: %s\n", i, tk->string.mbs );
+		//printf( "%3i: %s\n", i, tk->string.chars );
 		format.setFontPointSize( fontSize );
 		format.setForeground( plainColor );
-		DString_SetDataMBS( wcs, tk->string.mbs, tk->string.size );
-		//printf( "%4i:  %3i  %s\n", i, tk->type, tk->string.mbs );
+		DString_SetBytes( daostring, tk->string.chars, tk->string.size );
+		//printf( "%4i:  %3i  %s\n", i, tk->type, tk->string.chars );
 		switch( tk->type ){
-		case DTOK_BLANK : case DTOK_TAB :
+		case DTOK_SPACE : case DTOK_TAB :
 			format.setObjectType( 0 );
 			if( tk->type == DTOK_TAB ) format.setBackground( tabColor[i%2] );
 			break;
@@ -1120,16 +1113,16 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 			if( language->isLatex ){
 				if( i ==0 ){
 					if( tk->string.size >= 5 )
-						words[ QString::fromUtf8( tk->string.mbs ) ] = true;
+						words[ QString::fromUtf8( tk->string.chars ) ] = true;
 					break;
 				}
-				if( strcmp( tokens->items.pToken[i-1]->string.mbs, "\\" ) !=0 ){
+				if( strcmp( tokens->items.pToken[i-1]->string.chars, "\\" ) !=0 ){
 					if( tk->string.size >= 5 )
-						words[ QString::fromUtf8( tk->string.mbs ) ] = true;
+						words[ QString::fromUtf8( tk->string.chars ) ] = true;
 					break;
 				}else{
 					if( tk->string.size >= 3 )
-						words[ "\\" + QString::fromUtf8( tk->string.mbs ) ] = true;
+						words[ "\\" + QString::fromUtf8( tk->string.chars ) ] = true;
 				}
 			}
 			if( language->caseInsensitive ) DString_ToLower( & tk->string );
@@ -1153,18 +1146,18 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 			break;
 		}
 		if( ud->font_size ) format.setFontPointSize( ud->font_size );
-		setFormat( pos, wcs->size, format );
-		pos += wcs->size;
+		setFormat( pos, daostring->size, format );
+		pos += daostring->size;
 	}
 	SetIndentationData( ud, lexer );
 
-	DString_SetMBS( wcs, src.toLocal8Bit().data() );
+	DString_SetChars( daostring, src.toLocal8Bit().data() );
 	for(i=0; i<language->patterns.size(); i++){
 		DaoSyntaxPattern sp = language->patterns[i];
 		int pos, len, type;
 		daoint start = 0;
-		daoint end = wcs->size-1;
-		while( DaoRegex_Match( sp.pattern, wcs, &start, &end ) ){
+		daoint end = daostring->size-1;
+		while( DaoRegex_Match( sp.pattern, daostring, &start, &end ) ){
 			daoint s1 = 0, s2 = 0;
 			for(j=0; j<8*sizeof(sp.groups); j++){
 				if( not (sp.groups & (1<<j) ) ) continue;
@@ -1182,7 +1175,7 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 				if( len ) setFormat( pos, len, format );
 			}
 			start = end + 1;
-			end = wcs->size-1;
+			end = daostring->size-1;
 		}
 	}
 	SetFontSize( oldFontSize );
@@ -1260,11 +1253,10 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 	bool def_method = ud->def_method;
 	ud->def_class = ud->def_method = false;
 	if( tokens->size and tokens->items.pToken[0]->type == DTOK_IDENTIFIER ){
-		DString_Resize( wcs, src.size() );
-		src.toWCharArray( wcs->wcs );
-		if( lang->func_regex && DaoRegex_Match( lang->func_regex, wcs, NULL, NULL ) )
+		DString_SetChars( daostring, src.toLocal8Bit().data() );
+		if( lang->func_regex && DaoRegex_Match( lang->func_regex, daostring, NULL, NULL ) )
 			ud->def_method = true;
-		if( lang->class_regex && DaoRegex_Match( lang->class_regex, wcs, NULL, NULL ) )
+		if( lang->class_regex && DaoRegex_Match( lang->class_regex, daostring, NULL, NULL ) )
 			ud->def_class = true;
 	}
 
@@ -1280,10 +1272,10 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 		DaoTokenFormat format;
 		format.setFontPointSize( fontSize );
 		format.setForeground( plainColor );
-		DString_SetDataMBS( wcs, tk->string.mbs, tk->string.size );
-		//printf( "%4i:  %3i  %s\n", i, tk->name, tk->string.mbs );
+		DString_SetBytes( daostring, tk->string.chars, tk->string.size );
+		//printf( "%4i:  %3i  %s\n", i, tk->name, tk->string.chars );
 		switch( tk->name ){
-		case DTOK_BLANK : case DTOK_TAB :
+		case DTOK_SPACE : case DTOK_TAB :
 			format.setObjectType( 0 );
 			if( tk->type == DTOK_TAB ) format.setBackground( tabColor[i%2] );
 			break;
@@ -1309,11 +1301,11 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 			format = formatSBracket;
 			break;
 		case DKEY_USE : case DKEY_LOAD :
-		case DKEY_AS : case DKEY_SYNTAX : case DKEY_DEFER :
+		case DKEY_AS : case DKEY_DEFER :
 		case DKEY_AND : case DKEY_OR : case DKEY_NOT :
 			format = formatStmtKey;
 			break;
-		case DKEY_VAR : case DKEY_CONST : case DKEY_STATIC : case DKEY_GLOBAL :
+		case DKEY_VAR : case DKEY_CONST : case DKEY_STATIC : case DKEY_INVAR :
 		case DKEY_PRIVATE : case DKEY_PROTECTED : case DKEY_PUBLIC :
 			format = formatStorage;
 			break;
@@ -1326,8 +1318,7 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 			format = formatStmtKey;
 			break;
 		case DKEY_ANY : case DKEY_NONE : case DKEY_ENUM :
-		case DKEY_INT : case DKEY_LONG :
-		case DKEY_FLOAT : case DKEY_DOUBLE :
+		case DKEY_INT : case DKEY_FLOAT : case DKEY_DOUBLE :
 		case DKEY_STRING : case DKEY_COMPLEX :
 		case DKEY_LIST : case DKEY_MAP : case DKEY_TUPLE : case DKEY_ARRAY :
 		case DKEY_CLASS : case DKEY_ROUTINE :
@@ -1345,7 +1336,7 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 			break;
 		case DTOK_IDENTIFIER :
 			format.setObjectType( TXT_CHAR_IDENTIFIER );
-			if( tk->string.size == 3 && strcmp( tk->string.mbs, "dao" ) ==0 )
+			if( tk->string.size == 3 && strcmp( tk->string.chars, "dao" ) ==0 )
 				format = formatPrompt;
 			if( lang and DMap_Find( lang->keyOthers, & tk->string ) ) format = formatPrompt;
 			break;
@@ -1354,8 +1345,8 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 			break;
 		}
 		if( ud->font_size ) format.setFontPointSize( ud->font_size );
-		setFormat( pos, wcs->size, format );
-		pos += wcs->size;
+		setFormat( pos, daostring->size, format );
+		pos += daostring->size;
 	}
 	SetIndentationData( ud, lexer );
 	//printf( "%3i%3i%3i%3i: %s\n", ud->leadSpaces, ud->leadTabs,

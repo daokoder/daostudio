@@ -156,8 +156,7 @@ struct DaoBasicSyntax
 	DString *cmtOpen2;
 	DString *cmtClose1;
 	DString *cmtClose2;
-	DString *mbs;
-	DString *wcs;
+	DString *daostring;
 	bool hasDaoLineComment;
 	bool hasDaoBlockComment;
 	bool singleQuotation;
@@ -263,8 +262,7 @@ class DaoCodeSHL : public QSyntaxHighlighter
 	short fontSize;
 	int textSkip;
 	DaoLexer *lexer;
-	DString *mbs;
-	DString *wcs;
+	DString *daostring;
 	QString cmt;
 
 	QHash<QString,bool> words;

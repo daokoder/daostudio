@@ -55,7 +55,7 @@ void DaoxDebugger::slotSetBreakPoint()
 
 void DaoxDebugger::SetBreakPoints( DaoRoutine *routine )
 {
-	QFileInfo fi( routine->nameSpace->name->mbs );
+	QFileInfo fi( routine->nameSpace->name->chars );
 	QString name = fi.absoluteFilePath();
 	DaoVmCode  *codes = routine->body->vmCodes->data.codes;
 	DaoVmCodeX **annots = routine->body->annotCodes->items.pVmc;
