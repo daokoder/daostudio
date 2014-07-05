@@ -129,10 +129,10 @@ Q_OBJECT
 	DaoList  *codeList;
 
 	DaoList  *valueStack;
-	DArray   *extraStack;
+	DList   *extraStack;
 
 	DString  *daoString;
-	DArray   *tokens;
+	DList   *tokens;
 	int vmState;
 
 	QString StringAddress( void *p ){ return "0x"+QString::number( (size_t) p, 16 ); }
@@ -151,7 +151,7 @@ Q_OBJECT
 	void ViewProcess( DaoProcess *process );
 	void ViewStackFrame( DaoStackFrame *frame, DaoProcess *process );
 
-	void MakeList( DaoList *list, DaoValue **data, int size, DArray *type, DMap *names, int filter );
+	void MakeList( DaoList *list, DaoValue **data, int size, DList *type, DMap *names, int filter );
 	void ViewVmCodes( DaoList *list, DaoRoutine *routine );
 	QString RoutineInfo( DaoRoutine *routine, void *address );
 

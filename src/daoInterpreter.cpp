@@ -232,7 +232,7 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 	vmState = DAOCON_READY;
 	debugProcess = NULL;
 	daoString = DString_New();
-	tokens = DArray_New( DAO_DATA_TOKEN );
+	tokens = DList_New( DAO_DATA_TOKEN );
 
 	dataSocket = NULL;
 	scriptSocket = NULL;
@@ -290,7 +290,7 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 	varList = DaoList_New();
 	codeList = DaoList_New();
 	valueStack = DaoList_New();
-	extraStack = DArray_New(0);
+	extraStack = DList_New(0);
 
 	DaoValue_MarkConst( (DaoValue*)codeTuple );
 	DaoValue_MarkConst( (DaoValue*)valueTuple );
@@ -397,18 +397,18 @@ void DaoInterpreter::slotServeData()
 	DaoTuple *request = (DaoTuple*) value;
 	if( request->values[1]->xInteger.value == DATA_STACK ){
 		int erase = request->values[2]->xInteger.value;
-		DArray_Erase( valueStack->value, 0, erase );
-		DArray_Erase( extraStack, 0, erase );
+		DList_Erase( valueStack->value, 0, erase );
+		DList_Erase( extraStack, 0, erase );
 		value = valueStack->value->items.pValue[0];
 		if( extraStack->items.pValue[0] ){
 			DaoStackFrame *frame = (DaoStackFrame*)extraStack->items.pValue[0];
 			DaoList_PopFront( valueStack );
-			DArray_PopFront( extraStack );
+			DList_PopFront( extraStack );
 			ViewStackFrame( frame, (DaoProcess*)value );
 			SendDataInformation();
 		}else{
 			DaoList_PopFront( valueStack );
-			DArray_PopFront( extraStack );
+			DList_PopFront( extraStack );
 			ViewValue( value );
 		}
 		return;
@@ -680,13 +680,13 @@ void DaoInterpreter::InitDataBrowser()
 void DaoInterpreter::EraseDebuggingProcess()
 {
 	DaoList_Clear( valueStack );
-	DArray_Clear( extraStack );
+	DList_Clear( extraStack );
 }
 
 void DaoInterpreter::InitMessage( DaoValue *value )
 {
 	DaoList_PushFront( valueStack, value );
-	DArray_PushFront( extraStack, NULL );
+	DList_PushFront( extraStack, NULL );
 	messageTuple->values[INDEX_INIT]->xInteger.value = 0;
 	messageTuple->values[INDEX_ADDR]->xInteger.value = (daoint) value;
 	messageTuple->values[INDEX_TYPE]->xInteger.value = value->type;
@@ -1058,7 +1058,7 @@ void DaoInterpreter::ViewProcess( DaoProcess *process )
 		DaoList_PushBack( constList, (DaoValue*)valueTuple );
 	}
 }
-void DaoInterpreter::MakeList( DaoList *list, DaoValue **data, int size, DArray *type, DMap *names, int filter )
+void DaoInterpreter::MakeList( DaoList *list, DaoValue **data, int size, DList *type, DMap *names, int filter )
 {
 	DNode *node;
 	DaoType *itp = NULL;

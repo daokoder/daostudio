@@ -2019,7 +2019,7 @@ DaoCodeLineData* DaoTextEdit::SetIndentData( QTextBlock block )
 	block.setUserData( ud );
 	return ud;
 }
-static QString DaoToken_MakeShortCodes( DArray *tokens )
+static QString DaoToken_MakeShortCodes( DList *tokens )
 {
 	QString codes;
 	int i;
@@ -2120,7 +2120,7 @@ void DaoTextEdit::IndentLine( QTextCursor cursor, bool indent )
 	if( language == NULL ) language = DaoBasicSyntax::dao;
 	language->Tokenize( lexer, reference_line.toUtf8().data() );
 
-	DArray *tokens = lexer->tokens;
+	DList *tokens = lexer->tokens;
 	QString reference_indent;
 	bool begin = true;
 	int i;

@@ -273,7 +273,7 @@ void DaoMonitor::ViewTuple( DaoTuple *tuple )
 
 	QTableWidgetItem *it;
 	QStringList headers, rowlabs;
-	DArray *items = tuple->values[INDEX_VARS]->xList.value;
+	DList *items = tuple->values[INDEX_VARS]->xList.value;
 	size_t i, j, n = items->size;
 
 	wgtDataTable->setRowCount( tuple->size );
@@ -299,7 +299,7 @@ void DaoMonitor::ViewList( DaoTuple *tuple )
 
 	QTableWidgetItem *it;
 	QStringList headers, rowlabs;
-	DArray *items = tuple->values[INDEX_VARS]->xList.value;
+	DList *items = tuple->values[INDEX_VARS]->xList.value;
 	size_t i, j, n = items->size;
 
 	wgtDataTable->setRowCount( n );
@@ -324,8 +324,8 @@ void DaoMonitor::ViewMap( DaoTuple *tuple )
 
 	QTableWidgetItem *it;
 	QStringList headers;
-	DArray *keys = tuple->values[INDEX_CONSTS]->xList.value;
-	DArray *values = tuple->values[INDEX_VARS]->xList.value;
+	DList *keys = tuple->values[INDEX_CONSTS]->xList.value;
+	DList *values = tuple->values[INDEX_VARS]->xList.value;
 	size_t i, j, n = keys->size;
 
 	wgtDataTable->setRowCount( n );
@@ -349,7 +349,7 @@ void DaoMonitor::ViewMap( DaoTuple *tuple )
 }
 void DaoMonitor::ViewRoutine( DaoTuple *tuple )
 {
-	DArray *extras = tuple->values[INDEX_EXTRAS]->xList.value;
+	DList *extras = tuple->values[INDEX_EXTRAS]->xList.value;
 	int subtype = tuple->values[INDEX_SUBTYPE]->xInteger.value;
 	size_t i, j;
 
@@ -376,7 +376,7 @@ void DaoMonitor::ViewRoutine( DaoTuple *tuple )
 }
 void DaoMonitor::ViewRoutines( DaoTuple *tuple )
 {
-	DArray *extras = tuple->values[INDEX_EXTRAS]->xList.value;
+	DList *extras = tuple->values[INDEX_EXTRAS]->xList.value;
 	size_t i, j;
 	EnableOneTable( NULL );
 	wgtDataTableGroup->setTitle( tr("Overloaded Functions") );
@@ -396,7 +396,7 @@ void DaoMonitor::ViewClass( DaoTuple *tuple )
 	EnableThreeTable( NULL );
 
 	QStringList rowlabs;
-	DArray *extras = tuple->values[INDEX_EXTRAS]->xList.value;
+	DList *extras = tuple->values[INDEX_EXTRAS]->xList.value;
 	size_t i, j;
 
 	wgtInfoTable->setRowCount( extras->size );
@@ -425,7 +425,7 @@ void DaoMonitor::ViewObject( DaoTuple *tuple )
 	wgtInfoTableGroup->show();
 
 	QStringList rowlabs;
-	DArray *extras = tuple->values[INDEX_EXTRAS]->xList.value;
+	DList *extras = tuple->values[INDEX_EXTRAS]->xList.value;
 	size_t i, j;
 
 	wgtInfoTable->setRowCount( extras->size );
@@ -460,7 +460,7 @@ void DaoMonitor::ViewNamespace( DaoTuple *tuple )
 	QStringList headers;
 	wgtDataValue->clear();
 
-	DArray *extras = tuple->values[INDEX_EXTRAS]->xList.value;
+	DList *extras = tuple->values[INDEX_EXTRAS]->xList.value;
 	wgtInfoTable->setRowCount( extras->size );
 	wgtInfoTable->setColumnCount( 2 );
 	headers<<tr("Loaded Modules")<<tr("Module Files");
@@ -489,7 +489,7 @@ void DaoMonitor::ViewNamespace( DaoTuple *tuple )
 void DaoMonitor::ViewProcess( DaoTuple *tuple )
 {
 	size_t i, j;
-	DArray *array = tuple->values[INDEX_CONSTS]->xList.value;
+	DList *array = tuple->values[INDEX_CONSTS]->xList.value;
 	EnableOneTable( NULL );
 
 	wgtDataValue->clear();
@@ -524,7 +524,7 @@ void DaoMonitor::ViewStackFrame( DaoTuple *tuple )
 	QStringList rowlabs;
 	int i, j, entry = tuple->values[INDEX_ENTRY]->xInteger.value;
 
-	DArray *extras = tuple->values[INDEX_EXTRAS]->xList.value;
+	DList *extras = tuple->values[INDEX_EXTRAS]->xList.value;
 	wgtInfoTable->setRowCount( extras->size );
 	wgtInfoTable->setColumnCount(1);
 	wgtInfoTable->setColumnWidth(0, 150);

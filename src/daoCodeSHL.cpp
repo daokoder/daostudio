@@ -1007,7 +1007,7 @@ void DaoCodeSHL::SetIndentationData( DaoCodeLineData *ud, DaoLexer *lexer )
 }
 void DaoCodeSHL::HighlightNormal( const QString & text )
 {
-	DArray *tokens = lexer->tokens;
+	DList *tokens = lexer->tokens;
 	DaoCodeLineData *ud = (DaoCodeLineData*) currentBlockUserData();
 	if( ud == NULL ) setCurrentBlockUserData( new DaoCodeLineData(false, CLS_COMMAND ) );
 	ud = (DaoCodeLineData*) currentBlockUserData();
@@ -1182,7 +1182,7 @@ void DaoCodeSHL::HighlightNormal( const QString & text )
 }
 void DaoCodeSHL::highlightBlock ( const QString & text )
 {
-	DArray *tokens = lexer->tokens;
+	DList *tokens = lexer->tokens;
 	DaoCodeLineData *ud = (DaoCodeLineData*) currentBlockUserData();
 	//if( ud and ud->rehighlight == false ) return;
 
@@ -1300,7 +1300,7 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 		case DTOK_DOT : case DTOK_ARROW : case DTOK_COLON2 :
 			format = formatSBracket;
 			break;
-		case DKEY_USE : case DKEY_LOAD :
+		case DKEY_LOAD : case DKEY_IMPORT :
 		case DKEY_AS : case DKEY_DEFER :
 		case DKEY_AND : case DKEY_OR : case DKEY_NOT :
 			format = formatStmtKey;
@@ -1323,6 +1323,7 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 		case DKEY_LIST : case DKEY_MAP : case DKEY_TUPLE : case DKEY_ARRAY :
 		case DKEY_CLASS : case DKEY_ROUTINE :
 		case DKEY_OPERATOR :
+		case DKEY_NAMESPACE :
 			format = formatTypeStruct;
 			break;
 		case DKEY_SELF :

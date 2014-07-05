@@ -278,7 +278,6 @@ bool DaoxDebugger::EditContinue ( DaoProcess *process, int newEntryLine, QList<i
 	parser->nameSpace = routine->nameSpace = oldrout->nameSpace;
 	parser->vmSpace = oldrout->nameSpace->vmSpace;
 	DString_Assign( parser->fileName, oldrout->nameSpace->name );
-	DString_Assign( parser->routName, oldrout->routName );
 	routine->body->codeStart = oldrout->body->codeStart;
 	routine->body->codeEnd = oldrout->body->codeStart + newCodes.size() + 1;
 	parser->regCount = routine->parCount;
@@ -290,8 +289,8 @@ bool DaoxDebugger::EditContinue ( DaoProcess *process, int newEntryLine, QList<i
 	for(i=0; i<(int)oldrout->body->defLocals->size; i++){
 		DaoToken *tok = oldrout->body->defLocals->items.pToken[i];
 		if( tok->index >= oldrout->parCount || tok->type ==0 ) break;
-		MAP_Insert( DArray_Top( parser->localDataMaps ), & tok->string, i );
-		DArray_Append( routine->body->defLocals, tok );
+		MAP_Insert( DList_Top( parser->lookupTables ), & tok->string, i );
+		DList_Append( routine->body->defLocals, tok );
 	}
 	res = res && DaoParser_ParseRoutine( parser );
 	DaoParser_Delete( parser );
@@ -375,7 +374,7 @@ bool DaoxDebugger::EditContinue ( DaoProcess *process, int newEntryLine, QList<i
 		newEntryLine += routine->body->codeStart + 1;
 	}
 
-	GC_ShiftRC( routine, oldrout );
+	//XXX GC_ShiftRC( routine, oldrout );
 	GC_IncRC( routine );
 	oldrout->body->revised = routine;
 	process->activeRoutine = routine;
