@@ -61,7 +61,7 @@ void DaoxDebugger::SetBreakPoints( DaoRoutine *routine )
 	DaoVmCodeX **annots = routine->body->annotCodes->items.pVmc;
 	int i, j, n = routine->body->vmCodes->size;
 
-	for(i=0; i<n; i++) if( codes[i].code == DVM_DEBUG ) codes[i].code = DVM_NOP;
+	for(i=0; i<n; i++) codes[i].state &= ~ DAO_CODE_BREAKING;
 	if( not breakPoints.contains( name ) ) return;
 
 	QList<int> breakPointLines = breakPoints[name].keys();
@@ -70,10 +70,9 @@ void DaoxDebugger::SetBreakPoints( DaoRoutine *routine )
 	for(i=0; i<breakPointLines.size(); i++){
 		int k = breakPointLines[i];
 		while( j < n && annots[j]->line < k ) j ++;
-		while( j < n && annots[j]->line == k && codes[j].code != DVM_NOP ) j ++;
-		if( j < n && annots[j]->line == k && codes[j].code == DVM_NOP ){
+		if( j < n && annots[j]->line == k ){
 			//printf( "1 break point:  %3i  %3i\n", i, k );
-			codes[j].code = DVM_DEBUG;
+			codes[j].state |= DAO_CODE_BREAKING;
 		}
 	}
 }

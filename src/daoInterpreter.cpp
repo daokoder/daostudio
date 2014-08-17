@@ -1066,8 +1066,6 @@ void DaoInterpreter::MakeList( DaoList *list, DaoValue **data, int size, DList *
 	if( names ){
 		for(node=DMap_First(names); node!=NULL; node=DMap_Next(names,node)){
 			if( filter && LOOKUP_ST( node->value.pInt ) != filter ) continue;
-			if( LOOKUP_UP( node->value.pInt ) ) continue;
-			// LOOKUP_ID: get the last 16 bits
 			idnames[ LOOKUP_ID( node->value.pInt ) ] = node->key.pString->chars;
 		}
 	}

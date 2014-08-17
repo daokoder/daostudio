@@ -143,12 +143,17 @@ int main( int argc, char *argv[] )
 	translator.load( langPath + QString("/daostudio_") + locale);
 	app.installTranslator(&translator);
 
+	int id = QFontDatabase::addApplicationFont(":/fonts/CourierCode/CourierCode-Roman.ttf");
+	id = QFontDatabase::addApplicationFont(":/fonts/CourierCode/CourierCode-Italic.ttf");
+	//qDebug() << id << QFontDatabase::applicationFontFamilies(id);
+
 	DaoStudioSettings::codeFont.setWeight( 60 );
-	DaoStudioSettings::codeFont.setFamily( "Courier 10 Pitch" );
+	DaoStudioSettings::codeFont.setFamily( "Courier Code" );
+	//DaoStudioSettings::codeFont.setFamily( "Courier 10 Pitch" );
 	DaoStudioSettings::codeFont.setPointSize( 16 );
 	QFontInfo fi( DaoStudioSettings::codeFont );
-	if( fi.family() != "Courier 10 Pitch" )
-		DaoStudioSettings::codeFont.setFamily( "Courier" );
+	//if( fi.family() != "Courier 10 Pitch" )
+	//	DaoStudioSettings::codeFont.setFamily( "Courier" );
 
 	QLocalSocket socket;
     socket.connectToServer( DaoStudioSettings::socket_stdout );

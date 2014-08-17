@@ -17,7 +17,7 @@ all:
 $(PLATS) :
 	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile $@
 	$(DAOMAKE) mkdir2 build
-	cd build && ../$(DAOMAKE) --mode $(MODE) --suffix .daomake  ../dao
+	cd build && ../$(DAOMAKE) --mode $(MODE) --suffix .daomake --option-CODE-STATE ON  ../dao
 	cd build && $(MAKE) -f Makefile.daomake
 	qmake -o Makefile.qmake DaoStudio.pro
 	$(MAKE) -f Makefile.qmake
@@ -25,7 +25,7 @@ $(PLATS) :
 macosx :
 	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile $@
 	$(DAOMAKE) mkdir2 build
-	cd build && ../$(DAOMAKE) --mode $(MODE) --suffix .daomake $(MAC_INSTALL) ../dao
+	cd build && ../$(DAOMAKE) --mode $(MODE) --suffix .daomake --option-CODE-STATE ON $(MAC_INSTALL) ../dao
 	cd build && $(MAKE) -f Makefile.daomake
 	qmake -spec macx-g++ -o Makefile.qmake DaoStudio.pro
 	$(MAKE) -f Makefile.qmake
@@ -34,7 +34,7 @@ macosx :
 
 mingw :
 	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile $@
-	cd build && ..\dao\tools\daomake\bootstrap\daomake --mode $(MODE) --platform $@ --suffix .daomake $(WIN_INSTALL) ..\dao
+	cd build && ..\dao\tools\daomake\bootstrap\daomake --mode $(MODE) --platform $@ --suffix .daomake --option-CODE-STATE ON $(WIN_INSTALL) ..\dao
 	cd build && $(MAKE) -f Makefile.daomake
 	qmake -o Makefile.qmake DaoStudio.pro
 	$(MAKE) -f Makefile.qmake

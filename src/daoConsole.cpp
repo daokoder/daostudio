@@ -347,25 +347,23 @@ void DaoConsole::keyPressEvent ( QKeyEvent * event )
 			DaoTextEdit::keyPressEvent( event );
 		}else if( state == DAOCON_STDIN ){
 			//QMessageBox::about( this, "", QString::number( stdinCount ) + " " + QString::number((size_t)stdinSocket) );
-			if( stdinCount >=0 ){
-				QTextCursor cursor = textCursor();
-				cursor.setPosition( outputBound );
-				setTextCursor( cursor );
-				moveCursor( QTextCursor::End, QTextCursor::KeepAnchor );
-				cursor = textCursor();
-				QString txt = cursor.selectedText();
-				txt.replace( QChar( 0x2029 ), '\n' );
-				QByteArray data = txt.toUtf8();
-				moveCursor( QTextCursor::End );
-				if( data.size() >= stdinCount && stdinSocket ){
-					stdinSocket->write( data );
-					/* Maybe necessary on Windows: */
-					stdinSocket->waitForBytesWritten( 1000 );
-					stdinSocket->disconnectFromServer();
-					/* Necessary on Windows: */
-					stdinSocket->waitForDisconnected(1000);
-					stdinSocket = NULL;
-				}
+			QTextCursor cursor = textCursor();
+			cursor.setPosition( outputBound );
+			setTextCursor( cursor );
+			moveCursor( QTextCursor::End, QTextCursor::KeepAnchor );
+			cursor = textCursor();
+			QString txt = cursor.selectedText();
+			txt.replace( QChar( 0x2029 ), '\n' );
+			QByteArray data = txt.toUtf8();
+			moveCursor( QTextCursor::End );
+			if( data.size() >= stdinCount && stdinSocket ){
+				stdinSocket->write( data );
+				/* Maybe necessary on Windows: */
+				stdinSocket->waitForBytesWritten( 1000 );
+				stdinSocket->disconnectFromServer();
+				/* Necessary on Windows: */
+				stdinSocket->waitForDisconnected(1000);
+				stdinSocket = NULL;
 			}
 			DaoTextEdit::keyPressEvent( event );
 		}else{

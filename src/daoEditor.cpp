@@ -2600,19 +2600,7 @@ void DaoEditor::MarkLine( int y )
 		}else{
 			breakPoints.erase( it );
 		}
-		QLocalSocket socket;
-		socket.connectToServer( DaoStudioSettings::socket_breakpoints );
-		if( socket.waitForConnected( 5000 ) ){
-			QByteArray data;
-			data.append( fullName );
-			data += '\0' + QByteArray::number( ud->breaking );
-			data += '\0' + QByteArray::number( blockNumber + 1 );
-			socket.write( data );
-			socket.flush();
-			/* Necessary on Windows: */
-			socket.waitForBytesWritten( 1000 );
-		}
-		socket.disconnectFromServer();
+		UpdateBreakPoint( block );
 	}else if( act ){
 		blockEntry = block;
 	}
@@ -2786,17 +2774,17 @@ void DaoEditor::PaintQuickScroll ( QPaintEvent * event )
 
 	QRect rect( 0, top-5, wgtLangLabels->width(), bottom-top+10 );
 	QLinearGradient linearGradient( 0, top-5, 0, bottom+5 );
-	linearGradient.setColorAt(0.0, QColor( 0, 0, 255, 30 ) );
-	linearGradient.setColorAt(0.03, QColor( 0, 0, 255, 50 ) );
-	linearGradient.setColorAt(0.06, QColor( 0, 0, 255, 80 ) );
-	linearGradient.setColorAt(0.1, QColor( 0, 0, 255, 90 ) );
-	linearGradient.setColorAt(0.2,  QColor( 0, 0, 255, 110 ) );
-	linearGradient.setColorAt(0.5,  QColor( 0, 0, 255, 120 ) );
-	linearGradient.setColorAt(0.8,  QColor( 0, 0, 255, 110 ) );
-	linearGradient.setColorAt(0.9, QColor( 0, 0, 255, 90 ) );
-	linearGradient.setColorAt(0.94, QColor( 0, 0, 255, 80 ) );
-	linearGradient.setColorAt(0.97, QColor( 0, 0, 255, 50 ) );
-	linearGradient.setColorAt(1.0, QColor( 0, 0, 255, 30 ) );
+	linearGradient.setColorAt(0.0,  QColor( 50, 100, 50, 30 ) );
+	linearGradient.setColorAt(0.03, QColor( 50, 100, 50, 50 ) );
+	linearGradient.setColorAt(0.06, QColor( 50, 100, 50, 80 ) );
+	linearGradient.setColorAt(0.1,  QColor( 50, 100, 50, 90 ) );
+	linearGradient.setColorAt(0.2,  QColor( 50, 100, 50, 110 ) );
+	linearGradient.setColorAt(0.5,  QColor( 50, 100, 50, 120 ) );
+	linearGradient.setColorAt(0.8,  QColor( 50, 100, 50, 110 ) );
+	linearGradient.setColorAt(0.9,  QColor( 50, 100, 50, 90 ) );
+	linearGradient.setColorAt(0.94, QColor( 50, 100, 50, 80 ) );
+	linearGradient.setColorAt(0.97, QColor( 50, 100, 50, 50 ) );
+	linearGradient.setColorAt(1.0,  QColor( 50, 100, 50, 30 ) );
 	painter.fillRect( rect, linearGradient );
 	wgtLangLabels->top = top;
 	wgtLangLabels->bottom = bottom;
@@ -2810,6 +2798,34 @@ void DaoEditor::slotTextChanged()
 		state = true;
 	}
 }
+void DaoEditor::UpdateBreakPoint( QTextBlock & block )
+{
+	int blockNumber = block.blockNumber();
+	DaoCodeLineData *ud = (DaoCodeLineData*) block.userData();
+	QLocalSocket socket;
+	socket.connectToServer( DaoStudioSettings::socket_breakpoints );
+	if( socket.waitForConnected( 5000 ) ){
+		QByteArray data;
+		data.append( fullName );
+		data += '\0' + QByteArray::number( ud->breaking );
+		data += '\0' + QByteArray::number( blockNumber + 1 );
+		socket.write( data );
+		socket.flush();
+		/* Necessary on Windows: */
+		socket.waitForBytesWritten( 1000 );
+	}
+	socket.disconnectFromServer();
+}
+void DaoEditor::ResetLineState( QTextBlock & block, int state )
+{
+	int blockNumber = block.blockNumber();
+	DaoCodeLineData *ud = (DaoCodeLineData*) block.userData();
+	QMap<int,int>::iterator it = breakPoints.find( blockNumber + 1 );
+	if( it != breakPoints.end() ) breakPoints.erase( it );
+	ud->state = state;
+	ud->breaking = false;
+	UpdateBreakPoint( block );
+}
 void DaoEditor::ResetBlockState()
 {
 	QTextBlock block = document()->firstBlock();
@@ -2818,8 +2834,7 @@ void DaoEditor::ResetBlockState()
 		if( ud == NULL ){
 			block.setUserData( new DaoCodeLineData(false, CLS_NORMAL, block.blockNumber()+1) );
 		}else{
-			ud->breaking = false;
-			ud->state = CLS_NORMAL;
+			ResetLineState( block, CLS_NORMAL );
 		}
 		SetIndentData( block );
 		block = block.next();
@@ -2836,15 +2851,13 @@ void DaoEditor::slotContentsChange( int pos, int rem, int add )
 	if( ud1 == NULL ){
 		block1.setUserData( new DaoCodeLineData(false, CLS_CHANGED) );
 	}else{
-		ud1->breaking = false;
-		ud1->state = CLS_CHANGED;
+		ResetLineState( block1, CLS_CHANGED );
 	}
 	if( add ){
 		if( ud2 == NULL ){
 			block2.setUserData( new DaoCodeLineData(false, CLS_CHANGED) );
 		}else{
-			ud2->breaking = false;
-			ud2->state = CLS_CHANGED;
+			ResetLineState( block2, CLS_CHANGED );
 		}
 		while( block1 != block2 ){
 			block1 = block1.next();
@@ -2853,8 +2866,7 @@ void DaoEditor::slotContentsChange( int pos, int rem, int add )
 			if( ud1 == NULL ){
 				block1.setUserData( new DaoCodeLineData(false, CLS_CHANGED) );
 			}else{
-				ud1->breaking = false;
-				ud1->state = CLS_CHANGED;
+				ResetLineState( block1, CLS_CHANGED );
 			}
 		}
 	}

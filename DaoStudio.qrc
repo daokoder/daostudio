@@ -25,5 +25,7 @@
     <file>images/redball.png</file>
     <file>images/greenball.png</file>
     <file>images/violaball.png</file>
+    <file>fonts/CourierCode/CourierCode-Roman.ttf</file>
+    <file>fonts/CourierCode/CourierCode-Italic.ttf</file>
 </qresource>
 </RCC>

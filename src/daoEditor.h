@@ -334,7 +334,9 @@ class DaoEditor : public DaoTextEdit
 	bool TextChanged()const{ return state; }
 	void SetExePoint( int entry );
 	void SetState( bool state );
+	void ResetLineState( QTextBlock & block, int state );
 	void ResetBlockState();
+	void UpdateBreakPoint( QTextBlock & block );
 	void SetEditLines( int start, int end );
 
 	QList<int> BreakPoints(){ return breakPoints.keys(); }
