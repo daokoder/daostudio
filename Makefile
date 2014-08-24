@@ -17,7 +17,7 @@ all:
 $(PLATS) :
 	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile $@
 	$(DAOMAKE) mkdir2 build
-	cd build && ../$(DAOMAKE) --mode $(MODE) --suffix .daomake --option-CODE-STATE ON  ../dao
+	cd build && ../$(DAOMAKE) --mode $(MODE) --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "courier code" ../dao
 	cd build && $(MAKE) -f Makefile.daomake
 	qmake -o Makefile.qmake DaoStudio.pro
 	$(MAKE) -f Makefile.qmake
@@ -25,7 +25,7 @@ $(PLATS) :
 macosx :
 	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile $@
 	$(DAOMAKE) mkdir2 build
-	cd build && ../$(DAOMAKE) --mode $(MODE) --suffix .daomake --option-CODE-STATE ON $(MAC_INSTALL) ../dao
+	cd build && ../$(DAOMAKE) --mode $(MODE) --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "courier code" $(MAC_INSTALL) ../dao
 	cd build && $(MAKE) -f Makefile.daomake
 	qmake -spec macx-g++ -o Makefile.qmake DaoStudio.pro
 	$(MAKE) -f Makefile.qmake
@@ -35,7 +35,7 @@ macosx :
 mingw :
 	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile $@
 	$(DAOMAKE) mkdir2 build
-	cd build && ../dao/tools/daomake/bootstrap/daomake --mode $(MODE) --platform $@ --suffix .daomake --option-CODE-STATE ON $(WIN_INSTALL) ../dao
+	cd build && ../dao/tools/daomake/bootstrap/daomake --mode $(MODE) --platform $@ --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "courier code" $(WIN_INSTALL) ../dao
 	cd build && $(MAKE) -f Makefile.daomake
 	$(QT_DIR)/bin/qmake -o Makefile.qmake DaoStudio.pro
 	$(MAKE) -j64 -f Makefile.qmake

@@ -76,7 +76,7 @@ DaoDocViewer::DaoDocViewer( QWidget *parent, const QString & path )
 	SetPath( path + "/doc/html/" );
 
 	QString lang = DaoStudioSettings::locale.indexOf( "zh" ) == 0 ? "zh" : "en";
-	if( QFile::exists( lang + "/index.html" ) == 0 ) lang = "en";
+	if( QFile::exists( path + "/doc/html/" + lang + "/index.html" ) == 0 ) lang = "en";
 
 	SetPath( path + "/doc/html/" + lang + "/" );
 }
@@ -162,7 +162,7 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	docViewer->setSearchPaths( QStringList( programPath + "/doc/html/" ) );
 	docViewer->studio = this;
 	docViewer->tabWidget = wgtEditorTabs;
-	docViewer->setFont( DaoStudioSettings::codeFont );
+	docViewer->setFontFamily( DaoStudioSettings::codeFont.family() );
 	wgtEditorTabs->addTab( docViewer, book, "" );
 	wgtEditorTabs->setTabsClosable(1);
 	wgtEditorTabs->setFixedHeight( 200 );
@@ -248,9 +248,9 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 		this, SLOT(slotFontFamily(const QFont&)) );
 	
 	wgtFontSize->setCurrentIndex(4);
-	wgtEditorColor->setCurrentIndex(1);
-	wgtConsoleColor->setCurrentIndex(1);
-	slotConsoleColor(1);
+	wgtEditorColor->setCurrentIndex(2);
+	wgtConsoleColor->setCurrentIndex(2);
+	slotConsoleColor(2);
 	
 	wgtFind = new QLineEdit( DConToolBar );
 	wgtReplace = new QLineEdit( DConToolBar );
@@ -646,7 +646,7 @@ void DaoStudio::slotFontFamily( const QFont & font )
 	}
 	wgtConsole->SetFontFamily( family );
 
-	docViewer->setFont( DaoStudioSettings::codeFont );
+	docViewer->setFontFamily( family );
 }
 void DaoStudio::slotEditorColor( int scheme )
 {
@@ -1239,17 +1239,26 @@ void DaoStudio::LoadSettings()
 	wgtEditorMode->setCurrentIndex( modeEditor );
 	wgtConsoleMode->setCurrentIndex( modeConsole );
 	
-	int csEditor = settings.value( "Editor/ColorScheme" ).toInt();
-	int csConsole = settings.value( "Console/ColorScheme" ).toInt();
+	if( settings.contains( "Editor/ColorScheme" ) ){
+		int csEditor = settings.value( "Editor/ColorScheme" ).toInt();
+		wgtEditorColor->setCurrentIndex( csEditor );
+	}
+
+	if( settings.contains( "Console/ColorScheme" ) ){
+		int csConsole = settings.value( "Console/ColorScheme" ).toInt();
+		wgtConsoleColor->setCurrentIndex( csConsole );
+	}
+
 	int tabVis = settings.value( "Editor/TabVisibility" ).toInt();
-	wgtEditorColor->setCurrentIndex( csEditor );
-	wgtConsoleColor->setCurrentIndex( csConsole );
 	wgtTabVisibility->setCurrentIndex( tabVis );
 	
-	QString family = settings.value( "Font/Family" ).toString();
+	if( settings.contains( "Font/Family" ) ){
+		QString family = settings.value( "Font/Family" ).toString();
+		id = wgtFontFamily->findText( family );
+		if( id >=0 ) wgtFontFamily->setCurrentIndex( id );
+	}
+
 	size = settings.value( "Font/Size" ).toInt();
-	id = wgtFontFamily->findText( family );
-	if( id >=0 ) wgtFontFamily->setCurrentIndex( id );
 	if( size >= 10 ) wgtFontSize->setCurrentIndex( size - 10 );
 
 	int debugger = settings.value( "Tools/Debugger" ).toInt();
