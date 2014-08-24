@@ -35,7 +35,7 @@ macosx :
 mingw :
 	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile $@
 	$(DAOMAKE) mkdir2 build
-	cd build && ..\dao\tools\daomake\bootstrap\daomake --mode $(MODE) --platform $@ --suffix .daomake --option-CODE-STATE ON $(WIN_INSTALL) ..\dao
+	cd build && ../dao/tools/daomake/bootstrap/daomake --mode $(MODE) --platform $@ --suffix .daomake --option-CODE-STATE ON $(WIN_INSTALL) ../dao
 	cd build && $(MAKE) -f Makefile.daomake
 	qmake -o Makefile.qmake DaoStudio.pro
 	$(MAKE) -f Makefile.qmake
