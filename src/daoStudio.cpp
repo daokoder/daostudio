@@ -162,6 +162,7 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	docViewer->setSearchPaths( QStringList( programPath + "/doc/html/" ) );
 	docViewer->studio = this;
 	docViewer->tabWidget = wgtEditorTabs;
+	docViewer->setFont( DaoStudioSettings::codeFont );
 	wgtEditorTabs->addTab( docViewer, book, "" );
 	wgtEditorTabs->setTabsClosable(1);
 	wgtEditorTabs->setFixedHeight( 200 );
@@ -683,9 +684,8 @@ DaoEditor* DaoStudio::NewEditor( const QString & name, const QString & tip )
 	editor->SetModeSelector( wgtEditorMode );
 	editor->SetColorScheme( wgtEditorColor->currentIndex() );
 	editor->SetTabVisibility( wgtTabVisibility->currentIndex() );
-	//XXX fix font and cursor in editor:
-	//XXX editor->SetFontSize( wgtFontSize->currentIndex() + 10 );
-	//XXX editor->SetFontFamily( wgtFontFamily->currentText() );
+	editor->SetFontSize( wgtFontSize->currentIndex() + 10 );
+	editor->SetFontFamily( wgtFontFamily->currentText() );
 	connect( editor, SIGNAL(signalFocusIn()), this, SLOT(slotMaxEditor()) );
 	connect( editor, SIGNAL(signalTextChanged(bool)), this, SLOT(slotTextChanged(bool)) );
 	wgtEditorTabs->setTabToolTip( id, tip );
