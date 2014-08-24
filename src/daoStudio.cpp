@@ -191,7 +191,10 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	QStringList sizes, colors;
 	for(i=12; i<=26; i++) sizes<<QString::number(i);
 	colors<<tr("White")<<tr("Light")<<tr("Dark")<<tr("Black");
+#ifndef WIN32
+	// Builtin Courier Code doesn't show up with this filter:
 	wgtFontFamily->setFontFilters( QFontComboBox::MonospacedFonts );
+#endif
 	wgtFontFamily->setCurrentFont( DaoStudioSettings::codeFont );
 	wgtFontSize->addItems( sizes );
 	wgtEditorColor->addItems( colors );

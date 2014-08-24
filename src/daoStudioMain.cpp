@@ -144,7 +144,6 @@ int main( int argc, char *argv[] )
 	app.installTranslator(&translator);
 
 	int id = QFontDatabase::addApplicationFont(":/fonts/CourierCode/CourierCode-Roman.ttf");
-	id = QFontDatabase::addApplicationFont(":/fonts/CourierCode/CourierCode-Italic.ttf");
 	//qDebug() << id << QFontDatabase::applicationFontFamilies(id);
 
 	DaoStudioSettings::codeFont.setWeight( 60 );
