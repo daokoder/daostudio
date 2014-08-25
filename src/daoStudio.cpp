@@ -154,8 +154,6 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 
 #ifdef MAC_OSX
 	docViewer = new DaoDocViewer(wgtEditorTabs, programPath + "/../Frameworks/shared/dao/");
-#elif defined(WIN32)
-	docViewer = new DaoDocViewer(wgtEditorTabs, programPath + "/shared/dao/");
 #else
 	docViewer = new DaoDocViewer(wgtEditorTabs, programPath + "/../shared/dao/" );
 #endif
