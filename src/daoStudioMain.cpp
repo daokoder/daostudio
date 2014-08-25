@@ -47,7 +47,7 @@ void DaoStudioSettings::SetProgramPath( const char *cmd, const char *suffix )
     QFileInfo finfo( program ); 
 
     program_path = finfo.absolutePath();
-    locale = QLocale::system().name();
+    locale = QLocale::system().name().toLower();
 
 	QString path = program_path;
 
@@ -136,18 +136,19 @@ int main( int argc, char *argv[] )
 #ifdef MAC_OSX
 	langPath += "/../Resources";
 #endif
-	langPath += "/langs";
+	langPath += "/../langs";
 
 	QTranslator translator;
-	QString locale = QLocale::system().name();
-	translator.load( langPath + QString("/daostudio_") + locale);
+	translator.load( langPath + QString("/daostudio_") + DaoStudioSettings::locale );
 	app.installTranslator(&translator);
 
-	int id = QFontDatabase::addApplicationFont(":/fonts/CourierCode/CourierCode-Roman.ttf");
-	//qDebug() << id << QFontDatabase::applicationFontFamilies(id);
+	int id1 = QFontDatabase::addApplicationFont(":/fonts/CourierCode/CourierCode-Roman.ttf");
+	int id2 = QFontDatabase::addApplicationFont(":/fonts/WQY-MicroHei/WenQuanYiMicroHeiMono.ttf");
+	//qDebug() << id2 << QFontDatabase::applicationFontFamilies(id2);
 
 	DaoStudioSettings::codeFont.setWeight( 60 );
-	DaoStudioSettings::codeFont.setFamily( "Courier Code" );
+	//DaoStudioSettings::codeFont.setFamily( "Courier Code" );
+	DaoStudioSettings::codeFont.setFamily( "WenQuanYi Micro Hei Mono" );
 	//DaoStudioSettings::codeFont.setFamily( "Courier 10 Pitch" );
 	DaoStudioSettings::codeFont.setPointSize( 16 );
 	QFontInfo fi( DaoStudioSettings::codeFont );

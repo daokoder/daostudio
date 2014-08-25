@@ -157,7 +157,7 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 #elif defined(WIN32)
 	docViewer = new DaoDocViewer(wgtEditorTabs, programPath + "/shared/dao/");
 #else
-	docViewer = new DaoDocViewer(wgtEditorTabs, programPath);
+	docViewer = new DaoDocViewer(wgtEditorTabs, programPath + "/../shared/dao/" );
 #endif
 	docViewer->setSearchPaths( QStringList( programPath + "/doc/html/" ) );
 	docViewer->studio = this;
