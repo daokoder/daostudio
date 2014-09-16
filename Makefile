@@ -41,11 +41,11 @@ linux-local:
 	$(DAOMAKE) mkdir2 $(INSTALL)/langs
 	$(DAOMAKE) copy langs/daostudio_zh_cn.qm $(INSTALL)/langs/
 	$(DAOMAKE) copy DaoStudio $(INSTALL_BIN)
-	$(DAOMAKE) copy build/dao $(INSTALL_BIN)
-	$(DAOMAKE) copy build/libdao.so $(INSTALL_BIN)
-	$(DAOMAKE) copy build/modules/serializer/libdao_serializer.so $(INSTALL_BIN)
-	$(DAOMAKE) copy build/modules/debugger/libdao_debugger.so $(INSTALL_BIN)
-	$(DAOMAKE) copy build/modules/profiler/libdao_profiler.so $(INSTALL_BIN)
+	$(DAOMAKE) copy build/bin/dao $(INSTALL_BIN)
+	$(DAOMAKE) copy build/lib/libdao.so $(INSTALL_BIN)
+	$(DAOMAKE) copy build/lib/dao/modules/libdao_serializer.so $(INSTALL_BIN)
+	$(DAOMAKE) copy build/lib/dao/modules/libdao_debugger.so $(INSTALL_BIN)
+	$(DAOMAKE) copy build/lib/dao/modules/libdao_profiler.so $(INSTALL_BIN)
 	$(DAOMAKE) copy $(QT_LIB_DIR)/libQtCore.so $(INSTALL_BIN)
 	$(DAOMAKE) copy $(QT_LIB_DIR)/libQtGui.so $(INSTALL_BIN)
 	$(DAOMAKE) copy $(QT_LIB_DIR)/libQtNetwork.so $(INSTALL_BIN)
@@ -73,11 +73,11 @@ mingw :
 	$(DAOMAKE) mkdir2 $(WIN_INSTALL)/langs
 	$(DAOMAKE) copy langs/daostudio_zh_cn.qm $(WIN_INSTALL)/langs/
 	$(DAOMAKE) copy $(MODE)/DaoStudio.exe $(WIN_INSTALL_BIN)
-	$(DAOMAKE) copy build/dao.exe $(WIN_INSTALL_BIN)
-	$(DAOMAKE) copy build/dao.dll $(WIN_INSTALL_BIN)
-	$(DAOMAKE) copy build/modules/serializer/dao_serializer.dll $(WIN_INSTALL_BIN)
-	$(DAOMAKE) copy build/modules/debugger/dao_debugger.dll $(WIN_INSTALL_BIN)
-	$(DAOMAKE) copy build/modules/profiler/dao_profiler.dll $(WIN_INSTALL_BIN)
+	$(DAOMAKE) copy build/bin/dao.exe $(WIN_INSTALL_BIN)
+	$(DAOMAKE) copy build/bin/dao.dll $(WIN_INSTALL_BIN)
+	$(DAOMAKE) copy build/lib/dao/modules/dao_serializer.dll $(WIN_INSTALL_BIN)
+	$(DAOMAKE) copy build/lib/dao/modules/dao_debugger.dll $(WIN_INSTALL_BIN)
+	$(DAOMAKE) copy build/lib/dao/modules/dao_profiler.dll $(WIN_INSTALL_BIN)
 	$(DAOMAKE) copy $(QT_DIR)/bin/QtCore4.dll $(WIN_INSTALL_BIN)
 	$(DAOMAKE) copy $(QT_DIR)/bin/QtGui4.dll $(WIN_INSTALL_BIN)
 	$(DAOMAKE) copy $(QT_DIR)/bin/QtNetwork4.dll $(WIN_INSTALL_BIN)
