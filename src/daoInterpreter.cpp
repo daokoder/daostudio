@@ -718,7 +718,6 @@ void DaoInterpreter::ViewValue( DaoValue *value )
 	case DAO_NONE :
 	case DAO_INTEGER :
 	case DAO_FLOAT :
-	case DAO_DOUBLE :
 	case DAO_COMPLEX :
 	case DAO_STRING :
 		InitMessage( value );

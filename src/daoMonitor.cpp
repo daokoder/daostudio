@@ -252,9 +252,6 @@ void DaoMonitor::ViewArray( DaoTuple *tuple )
 		case DAO_FLOAT :
 			elem = QString::number( array->data.f[i] );
 			break;
-		case DAO_DOUBLE :
-			elem = QString::number( array->data.d[i] );
-			break;
 		case DAO_COMPLEX :
 			elem = "(" + QString::number( array->data.c[i].real );
 			elem += "," + QString::number( array->data.c[i].imag ) + ")";

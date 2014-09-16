@@ -1317,12 +1317,11 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 		case DKEY_SWITCH : case DKEY_CASE : case DKEY_DEFAULT :
 			format = formatStmtKey;
 			break;
-		case DKEY_ANY : case DKEY_NONE : case DKEY_ENUM :
-		case DKEY_INT : case DKEY_FLOAT : case DKEY_DOUBLE :
-		case DKEY_STRING : case DKEY_COMPLEX :
+		case DKEY_ANY : case DKEY_NONE :
+		case DKEY_INT : case DKEY_FLOAT : case DKEY_COMPLEX :
+		case DKEY_STRING : case DKEY_ENUM :
 		case DKEY_LIST : case DKEY_MAP : case DKEY_TUPLE : case DKEY_ARRAY :
 		case DKEY_CLASS : case DKEY_ROUTINE :
-		case DKEY_OPERATOR :
 		case DKEY_NAMESPACE :
 			format = formatTypeStruct;
 			break;

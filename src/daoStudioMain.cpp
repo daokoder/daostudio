@@ -147,8 +147,8 @@ int main( int argc, char *argv[] )
 	//qDebug() << id2 << QFontDatabase::applicationFontFamilies(id2);
 
 	DaoStudioSettings::codeFont.setWeight( 60 );
-	//DaoStudioSettings::codeFont.setFamily( "Courier Code" );
-	DaoStudioSettings::codeFont.setFamily( "WenQuanYi Micro Hei Mono" );
+	DaoStudioSettings::codeFont.setFamily( "Courier Code" );
+	//DaoStudioSettings::codeFont.setFamily( "WenQuanYi Micro Hei Mono" );
 	//DaoStudioSettings::codeFont.setFamily( "Courier 10 Pitch" );
 	DaoStudioSettings::codeFont.setPointSize( 16 );
 	QFontInfo fi( DaoStudioSettings::codeFont );

@@ -2037,7 +2037,6 @@ static QString DaoToken_MakeShortCodes( DList *tokens )
 		case DTOK_DIGITS_DEC :
 		case DTOK_NUMBER_HEX :
 		case DTOK_NUMBER_DEC :
-		case DTOK_DOUBLE_DEC :
 		case DTOK_NUMBER_SCI :
 			codes += '0';
 			break;

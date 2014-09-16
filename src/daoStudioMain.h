@@ -28,7 +28,7 @@
 
 #define VALUE_INFO_TYPE \
 "tuple<init:int,type:int,subtype:int,address:int,name:string,info:string,value:string," \
-"numbers:array<int>|array<float>|array<float>|array<double>|array<complex>," \
+"numbers:array<int>|array<float>|array<float>|array<complex>," \
 "extras:list<tuple<string,string,string>>," \
 "consts:list<tuple<name:string,type:string,value:string>>," \
 "vars:list<tuple<name:string,type:string,value:string>>," \
