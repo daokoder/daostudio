@@ -4,8 +4,8 @@
 
 #TEMPLATE = app
 
-#CONFIG += thread release
-CONFIG += thread debug
+CONFIG += thread release
+#CONFIG += thread debug
 
 #QT += webkit
 QT += network
@@ -59,7 +59,7 @@ LIBS += -ldao -ldao_serializer -ldao_debugger -ldao_profiler
 
 
 win32 {
-	POST_TARGETDEPS += build/lib/dao.dll build/lib/dao/modules/dao_serializer.dll
+	POST_TARGETDEPS += build/bin/dao.dll build/lib/dao/modules/dao_serializer.dll
 	POST_TARGETDEPS += build/lib/dao/modules/dao_debugger.dll
 	POST_TARGETDEPS += build/lib/dao/modules/dao_profiler.dll
 	RC_FILE = DaoStudio.rc
