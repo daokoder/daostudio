@@ -324,8 +324,8 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	
 	QIcon fico = style.standardIcon( QStyle::SP_FileIcon );
 	wgtDocList->clear();
-	new QListWidgetItem(  fico, "English", wgtDocList, QListWidgetItem::UserType );
-	new QListWidgetItem(  fico, "中文", wgtDocList, QListWidgetItem::UserType );
+	new QListWidgetItem(  fico, tr("English"), wgtDocList, QListWidgetItem::UserType );
+	new QListWidgetItem(  fico, tr("Chinese"), wgtDocList, QListWidgetItem::UserType );
 	connect( & watcher, SIGNAL(directoryChanged(const QString &)),
 		this, SLOT(SetPathBrowsing(const QString &)) );
 	

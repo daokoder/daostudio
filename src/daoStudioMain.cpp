@@ -143,17 +143,12 @@ int main( int argc, char *argv[] )
 	app.installTranslator(&translator);
 
 	int id1 = QFontDatabase::addApplicationFont(":/fonts/CourierCode/CourierCode-Roman.ttf");
-	int id2 = QFontDatabase::addApplicationFont(":/fonts/WQY-MicroHei/WenQuanYiMicroHeiMono.ttf");
 	//qDebug() << id2 << QFontDatabase::applicationFontFamilies(id2);
 
-	DaoStudioSettings::codeFont.setWeight( 60 );
+	//DaoStudioSettings::codeFont.setWeight( 60 );
 	DaoStudioSettings::codeFont.setFamily( "Courier Code" );
-	//DaoStudioSettings::codeFont.setFamily( "WenQuanYi Micro Hei Mono" );
-	//DaoStudioSettings::codeFont.setFamily( "Courier 10 Pitch" );
 	DaoStudioSettings::codeFont.setPointSize( 16 );
 	QFontInfo fi( DaoStudioSettings::codeFont );
-	//if( fi.family() != "Courier 10 Pitch" )
-	//	DaoStudioSettings::codeFont.setFamily( "Courier" );
 
 	QLocalSocket socket;
     socket.connectToServer( DaoStudioSettings::socket_stdout );

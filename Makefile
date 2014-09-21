@@ -4,7 +4,7 @@ PLATS = linux freebsd
 MODE ?= release
 SUFFIX ?=
 
-DAOMAKE_DIR = ./dao/tools/daomake/bootstrap
+DAOMAKE_DIR = ./Dao/tools/daomake/bootstrap
 DAOMAKE = $(DAOMAKE_DIR)/daomake
 
 INSTALL     = DaoStudio-0.5-Beta
@@ -25,7 +25,7 @@ all:
 $(PLATS) :
 	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile $@
 	$(DAOMAKE) mkdir2 build
-	cd build && ../$(DAOMAKE) --mode $(MODE) --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "WenQuanYi Micro Hei Mono" $(OPT_INSTALL) ../dao
+	cd build && ../$(DAOMAKE) --mode $(MODE) --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "WenQuanYi Micro Hei Mono" $(OPT_INSTALL) ../Dao
 	cd build && $(MAKE) -f Makefile.daomake
 	qmake -o Makefile.qmake DaoStudio.pro
 	$(MAKE) -f Makefile.qmake
@@ -33,7 +33,7 @@ $(PLATS) :
 linux-local:
 	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile linux
 	$(DAOMAKE) mkdir2 build
-	cd build && ../$(DAOMAKE) --mode $(MODE) --platform linux --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "WenQuanYi Micro Hei Mono" $(OPT_INSTALL) ../dao
+	cd build && ../$(DAOMAKE) --mode $(MODE) --platform linux --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "WenQuanYi Micro Hei Mono" $(OPT_INSTALL) ../Dao
 	cd build && $(MAKE) -f Makefile.daomake
 	qmake -o Makefile.qmake DaoStudio.pro
 	$(MAKE) -f Makefile.qmake
@@ -55,7 +55,7 @@ linux-local:
 macosx :
 	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile $@
 	$(DAOMAKE) mkdir2 build
-	cd build && ../$(DAOMAKE) --mode $(MODE) --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "WenQuanYi Micro Hei Mono" $(OPT_INSTALL_MAC) ../dao
+	cd build && ../$(DAOMAKE) --mode $(MODE) --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "WenQuanYi Micro Hei Mono" $(OPT_INSTALL_MAC) ../Dao
 	cd build && $(MAKE) -f Makefile.daomake
 	qmake -spec macx-g++ -o Makefile.qmake DaoStudio.pro
 	$(MAKE) -f Makefile.qmake
@@ -65,10 +65,10 @@ macosx :
 mingw :
 	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile $@
 	$(DAOMAKE) mkdir2 build
-	cd build && ../$(DAOMAKE) --mode $(MODE) --platform $@ --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "WenQuanYi Micro Hei Mono" $(OPT_INSTALL_WIN) ../dao
+	cd build && ../$(DAOMAKE) --mode $(MODE) --platform $@ --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "WenQuanYi Micro Hei Mono" $(OPT_INSTALL_WIN) ../Dao
 	cd build && $(MAKE) -f Makefile.daomake
 	$(QT_DIR)/bin/qmake -o Makefile.qmake DaoStudio.pro
-	$(MAKE) -j64 -f Makefile.qmake
+	$(MAKE) -f Makefile.qmake
 	cd build && $(MAKE) -f Makefile.daomake install
 	$(DAOMAKE) mkdir2 $(WIN_INSTALL)/langs
 	$(DAOMAKE) copy langs/daostudio_zh_cn.qm $(WIN_INSTALL)/langs/
@@ -82,9 +82,6 @@ mingw :
 	$(DAOMAKE) copy $(QT_DIR)/bin/QtGui4.dll $(WIN_INSTALL_BIN)
 	$(DAOMAKE) copy $(QT_DIR)/bin/QtNetwork4.dll $(WIN_INSTALL_BIN)
 
-# -j64, to fix:
-# QWinEventNotifier: Cannot have more than 62 enabled at one time
-# https://bugreports.qt-project.org/browse/QTBUG-8819
 
 clean :
 	cd build && make -f Makefile.daomake clean

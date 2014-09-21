@@ -48,8 +48,8 @@ class DaoTextBrowser : public QTextBrowser
 public:
 	DaoTextBrowser( QWidget *parent ) : QTextBrowser( parent ){
 		setOpenExternalLinks( true );
-		langs["English"] = "en";
-		langs["中文"] = "zh";
+		langs[tr("English")] = "en";
+		langs[tr("Chinese")] = "zh";
 	}
 	
 	void SetRoot( const QString & path ){ docRoot = path; }

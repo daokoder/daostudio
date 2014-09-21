@@ -19,92 +19,92 @@
         <translation type="obsolete">运行失败</translation>
     </message>
     <message>
-        <location filename="../src/daoConsole.cpp" line="514"/>
+        <location filename="../src/daoConsole.cpp" line="534"/>
         <source>The output from this run is about to be erased:</source>
         <translation type="unfinished">此次运行的输出将被删除：</translation>
     </message>
     <message>
-        <location filename="../src/daoConsole.cpp" line="515"/>
+        <location filename="../src/daoConsole.cpp" line="535"/>
         <source>The first and last 5 lines of output might be remained.</source>
         <translation type="unfinished">此次输出的前5行和后5行将被保留。</translation>
     </message>
     <message>
-        <location filename="../src/daoConsole.cpp" line="517"/>
+        <location filename="../src/daoConsole.cpp" line="537"/>
         <source>The output of all run is about to be erased:</source>
         <translation type="unfinished">所有运行的输出将被删除</translation>
     </message>
     <message>
-        <location filename="../src/daoConsole.cpp" line="520"/>
+        <location filename="../src/daoConsole.cpp" line="540"/>
         <source>DaoStudio: Clear Console Output</source>
         <translation type="unfinished">清除控制台输出</translation>
     </message>
     <message>
-        <location filename="../src/daoConsole.cpp" line="522"/>
+        <location filename="../src/daoConsole.cpp" line="542"/>
         <source>Choose &quot;Save&quot; to save these output to file;</source>
         <translation type="unfinished">选择“保存”将输出保存到文件；</translation>
     </message>
     <message>
-        <location filename="../src/daoConsole.cpp" line="523"/>
+        <location filename="../src/daoConsole.cpp" line="543"/>
         <source>Choose &quot;No Save&quot; to erase without saving;</source>
         <translation type="unfinished">选择“不保存”直接删除；</translation>
     </message>
     <message>
-        <location filename="../src/daoConsole.cpp" line="524"/>
+        <location filename="../src/daoConsole.cpp" line="544"/>
         <source>Choose &quot;Abort&quot; to abort this operation.</source>
         <translation type="unfinished">选择“取消”将不重启道程序监控器。</translation>
     </message>
     <message>
-        <location filename="../src/daoConsole.cpp" line="525"/>
+        <location filename="../src/daoConsole.cpp" line="545"/>
         <source>Save</source>
         <translation type="unfinished">保存</translation>
     </message>
     <message>
-        <location filename="../src/daoConsole.cpp" line="526"/>
+        <location filename="../src/daoConsole.cpp" line="546"/>
         <source>No Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoConsole.cpp" line="527"/>
+        <location filename="../src/daoConsole.cpp" line="547"/>
         <source>Abort</source>
         <translation type="unfinished">取消</translation>
     </message>
     <message>
-        <location filename="../src/daoConsole.cpp" line="538"/>
-        <location filename="../src/daoConsole.cpp" line="587"/>
+        <location filename="../src/daoConsole.cpp" line="558"/>
+        <location filename="../src/daoConsole.cpp" line="607"/>
         <source>Set file name to save</source>
         <translation type="unfinished">保存文件名</translation>
     </message>
     <message>
-        <location filename="../src/daoConsole.cpp" line="541"/>
-        <location filename="../src/daoConsole.cpp" line="554"/>
-        <location filename="../src/daoConsole.cpp" line="590"/>
-        <location filename="../src/daoConsole.cpp" line="603"/>
+        <location filename="../src/daoConsole.cpp" line="561"/>
+        <location filename="../src/daoConsole.cpp" line="574"/>
+        <location filename="../src/daoConsole.cpp" line="610"/>
+        <location filename="../src/daoConsole.cpp" line="623"/>
         <source>Output will not be saved</source>
         <translation type="unfinished">输出将不被保存</translation>
     </message>
     <message>
-        <location filename="../src/daoConsole.cpp" line="554"/>
-        <location filename="../src/daoConsole.cpp" line="603"/>
+        <location filename="../src/daoConsole.cpp" line="574"/>
+        <location filename="../src/daoConsole.cpp" line="623"/>
         <source>Failed to open file</source>
         <translation type="unfinished">打开文件失败</translation>
     </message>
     <message>
-        <location filename="../src/daoConsole.cpp" line="648"/>
+        <location filename="../src/daoConsole.cpp" line="668"/>
         <source>ERROR: DaoMonitor is not running!</source>
         <translation type="unfinished">错误：DaoMonitor不在运行！</translation>
     </message>
     <message>
-        <location filename="../src/daoConsole.cpp" line="905"/>
+        <location filename="../src/daoConsole.cpp" line="933"/>
         <source>shell execution crashed unexpectly</source>
         <translation type="unfinished">程序异常终止</translation>
     </message>
     <message>
-        <location filename="../src/daoConsole.cpp" line="908"/>
+        <location filename="../src/daoConsole.cpp" line="936"/>
         <source>execution terminated normally</source>
         <translation type="unfinished">运行正常终止</translation>
     </message>
     <message>
-        <location filename="../src/daoConsole.cpp" line="910"/>
+        <location filename="../src/daoConsole.cpp" line="938"/>
         <source>execution failed</source>
         <translation type="unfinished">运行失败</translation>
     </message>
@@ -113,7 +113,7 @@
         <translation type="obsolete">进入调试模式，请点击调试按钮继续运行</translation>
     </message>
     <message>
-        <location filename="../src/daoConsole.cpp" line="978"/>
+        <location filename="../src/daoConsole.cpp" line="1017"/>
         <source>execution cancelled</source>
         <translation type="unfinished">运行被取消</translation>
     </message>
@@ -312,59 +312,59 @@ the current execution point</source>
 <context>
     <name>DaoEditor</name>
     <message>
-        <location filename="../src/daoEditor.cpp" line="2406"/>
+        <location filename="../src/daoEditor.cpp" line="2403"/>
         <source>Right click to:</source>
         <translation>点击鼠标右键：</translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="2407"/>
+        <location filename="../src/daoEditor.cpp" line="2404"/>
         <source>set or unset break points;</source>
         <translation>设置或取消调试点；</translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="2408"/>
+        <location filename="../src/daoEditor.cpp" line="2405"/>
         <source>change execution point.</source>
         <translation>更改程序执行点</translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="2477"/>
+        <location filename="../src/daoEditor.cpp" line="2488"/>
         <source>DaoStudio</source>
         <translation>DaoStudio</translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="2478"/>
+        <location filename="../src/daoEditor.cpp" line="2489"/>
         <source>The copy of the file on harddisk has been modified .
 Do you want to reload the file?</source>
         <translation>此文件的磁盘拷贝已被更改。
 重新载入此文件？</translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="2488"/>
+        <location filename="../src/daoEditor.cpp" line="2499"/>
         <source>Saving is disable for the file under debugging!</source>
         <translation type="unfinished">调试模式下禁用文件保存！</translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="2489"/>
+        <location filename="../src/daoEditor.cpp" line="2500"/>
         <source>Press the debugging button to resume the execution!</source>
         <translation type="unfinished">点击调试按钮继续运行！</translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="2565"/>
+        <location filename="../src/daoEditor.cpp" line="2576"/>
         <source>Read only area</source>
         <translation>只读区域</translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="2591"/>
+        <location filename="../src/daoEditor.cpp" line="2602"/>
         <source>Unset break point</source>
         <translation>取消调试点</translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="2591"/>
+        <location filename="../src/daoEditor.cpp" line="2602"/>
         <source>Set break point</source>
         <translation>设置调试点</translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="2595"/>
+        <location filename="../src/daoEditor.cpp" line="2606"/>
         <source>Move exection point to here</source>
         <translation>移动程序执行点</translation>
     </message>
@@ -1006,7 +1006,7 @@ Do you want to reload the file?</source>
 <context>
     <name>DaoInterpreter</name>
     <message>
-        <location filename="../src/daoInterpreter.cpp" line="576"/>
+        <location filename="../src/daoInterpreter.cpp" line="615"/>
         <source>execution time</source>
         <translation type="unfinished">运行时间</translation>
     </message>
@@ -1131,218 +1131,218 @@ Do you want to reload the file?</source>
         <translation type="unfinished">表单</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.ui" line="37"/>
+        <location filename="../src/daoMonitor.ui" line="43"/>
         <source>Value View Stack</source>
         <translation type="unfinished">数据值视图栈</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.ui" line="56"/>
+        <location filename="../src/daoMonitor.ui" line="68"/>
         <source>Value Information</source>
         <translation type="unfinished">数据值信息</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.ui" line="94"/>
-        <location filename="../src/daoMonitor.cpp" line="503"/>
+        <location filename="../src/daoMonitor.ui" line="112"/>
+        <location filename="../src/daoMonitor.cpp" line="516"/>
         <source>Associated Data</source>
         <translation type="unfinished">关联数据</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.ui" line="125"/>
-        <location filename="../src/daoMonitor.cpp" line="502"/>
+        <location filename="../src/daoMonitor.ui" line="143"/>
+        <location filename="../src/daoMonitor.cpp" line="515"/>
         <source>Local Variables</source>
         <translation type="unfinished">局部变量</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.ui" line="140"/>
+        <location filename="../src/daoMonitor.ui" line="158"/>
         <source>Double click to view the data object</source>
         <translation type="unfinished">鼠标双击查看数据对象</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.ui" line="168"/>
-        <location filename="../src/daoMonitor.cpp" line="504"/>
+        <location filename="../src/daoMonitor.ui" line="186"/>
+        <location filename="../src/daoMonitor.cpp" line="517"/>
         <source>VM Instructions</source>
         <translation type="unfinished">虚拟机指令</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.ui" line="214"/>
-        <location filename="../src/daoMonitor.cpp" line="317"/>
+        <location filename="../src/daoMonitor.ui" line="232"/>
+        <location filename="../src/daoMonitor.cpp" line="330"/>
         <source>Value Data</source>
         <translation type="unfinished">值数据</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="255"/>
+        <location filename="../src/daoMonitor.cpp" line="268"/>
         <source>Items</source>
         <translation type="unfinished">元素</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="265"/>
+        <location filename="../src/daoMonitor.cpp" line="278"/>
         <source>Field</source>
         <translation type="unfinished">成员域</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="265"/>
-        <location filename="../src/daoMonitor.cpp" line="291"/>
-        <location filename="../src/daoMonitor.cpp" line="541"/>
+        <location filename="../src/daoMonitor.cpp" line="278"/>
+        <location filename="../src/daoMonitor.cpp" line="304"/>
+        <location filename="../src/daoMonitor.cpp" line="554"/>
         <source>Type</source>
         <translation type="unfinished">类型</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="265"/>
-        <location filename="../src/daoMonitor.cpp" line="291"/>
-        <location filename="../src/daoMonitor.cpp" line="541"/>
+        <location filename="../src/daoMonitor.cpp" line="278"/>
+        <location filename="../src/daoMonitor.cpp" line="304"/>
+        <location filename="../src/daoMonitor.cpp" line="554"/>
         <source>Value</source>
         <translation type="unfinished">值</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="317"/>
+        <location filename="../src/daoMonitor.cpp" line="330"/>
         <source>Key Type</source>
         <translation type="unfinished">键类型</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="317"/>
+        <location filename="../src/daoMonitor.cpp" line="330"/>
         <source>Key Data</source>
         <translation type="unfinished">键数据</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="317"/>
+        <location filename="../src/daoMonitor.cpp" line="330"/>
         <source>Value Type</source>
         <translation type="unfinished">值类型</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="341"/>
+        <location filename="../src/daoMonitor.cpp" line="354"/>
         <source>Local Constants</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="347"/>
-        <location filename="../src/daoMonitor.cpp" line="515"/>
+        <location filename="../src/daoMonitor.cpp" line="360"/>
+        <location filename="../src/daoMonitor.cpp" line="528"/>
         <source>Namespace</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="347"/>
-        <location filename="../src/daoMonitor.cpp" line="422"/>
+        <location filename="../src/daoMonitor.cpp" line="360"/>
+        <location filename="../src/daoMonitor.cpp" line="435"/>
         <source>Class</source>
         <translation type="unfinished">类</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="348"/>
-        <location filename="../src/daoMonitor.cpp" line="389"/>
-        <location filename="../src/daoMonitor.cpp" line="418"/>
-        <location filename="../src/daoMonitor.cpp" line="517"/>
+        <location filename="../src/daoMonitor.cpp" line="361"/>
+        <location filename="../src/daoMonitor.cpp" line="402"/>
+        <location filename="../src/daoMonitor.cpp" line="431"/>
+        <location filename="../src/daoMonitor.cpp" line="530"/>
         <source>Data</source>
         <translation type="unfinished">数据</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="366"/>
+        <location filename="../src/daoMonitor.cpp" line="379"/>
         <source>Overloaded Functions</source>
         <translation type="unfinished">重载函数</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="392"/>
+        <location filename="../src/daoMonitor.cpp" line="405"/>
         <source>Parent/Mixin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="400"/>
-        <location filename="../src/daoMonitor.cpp" line="439"/>
+        <location filename="../src/daoMonitor.cpp" line="413"/>
+        <location filename="../src/daoMonitor.cpp" line="452"/>
         <source>Constants</source>
         <translation type="unfinished">常量</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="401"/>
+        <location filename="../src/daoMonitor.cpp" line="414"/>
         <source>Static Variables</source>
         <translation type="unfinished">静态变量</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="424"/>
+        <location filename="../src/daoMonitor.cpp" line="437"/>
         <source>Parent Object</source>
         <translation type="unfinished">父对象</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="433"/>
+        <location filename="../src/daoMonitor.cpp" line="446"/>
         <source>Instance Variables</source>
         <translation type="unfinished">实例变量</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="440"/>
+        <location filename="../src/daoMonitor.cpp" line="453"/>
         <source>Variables</source>
         <translation type="unfinished">变量</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="450"/>
+        <location filename="../src/daoMonitor.cpp" line="463"/>
         <source>Loaded Modules</source>
         <translation type="unfinished">载入模块</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="450"/>
+        <location filename="../src/daoMonitor.cpp" line="463"/>
         <source>Module Files</source>
         <translation type="unfinished">模块文件</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="481"/>
+        <location filename="../src/daoMonitor.cpp" line="494"/>
         <source>Function Call Stack</source>
         <translation type="unfinished">函数调用栈</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="488"/>
+        <location filename="../src/daoMonitor.cpp" line="501"/>
         <source>Function Name</source>
         <translation type="unfinished">函数名</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="488"/>
+        <location filename="../src/daoMonitor.cpp" line="501"/>
         <source>Function Type</source>
         <translation type="unfinished">函数类型</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="515"/>
+        <location filename="../src/daoMonitor.cpp" line="528"/>
         <source>Routine</source>
         <translation type="unfinished">函数</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="516"/>
+        <location filename="../src/daoMonitor.cpp" line="529"/>
         <source>Object</source>
         <translation type="unfinished">对象</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="541"/>
+        <location filename="../src/daoMonitor.cpp" line="554"/>
         <source>Name</source>
         <translation type="unfinished">名称</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="560"/>
+        <location filename="../src/daoMonitor.cpp" line="573"/>
         <source>Opcode</source>
         <translation type="unfinished">操作码</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="560"/>
+        <location filename="../src/daoMonitor.cpp" line="573"/>
         <source>Line</source>
         <translation type="unfinished">行序号</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="560"/>
+        <location filename="../src/daoMonitor.cpp" line="573"/>
         <source>Notes</source>
         <translation type="unfinished">注释</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="577"/>
+        <location filename="../src/daoMonitor.cpp" line="590"/>
         <source>Double click on an Opcode cell to change
 the current execution point</source>
         <translation type="unfinished">鼠标双击“操作码”格可改变程序执行点</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="625"/>
-        <location filename="../src/daoMonitor.cpp" line="631"/>
+        <location filename="../src/daoMonitor.cpp" line="643"/>
+        <location filename="../src/daoMonitor.cpp" line="649"/>
         <source>DaoStudio - Change execution point</source>
         <translation type="unfinished">DaoStudio - 修改程序执行点</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="626"/>
+        <location filename="../src/daoMonitor.cpp" line="644"/>
         <source>Only possible to go back to a previously executed point</source>
         <translation type="unfinished">仅可以设定到已执行到过的点</translation>
     </message>
     <message>
-        <location filename="../src/daoMonitor.cpp" line="632"/>
+        <location filename="../src/daoMonitor.cpp" line="650"/>
         <source>This frame is not in the top of the execution stack.
 Setting this new execution point will remove those frames that are above this one.
 
@@ -1356,54 +1356,54 @@ Proceed?</source>
 <context>
     <name>DaoStudio</name>
     <message>
-        <location filename="../src/daoStudio.cpp" line="190"/>
+        <location filename="../src/daoStudio.cpp" line="195"/>
         <source>White</source>
         <translation type="unfinished">白色</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="190"/>
+        <location filename="../src/daoStudio.cpp" line="195"/>
         <source>Light</source>
         <translation type="unfinished">浅灰</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="190"/>
+        <location filename="../src/daoStudio.cpp" line="195"/>
         <source>Dark</source>
         <translation type="unfinished">深灰</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="190"/>
+        <location filename="../src/daoStudio.cpp" line="195"/>
         <source>Black</source>
         <translation type="unfinished">黑色</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="196"/>
+        <location filename="../src/daoStudio.cpp" line="204"/>
         <source>Default text font size</source>
         <translation type="unfinished">文本字体缺省大小</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="197"/>
+        <location filename="../src/daoStudio.cpp" line="205"/>
         <source>Background color of the code editor</source>
         <translation type="unfinished">代码编辑器背景色</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="198"/>
+        <location filename="../src/daoStudio.cpp" line="206"/>
         <source>Background color of the script console</source>
         <translation type="unfinished">脚本终端背景色</translation>
     </message>
     <message>
         <location filename="../src/daoStudio.ui" line="623"/>
-        <location filename="../src/daoStudio.cpp" line="199"/>
-        <location filename="../src/daoStudio.cpp" line="202"/>
+        <location filename="../src/daoStudio.cpp" line="207"/>
+        <location filename="../src/daoStudio.cpp" line="210"/>
         <source>Normal</source>
         <translation type="unfinished">普通</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="251"/>
+        <location filename="../src/daoStudio.cpp" line="259"/>
         <source>All</source>
         <translation type="unfinished">全部</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="252"/>
+        <location filename="../src/daoStudio.cpp" line="260"/>
         <source>Case Sensitive</source>
         <translation type="unfinished">区分大小写</translation>
     </message>
@@ -1412,39 +1412,39 @@ Proceed?</source>
         <translation type="obsolete">数据</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="312"/>
+        <location filename="../src/daoStudio.cpp" line="321"/>
         <source>start Dao Studio</source>
         <translation type="unfinished">启动 Dao Studio</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="346"/>
+        <location filename="../src/daoStudio.cpp" line="345"/>
         <source>DaoMonitor is running. Use it?</source>
         <translation type="unfinished">DaoMonitor已经在运行。使用它？</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="347"/>
+        <location filename="../src/daoStudio.cpp" line="346"/>
         <source>Warning: if you use the running DaoMonitor, its standard output will not be available in DaoStudio!</source>
         <translation type="unfinished">警告：如果你使用正在运行的DaoMonitor，它的标准输出将不被DaoStudio捕捉！</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="456"/>
-        <location filename="../src/daoStudio.cpp" line="494"/>
+        <location filename="../src/daoStudio.cpp" line="455"/>
+        <location filename="../src/daoStudio.cpp" line="493"/>
         <source>change the working path to</source>
         <translation type="unfinished">更改工作目录为</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="527"/>
+        <location filename="../src/daoStudio.cpp" line="526"/>
         <source>The execution is not done yet.</source>
         <translation type="unfinished">运行还未完成</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="544"/>
+        <location filename="../src/daoStudio.cpp" line="542"/>
         <source>quit Dao Studio</source>
         <translation type="unfinished">退出 Dao Studio</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="722"/>
-        <location filename="../src/daoStudio.cpp" line="771"/>
+        <location filename="../src/daoStudio.cpp" line="711"/>
+        <location filename="../src/daoStudio.cpp" line="761"/>
         <source>open source file</source>
         <translation type="unfinished">打开源代码文件</translation>
     </message>
@@ -1465,180 +1465,190 @@ Proceed?</source>
         <translation type="obsolete">重新启动道程序监控器</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="200"/>
-        <location filename="../src/daoStudio.cpp" line="203"/>
+        <location filename="../src/daoStudio.cpp" line="208"/>
+        <location filename="../src/daoStudio.cpp" line="211"/>
         <source>DS-VIM</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="207"/>
+        <location filename="../src/daoStudio.cpp" line="215"/>
         <source>Console Debugger</source>
         <translation type="unfinished">控制台调试器</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="208"/>
+        <location filename="../src/daoStudio.cpp" line="216"/>
         <source>Graphical Debugger</source>
         <translation type="unfinished">图形界面调试器</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="209"/>
+        <location filename="../src/daoStudio.cpp" line="217"/>
         <source>Console Profiler</source>
         <translation type="unfinished">控制台分析器</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="214"/>
+        <location filename="../src/daoStudio.cpp" line="222"/>
         <source>All Files</source>
         <translation type="unfinished">所有文件</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="215"/>
+        <location filename="../src/daoStudio.cpp" line="223"/>
         <source>Dao Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="216"/>
+        <location filename="../src/daoStudio.cpp" line="224"/>
         <source>C/C++ Header Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="217"/>
+        <location filename="../src/daoStudio.cpp" line="225"/>
         <source>C Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="218"/>
+        <location filename="../src/daoStudio.cpp" line="226"/>
         <source>C++ Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="219"/>
+        <location filename="../src/daoStudio.cpp" line="227"/>
         <source>C/C++ Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="220"/>
+        <location filename="../src/daoStudio.cpp" line="228"/>
         <source>Lua Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="221"/>
+        <location filename="../src/daoStudio.cpp" line="229"/>
         <source>Python Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="222"/>
+        <location filename="../src/daoStudio.cpp" line="230"/>
         <source>Perl Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="223"/>
+        <location filename="../src/daoStudio.cpp" line="231"/>
         <source>PipeLang Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="224"/>
+        <location filename="../src/daoStudio.cpp" line="232"/>
         <source>SDML Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="225"/>
+        <location filename="../src/daoStudio.cpp" line="233"/>
         <source>Text Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="226"/>
+        <location filename="../src/daoStudio.cpp" line="234"/>
         <source>HTML Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="227"/>
+        <location filename="../src/daoStudio.cpp" line="235"/>
         <source>TEX Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="228"/>
+        <location filename="../src/daoStudio.cpp" line="236"/>
         <source>CGI Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="229"/>
+        <location filename="../src/daoStudio.cpp" line="237"/>
         <source>Qt Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="376"/>
+        <location filename="../src/daoStudio.cpp" line="327"/>
+        <source>English</source>
+        <translation type="unfinished">英文</translation>
+    </message>
+    <message>
+        <location filename="../src/daoStudio.cpp" line="328"/>
+        <source>Chinese</source>
+        <translation type="unfinished">中文</translation>
+    </message>
+    <message>
+        <location filename="../src/daoStudio.cpp" line="375"/>
         <source>connected to running</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="527"/>
+        <location filename="../src/daoStudio.cpp" line="526"/>
         <source>Quit anyway?</source>
         <translation type="unfinished">还是退出？</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="600"/>
+        <location filename="../src/daoStudio.cpp" line="590"/>
         <source>Dao Virtual Machine exited for unknown reason</source>
         <translation type="unfinished">道虚拟机因未知原因退出</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="607"/>
+        <location filename="../src/daoStudio.cpp" line="597"/>
         <source>Dao Virtual Machine crashed unexpectly</source>
         <translation type="unfinished">道虚拟机意外退出</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="609"/>
+        <location filename="../src/daoStudio.cpp" line="599"/>
         <source>Dao Virtual Machine exited with code</source>
         <translation type="unfinished">道虚拟机退出，返回码</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="752"/>
+        <location filename="../src/daoStudio.cpp" line="742"/>
         <source>create new source file</source>
         <translation type="unfinished">创建新的源代码文件</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="756"/>
+        <location filename="../src/daoStudio.cpp" line="746"/>
         <source>Open file</source>
         <translation type="unfinished">打开文件</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="782"/>
-        <location filename="../src/daoStudio.cpp" line="802"/>
+        <location filename="../src/daoStudio.cpp" line="772"/>
+        <location filename="../src/daoStudio.cpp" line="792"/>
         <source>Set file name to save</source>
         <translation type="unfinished">保存文件名</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="790"/>
-        <location filename="../src/daoStudio.cpp" line="805"/>
+        <location filename="../src/daoStudio.cpp" line="780"/>
+        <location filename="../src/daoStudio.cpp" line="795"/>
         <source>save source file</source>
         <translation type="unfinished">保存源代码文件</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="806"/>
+        <location filename="../src/daoStudio.cpp" line="796"/>
         <source>as</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="828"/>
+        <location filename="../src/daoStudio.cpp" line="818"/>
         <source>Printing: </source>
         <translation type="unfinished">打印：</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="843"/>
+        <location filename="../src/daoStudio.cpp" line="833"/>
         <source>Printing console output</source>
         <translation type="unfinished">打印终端输出</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="950"/>
+        <location filename="../src/daoStudio.cpp" line="940"/>
         <source>DaoStudio: Restart Dao Virtual Machine</source>
         <translation type="unfinished">DaoStudio：重启道虚拟机</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="951"/>
+        <location filename="../src/daoStudio.cpp" line="941"/>
         <source>The Dao Virtual Machine is about to restart:</source>
         <translation type="unfinished">道虚拟机即将重启：</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="953"/>
+        <location filename="../src/daoStudio.cpp" line="943"/>
         <source>Choose &quot;Restart&quot; to start a new virtual machine;</source>
         <translation type="unfinished">选择“重启”启动新的道虚拟机；</translation>
     </message>
@@ -1659,7 +1669,7 @@ Proceed?</source>
         <translation type="obsolete">选择“重启”将重启并放弃所有目前的数据；</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="954"/>
+        <location filename="../src/daoStudio.cpp" line="944"/>
         <source>Choose &quot;Abort&quot; to abort this operation.</source>
         <translation type="unfinished">选择“取消”将不重启道程序监控器。</translation>
     </message>
@@ -1680,36 +1690,41 @@ Choose &quot;Abort&quot; to abort this operation.
         <translation type="obsolete">恢复</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="957"/>
+        <location filename="../src/daoStudio.cpp" line="947"/>
         <source>Abort</source>
         <translation type="unfinished">取消</translation>
     </message>
     <message>
         <location filename="../src/daoStudio.ui" line="25"/>
-        <location filename="../src/daoStudio.cpp" line="345"/>
-        <location filename="../src/daoStudio.cpp" line="526"/>
-        <location filename="../src/daoStudio.cpp" line="973"/>
+        <location filename="../src/daoStudio.cpp" line="344"/>
+        <location filename="../src/daoStudio.cpp" line="525"/>
+        <location filename="../src/daoStudio.cpp" line="963"/>
         <source>DaoStudio</source>
         <translation type="unfinished">DaoStudio</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="974"/>
+        <location filename="../src/daoStudio.cpp" line="964"/>
         <source>The script has been modified.
 Do you want to save your changes?</source>
         <translation type="unfinished">此脚本已被修改。保存修改？</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="986"/>
+        <location filename="../src/daoStudio.cpp" line="976"/>
         <source>close source file</source>
         <translation type="unfinished">关闭源文件</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="1043"/>
+        <location filename="../src/daoStudio.cpp" line="1020"/>
+        <source>compile script file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/daoStudio.cpp" line="1047"/>
         <source>load script file</source>
         <translation type="unfinished">载入脚本</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="1070"/>
+        <location filename="../src/daoStudio.cpp" line="1074"/>
         <source>start to debug script file</source>
         <translation type="unfinished">开始调试脚本</translation>
     </message>
@@ -1726,7 +1741,7 @@ Do you want to save your changes?</source>
         <translation type="obsolete">运行失败</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="1127"/>
+        <location filename="../src/daoStudio.cpp" line="1131"/>
         <source>execution started successfully</source>
         <translation type="unfinished">成功开始运行</translation>
     </message>
@@ -1751,17 +1766,17 @@ Do you want to save your changes?</source>
         <translation type="obsolete">选择“取消”将不重启道程序监控器。</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="956"/>
+        <location filename="../src/daoStudio.cpp" line="946"/>
         <source>Restart</source>
         <translation type="unfinished">重启</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="1133"/>
+        <location filename="../src/daoStudio.cpp" line="1137"/>
         <source>pause for debugging</source>
         <translation type="unfinished">暂停运行，开始调试</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.cpp" line="1139"/>
+        <location filename="../src/daoStudio.cpp" line="1143"/>
         <source>pause for standard input</source>
         <translation type="unfinished">暂停运行，等待标准输入</translation>
     </message>
@@ -1817,7 +1832,7 @@ Proceed?</source>
     </message>
     <message>
         <location filename="../src/daoStudio.ui" line="338"/>
-        <location filename="../src/daoStudio.ui" line="1212"/>
+        <location filename="../src/daoStudio.ui" line="1213"/>
         <source>Documentations</source>
         <translation type="unfinished">文档</translation>
     </message>
@@ -1853,7 +1868,7 @@ Proceed?</source>
     </message>
     <message>
         <location filename="../src/daoStudio.ui" line="850"/>
-        <location filename="../src/daoStudio.cpp" line="142"/>
+        <location filename="../src/daoStudio.cpp" line="146"/>
         <source>Log</source>
         <translation type="unfinished">日志</translation>
     </message>
@@ -1879,7 +1894,7 @@ Proceed?</source>
     </message>
     <message>
         <location filename="../src/daoStudio.ui" line="742"/>
-        <location filename="../src/daoStudio.ui" line="1008"/>
+        <location filename="../src/daoStudio.ui" line="1009"/>
         <source>Tools</source>
         <translation type="unfinished">工具</translation>
     </message>
@@ -1930,137 +1945,147 @@ Proceed?</source>
         <translation type="unfinished">道控制台</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1028"/>
+        <location filename="../src/daoStudio.ui" line="1029"/>
         <source>toolBar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1059"/>
+        <location filename="../src/daoStudio.ui" line="1060"/>
         <source>Open</source>
         <translation type="unfinished">打开</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1064"/>
+        <location filename="../src/daoStudio.ui" line="1065"/>
         <source>Save</source>
         <translation type="unfinished">保存</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1069"/>
+        <location filename="../src/daoStudio.ui" line="1070"/>
         <source>Quit</source>
         <translation type="unfinished">退出</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1074"/>
+        <location filename="../src/daoStudio.ui" line="1075"/>
         <source>Undo</source>
         <translation type="unfinished">取消操作</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1077"/>
+        <location filename="../src/daoStudio.ui" line="1078"/>
         <source>Undo/Backward</source>
         <translation type="unfinished">取消或后退</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1082"/>
+        <location filename="../src/daoStudio.ui" line="1083"/>
         <source>Redo</source>
         <translation type="unfinished">重做操作</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1085"/>
+        <location filename="../src/daoStudio.ui" line="1086"/>
         <source>Redo/Forward</source>
         <translation type="unfinished">重做或前进</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1094"/>
+        <location filename="../src/daoStudio.ui" line="1095"/>
         <source>Copy</source>
         <translation type="unfinished">复制</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1103"/>
+        <location filename="../src/daoStudio.ui" line="1104"/>
         <source>Cut</source>
         <translation type="unfinished">剪切</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1112"/>
+        <location filename="../src/daoStudio.ui" line="1113"/>
         <source>Paste</source>
         <translation type="unfinished">粘贴</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1121"/>
+        <location filename="../src/daoStudio.ui" line="1122"/>
         <source>Find</source>
         <translation type="unfinished">查找</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1130"/>
+        <location filename="../src/daoStudio.ui" line="1131"/>
         <source>Replace</source>
         <translation type="unfinished">替换</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1135"/>
+        <location filename="../src/daoStudio.ui" line="1136"/>
         <source>About DaoStudio</source>
         <translation type="unfinished">关于DaoStudio</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1140"/>
+        <location filename="../src/daoStudio.ui" line="1141"/>
         <source>New</source>
         <translation type="unfinished">新建</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1149"/>
+        <location filename="../src/daoStudio.ui" line="1150"/>
         <source>Start/Resume</source>
         <translation type="unfinished">开始或继续运行</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1199"/>
+        <location filename="../src/daoStudio.ui" line="1200"/>
         <source>Debugger</source>
         <translation type="unfinished">调试器</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1202"/>
+        <location filename="../src/daoStudio.ui" line="1203"/>
         <source>Activate/Deactivate Debugger</source>
         <translation type="unfinished">启用或禁用调试器</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1222"/>
-        <location filename="../src/daoStudio.cpp" line="594"/>
+        <location filename="../src/daoStudio.ui" line="1223"/>
+        <location filename="../src/daoStudio.cpp" line="584"/>
         <source>Restart Dao Virtual Machine</source>
         <translation type="unfinished">重启道虚拟机</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1239"/>
+        <location filename="../src/daoStudio.ui" line="1240"/>
         <source>Profiler</source>
         <translation type="unfinished">分析器</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1242"/>
+        <location filename="../src/daoStudio.ui" line="1243"/>
         <source>Activate/Deactivate Profiler</source>
         <translation type="unfinished">启用或禁用分析器</translation>
+    </message>
+    <message>
+        <location filename="../src/daoStudio.ui" line="1248"/>
+        <source>Compile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/daoStudio.ui" line="1251"/>
+        <source>Compile to Bytecode File</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Start</source>
         <translation type="obsolete">开始</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1158"/>
+        <location filename="../src/daoStudio.ui" line="1159"/>
         <source>Stop</source>
         <translation type="unfinished">停止</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1163"/>
+        <location filename="../src/daoStudio.ui" line="1164"/>
         <source>Save as</source>
         <translation type="unfinished">保存为</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1175"/>
+        <location filename="../src/daoStudio.ui" line="1176"/>
         <source>Manual Split</source>
         <translation type="unfinished">手动分割窗口</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1178"/>
+        <location filename="../src/daoStudio.ui" line="1179"/>
         <source>Manual Split code editor, console and data widget</source>
         <translation type="unfinished">手动调整代码编辑器，脚本终端和数据查看器的垂直分割</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1187"/>
+        <location filename="../src/daoStudio.ui" line="1188"/>
         <source>State</source>
         <translation type="unfinished">状态</translation>
     </message>
@@ -2069,12 +2094,12 @@ Proceed?</source>
         <translation type="obsolete">开始或继续调试</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1207"/>
+        <location filename="../src/daoStudio.ui" line="1208"/>
         <source>Usage Tips</source>
         <translation type="unfinished">使用提示</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1217"/>
+        <location filename="../src/daoStudio.ui" line="1218"/>
         <source>Print</source>
         <translation type="unfinished">打印</translation>
     </message>
@@ -2083,7 +2108,7 @@ Proceed?</source>
         <translation type="obsolete">重启程序监控器</translation>
     </message>
     <message>
-        <location filename="../src/daoStudio.ui" line="1227"/>
+        <location filename="../src/daoStudio.ui" line="1228"/>
         <source>DS-VIM Commands</source>
         <translation type="unfinished">DS-VIM命令</translation>
     </message>
@@ -2104,7 +2129,7 @@ Proceed?</source>
 <context>
     <name>DaoTextEdit</name>
     <message>
-        <location filename="../src/daoEditor.cpp" line="1342"/>
+        <location filename="../src/daoEditor.cpp" line="1340"/>
         <source>File: </source>
         <translation type="unfinished">文件</translation>
     </message>
@@ -2121,108 +2146,108 @@ Proceed?</source>
         <translation type="obsolete">开始VIM命令模式</translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="1027"/>
+        <location filename="../src/daoEditor.cpp" line="1025"/>
         <source>Unexpected comma</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="1055"/>
+        <location filename="../src/daoEditor.cpp" line="1053"/>
         <source>Invalid format</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="1105"/>
+        <location filename="../src/daoEditor.cpp" line="1103"/>
         <source>Invalid range</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="1110"/>
+        <location filename="../src/daoEditor.cpp" line="1108"/>
         <source>Range adjusted to</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="1145"/>
-        <location filename="../src/daoEditor.cpp" line="1159"/>
+        <location filename="../src/daoEditor.cpp" line="1143"/>
+        <location filename="../src/daoEditor.cpp" line="1157"/>
         <source>Unexpected: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="1163"/>
+        <location filename="../src/daoEditor.cpp" line="1161"/>
         <source>need Dao regular expression</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="1179"/>
+        <location filename="../src/daoEditor.cpp" line="1177"/>
         <source>Invalid Dao regular expression</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="1180"/>
+        <location filename="../src/daoEditor.cpp" line="1178"/>
         <source>at char </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="1194"/>
+        <location filename="../src/daoEditor.cpp" line="1192"/>
         <source>need valid Dao regular expression</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="1251"/>
+        <location filename="../src/daoEditor.cpp" line="1249"/>
         <source>Invalid operaion</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="1290"/>
+        <location filename="../src/daoEditor.cpp" line="1288"/>
         <source>Searching from the beginning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="1297"/>
+        <location filename="../src/daoEditor.cpp" line="1295"/>
         <source>Text pattern not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="1790"/>
-        <location filename="../src/daoEditor.cpp" line="1805"/>
-        <location filename="../src/daoEditor.cpp" line="1988"/>
-        <location filename="../src/daoEditor.cpp" line="2348"/>
+        <location filename="../src/daoEditor.cpp" line="1788"/>
+        <location filename="../src/daoEditor.cpp" line="1803"/>
+        <location filename="../src/daoEditor.cpp" line="1986"/>
+        <location filename="../src/daoEditor.cpp" line="2345"/>
         <source>Switch to </source>
         <translation type="unfinished">切换到</translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="1791"/>
-        <location filename="../src/daoEditor.cpp" line="1806"/>
-        <location filename="../src/daoEditor.cpp" line="1989"/>
-        <location filename="../src/daoEditor.cpp" line="2349"/>
+        <location filename="../src/daoEditor.cpp" line="1789"/>
+        <location filename="../src/daoEditor.cpp" line="1804"/>
+        <location filename="../src/daoEditor.cpp" line="1987"/>
+        <location filename="../src/daoEditor.cpp" line="2346"/>
         <source> mode</source>
         <translation type="unfinished">模式</translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="1791"/>
-        <location filename="../src/daoEditor.cpp" line="1806"/>
-        <location filename="../src/daoEditor.cpp" line="2340"/>
+        <location filename="../src/daoEditor.cpp" line="1789"/>
+        <location filename="../src/daoEditor.cpp" line="1804"/>
+        <location filename="../src/daoEditor.cpp" line="2337"/>
         <source>Normal Edit</source>
         <translation type="unfinished">普通编辑</translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="1971"/>
+        <location filename="../src/daoEditor.cpp" line="1969"/>
         <source>Buffer is empty</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="1978"/>
+        <location filename="../src/daoEditor.cpp" line="1976"/>
         <source>Invalid DS-VIM command key</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="1987"/>
-        <location filename="../src/daoEditor.cpp" line="2336"/>
-        <location filename="../src/daoEditor.cpp" line="2343"/>
+        <location filename="../src/daoEditor.cpp" line="1985"/>
+        <location filename="../src/daoEditor.cpp" line="2333"/>
+        <location filename="../src/daoEditor.cpp" line="2340"/>
         <source> Command</source>
         <translation type="unfinished">命令</translation>
     </message>
     <message>
-        <location filename="../src/daoEditor.cpp" line="2336"/>
+        <location filename="../src/daoEditor.cpp" line="2333"/>
         <source> Edit</source>
         <translation type="unfinished">编辑</translation>
     </message>
@@ -2242,7 +2267,7 @@ Proceed?</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/daoInterpreter.cpp" line="139"/>
+        <location filename="../src/daoInterpreter.cpp" line="145"/>
         <source>Entering debug mode, please click the debug button to resume</source>
         <translation type="unfinished">进入调试模式，请点击调试按钮继续运行</translation>
     </message>

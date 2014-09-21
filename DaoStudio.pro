@@ -79,12 +79,13 @@ mac {
 	QMAKESPEC = macx-g++
 	DEFINES += UNIX MAC_OSX
 	#LIBS += -lz -lssl -lcrypto
-	QMAKE_LFLAGS += -Wl,-rpath,build -Wl,-rpath,build/lib/dao/modules
+	QMAKE_LFLAGS += -Wl,-rpath,build/lib -Wl,-rpath,build/lib/dao/modules
 
 	QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
 } else:unix{
 	POST_TARGETDEPS += build/lib/libdao.so build/lib/dao/modules/libdao_serializer.so
 	POST_TARGETDEPS += build/lib/dao/modules/libdao_debugger.so
 	POST_TARGETDEPS += build/lib/dao/modules/libdao_profiler.so
+	QMAKE_LFLAGS += -Wl,-rpath,build/lib -Wl,-rpath,build/lib/dao/modules
 }
 
