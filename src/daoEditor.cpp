@@ -2430,6 +2430,17 @@ QString DaoEditor::GuessFileType( const QString & source )
 	if( npatt >= 0.2*nline ) return "makefile";
 	return "";
 }
+static void DaoTryConvertFromUtf8( QString &text )
+{
+	QByteArray utf8 = text.toLocal8Bit();
+	DString *dstring = DString_New();
+
+	DString_SetBytes( dstring, utf8.data(), utf8.size() );
+	if( DString_CheckUTF8( dstring ) ){
+		text = QString::fromUtf8( utf8.data(), utf8.size() );
+	}
+	DString_Delete( dstring );
+}
 void DaoEditor::LoadFile( const QString & name )
 {
 	QFileInfo info( name );
@@ -2447,6 +2458,8 @@ void DaoEditor::LoadFile( const QString & name )
 		codehl.SetLanguage( ftype );
 		codeThumb->codehl.SetLanguage( ftype );
 		textOnDisk = fin.readAll();
+
+		DaoTryConvertFromUtf8( textOnDisk );
 		if( ftype == "" ){
 			ftype = GuessFileType( textOnDisk );
 			//printf( "%s\n", ftype.toUtf8().data() );
@@ -2469,6 +2482,7 @@ void DaoEditor::slotFileChanged( const QString & fname )
 		QTextStream fin( & file );
 		text = fin.readAll();
 	}
+	DaoTryConvertFromUtf8( text );
 	if( text != textOnDisk ){
 		tabWidget->setCurrentWidget( this );
 		int ret = QMessageBox::warning(this, tr("DaoStudio"),

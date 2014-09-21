@@ -73,30 +73,34 @@ DaoDocViewer::DaoDocViewer( QWidget *parent, const QString & path )
 {
 	//viewport()->setStyleSheet( "font-family: courier; font-size: 20pt;" );
 	setHtml( "" );
-	SetPath( path + "/doc/html/" );
 
 	QString lang = DaoStudioSettings::locale.indexOf( "zh" ) == 0 ? "zh" : "en";
-	if( QFile::exists( path + "/doc/html/" + lang + "/index.html" ) == 0 ) lang = "en";
+	if( QFile::exists( path + lang + "/index.html" ) == 0 ) lang = "en";
 
-	SetPath( path + "/doc/html/" + lang + "/" );
+	SetPath( path + "zh" + "/" );
+	SetRoot( path );
+
+	setLanguage( QFile::exists( path + lang + "/index.html" ) ? "中文" : "English" );
+	setSearchPaths( QStringList( path + lang + "/" ) );
 }
+void DaoTextBrowser::setLanguage( const QString & lang )
+{
+	SetPath( docRoot + langs[lang] + "/" );
+	setSearchPaths( QStringList( docRoot + langs[lang] + "/" ) );
+}
+void DaoTryConvertFromUtf8( QString &text );
 QVariant DaoTextBrowser::loadResource ( int type, const QUrl & url )
 {
-	if( type == QTextDocument::HtmlResource && url.isRelative() ){
-		QString name = docPath + url.toLocalFile();
-		QFile file( name );
-		if( file.open( QFile::ReadOnly )) {
-			QTextStream fin( & file );
-			QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-			fin.setCodec( codec );
-			return QVariant( fin.readAll() );
-		}else{
-			return QTextBrowser::loadResource( type, url );
-		}
-	}else{
-		return QTextBrowser::loadResource( type, url );
+	QByteArray bytes = QTextBrowser::loadResource( type, url ).toByteArray();
+	QString source = bytes;
+	DString *dstring = DString_New();
+
+	DString_SetBytes( dstring, bytes.data(), bytes.size() );
+	if( DString_CheckUTF8( dstring ) ){
+		source = QString::fromUtf8( bytes.data(), bytes.size() );
 	}
-	return QVariant();
+	DString_Delete( dstring );
+	return QVariant( source );
 }
 #if 0
 void DaoDocViewer::mousePressEvent ( QMouseEvent * event )
@@ -153,11 +157,11 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 			this, SLOT(slotMaxMonitor()) );
 
 #ifdef MAC_OSX
-	docViewer = new DaoDocViewer(wgtEditorTabs, programPath + "/../Frameworks/shared/dao/");
+	QString docRoot = programPath + "/../Frameworks/share/dao/doc/html/";
 #else
-	docViewer = new DaoDocViewer(wgtEditorTabs, programPath + "/../shared/dao/" );
+	QString docRoot = programPath + "/../share/dao/doc/html/";
 #endif
-	docViewer->setSearchPaths( QStringList( programPath + "/doc/html/" ) );
+	docViewer = new DaoDocViewer( wgtEditorTabs, docRoot );
 	docViewer->studio = this;
 	docViewer->tabWidget = wgtEditorTabs;
 	docViewer->setFontFamily( DaoStudioSettings::codeFont.family() );
@@ -318,22 +322,10 @@ DaoStudio::DaoStudio( const char *cmd ) : QMainWindow()
 	SetPathBrowsing( "." );
 	DaoVmSpace_AddPath( vmSpace, programPath.toLocal8Bit().data() );
 	
-#ifdef MAC_OSX
-	QDir dir( programPath + "/../Frameworks/shared/dao/doc/html/en/", "*.html" );
-#elif defined(WIN32)
-	QDir dir( programPath + "/shared/dao/doc/html/en/", "*.html" );
-#else
-	QDir dir( programPath + "/doc/html/en/", "*.html" );
-#endif
 	QIcon fico = style.standardIcon( QStyle::SP_FileIcon );
-	dir.setSorting( QDir::Name );
-	QFileInfoList list = dir.entryInfoList();
 	wgtDocList->clear();
-	for (i = 0; i < list.size(); ++i) {
-		QFileInfo info = list.at(i);
-		new QListWidgetItem(  fico, info.fileName(), 
-			wgtDocList, QListWidgetItem::UserType + info.isDir() );
-	}
+	new QListWidgetItem(  fico, "English", wgtDocList, QListWidgetItem::UserType );
+	new QListWidgetItem(  fico, "中文", wgtDocList, QListWidgetItem::UserType );
 	connect( & watcher, SIGNAL(directoryChanged(const QString &)),
 		this, SLOT(SetPathBrowsing(const QString &)) );
 	
@@ -728,7 +720,8 @@ void DaoStudio::slotViewDocument( QListWidgetItem *item )
 {
 	wgtEditorTabs->setCurrentIndex(ID_DOCVIEW);
 	slotMaxEditor();
-	docViewer->setSource( QUrl( item->text() ) );
+	docViewer->setLanguage( item->text() );
+	docViewer->reload();
 }
 void DaoStudio::slotTextChanged( bool changed )
 {
