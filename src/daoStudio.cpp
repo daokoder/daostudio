@@ -45,6 +45,10 @@ DaoHelpVIM::DaoHelpVIM( QWidget *parent ) : QDialog( parent )
 	treeWidget->setColumnWidth(1,300);
 }
 
+DaoTextBrowser::DaoTextBrowser( QWidget *parent ) : QTextBrowser( parent )
+{
+	setOpenExternalLinks( true );
+}
 void DaoTextBrowser::mousePressEvent ( QMouseEvent * event )
 {
 	QTextBrowser::mousePressEvent( event );
@@ -71,24 +75,21 @@ void DaoTextBrowser::keyPressEvent ( QKeyEvent * event )
 DaoDocViewer::DaoDocViewer( QWidget *parent, const QString & path ) 
 : DaoTextBrowser( parent )
 {
-	//viewport()->setStyleSheet( "font-family: courier; font-size: 20pt;" );
+	docRoot = path;
+	docLang = DaoStudioSettings::locale.indexOf( "zh" ) == 0 ? "zh" : "en";
+	if( QFile::exists( path + docLang + "/index.html" ) == 0 ) docLang = "en";
+
+	setSearchPaths( QStringList( path + docLang + "/" ) );
+
 	setHtml( "" );
-
-	QString lang = DaoStudioSettings::locale.indexOf( "zh" ) == 0 ? "zh" : "en";
-	if( QFile::exists( path + lang + "/index.html" ) == 0 ) lang = "en";
-
-	SetPath( path + "zh" + "/" );
-	SetRoot( path );
-
-	setLanguage( QFile::exists( path + lang + "/index.html" ) ? "中文" : "English" );
-	setSearchPaths( QStringList( path + lang + "/" ) );
 }
-void DaoTextBrowser::setLanguage( const QString & lang )
+void DaoDocViewer::setLanguage( const QString & lang )
 {
-	SetPath( docRoot + langs[lang] + "/" );
-	setSearchPaths( QStringList( docRoot + langs[lang] + "/" ) );
+	docLang = lang;
+	if( QFile::exists( docRoot + docLang + "/index.html" ) == 0 ) docLang = "en";
+
+	setSearchPaths( QStringList( docRoot + lang + "/" ) );
 }
-void DaoTryConvertFromUtf8( QString &text );
 QVariant DaoTextBrowser::loadResource ( int type, const QUrl & url )
 {
 	QByteArray bytes = QTextBrowser::loadResource( type, url ).toByteArray();
@@ -718,9 +719,10 @@ void DaoStudio::slotViewFrame( QListWidgetItem * )
 }
 void DaoStudio::slotViewDocument( QListWidgetItem *item )
 {
+	const char *const langs[] = { "en", "zh" };
 	wgtEditorTabs->setCurrentIndex(ID_DOCVIEW);
 	slotMaxEditor();
-	docViewer->setLanguage( item->text() );
+	docViewer->setLanguage( langs[ wgtDocList->currentRow() ] );
 	docViewer->reload();
 }
 void DaoStudio::slotTextChanged( bool changed )

@@ -39,24 +39,11 @@
 class DaoTextBrowser : public QTextBrowser
 {
 	Q_OBJECT
-	
-	QString docRoot;
-	QString docPath;
 
-	QMap<QString,QString> langs;
-	
 public:
-	DaoTextBrowser( QWidget *parent ) : QTextBrowser( parent ){
-		setOpenExternalLinks( true );
-		langs[tr("English")] = "en";
-		langs[tr("Chinese")] = "zh";
-	}
+	DaoTextBrowser( QWidget *parent );
 	
-	void SetRoot( const QString & path ){ docRoot = path; }
-	void SetPath( const QString & path ){ docPath = path; }
-	QString GetPath()const{ return docPath; }
 	QVariant loadResource ( int type, const QUrl & name );
-	void setLanguage( const QString & lang );
 	
 	DaoStudio *studio;
 	QTabWidget *tabWidget;
@@ -76,8 +63,13 @@ public:
 
 class DaoDocViewer : public DaoTextBrowser
 {
+	QString docRoot;
+	QString docLang;
+
 public:
 	DaoDocViewer( QWidget *parent, const QString & path="" );
+
+	void setLanguage( const QString & lang );
 };
 
 class DaoStudio : public QMainWindow, private Ui::DaoStudio

@@ -25,7 +25,7 @@ all:
 $(PLATS) :
 	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile $@
 	$(DAOMAKE) mkdir2 build
-	cd build && ../$(DAOMAKE) --mode $(MODE) --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "WenQuanYi Micro Hei Mono" $(OPT_INSTALL) ../Dao
+	cd build && ../$(DAOMAKE) --mode $(MODE) --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "Courier Code" $(OPT_INSTALL) ../Dao
 	cd build && $(MAKE) -f Makefile.daomake
 	qmake -o Makefile.qmake DaoStudio.pro
 	$(MAKE) -f Makefile.qmake
@@ -33,7 +33,7 @@ $(PLATS) :
 linux-local:
 	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile linux
 	$(DAOMAKE) mkdir2 build
-	cd build && ../$(DAOMAKE) --mode $(MODE) --platform linux --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "WenQuanYi Micro Hei Mono" $(OPT_INSTALL) ../Dao
+	cd build && ../$(DAOMAKE) --mode $(MODE) --platform linux --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "Courier Code" $(OPT_INSTALL) ../Dao
 	cd build && $(MAKE) -f Makefile.daomake
 	qmake -o Makefile.qmake DaoStudio.pro
 	$(MAKE) -f Makefile.qmake
@@ -55,7 +55,7 @@ linux-local:
 macosx :
 	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile $@
 	$(DAOMAKE) mkdir2 build
-	cd build && ../$(DAOMAKE) --mode $(MODE) --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "WenQuanYi Micro Hei Mono" $(OPT_INSTALL_MAC) ../Dao
+	cd build && ../$(DAOMAKE) --mode $(MODE) --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "Courier Code" $(OPT_INSTALL_MAC) ../Dao
 	cd build && $(MAKE) -f Makefile.daomake
 	qmake -spec macx-g++ -o Makefile.qmake DaoStudio.pro
 	$(MAKE) -f Makefile.qmake
@@ -65,7 +65,7 @@ macosx :
 mingw :
 	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile $@
 	$(DAOMAKE) mkdir2 build
-	cd build && ../$(DAOMAKE) --mode $(MODE) --platform $@ --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "WenQuanYi Micro Hei Mono" $(OPT_INSTALL_WIN) ../Dao
+	cd build && ../$(DAOMAKE) --mode $(MODE) --platform $@ --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "Courier Code" $(OPT_INSTALL_WIN) ../Dao
 	cd build && $(MAKE) -f Makefile.daomake
 	$(QT_DIR)/bin/qmake -o Makefile.qmake DaoStudio.pro
 	$(MAKE) -f Makefile.qmake
