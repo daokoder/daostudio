@@ -7,7 +7,7 @@ An Integrated Development Environment for Dao.
 
 DaoStudio requires Dao and Qt4 to build.
 
-To build, Dao should be presented as a subdirectory "dao" under
+To build, Dao should be presented as a subdirectory "Dao" under
 the root directory of DaoStudio. Then the following command can
 be used to build DaoStudio:
 

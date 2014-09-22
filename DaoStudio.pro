@@ -11,8 +11,8 @@ CONFIG += thread release
 QT += network
 
 DEPENDPATH += . src
-INCLUDEPATH += . src dao/kernel dao/modules/serializer
-INCLUDEPATH += dao/modules/debugger dao/modules/profiler
+INCLUDEPATH += . src Dao/kernel Dao/modules/serializer
+INCLUDEPATH += Dao/modules/debugger Dao/modules/profiler
 
 DEFINES += DAO_WITH_THREAD
 DEFINES += DAO_WITH_NUMARRAY
