@@ -23,7 +23,7 @@ all:
 	@echo "Please choose a platform!"
 
 $(PLATS) :
-	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile $@
+	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile $@ PLAT=$@
 	$(DAOMAKE) mkdir2 build
 	cd build && ../$(DAOMAKE) --mode $(MODE) --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "Courier Code" $(OPT_INSTALL) ../Dao
 	cd build && $(MAKE) -f Makefile.daomake
@@ -31,7 +31,7 @@ $(PLATS) :
 	$(MAKE) -f Makefile.qmake
 
 linux-local:
-	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile linux
+	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile linux  PLAT=linux
 	$(DAOMAKE) mkdir2 build
 	cd build && ../$(DAOMAKE) --mode $(MODE) --platform linux --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "Courier Code" $(OPT_INSTALL) ../Dao
 	cd build && $(MAKE) -f Makefile.daomake
@@ -53,7 +53,7 @@ linux-local:
 	chmod +x $(INSTALL)/DaoStudio
 
 macosx :
-	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile $@
+	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile $@  PLAT=$@
 	$(DAOMAKE) mkdir2 build
 	cd build && ../$(DAOMAKE) --mode $(MODE) --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "Courier Code" $(OPT_INSTALL_MAC) ../Dao
 	cd build && $(MAKE) -f Makefile.daomake
@@ -63,7 +63,7 @@ macosx :
 	./update_bundle.sh
 
 mingw :
-	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile $@
+	cd $(DAOMAKE_DIR) && $(MAKE) -f Makefile $@  PLAT=$@
 	$(DAOMAKE) mkdir2 build
 	cd build && ../$(DAOMAKE) --mode $(MODE) --platform $@ --suffix .daomake --option-CODE-STATE ON --option-HELP-PATH ../Dao/modules/help --option-HELP-FONT "Courier Code" $(OPT_INSTALL_WIN) ../Dao
 	cd build && $(MAKE) -f Makefile.daomake
