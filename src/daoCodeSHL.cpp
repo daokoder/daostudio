@@ -351,7 +351,7 @@ const char *pat_cxx_method =
 "( (%w+) :: | ) ((( %w+ | operator %W+ ))) %s* %b() %s* [^%S;]* $";
 
 const char *pat_dao_method =
-"^(routine|function|sub|operator) %s+ (%w+ %s* :: %s* |) %w+ %s* %b() %s* [^%S;]* $";
+"^(routine) %s+ (%w+ %s* :: %s* |) %w+ %s* %b() %s* [^%S;]* $";
 
 const char *pat_python_method =
 "def %s+ %w+ %s* %b() %s* :";
@@ -1317,7 +1317,8 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 		case DKEY_SWITCH : case DKEY_CASE : case DKEY_DEFAULT :
 			format = formatStmtKey;
 			break;
-		case DKEY_ANY : case DKEY_NONE :
+		case DKEY_ANY :
+		case DKEY_BOOL :
 		case DKEY_INT : case DKEY_FLOAT : case DKEY_COMPLEX :
 		case DKEY_STRING : case DKEY_ENUM :
 		case DKEY_LIST : case DKEY_MAP : case DKEY_TUPLE : case DKEY_ARRAY :
@@ -1326,6 +1327,8 @@ void DaoCodeSHL::highlightBlock ( const QString & text )
 			format = formatTypeStruct;
 			break;
 		case DKEY_SELF :
+		case DKEY_NONE :
+		case DKEY_TRUE : case DKEY_FALSE :
 			format = formatStdobj;
 			break;
 		case DTOK_ID_THTYPE :

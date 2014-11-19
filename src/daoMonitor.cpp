@@ -147,6 +147,12 @@ void DaoMonitor::slotUpdateMonitor( const QByteArray & serial )
 		return;
 	}
 #endif
+#if 0
+	DaoStream *stream = DaoStream_New();
+	DaoValue_Print( (DaoValue*) tuple, NULL, stream, NULL );
+	DaoGC_TryDelete( (DaoValue*) stream );
+#endif
+	
 	int subtype = tuple->values[INDEX_SUBTYPE]->xInteger.value;
 	currentType = tuple->values[INDEX_TYPE]->xInteger.value;
 	currentEntry = tuple->values[INDEX_ENTRY]->xInteger.value;
@@ -246,6 +252,9 @@ void DaoMonitor::ViewArray( DaoTuple *tuple )
 		}
 		QString elem;
 		switch( array->etype ){
+		case DAO_BOOLEAN :
+			elem = QString::number( array->data.b[i] );
+			break;
 		case DAO_INTEGER :
 			elem = QString::number( array->data.i[i] );
 			break;
