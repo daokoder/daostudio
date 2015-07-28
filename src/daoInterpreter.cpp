@@ -63,8 +63,9 @@ static void DaoResetExecution( DaoProcess *process, int line, int offset=0 )
 	//DaoVmCodeX_Print( *annotCodes[i], NULL );
 	//printf( "entry: %s\n", annotCodes[i]->annot->chars->data );
 }
-static void DaoStdioRead( DaoConsoleStream *self, DString *buf, int count )
+static int DaoStdioRead( DaoStream *stream, DString *buf, int count )
 {
+	DaoConsoleStream *self = (DaoConsoleStream*) stream;
 	fflush( stdout );
 	self->interpreter->mutex.lock();
 	self->interpreter->waiting = true;
@@ -85,7 +86,7 @@ static void DaoStdioRead( DaoConsoleStream *self, DString *buf, int count )
 	}
 	if( self->interpreter->vmSpace->stopit ){
 		self->interpreter->mutex.unlock();
-		return;
+		return 0;
 	}
 	if( self->socket.state() == QLocalSocket::ConnectedState ){
 		self->socket.waitForReadyRead( 1000 );
@@ -94,9 +95,12 @@ static void DaoStdioRead( DaoConsoleStream *self, DString *buf, int count )
 	//QString s = QString::fromUtf8( data.data(), data.size() );
 	DString_SetBytes( buf, data.data(), data.size() );
 	self->interpreter->mutex.unlock();
+	return buf->size;
 }
-static void DaoStdioWrite( DaoConsoleStream *self, DString *buf )
+static int DaoStdioWrite( DaoStream *stream, const void *data, int count )
 {
+	DaoConsoleStream *self = (DaoConsoleStream*) stream;
+	DString buf = DString_WrapBytes( (char*) data, count );
 #if 0
 	FILE *fout = fopen( "output.txt", "a+" );
 	time_t t = time(NULL);
@@ -104,27 +108,30 @@ static void DaoStdioWrite( DaoConsoleStream *self, DString *buf )
 	fprintf( fout, "%s\n", DString_GetData( buf ) );
 	fclose( fout );
 #endif
-	DaoFile_WriteString( stdout, buf );
+	DaoFile_WriteString( stdout, & buf );
 	fflush( stdout );
 	fflush( stderr );
-	return;
+	return count;
 	self->interpreter->mutex.lock();
-	self->socket2.write( DString_GetData( buf ), DString_Size( buf ) );
+	self->socket2.write( (const char*)data, count );
 	self->socket2.flush();
 	self->interpreter->mutex.unlock();
+	return count;
 }
-static void DaoSudio_SetColor( DaoConsoleStream *self, const char *fgcolor, const char *bgcolor )
+static int DaoSudio_SetColor( DaoStream *stream, const char *fgcolor, const char *bgcolor )
 {
 	char buf[32];
+	DaoConsoleStream *self = (DaoConsoleStream*) stream;
 	int n = sprintf( buf, "\1%s:%s\2", fgcolor?fgcolor:"", bgcolor?bgcolor:"" );
 	printf( "%s", buf );
 	fflush( stdout );
 	fflush( stderr );
-	return;
+	return 1;
 	self->interpreter->mutex.lock();
 	self->socket2.write( buf, n );
 	self->socket2.flush();
 	self->interpreter->mutex.unlock();
+	return 0;
 }
 static void DaoConsDebug( DaoVmDebugger *self, DaoProcess *process, DaoStream *stream )
 {
@@ -220,12 +227,12 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 #ifdef MAC_OSX
 	DString_SetChars( base, programPath.toLocal8Bit().data() );
 	DString_SetChars( mod, "../Frameworks/bin/" );
-	Dao_MakePath( base, mod );
+	DString_MakePath( base, mod );
 	daoBinPath = QString::fromUtf8( mod->chars, mod->size );
 #elif defined(WIN32)
 	DString_SetChars( base, programPath.toLocal8Bit().data() );
 	DString_SetChars( mod, "./bin/" );
-	Dao_MakePath( base, mod );
+	DString_MakePath( base, mod );
 	daoBinPath = QString::fromUtf8( mod->chars, mod->size );
 #endif
 
@@ -241,15 +248,15 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 	handler.InvokeHost = DaoProcessEvents;
 	handler.timer.start();
 
-	stdioStream.stdRead = DaoStdioRead;
-	stdioStream.stdWrite = DaoStdioWrite;
-	stdioStream.stdFlush = NULL;
-	stdioStream.SetColor = DaoSudio_SetColor;
+	stdioStream.base.Read = DaoStdioRead;
+	stdioStream.base.Write = DaoStdioWrite;
+	stdioStream.base.Flush = NULL;
+	stdioStream.base.SetColor = DaoSudio_SetColor;
 	stdioStream.interpreter = this;
-	errorStream.stdRead = DaoStdioRead;
-	errorStream.stdWrite = DaoStdioWrite;
-	errorStream.stdFlush = NULL;
-	errorStream.SetColor = DaoSudio_SetColor;
+	errorStream.base.Read = DaoStdioRead;
+	errorStream.base.Write = DaoStdioWrite;
+	errorStream.base.Flush = NULL;
+	errorStream.base.SetColor = DaoSudio_SetColor;
 	errorStream.interpreter = this;
 	guiDebugger.debugger = & this->debugger;
 	guiDebugger.interpreter = this;
@@ -268,11 +275,11 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 	cmdDebugger.process = DaoVmSpace_MainProcess( vmSpace );
 	handler.process = DaoVmSpace_MainProcess( vmSpace );
 	profiler = DaoxProfiler_New();
-	DaoVmSpace_SetUserStdio( vmSpace, (DaoUserStream*) & stdioStream );
-	//DaoVmSpace_SetUserStdError( vmSpace, (DaoUserStream*) & errorStream );
-	DaoVmSpace_SetUserStdError( vmSpace, (DaoUserStream*) & stdioStream );
-	//DaoVmSpace_SetUserDebugger( vmSpace, (DaoDebugger*) & guiDebugger );
-	DaoVmSpace_SetUserHandler( vmSpace, (DaoUserHandler*) & handler );
+	DaoVmSpace_SetStdio( vmSpace, (DaoStream*) & stdioStream );
+	//DaoVmSpace_SetStdError( vmSpace, (DaoStream*) & errorStream );
+	DaoVmSpace_SetStdError( vmSpace, (DaoStream*) & stdioStream );
+	//DaoVmSpace_SetDebugger( vmSpace, (DaoDebugger*) & guiDebugger );
+	DaoVmSpace_SetHandler( vmSpace, (DaoUserHandler*) & handler );
 
 	DaoNamespace *ns = vmSpace->mainNamespace;
 	DString_SetChars( ns->name, "interactive codes" );
@@ -305,7 +312,7 @@ DaoInterpreter::DaoInterpreter( const char *cmd ) : QObject()
 #ifdef MAC_OSX
 	DString_SetChars( base, programPath.toLocal8Bit().data() );
 	DString_SetChars( mod, "../Frameworks/lib/dao/modules/" );
-	Dao_MakePath( base, mod );
+	DString_MakePath( base, mod );
 	DaoVmSpace_AddPath( vmSpace, mod->chars );
 #else
 	DaoVmSpace_AddPath( vmSpace, programPath.toLocal8Bit().data() );
@@ -465,20 +472,20 @@ void DaoInterpreter::slotStartExecution()
 		char id = script[0];
 		switch( id ){
 		case 0 :
-			DaoVmSpace_SetUserDebugger( vmSpace, NULL );
+			DaoVmSpace_SetDebugger( vmSpace, NULL );
 			break;
 		case 1 :
-			DaoVmSpace_SetUserDebugger( vmSpace, (DaoDebugger*) & cmdDebugger );
+			DaoVmSpace_SetDebugger( vmSpace, (DaoDebugger*) & cmdDebugger );
 			break;
 		case 2 :
-			DaoVmSpace_SetUserDebugger( vmSpace, (DaoDebugger*) & guiDebugger );
+			DaoVmSpace_SetDebugger( vmSpace, (DaoDebugger*) & guiDebugger );
 			break;
 		}
 		scriptSocket->disconnectFromServer();
 		return;
 	}else if( info == DAO_PROFILER_SWITCH ){
 		char checked = script[0];
-		DaoVmSpace_SetUserProfiler( vmSpace, checked ? (DaoProfiler*) profiler : NULL );
+		DaoVmSpace_SetProfiler( vmSpace, checked ? (DaoProfiler*) profiler : NULL );
 		scriptSocket->disconnectFromServer();
 		return;
 	}

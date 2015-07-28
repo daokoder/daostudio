@@ -53,11 +53,8 @@ extern "C"{
 
 struct DaoConsoleStream
 {
-	DaoStream *stream;
-	void (*stdRead)( DaoConsoleStream *self, DString *buf, int count );
-	void (*stdWrite)( DaoConsoleStream *self, DString *str );
-	void (*stdFlush)( DaoConsoleStream *self );
-	void (*SetColor)( DaoConsoleStream *self, const char *fgcolor, const char *bgcolor );
+	DaoStream  base;
+
 	DaoInterpreter	*interpreter;
 	DaoProcess   *process;
 	QLocalSocket  socket;

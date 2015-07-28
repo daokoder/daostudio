@@ -11,7 +11,7 @@ CONFIG += thread release
 QT += network
 
 DEPENDPATH += . src
-INCLUDEPATH += . src Dao/kernel Dao/modules/serializer
+INCLUDEPATH += . src Dao/kernel Dao/modules/auxlib Dao/modules/serializer
 INCLUDEPATH += Dao/modules/debugger Dao/modules/profiler
 
 DEFINES += DAO_WITH_THREAD
@@ -51,10 +51,10 @@ FORMS += src/daoStudio.ui \
 RESOURCES += DaoStudio.qrc
 TRANSLATIONS = langs/daostudio_zh_cn.ts
 
-DEPENDPATH += build
+DEPENDPATH += build/lib
 DEPENDPATH += build/lib/dao/modules
 
-LIBS += -Lbuild -Lbuild/lib/dao/modules
+LIBS += -Lbuild/lib -Lbuild/lib/dao/modules
 LIBS += -ldao -ldao_serializer -ldao_debugger -ldao_profiler
 
 
